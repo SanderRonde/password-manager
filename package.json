@@ -1,0 +1,10 @@
+{
+  "name": "password-manager-server",
+  "version": "1.0.0",
+  "description": "The server-side implementation of a password manager",
+  "main": "app/main.js",
+  "repository": "https://github.com/SanderRonde/password-manager-server",
+  "author": "Sander Ronde <awsdfgvhbjn@gmail.com>",
+  "license": "MIT",
+  "private": true
+}

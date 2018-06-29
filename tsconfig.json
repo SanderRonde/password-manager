@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "alwaysStrict": true,
+        "baseUrl": "./typings/",
+        "forceConsistentCasingInFileNames": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "removeComments": true,
+        "preserveConstEnums": false,
+        "listFiles": false,
+        "pretty": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "target": "es6",
+        "noUnusedParameters": true,
+        "experimentalDecorators": true
+	}, 
+    "allowJs": true,
+    "compileOnSave": true,
+    "include": [
+        "app/",
+    ]
+}
