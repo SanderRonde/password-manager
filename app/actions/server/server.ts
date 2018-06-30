@@ -10,6 +10,7 @@ export interface ServerArgs {
 	https_cert?: string;
 	dbpath: string;
 	password?: string;
+	database: string;
 }
 
 export interface ServerConfig extends ServerArgs {

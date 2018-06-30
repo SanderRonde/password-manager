@@ -6,7 +6,9 @@ import fs = require('fs');
 
 export function readFile(filePath: string): Promise<string> {
 	return new Promise<string>((resolve, reject) => {
-		fs.readFile(filePath, (err, data) => {
+		fs.readFile(filePath, {
+			encoding: 'utf8'
+		}, (err, data) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -33,7 +35,9 @@ export function writeFile(filePath: string, data: string) {
 		await assertDir(path.dirname(filePath)).catch((err) => {
 			resolve(err);
 		});
-		fs.writeFile(filePath, data, (err) => {
+		fs.writeFile(filePath, data, {
+			encoding: 'utf8'
+		}, (err) => {
 			if (err) {
 				reject(err);
 			} else {

@@ -11,6 +11,7 @@ export interface BackupArgs {
 	password?: string;
 	input?: string;
 	output?: string;
+	database: string;
 }
 
 export interface BackupConfig extends BackupArgs {

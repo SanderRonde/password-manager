@@ -14,11 +14,15 @@ commander
 	.description('create or delete an account')
 	.option('-a, --account <email>', 'Account name (email)')
 	.option('-p, --password <pw>', 'The password used to decrypt the database')
+	.option('-d, --database <location>', 'The path to the database', 
+		'mongodb://127.0.0.1:27017/pwmanager')
 	.action(async (action: string, { 
 		account: email,
+		database: databasePath,
 		password: dbPassword
 	}: { 
 		account: string;
+		database: string;
 		password?: string;
 	}) => {
 		if (!email) {
@@ -26,10 +30,10 @@ commander
 		}
 		switch (action.toLowerCase()) {
 			case 'create':
-				Account.CreateAccount.createAccount(email, await getDatabase(dbPassword, true));
+				Account.CreateAccount.createAccount(email, await getDatabase(databasePath, dbPassword, true));
 				break;
 			case 'delete':
-				Account.DeleteAccount.deleteAccount(email, await getDatabase(dbPassword, true));
+				Account.DeleteAccount.deleteAccount(email, await getDatabase(databasePath, dbPassword, true));
 				break;
 			default:
 				exitWith('Invalid account action, choose "create" or "delete"');
@@ -43,6 +47,8 @@ commander
 	.option('-p, --password', 'A password that is used to encrpt/decrypt the backup file')
 	.option('-i, --input', 'The path to the backup file to load (if using "load")')
 	.option('-o, --output', 'The path to the backup file output (if using "local")')
+	.option('-d, --database <location>', 'The path to the database', 
+		'mongodb://127.0.0.1:27017/pwmanager')
 	.action(async (method: string, settings: BackupSettings) => {
 		if (settings.config) {
 			settings = {
@@ -60,6 +66,9 @@ commander
 						'the "load" option. This seems a bit conflicting,' +
 						' remove the config option to continue');
 				}
+				if (!settings.input) {
+					exitWith('No input was specified');
+				}
 				break;
 			case 'drive':
 			case 'google':
@@ -74,6 +83,9 @@ commander
 				Backup.Dropbox.backup(settings);
 				break;
 			case 'local':
+				if (!settings.output) {
+					exitWith('No output was specified');
+				}
 				Backup.Local.backup(settings);
 				break;
 			default:
@@ -91,6 +103,8 @@ commander
 	.option('--https-key <https_key>', 'The path to the HTTPS key')
 	.option('--https-cert <https_cert>', 'The path to the HTTPS cert')
 	.option('-p, --password <pw>', 'The password used to decrypt the database')
+	.option('-d, --database <location>', 'The path to the database', 
+		'mongodb://127.0.0.1:27017/pwmanager')
 	.action(async (settings: ServerSettings) => {
 		if (settings.config) {
 			settings = {
@@ -99,7 +113,8 @@ commander
 				isConfig: true
 			}
 		}
-		Server.run(await getDatabase(settings.password, false), settings);
+		Server.run(await getDatabase(settings.database, settings.password, false),
+			settings);
 	});
 
 commander

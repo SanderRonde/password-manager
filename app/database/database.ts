@@ -4,29 +4,30 @@ import { exitWith } from '../lib/util';
 import promptly = require('promptly');
 import mongo = require('mongodb');
 
-export async function getDatabase(key: string, quitOnError: boolean): Promise<Database> {
-	const instance = await new Database(quitOnError).init();
+export async function getDatabase(dbPath: string, key: string, 
+		quitOnError: boolean): Promise<Database> {
+		const instance = await new Database(dbPath, quitOnError).init();
 
-	const isReadline = !!key;
-	if (!isReadline) {
-		if (instance.canDecrypt(key)) {
-			instance.setKey(key);
-			return instance;
-		}
-		exitWith('Database can\'t be decrypted with that key; password invalid');		
-	} else {
-		//Give them 5 tries
-		for (let i = 0; i < 5; i++) {
-			console.log(`Attempt ${i + 1}/5`);
-			const password = await promptly.password('Please enter the database password');
-			if (instance.canDecrypt(password)) {
-				instance.setKey(password);
+		const isReadline = !!key;
+		if (!isReadline) {
+			if (instance.canDecrypt(key)) {
+				instance.setKey(key);
 				return instance;
 			}
+			exitWith('Database can\'t be decrypted with that key; password invalid');		
+		} else {
+			//Give them 5 tries
+			for (let i = 0; i < 5; i++) {
+				console.log(`Attempt ${i + 1}/5`);
+				const password = await promptly.password('Please enter the database password');
+				if (instance.canDecrypt(password)) {
+					instance.setKey(password);
+					return instance;
+				}
+			}
 		}
+		return exitWith('Database can\'t be decrypted with that key; password invalid');
 	}
-	return exitWith('Database can\'t be decrypted with that key; password invalid');
-}
 
 export type DatabaseEncrypted<T> = {
 	data: string;
@@ -133,7 +134,7 @@ export class Database {
 	}
 
 
-	constructor(private _quitOnError: boolean) { }
+	constructor(private _dbPath: string, private _quitOnError: boolean) { }
 
 	public async init() {
 		if (this._initialized) {
@@ -182,7 +183,7 @@ export class Database {
 	}
 
 	private async _connectToMongo(): Promise<mongo.Db> {
-		return await mongo.connect('mongodb://127.0.0.1:27017/pwmanager').catch((err) => {
+		return await mongo.connect(this._dbPath).catch((err) => {
 			if (err !== null && err) {
 				if (err.message.includes('ECONNREFUSED')) {
 					exitWith('Looks like you didn\'t start the mongodb service');
