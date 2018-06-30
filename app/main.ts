@@ -26,10 +26,10 @@ commander
 		}
 		switch (action.toLowerCase()) {
 			case 'create':
-				Account.CreateAccount.createAccount(email, await getDatabase(dbPassword));
+				Account.CreateAccount.createAccount(email, await getDatabase(dbPassword, true));
 				break;
 			case 'delete':
-				Account.DeleteAccount.deleteAccount(email, await getDatabase(dbPassword));
+				Account.DeleteAccount.deleteAccount(email, await getDatabase(dbPassword, true));
 				break;
 			default:
 				exitWith('Invalid account action, choose "create" or "delete"');
@@ -99,7 +99,7 @@ commander
 				isConfig: true
 			}
 		}
-		Server.run(await getDatabase(settings.password), settings);
+		Server.run(await getDatabase(settings.password, false), settings);
 	});
 
 commander

@@ -1,11 +1,11 @@
+import { encrypt, decrypt } from '../lib/crypto';
+import { CONSTANTS } from '../lib/constants';
 import { exitWith } from '../lib/util';
 import promptly = require('promptly');
-import crypto = require('crypto');
 import mongo = require('mongodb');
-import { EncryptedAccount } from '../actions/account/account';
 
-export async function getDatabase(key: string): Promise<Database> {
-	const instance = await new Database().init();
+export async function getDatabase(key: string, quitOnError: boolean): Promise<Database> {
+	const instance = await new Database(quitOnError).init();
 
 	const isReadline = !!key;
 	if (!isReadline) {
@@ -17,6 +17,7 @@ export async function getDatabase(key: string): Promise<Database> {
 	} else {
 		//Give them 5 tries
 		for (let i = 0; i < 5; i++) {
+			console.log(`Attempt ${i + 1}/5`);
 			const password = await promptly.password('Please enter the database password');
 			if (instance.canDecrypt(password)) {
 				instance.setKey(password);
@@ -27,12 +28,94 @@ export async function getDatabase(key: string): Promise<Database> {
 	return exitWith('Database can\'t be decrypted with that key; password invalid');
 }
 
-export type Encrypted<T> = string & {
-	__data: T;
+export type DatabaseEncrypted<T> = {
+	data: string;
+	algorithm: string;
+	__data?: T;
+}
+
+export type MasterPasswordEncrypted<T> = string & {
+	__encrypted: T;
 }
 
 export type Hashed<T> = string & {
 	__hashed: T;
+}
+
+type MongoRecord<T> = T & {
+	_id: TypedObjectID<T>;
+}
+
+export interface EncryptedAccount {
+	email: DatabaseEncrypted<EncodedString<string>>;
+	pw: DatabaseEncrypted<EncodedString<Hashed<string>>>;
+}
+
+export interface DecryptedAccount {
+	email: string;
+	pw: Hashed<string>;
+}
+
+declare class TypedObjectID<T> extends mongo.ObjectID { }
+
+type StringifiedObjectId<T> = string & {
+	__id: TypedObjectID<T>;
+}
+
+interface TypedCollection<C = any> extends mongo.Collection<C> {
+	findOne<T = C>(filter: {
+		_id: TypedObjectID<T>;
+	}, callback: mongo.MongoCallback<T | null>): void;
+	findOne<T = C>(filter: {
+		_id: TypedObjectID<T>;
+	}, options?: mongo.FindOneOptions): Promise<T | null>;
+    findOne<T = C>(filter: {
+		_id: TypedObjectID<T>;
+	}, options: mongo.FindOneOptions, callback: mongo.MongoCallback<T | null>): void;
+	findOne<T = C>(filter: mongo.FilterQuery<C>, callback: mongo.MongoCallback<T | null>): void;
+    findOne<T = C>(filter: mongo.FilterQuery<C>, options?: mongo.FindOneOptions): Promise<T | null>;
+    findOne<T = C>(filter: mongo.FilterQuery<C>, options: mongo.FindOneOptions, callback: mongo.MongoCallback<T | null>): void;
+}
+
+export interface Instance {
+	instance_id: number;
+	twofactor_enabled: boolean;
+	public_key:DatabaseEncrypted<EncodedString<string>>; 
+	user_id: TypedObjectID<EncryptedAccount>;
+}
+
+export interface EncryptedPassword {
+	user_id: DatabaseEncrypted<EncodedString<StringifiedObjectId<EncryptedAccount>>>;
+	websites: DatabaseEncrypted<EncodedString<string>>[];
+	encrypted: DatabaseEncrypted<EncodedString<{
+		username: string;
+		encrypted: MasterPasswordEncrypted<EncodedString<{
+			password: string;
+			notes: string[];
+		}>>;
+	}>>;
+}
+
+export interface DecryptedPassword {
+	user_id: TypedObjectID<EncryptedAccount>;
+	websites: string[];
+	username: string;
+	encrypted: MasterPasswordEncrypted<EncodedString<{
+		password: string;
+		notes: string[];
+	}>>;
+}
+
+export enum COLLECTIONS {
+	USERS,
+	INSTANCES,
+	PASSWORDS
+}
+
+interface EncryptedCollectionRecords {
+	[COLLECTIONS.USERS]: EncryptedAccount;
+	[COLLECTIONS.INSTANCES]: Instance;
+	[COLLECTIONS.PASSWORDS]: EncryptedPassword;
 }
 
 export class Database {
@@ -44,13 +127,13 @@ export class Database {
 		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
 
 	public collections: {
-		users: mongo.Collection<EncryptedAccount>;
-		instances: mongo.Collection;
-		passwords: mongo.Collection;
+		users: TypedCollection<MongoRecord<EncryptedAccount>>;
+		instances: TypedCollection<MongoRecord<Instance>>;
+		passwords: TypedCollection<MongoRecord<EncryptedPassword>>;
 	}
 
 
-	constructor() { }
+	constructor(private _quitOnError: boolean) { }
 
 	public async init() {
 		if (this._initialized) {
@@ -117,49 +200,108 @@ export class Database {
 		}
 	}
 
-	private _encrypt<T>(data: T, key: string = this._deObfuscateKey()): Encrypted<EncodedString<T>> {
-		const sha256 = crypto.createHash('sha256');
-		sha256.update(key);
-
-		const iv = crypto.randomBytes(16);
-		const plaintext = new Buffer(JSON.stringify(data));
-		const cipher = crypto.createCipheriv('aes-256-ctr', sha256.digest(), iv);
-		const ciphertext = cipher.update(plaintext);
-		const finalText = Buffer.concat([iv, ciphertext, cipher.final()]);
-	
-		return finalText.toString('base64') as Encrypted<EncodedString<T>>;
+	private _err(message: string) {
+		if (this._quitOnError) {
+			throw new Error(message);
+		} else {
+			console.log(message);
+		}
 	}
 
-	private _decrypt<T>(data: Encrypted<EncodedString<T>>, key: string = this._deObfuscateKey()): T {
-		const sha256 = crypto.createHash('sha256');
-		sha256.update(key);
-
-		const input = new Buffer(data, 'base64');
-		const iv = input.slice(0, 16);
-		const ciphertext = input.slice(16);
-		const decipher = crypto.createDecipheriv('aes-256-ctr', sha256.digest(), iv);
-		const plaintext = decipher.update(ciphertext);
-
-		return JSON.parse(plaintext.toString() + decipher.final());
+	private _getCollection<C extends COLLECTIONS>(collection: C): TypedCollection<EncryptedCollectionRecords[C]> {
+		switch (collection) {
+			case COLLECTIONS.USERS:
+				return this.collections.users;
+			case COLLECTIONS.INSTANCES:
+				return this.collections.instances;
+			case COLLECTIONS.PASSWORDS:
+				return this.collections.passwords;
+		}
+		this._err('Could not find given collection');
+		return null;
 	}
+
+	public dbEncrypt<T>(data: T, 
+		key: string = this._deObfuscateKey()): DatabaseEncrypted<EncodedString<T>> {
+			return encrypt(data, key, CONSTANTS.algorithm);
+		}
+
+	public dbDecrypt<T>(data: DatabaseEncrypted<EncodedString<T>>, 
+		key: string = this._deObfuscateKey()): T {
+			return decrypt(data, key);
+		}
 
 	public async canDecrypt(key: string) {
 		const record = await this._mongoInstance.collection('meta').findOne({
-			index: 1
+			type: 'database'
 		});
 		if (!record) {
 			//Uninitialized database, initialize now
 			console.log('Empty database, creating with this key');
 			await this._mongoInstance.collection('meta').insertOne({
-				index: 1,
-				data: this._encrypt('decrypted', key)
+				type: 'database',
+				data: this.dbEncrypt('decrypted', key)
 			});
 			return true;
 		}
-		return this._decrypt(record.data, key) === 'decrypted';
+		return this.dbDecrypt(record.data, key) === 'decrypted';
 	}
 
 	public setKey(key: string) {
 		this._obfuscatedKey = this._obfuscateKey(key);
 	}
+
+	public async insertOne<R extends EncryptedCollectionRecords[C], 
+		C extends COLLECTIONS>(collectionName: C, record: R) {
+			const collection = this._getCollection(collectionName);
+			if (!collection) {
+				return;
+			}
+
+			const { result: { ok } } = await collection.insertOne(record);
+			if (!ok) {
+				this._err('Failed to insert record into the database');
+			}
+		}
+
+	public async findOne<R extends EncryptedCollectionRecords[C], 
+		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>): Promise<MongoRecord<R> | null> {
+			const collection = this._getCollection(collectionName);
+			if (!collection) {
+				return null;
+			}
+
+			const record = await collection.findOne(filter);
+			if (record) {
+				return record as MongoRecord<R>;
+			}
+			return null;
+		}
+
+	public async deleteOne<R extends EncryptedCollectionRecords[C], 
+		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>): Promise<void> {
+			const collection = this._getCollection(collectionName);
+			if (!collection) {
+				return;
+			}
+
+			const {  result: { ok } } = await collection.deleteOne(filter);
+			if (!ok) {
+				this._err('Failed to delete record');
+			}
+		}
+
+	public async deleteMany<R extends EncryptedCollectionRecords[C], 
+		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>): Promise<void> {
+			const collection = this._getCollection(collectionName);
+			if (!collection) {
+				return;
+			}
+
+			const { deletedCount } = await collection.deleteMany(filter);
+			if (!deletedCount) {
+				this._err('Failed to delete record');
+			}
+		}
+
 }

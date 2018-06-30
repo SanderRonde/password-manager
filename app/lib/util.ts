@@ -1,4 +1,5 @@
 import commentJson = require('comment-json');
+import promptly = require('promptly');
 import mkdirp = require('mkdirp');
 import path = require('path');
 import fs = require('fs');
@@ -49,4 +50,15 @@ export async function readJSON<T>(filePath: string): Promise<T> {
 export function exitWith(err: string): never {
 	console.log(err);
 	return process.exit(1);
+}
+
+export async function getConfirmedPassword(msg: string): Promise<string> {
+	while (true) {
+		const password = await promptly.password(msg);
+		if (await promptly.password('Please confirm your password') === password) {
+			return password;
+		} else {
+			console.log('Passwords don\'t match, please try again\n');
+		}
+	}
 }
