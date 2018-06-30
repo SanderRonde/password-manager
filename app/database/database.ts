@@ -2,6 +2,7 @@ import { exitWith } from '../lib/util';
 import promptly = require('promptly');
 import crypto = require('crypto');
 import mongo = require('mongodb');
+import { EncryptedAccount } from '../actions/account/account';
 
 export async function getDatabase(key: string): Promise<Database> {
 	const instance = await new Database().init();
@@ -26,18 +27,27 @@ export async function getDatabase(key: string): Promise<Database> {
 	return exitWith('Database can\'t be decrypted with that key; password invalid');
 }
 
+export type Encrypted<T> = string & {
+	__data: T;
+}
+
+export type Hashed<T> = string & {
+	__hashed: T;
+}
+
 export class Database {
 	private _initialized: boolean = false;
 	private _mongoInstance: mongo.Db;
-	private _collections: {
-		users: mongo.Collection;
-		instances: mongo.Collection;
-		passwords: mongo.Collection;
-	}
 	private _obfuscatedKey: string;
 	private _keySpacing: number;
 	private readonly _obfuscateChars = 
 		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
+
+	public collections: {
+		users: mongo.Collection<EncryptedAccount>;
+		instances: mongo.Collection;
+		passwords: mongo.Collection;
+	}
 
 
 	constructor() { }
@@ -47,7 +57,7 @@ export class Database {
 			return this;
 		}
 		this._mongoInstance = await this._connectToMongo();
-		this._collections = await this._getCollections();
+		this.collections = await this._getCollections();
 		this._initialized = true;
 		return this;
 	}
@@ -107,20 +117,20 @@ export class Database {
 		}
 	}
 
-	private _encrypt(data: string, key: string = this._deObfuscateKey()) {
+	private _encrypt<T>(data: T, key: string = this._deObfuscateKey()): Encrypted<EncodedString<T>> {
 		const sha256 = crypto.createHash('sha256');
 		sha256.update(key);
 
 		const iv = crypto.randomBytes(16);
-		const plaintext = new Buffer(data);
+		const plaintext = new Buffer(JSON.stringify(data));
 		const cipher = crypto.createCipheriv('aes-256-ctr', sha256.digest(), iv);
 		const ciphertext = cipher.update(plaintext);
 		const finalText = Buffer.concat([iv, ciphertext, cipher.final()]);
 	
-		return finalText.toString('base64');
+		return finalText.toString('base64') as Encrypted<EncodedString<T>>;
 	}
 
-	private _decrypt(data: string, key: string = this._deObfuscateKey()) {
+	private _decrypt<T>(data: Encrypted<EncodedString<T>>, key: string = this._deObfuscateKey()): T {
 		const sha256 = crypto.createHash('sha256');
 		sha256.update(key);
 
@@ -130,7 +140,7 @@ export class Database {
 		const decipher = crypto.createDecipheriv('aes-256-ctr', sha256.digest(), iv);
 		const plaintext = decipher.update(ciphertext);
 
-		return plaintext.toString() + decipher.final();
+		return JSON.parse(plaintext.toString() + decipher.final());
 	}
 
 	public async canDecrypt(key: string) {
