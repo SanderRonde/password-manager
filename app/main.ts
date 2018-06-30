@@ -75,10 +75,6 @@ commander
 			case 'googledrive':
 				Backup.GoogleDrive.backup(settings);
 				break;
-			case 'onedrive':
-			case 'microsoft':
-				Backup.Onedrive.backup(settings);
-				break;
 			case 'local':
 				if (!settings.output) {
 					exitWith('No output was specified');
@@ -86,8 +82,7 @@ commander
 				Backup.Local.backup(settings);
 				break;
 			default:
-				exitWith('Invalid backup method, choose "load", "drive", "onedrive"' +
-					' or "local"');
+				exitWith('Invalid backup method, choose "load", "drive" or "local"');
 		}
 	});
 
