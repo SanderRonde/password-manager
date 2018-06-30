@@ -43,7 +43,7 @@ export namespace Load {
 			proc.stdin.pipe(dataStream);
 
 			dataStream.write(decrypted);
-			dataStream.end();
+			dataStream.write(null);
 
 			proc.on('exit', (code) => {
 				if (code) {
