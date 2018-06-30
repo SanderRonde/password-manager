@@ -4,6 +4,7 @@ import { ServerConfig, ServerSettings, Server } from "./actions/server/server";
 import { Account } from "./actions/account/account";
 import { readJSON, exitWith } from "./lib/util";
 import * as commander from 'commander';
+import { getDatabase } from "./database/database";
 
 commander
 	.version('0.1.0', '-v, --version');
@@ -12,20 +13,23 @@ commander
 	.command('account <action>')
 	.description('create or delete an account')
 	.option('-a, --account <email>', 'Account name (email)')
-	.action((action: string, { 
-		account: email 
+	.option('-p, --password <pw>', 'The password used to decrypt the database')
+	.action(async (action: string, { 
+		account: email,
+		password: dbPassword
 	}: { 
-		account: string 
+		account: string;
+		password?: string;
 	}) => {
 		if (!email) {
 			exitWith('Please supply the email of the account to edit through -a');
 		}
 		switch (action.toLowerCase()) {
 			case 'create':
-				Account.CreateAccount.createAccount(email);
+				Account.CreateAccount.createAccount(email, await getDatabase(dbPassword));
 				break;
 			case 'delete':
-				Account.DeleteAccount.deleteAccount(email);
+				Account.DeleteAccount.deleteAccount(email, await getDatabase(dbPassword));
 				break;
 			default:
 				exitWith('Invalid account action, choose "create" or "delete"');
@@ -85,8 +89,8 @@ commander
 	.option('--http <http_port>', 'The port to use for non-https traffic', 80)
 	.option('--https <https_port>', 'The port to use for https traffic', 443)
 	.option('--https-key <https_key>', 'The path to the HTTPS key')
-	.option('--https-key <https_key>', 'The path to the HTTPS cert')
-	.option('-d, --dbpath <dbpath>', 'The path to the database', './db/')
+	.option('--https-cert <https_cert>', 'The path to the HTTPS cert')
+	.option('-p, --password <pw>', 'The password used to decrypt the database')
 	.action(async (settings: ServerSettings) => {
 		if (settings.config) {
 			settings = {
@@ -95,7 +99,7 @@ commander
 				isConfig: true
 			}
 		}
-		Server.run(settings);
+		Server.run(await getDatabase(settings.password), settings);
 	});
 
 commander

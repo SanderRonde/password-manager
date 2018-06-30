@@ -1,8 +1,15 @@
 import { readFile, writeFile } from "../../lib/util";
 import path = require('path');
+import { Database } from "../../database/database";
 
 export interface ServerArgs {
 	config?: string;
+	http: number;
+	https: number;
+	https_key?: string;
+	https_cert?: string;
+	dbpath: string;
+	password?: string;
 }
 
 export interface ServerConfig extends ServerArgs {
@@ -13,8 +20,8 @@ export interface ServerConfig extends ServerArgs {
 export type ServerSettings = ServerArgs|ServerConfig;
 
 export namespace Server {
-	export function run(config: ServerSettings) {
-		
+	export function run(database: Database, config: ServerSettings) {
+
 	}
 
 	export async function genConfig(settings: {
