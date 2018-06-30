@@ -79,9 +79,6 @@ commander
 			case 'microsoft':
 				Backup.Onedrive.backup(settings);
 				break;
-			case 'dropbox':
-				Backup.Dropbox.backup(settings);
-				break;
 			case 'local':
 				if (!settings.output) {
 					exitWith('No output was specified');
@@ -89,8 +86,8 @@ commander
 				Backup.Local.backup(settings);
 				break;
 			default:
-				exitWith('Invalid backup method, choose "load", "drive", "onedrive",' +
-					' "dropbox" or "local"');
+				exitWith('Invalid backup method, choose "load", "drive", "onedrive"' +
+					' or "local"');
 		}
 	});
 
