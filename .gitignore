@@ -61,3 +61,5 @@ jspm_packages/
 app/*.js
 
 secrets.js
+
+app/**/*.js
