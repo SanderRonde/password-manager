@@ -1,7 +1,7 @@
 import { Database, COLLECTIONS } from "../../../database/database";
-import { getConfirmedPassword } from "../../../lib/util";
-import { hash } from "../../../lib/crypto";
 import { EncryptedAccount } from "../../../database/dbtypes";
+import { getConfirmedPassword } from "../../../lib/util";
+import { hash, pad } from "../../../lib/crypto";
 
 export namespace CreateAccount {
 	export async function createAccount(email: string, database: Database) {
@@ -10,7 +10,7 @@ export namespace CreateAccount {
 
 		const record: EncryptedAccount = {
 			email: database.Crypto.dbEncrypt(email),
-			pw: database.Crypto.dbEncrypt(hash(password))
+			pw: database.Crypto.dbEncrypt(hash(pad(password, 'masterpwverify')))
 		}
 
 		await database.Manipulation.insertOne(COLLECTIONS.USERS, record);

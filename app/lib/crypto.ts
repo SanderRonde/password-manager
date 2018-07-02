@@ -10,9 +10,23 @@ export type Encrypted<T, K> = string & {
 //Among others
 export type HashingAlgorithms = 'sha256'|'sha512'
 
-export type Hashed<T, A extends HashingAlgorithms> = string & {
+export type Hashed<T, A extends HashingAlgorithms = 'sha512'> = string & {
 	__hashed: T;
 	__agorithm: A;
+}
+
+export type MasterPasswordVerificatonPadding = 'masterpwverify';
+export type MasterPasswordDecryptionpadding = 'masterpwdecrypt';
+export type Paddings = MasterPasswordVerificatonPadding | 
+	MasterPasswordDecryptionpadding;
+
+export type Padded<T extends string, P extends Paddings> = string & {
+	__base: T;
+	__padding: P;
+}
+
+export function pad<T extends string, P extends Paddings>(data: T, padding: P): Padded<T, P> {
+	return `${data}${padding}` as Padded<T, P>;
 }
 
 export function hash<T extends string, A extends HashingAlgorithms = 'sha512'>(data: T, 

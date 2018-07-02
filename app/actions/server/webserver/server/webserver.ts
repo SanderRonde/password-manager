@@ -1,15 +1,17 @@
 import { Database } from "../../../../database/database";
+import { WebserverRouter } from "./modules/routing";
 import { readFile } from "../../../../lib/util";
+import { WebserverAuth } from "./modules/auth";
 import { ServerConfig } from "../../server";
 import bodyParser = require('body-parser');
-import { Router } from "./modules/routing";
 import express = require('express');
 import http2 = require('http2');
 
 
 export class Webserver {
 	public app: express.Express;
-	private _router: Router;
+	public Auth: WebserverAuth = new WebserverAuth();
+	public Router: WebserverRouter = new WebserverRouter(this);
 
 	constructor(public database: Database, public config: ServerConfig) {
 		this._init();
@@ -22,7 +24,6 @@ export class Webserver {
 
 	private async _init() {
 		this.app = express();
-		this._router = new Router(this);
 		this._initMiddleware();
 		
 		await Promise.all([...(this.config.https_key && this.config.https_cert ?

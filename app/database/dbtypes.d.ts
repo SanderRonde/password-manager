@@ -1,4 +1,4 @@
-import { Encrypted, Hashed } from "../lib/crypto";
+import { Encrypted, Hashed, Padded, MasterPasswordVerificatonPadding } from "../lib/crypto";
 import mongo = require('mongodb');
 
 //Database stuff
@@ -6,7 +6,9 @@ export type MongoRecord<T> = T & {
 	_id: TypedObjectID<T>;
 }
 
-export declare class TypedObjectID<T> extends mongo.ObjectID { }
+export declare class TypedObjectID<T> extends mongo.ObjectID { 
+	toHexString(): StringifiedObjectId<T>;
+}
 
 export type DatabaseEncrypted<T> = {
 	data: Encrypted<T, DatabaseKey>;
@@ -22,12 +24,13 @@ export type PublicKey = string;
 //Account
 export interface EncryptedAccount {
 	email: DatabaseEncrypted<EncodedString<string>>;
-	pw: DatabaseEncrypted<EncodedString<Hashed<string, 'sha512'>>>;
+	pw: DatabaseEncrypted<EncodedString<Hashed<Padded<MasterPassword, 
+		MasterPasswordVerificatonPadding>>>>;
 }
 
 export interface DecryptedAccount {
 	email: string;
-	pw: Hashed<string, 'sha512'>;
+	pw: Padded<MasterPassword, MasterPasswordVerificatonPadding>;
 }
 
 //Instance
@@ -51,7 +54,7 @@ export interface EncryptedPassword {
 		encrypted: Encrypted<EncodedString<{
 			password: string;
 			notes: string[];
-		}>, Hashed<MasterPassword, 'sha256'>>;
+		}>, Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>>;
 	}>>;
 }
 
@@ -62,5 +65,5 @@ export interface DecryptedPassword {
 	encrypted: Encrypted<EncodedString<{
 		password: string;
 		notes: string[];
-	}>, Hashed<MasterPassword, 'sha256'>>;
+}>, Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>>;
 }
