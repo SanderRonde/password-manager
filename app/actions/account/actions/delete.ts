@@ -1,17 +1,18 @@
-import { Database, EncryptedAccount, COLLECTIONS } from "../../../database/database";
+import { Database, COLLECTIONS } from "../../../database/database";
 import promptly = require('promptly');
 import { hash } from "../../../lib/crypto";
+import { EncryptedAccount } from "../../../database/dbtypes";
 
 export namespace DeleteAccount {
 	async function tryPasswordOnce(email: string, database: Database) {
 		const password = await promptly.password('Please enter the account\'s password');
 
 		const record: EncryptedAccount = {
-			email: database.dbEncrypt(email),
-			pw: database.dbEncrypt(hash(password))
+			email: database.Crypto.dbEncrypt(email),
+			pw: database.Crypto.dbEncrypt(hash(password))
 		};
 
-		const result = await database.findOne(COLLECTIONS.USERS, record);
+		const result = await database.Manipulation.findOne(COLLECTIONS.USERS, record);
 		if (result) {
 			return result;
 		}
@@ -45,19 +46,19 @@ export namespace DeleteAccount {
 
 		console.log('Deleting instances...');
 		//Delete all instances from the instances collection
-		await database.deleteMany(COLLECTIONS.INSTANCES, {
+		await database.Manipulation.deleteMany(COLLECTIONS.INSTANCES, {
 			user_id: id
 		});
 
 		console.log('Deleting passwords...');
 		//Delete all passwords from the passwords collection
-		await database.deleteMany(COLLECTIONS.PASSWORDS, {
-			user_id: database.dbEncrypt(id.toHexString())
+		await database.Manipulation.deleteMany(COLLECTIONS.PASSWORDS, {
+			user_id: database.Crypto.dbEncrypt(id.toHexString())
 		});
 
 		console.log('Deleting user record...');
 		//Delete the record from the users collection
-		await database.deleteOne(COLLECTIONS.USERS, {
+		await database.Manipulation.deleteOne(COLLECTIONS.USERS, {
 			_id: id
 		});
 

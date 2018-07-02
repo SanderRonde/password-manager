@@ -2,9 +2,9 @@
 import { Backup, BackupConfig, BackupSettings } from "./actions/backup/backup";
 import { ServerConfig, ServerSettings, Server } from "./actions/server/server";
 import { Account } from "./actions/account/account";
+import { getDatabase } from "./database/database";
 import { readJSON, exitWith } from "./lib/util";
 import * as commander from 'commander';
-import { getDatabase } from "./database/database";
 
 commander
 	.version('0.1.0', '-v, --version');
@@ -106,7 +106,7 @@ commander
 			}
 		}
 		Server.run(await getDatabase(settings.database, settings.password, false),
-			settings);
+			settings as  ServerConfig);
 	});
 
 commander

@@ -1,4 +1,6 @@
+import { ServerConfig } from '../actions/server/server';
 import commentJson = require('comment-json');
+import nodemailer = require('nodemailer');
 import promptly = require('promptly');
 import mkdirp = require('mkdirp');
 import path = require('path');
@@ -105,3 +107,41 @@ export async function createTempFile(filePath: string, data: string) {
 		});
 	}
 }
+
+export function sendEmail({ email }: ServerConfig, to: string,
+	subject: string, content: string) {
+		if (!email) {
+			console.log('Attempting to send email while no email settings are' + 
+			' configured, skipping');
+			return;
+		}
+
+		const {
+			from,
+			password,
+			port,
+			server,
+			user
+		} = email;
+
+		const transporter = nodemailer.createTransport({
+			host: server,
+			port: ~~port,
+			secure: false,
+			auth: {
+				user: user,
+				pass: password
+			}
+		});
+
+		transporter.sendMail({
+			from: from,
+			to: [to],
+			subject: subject,
+			text: content
+		}, (err) => {
+			if (err) {
+				console.log(err);
+			}
+		});
+	}

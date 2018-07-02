@@ -1,6 +1,7 @@
+import { Webserver } from "./webserver/server/webserver";
 import { readFile, writeFile } from "../../lib/util";
-import path = require('path');
 import { Database } from "../../database/database";
+import path = require('path');
 
 export interface ServerArgs {
 	config?: string;
@@ -16,13 +17,21 @@ export interface ServerArgs {
 export interface ServerConfig extends ServerArgs {
 	config: string;
 	isConfig: true
+
+	email?: {
+		server: string;
+		port: string;
+		user: string;
+		password: string;
+		from: string;
+	}
 }
 
 export type ServerSettings = ServerArgs|ServerConfig;
 
 export namespace Server {
-	export function run(database: Database, config: ServerSettings) {
-
+	export function run(database: Database, config: ServerConfig) {
+		new Webserver(database, config);
 	}
 
 	export async function genConfig(settings: {
