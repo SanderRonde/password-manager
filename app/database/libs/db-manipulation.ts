@@ -1,12 +1,20 @@
 import { Database, COLLECTIONS, TypedCollection } from "../database";
-import { EncryptedAccount, Instance, EncryptedPassword, MongoRecord } from "../dbtypes";
+import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord, TypedObjectID, StringifiedObjectId } from "../db-types";
 import mongo = require('mongodb');
 
 
 interface EncryptedCollectionRecords {
 	[COLLECTIONS.USERS]: EncryptedAccount;
-	[COLLECTIONS.INSTANCES]: Instance;
+	[COLLECTIONS.INSTANCES]: EncryptedInstance;
 	[COLLECTIONS.PASSWORDS]: EncryptedPassword;
+}
+
+type ToTypedObjectID<T> = T extends StringifiedObjectId<infer V> ?
+	TypedObjectID<V> : TypedObjectID<void>;
+
+export type UnstringifyObjectIDs<T> = {
+	[P in keyof T]: T[P] extends StringifiedObjectId<any> ? 
+		ToTypedObjectID<T[P]> : T[P];
 }
 
 export class DatabaseManipulation {
@@ -28,7 +36,7 @@ export class DatabaseManipulation {
 	}
 
 	public async insertOne<R extends EncryptedCollectionRecords[C], 
-		C extends COLLECTIONS>(collectionName: C, record: R) {
+		C extends COLLECTIONS>(collectionName: C, record: UnstringifyObjectIDs<R>) {
 			const collection = this._getCollection(collectionName);
 			if (!collection) {
 				return;
@@ -40,7 +48,7 @@ export class DatabaseManipulation {
 			}
 		}
 
-	public async findOne<R extends EncryptedCollectionRecords[C], 
+	public async findOne<R extends UnstringifyObjectIDs<EncryptedCollectionRecords[C]>, 
 		C extends COLLECTIONS>(collectionName: C, 
 			filter: Partial<R>|mongo.FilterQuery<R>): Promise<MongoRecord<R> | null> {
 				const collection = this._getCollection(collectionName);
@@ -50,12 +58,23 @@ export class DatabaseManipulation {
 
 				const record = await collection.findOne(filter);
 				if (record) {
-					return record as MongoRecord<R>;
+					return record as any;
 				}
 				return null;
 			}
+	
+	public async findMany<R extends EncryptedCollectionRecords[C], 
+		C extends COLLECTIONS>(collectionName: C, 
+			filter: Partial<R>|mongo.FilterQuery<R>): Promise<MongoRecord<R>[]> {
+				const collection = this._getCollection(collectionName);
+				if (!collection) {
+					return [];
+				}
 
-	public async deleteOne<R extends EncryptedCollectionRecords[C], 
+				return await (await collection.find(filter)).toArray() as MongoRecord<R>[];
+			}
+
+	public async deleteOne<R extends UnstringifyObjectIDs<EncryptedCollectionRecords[C]>, 
 		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>): Promise<void> {
 			const collection = this._getCollection(collectionName);
 			if (!collection) {
@@ -68,7 +87,7 @@ export class DatabaseManipulation {
 			}
 		}
 
-	public async deleteMany<R extends EncryptedCollectionRecords[C], 
+	public async deleteMany<R extends UnstringifyObjectIDs<EncryptedCollectionRecords[C]>, 
 		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>): Promise<void> {
 			const collection = this._getCollection(collectionName);
 			if (!collection) {
@@ -81,7 +100,7 @@ export class DatabaseManipulation {
 			}
 		}
 
-	public async findAndUpdateOne<R extends EncryptedCollectionRecords[C], 
+	public async findAndUpdateOne<R extends UnstringifyObjectIDs<EncryptedCollectionRecords[C]>, 
 		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>,
 			update: Partial<R>): Promise<void> {
 				const collection = this._getCollection(collectionName);

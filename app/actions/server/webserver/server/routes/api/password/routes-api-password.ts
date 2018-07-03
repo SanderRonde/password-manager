@@ -1,0 +1,313 @@
+import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord } from "../../../../../../../database/db-types";
+import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificatonPadding } from "../../../../../../../lib/crypto";
+import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-manipulation";
+import { COLLECTIONS } from "../../../../../../../database/database";
+import { Webserver } from "../../../webserver";
+import express = require('express');
+import mongo = require('mongodb');
+
+export class RoutesApiPassword {
+	constructor(public server: Webserver) { }
+
+	private async _getPasswordIfOwner(passwordId: StringifiedObjectId<EncryptedPassword>, 
+		instance: DecryptedInstance, res: express.Response) {
+			//Make sure this password is actually theirs
+			const password = await this.server.database.Manipulation.findOne(COLLECTIONS.PASSWORDS, {
+				_id: new mongo.ObjectId(passwordId)
+			});
+
+			if (!password || instance.user_id !== this.server.database.Crypto.dbDecrypt(password.user_id)) {
+				//Either the password is non-existent or it isn't theirs
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'failed'
+				});
+				return { password: null }
+			}
+			return {
+				password: password
+			}
+		}
+
+	private _verify2FAIfEnabled(twofactorSecret: string, twofactorToken: string,
+		password: MongoRecord<UnstringifyObjectIDs<EncryptedPassword>>, res: express.Response) {
+			const decryptedPassword = this.server.database.Crypto.dbDecryptPasswordRecord(password);
+			if (decryptedPassword.twofactor_enabled) {
+				//Password is secured with 2FA
+				if (!twofactorSecret) {
+					res.status(400);
+					res.json({
+						success: false,
+						error: 'no 2FA token supplied'
+					})
+					return false;
+				}
+				if (!this.server.Router.verify2FA(twofactorSecret, twofactorToken)) {
+					res.status(200);
+					res.json({
+						succes: false,
+						error: 'failed'
+					});
+					return false;
+				}
+			}
+			return true;
+		}
+
+	public set(req: express.Request, res: express.Response, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+			token: string;
+			websites: string[];
+			twofactor_enabled: boolean;
+			encrypted: Encrypted<EncodedString<{
+				username: string;
+				password: string;
+				notes: string[];
+			}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+		}, {}>([
+			'instance_id', 'token', 'websites', 'encrypted', 'twofactor_enabled'
+		], [], async (_req, res, { instance_id, token, websites, encrypted, twofactor_enabled }) => {
+			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+
+			const { decryptedInstance } = 
+				await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (!decryptedInstance) return;
+
+			const account = await this.server.database.Manipulation.findOne(
+				COLLECTIONS.USERS, {
+					_id: new mongo.ObjectId(decryptedInstance.user_id)
+				});
+
+			//All don't exist
+			const record: EncryptedPassword = {
+				user_id: this.server.database.Crypto.dbEncrypt(account._id.toHexString()),
+				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled),
+				websites: websites.map(website => this.server.database.Crypto.dbEncrypt(website)),
+				encrypted: this.server.database.Crypto.dbEncrypt(encrypted)
+			};
+			await this.server.database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, record);
+			res.status(200);
+			res.json({
+				success: true
+			})
+		})(req, res, next);
+	}
+
+	public update(req: express.Request, res: express.Response, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+			token: string;
+			password_id: StringifiedObjectId<EncryptedPassword>;
+		}, {
+			websites: string[];
+			twofactor_enabled: boolean;
+			twofactor_token: string;
+			encrypted: Encrypted<EncodedString<{
+				username: string;
+				password: string;
+				notes: string[];
+			}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+		}>([
+			'instance_id', 'token'
+		], [
+			'encrypted', 'twofactor_enabled', 'websites', 'twofactor_token'
+		], async (_req, res, { 
+			token, 
+			instance_id, 
+			password_id, 
+			twofactor_token, 
+			encrypted, 
+			twofactor_enabled, 
+			websites 
+		}) => {
+			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+
+			const { decryptedInstance, accountPromise } = 
+				await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (!decryptedInstance) return;
+
+			const { password } = await this._getPasswordIfOwner(password_id,
+				decryptedInstance, res);
+			if (!password) return;
+
+			const { twofactor_secret } = await accountPromise;
+			if (!this._verify2FAIfEnabled(twofactor_secret, twofactor_token,
+				password, res)) return;
+
+			await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
+				_id: new mongo.ObjectId(password_id)
+			}, {
+				twofactor_enabled: typeof twofactor_enabled === 'boolean' ?
+					this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled) : undefined,
+				websites: Array.isArray(websites) ?
+					websites.map(website => this.server.database.Crypto.dbEncrypt(website)) : undefined,
+				encrypted: encrypted ?
+					this.server.database.Crypto.dbEncrypt(encrypted) : undefined
+			});
+			res.status(200);
+			res.json({
+				success: true
+			});
+		})(req, res, next);
+	}
+
+	public remove(req: express.Request, res: express.Response, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+			token: string;
+			password_id: StringifiedObjectId<EncryptedPassword>;
+		}, { 
+			twofactor_token: string;
+		}>([
+			'instance_id', 'token', 'password_id'
+		], [
+			'twofactor_token'
+		], async (_req, res, { token, instance_id, password_id, twofactor_token }) => {
+			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+
+			const { decryptedInstance, accountPromise } = 
+				await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (!decryptedInstance) return;
+
+			const { password } = await this._getPasswordIfOwner(password_id,
+				decryptedInstance, res);
+			if (!password) return;
+
+			const { twofactor_secret } = await accountPromise;
+			if (!this._verify2FAIfEnabled(twofactor_secret, twofactor_token,
+				password, res)) return;
+
+			await this.server.database.Manipulation.deleteOne(COLLECTIONS.PASSWORDS, {
+				_id: password._id
+			});
+			res.status(200);
+			res.json({
+				success: true
+			});
+		})(req, res, next);
+	}
+
+	public get(req: express.Request, res: express.Response, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+			token: string;
+			password_id: StringifiedObjectId<EncryptedPassword>;
+		}, { 
+			twofactor_token: string;
+		}>([
+			'instance_id', 'token', 'password_id'
+		], [
+			'twofactor_token'
+		], async (_req, res, { token, instance_id, password_id, twofactor_token }) => {
+			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+
+			const { decryptedInstance, accountPromise } = 
+				await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (!decryptedInstance) return;
+
+			const { password } = await this._getPasswordIfOwner(password_id,
+				decryptedInstance, res);
+			if (!password) return;
+
+			const account = await accountPromise;
+			if (!this._verify2FAIfEnabled(account.twofactor_secret, twofactor_token,
+				password, res)) return;
+
+			const { encrypted } = this.server.database.Crypto
+				.dbDecryptPasswordRecord(password);
+			res.status(200);
+			res.json({
+				success: true,
+				data: encryptWithPublicKey(JSON.stringify({
+					id: password._id.toHexString(),
+					encrypted: encrypted
+				}), decryptedInstance.public_key)
+			})
+
+		})(req, res, next);
+	}
+	
+	public getmeta(req: express.Request, res: express.Response, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+			token: string;
+			password_id: StringifiedObjectId<EncryptedPassword>;
+		}, {}>([
+			'instance_id', 'token', 'password_id'
+		], [], async (_req, res, { token, instance_id, password_id }) => {
+			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+
+			const { decryptedInstance } = 
+				await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (!decryptedInstance) return;
+
+			const { password } = await this._getPasswordIfOwner(password_id,
+				decryptedInstance, res);
+			if (!password) return;
+
+			const { websites, twofactor_enabled } = this.server.database.Crypto
+				.dbDecryptPasswordRecord(password);
+			res.status(200);
+			res.json({
+				success: true,
+				data: encryptWithPublicKey(JSON.stringify({
+					id: password._id.toHexString(),
+					websites: websites,
+					twofactor_enabled: twofactor_enabled		
+				}), decryptedInstance.public_key)
+			});
+		})(req, res, next);
+	}
+
+	public allmeta(req: express.Request, res: express.Response, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+			token: string;
+			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>;
+		}, {}>([
+			'instance_id', 'token', 'password_hash'
+		], [], async (_req, res, { token, instance_id, password_hash }) => {
+			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+
+			const { decryptedInstance } = 
+				await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (!decryptedInstance) return;
+
+			//Verify password
+			const account = await this.server.database.Manipulation.findOne(
+				COLLECTIONS.USERS, {
+					_id: decryptedInstance.user_id
+				});
+
+			if (!this.server.Router.checkPassword(account.pw, 
+				this.server.database.Crypto.dbEncrypt(password_hash), req, res)) {
+					return;
+				}
+
+			const passwords = await this.server.database.Manipulation.findMany(
+				COLLECTIONS.PASSWORDS, {
+					user_id: account._id
+				});
+
+			res.status(200);
+			res.json({
+				success: true,
+				data: encryptWithPublicKey(JSON.stringify(passwords.map((password) => {
+					const decrypted = this.server.database.Crypto
+						.dbDecryptPasswordRecord(password);
+					return {
+						id: password._id.toHexString(),
+						websites: decrypted.websites,
+						twofactor_enabled: decrypted.twofactor_enabled
+					}
+				})), decryptedInstance.public_key)
+			});
+		})(req, res, next);
+	}
+
+	public query(req: express.Request, res: express.Response, next: express.NextFunction) {
+		//TODO: 
+	}
+}

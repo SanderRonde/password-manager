@@ -1,4 +1,4 @@
-import { TypedObjectID, EncryptedAccount, Instance, EncryptedPassword, MongoRecord } from './dbtypes';
+import { TypedObjectID, EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from './db-types';
 import { DatabaseEncryption } from './libs/db-encryption';
 import { exitWith } from '../lib/util';
 import promptly = require('promptly');
@@ -30,7 +30,7 @@ export async function getDatabase(dbPath: string, key: string,
 		return exitWith('Database can\'t be decrypted with that key; password invalid');
 	}
 
-export interface TypedCollection<C = any> extends mongo.Collection<C> {
+export interface TypedCollection<C = any> extends mongo.Collection<MongoRecord<C>> {
 	findOne<T = C>(filter: {
 		_id: TypedObjectID<T>;
 	}, callback: mongo.MongoCallback<T | null>): void;
@@ -57,7 +57,7 @@ export class Database {
 	public mongoInstance: mongo.Db;
 	public collections: {
 		users: TypedCollection<MongoRecord<EncryptedAccount>>;
-		instances: TypedCollection<MongoRecord<Instance>>;
+		instances: TypedCollection<MongoRecord<EncryptedInstance>>;
 		passwords: TypedCollection<MongoRecord<EncryptedPassword>>;
 	}
 

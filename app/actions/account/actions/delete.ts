@@ -1,13 +1,13 @@
 import { Database, COLLECTIONS } from "../../../database/database";
 import promptly = require('promptly');
 import { hash } from "../../../lib/crypto";
-import { EncryptedAccount } from "../../../database/dbtypes";
+import { EncryptedAccount } from "../../../database/db-types";
 
 export namespace DeleteAccount {
 	async function tryPasswordOnce(email: string, database: Database) {
 		const password = await promptly.password('Please enter the account\'s password');
 
-		const record: EncryptedAccount = {
+		const record: Partial<EncryptedAccount> = {
 			email: database.Crypto.dbEncrypt(email),
 			pw: database.Crypto.dbEncrypt(hash(password))
 		};
@@ -47,7 +47,7 @@ export namespace DeleteAccount {
 		console.log('Deleting instances...');
 		//Delete all instances from the instances collection
 		await database.Manipulation.deleteMany(COLLECTIONS.INSTANCES, {
-			user_id: id
+			user_id: database.Crypto.dbEncrypt(id.toHexString())
 		});
 
 		console.log('Deleting passwords...');

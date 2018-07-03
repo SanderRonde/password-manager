@@ -1,5 +1,6 @@
 import { Database } from "../../../../database/database";
 import { WebserverRouter } from "./modules/routing";
+import { WebserverRoutes } from "./modules/routes";
 import { readFile } from "../../../../lib/util";
 import { WebserverAuth } from "./modules/auth";
 import { ServerConfig } from "../../server";
@@ -11,6 +12,7 @@ import http2 = require('http2');
 export class Webserver {
 	public app: express.Express;
 	public Auth: WebserverAuth = new WebserverAuth();
+	public Routes: WebserverRoutes = new WebserverRoutes(this);
 	public Router: WebserverRouter = new WebserverRouter(this);
 
 	constructor(public database: Database, public config: ServerConfig) {

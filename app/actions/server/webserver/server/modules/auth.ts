@@ -1,7 +1,7 @@
-import { StringifiedObjectId, Instance } from "../../../../../database/dbtypes";
+import { StringifiedObjectId, EncryptedInstance } from "../../../../../database/db-types";
 
 interface InstanceAuthRepresentation {
-	instance: StringifiedObjectId<Instance>;
+	instance: StringifiedObjectId<EncryptedInstance>;
 	exprires: number;
 }
 
@@ -40,7 +40,7 @@ export class WebserverAuth {
 		});
 	}
 
-	public genLoginToken(instance: StringifiedObjectId<Instance>) {
+	public genLoginToken(instance: StringifiedObjectId<EncryptedInstance>) {
 		const token = this._genRandomToken();
 		this._loginTokens.set(token, {
 			instance,
@@ -49,7 +49,7 @@ export class WebserverAuth {
 		return token;
 	}
 
-	public verifyLoginToken(token: string, instance: StringifiedObjectId<Instance>) {
+	public verifyLoginToken(token: string, instance: StringifiedObjectId<EncryptedInstance>) {
 		this._clearExpiredTokens();
 
 		const match = this._loginTokens.get(token);
@@ -60,7 +60,7 @@ export class WebserverAuth {
 		return match.instance === instance;
 	}
 
-	public extendLoginToken(oldToken: string, instance: StringifiedObjectId<Instance>) {
+	public extendLoginToken(oldToken: string, instance: StringifiedObjectId<EncryptedInstance>) {
 		if (this.verifyLoginToken(oldToken, instance)) {
 			//Delete old token
 			this._loginTokens.delete(oldToken);
@@ -71,7 +71,7 @@ export class WebserverAuth {
 		return false;
 	}
 
-	public genTwofactorToken(instance: StringifiedObjectId<Instance>) {
+	public genTwofactorToken(instance: StringifiedObjectId<EncryptedInstance>) {
 			const token = this._genRandomToken();
 			this._twofactorTokens.set(token, {
 				instance,
@@ -80,7 +80,7 @@ export class WebserverAuth {
 			return token;
 		}
 
-	public verifyTwofactorToken(token: string, instance: StringifiedObjectId<Instance>) {
+	public verifyTwofactorToken(token: string, instance: StringifiedObjectId<EncryptedInstance>) {
 		this._clearExpiredTokens();
 
 		const match = this._twofactorTokens.get(token);

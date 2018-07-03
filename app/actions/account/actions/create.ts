@@ -1,5 +1,5 @@
 import { Database, COLLECTIONS } from "../../../database/database";
-import { EncryptedAccount } from "../../../database/dbtypes";
+import { EncryptedAccount } from "../../../database/db-types";
 import { getConfirmedPassword } from "../../../lib/util";
 import { hash, pad } from "../../../lib/crypto";
 
@@ -10,7 +10,9 @@ export namespace CreateAccount {
 
 		const record: EncryptedAccount = {
 			email: database.Crypto.dbEncrypt(email),
-			pw: database.Crypto.dbEncrypt(hash(pad(password, 'masterpwverify')))
+			pw: database.Crypto.dbEncrypt(hash(pad(password, 'masterpwverify'))),
+			twofactor_enabled: database.Crypto.dbEncryptWithSalt(false),
+			twofactor_secret: database.Crypto.dbEncrypt(null)
 		}
 
 		await database.Manipulation.insertOne(COLLECTIONS.USERS, record);

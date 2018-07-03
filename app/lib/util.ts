@@ -145,3 +145,13 @@ export function sendEmail({ email }: ServerConfig, to: string,
 			}
 		});
 	}
+
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
+
+export function genRandomString(length: number = 50): string {
+	let str = '';
+	for (let i = 0; i < length; i++) {
+		str += chars[Math.floor(Math.random() * chars.length)];
+	}
+	return str;
+}

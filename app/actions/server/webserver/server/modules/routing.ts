@@ -1,16 +1,14 @@
-import { MongoRecord, EncryptedAccount, TypedObjectID, Instance, StringifiedObjectId, MasterPassword } from "../../../../../database/dbtypes";
-import { encryptWithPublicKey, Hashed, Padded, MasterPasswordVerificatonPadding } from "../../../../../lib/crypto";
+import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword, DatabaseEncrypted } from "../../../../../database/db-types";
+import { Hashed, Padded, MasterPasswordVerificatonPadding } from "../../../../../lib/crypto";
 import { COLLECTIONS } from "../../../../../database/database";
-import { sendEmail } from "../../../../../lib/util";
 import { Webserver } from "../webserver";
+import { rateLimit } from "./rateLimit";
 import speakeasy = require('speakeasy');
 import express = require('express');
 import mongo = require('mongodb');
 
 export class WebserverRouter {
-	private readonly BASE_TIMEOUT = 1000 * 60 * 10;
-
-	constructor(private _parent: Webserver) { 
+	constructor(public parent: Webserver) { 
 		this._init();
 	}
 
@@ -18,51 +16,22 @@ export class WebserverRouter {
 		this._register();
 	}
 
-	private _validCookies: {
-		email: string;
-		cookie: string;
-		valid_until: number;
-	}[] = [];
-
-	private _extendDashboardCookie(toExtend: string) {
-		for (const cookie of this._validCookies) {
-			if (cookie.cookie === toExtend) {
-				cookie.valid_until = Date.now() + this.BASE_TIMEOUT;
-			}
-		}
-	}
-
-	private _invalidateDashboardCookies() {
-		this._validCookies = this._validCookies.filter(({ valid_until }) => {
-			return Date.now() < valid_until;
-		});
-	}
-
-	private isDashboardAuthenticated(req: express.Request, res: express.Response) {
-		const { login_auth } = req.cookies;
-			if (!login_auth) {
-				res.redirect('/login');
-				return false;
-			}
-			this._invalidateDashboardCookies();
-			for (const { cookie } of this._validCookies) {
-				if (cookie === login_auth) {
-					this._extendDashboardCookie(cookie);
-					return true;
+	public checkPassword(actualPasswordd: DatabaseEncrypted<EncodedString<Hashed<Padded<string,
+			MasterPasswordVerificatonPadding>>>>, 
+		expectedPassword: DatabaseEncrypted<EncodedString<Hashed<Padded<string,
+			MasterPasswordVerificatonPadding>>>>, _req: express.Request, res: express.Response) {
+				if (actualPasswordd !== expectedPassword) {
+					res.status(200);
+					res.json({
+						success: false,
+						error: 'invalid credentials'
+					});
+					return false;
 				}
+				return true;
 			}
-		return false;
-	}
 
-	private _incorrectLogin(res: express.Response) {
-		res.status(400);
-		res.json({
-			success: false,
-			error: 'Incorrect combination'
-		});
-	}
-
-	private async _checkPasswordFromBody(req: express.Request, res: express.Response, 
+	public async checkPasswordFromBody(req: express.Request, res: express.Response, 
 		supressErr: boolean = false): Promise<false|MongoRecord<EncryptedAccount>> {
 			const { email, password } = req.body as {
 				email: string;
@@ -74,38 +43,49 @@ export class WebserverRouter {
 			}
 
 			//Check if an account with that email exists
-			if (!await this._parent.database.Manipulation.findOne(
+			if (!await this.parent.database.Manipulation.findOne(
 				COLLECTIONS.USERS, {
-					email: this._parent.database.Crypto.dbEncrypt(email)
+					email: this.parent.database.Crypto.dbEncrypt(email)
 				})) {
-					this._incorrectLogin(res);
+					res.status(400);
+					res.json({
+						success: false,
+						error: 'Incorrect combination'
+					});
 					return false;
 				}
 
 			//Check if the password is correct
-			const record = await this._parent.database.Manipulation.findOne(
+			const record = await this.parent.database.Manipulation.findOne(
 				COLLECTIONS.USERS, {
-					email: this._parent.database.Crypto.dbEncrypt(email),
-					pw: this._parent.database.Crypto.dbEncrypt(password)
+					email: this.parent.database.Crypto.dbEncrypt(email),
+					pw: this.parent.database.Crypto.dbEncrypt(password)
 				});
 
 			if (!record) {
 				if (!supressErr) {
-					this._incorrectLogin(res);
+					res.status(400);
+					res.json({
+						success: false,
+						error: 'Incorrect combination'
+					});
 				}
 				return false;
 			}
 			return record;
 		}
 
-	private async _getInstance(id: StringifiedObjectId<Instance>) {
+	private async _getInstance(id: StringifiedObjectId<EncryptedInstance>) {
 		const objectId = new mongo.ObjectId(id);
-		return await this._parent.database.Manipulation.findOne(COLLECTIONS.INSTANCES, {
+		return await this.parent.database.Manipulation.findOne(COLLECTIONS.INSTANCES, {
 			_id: objectId
 		});
 	}
 
-	private _verify2FA(secret: string, key: string) {
+	public verify2FA(secret: string, key: string) {
+		if (!secret) {
+			return false;
+		}
 		return speakeasy.totp.verify({
 			secret: secret,
 			encoding: 'base32',
@@ -114,7 +94,7 @@ export class WebserverRouter {
 		});
 	}
 
-	private _requireParams<T extends {
+	public requireParams<T extends {
 		[key: string]: any;
 	}, O extends {
 		[key: string]: any;
@@ -151,274 +131,84 @@ export class WebserverRouter {
 				}
 			}
 
-	private _register() {
-		//Main entrypoint
-		this._parent.app.get('/', async (req, res) => {
-			if (this.isDashboardAuthenticated(req, res)) {
-				res.redirect('/dashboard');
-				return;
+	public async verifyAndGetInstance(instanceId: StringifiedObjectId<EncryptedInstance>, res: express.Response) {
+		const instance = await this._getInstance(instanceId);
+		if (!instance) {
+			res.status(400);
+			res.json({
+				success: false,
+				error: 'invalid instance ID'
+			});
+			return { instance: null, decryptedInstance: null, accountPromise: null };
+		}
+		const decryptedInstance = this.parent.database.Crypto
+			.dbDecryptInstanceRecord(instance);
+		const _this = this;
+		return { 
+			instance, 
+			decryptedInstance,
+			get accountPromise() {
+				return (async() => {
+					return _this.parent.database.Crypto.dbDecryptAccountRecord(
+						await _this.parent.database.Manipulation.findOne(
+							COLLECTIONS.USERS, {
+								_id: new mongo.ObjectId(decryptedInstance.user_id)
+							}));
+				})();
 			}
-		});
-		this._parent.app.get('/login', async (_req, _res, _next) => {
-			//TODO:
-		});
-		this._parent.app.get('/dashboard', async (req, res) => {
-			if (!this.isDashboardAuthenticated(req, res)) {
-				return;
-			}
+		};
+	}
 
-			//TODO:
-		});
-
-		//API
-		this._parent.app.post('/api/instance/register', this._requireParams<{
-			email: string;
-			public_key: string;
-			password: string;
-		}, { }>([
-			'public_key', 'email', 'password'
-		], [], async (req, res, { public_key }) => {
-			const auth = await this._checkPasswordFromBody(req, res);
-			if (auth === false) {
-				return;
-			}
-
-			const record: Instance = {
-				twofactor_enabled: false,
-				twofactor_secret: null,
-				public_key: this._parent.database.Crypto.dbEncrypt(public_key),
-				user_id: new mongo.ObjectId(auth._id.toHexString()) as TypedObjectID<EncryptedAccount>
-			};
-			await this._parent.database.Manipulation.insertOne(
-				COLLECTIONS.INSTANCES, record);
-			
-			//Find the record again
-			const insertedRecord = await this._parent.database.Manipulation.findOne(
-				COLLECTIONS.INSTANCES, record);
-			const id = insertedRecord._id.toHexString();
-
+	public verifyLoginToken(token: string, instanceId: StringifiedObjectId<EncryptedInstance>, res: express.Response) {
+		if (!this.parent.Auth.verifyLoginToken(token, instanceId)) {
 			res.status(200);
 			res.json({
-				success: true,
-				data: {
-					id: encryptWithPublicKey(public_key, id)
-				}
+				success: false,
+				error: 'invalid token'
 			});
+			return false;
+		}
+		return true;
+	}
 
-			sendEmail(this._parent.config, this._parent.database.Crypto.dbDecrypt(auth.email),
-				'New instance registered', 'A new instance was registered to your email');
-		}));
+	private _register() {
+		//Main entrypoint
+		this.parent.app.get('/', this.parent.Routes.Dashboard.index);
+		this.parent.app.get('/login', this.parent.Routes.Dashboard.login);
+		this.parent.app.get('/dashboard', this.parent.Routes.Dashboard.dashboard);
 
-		this._parent.app.post('/api/instance/set2fa', this._requireParams<{
-			id: StringifiedObjectId<Instance>;
-			password: string;
-			email: string;
-		},{
-			enable: boolean;
-			twofactor_token: string;
-		}>([
-			'id', 'password', 'email'
-		], [
-			'enable', 'twofactor_token'
-		], async (req, res, { id, enable, twofactor_token }) => {
-			const auth = await this._checkPasswordFromBody(req, res);
-			if (auth === false) {
-				return;
-			}
+		//API
+		this.parent.app.post('/api/instance/register', 
+			this.parent.Routes.API.Instance.register);
+		this.parent.app.post('/api/instance/login', 
+			this.parent.Routes.API.Instance.login);
+		this.parent.app.post('/api/instance/extend_key', 
+			this.parent.Routes.API.Instance.extendKey);
 
-			//Check if 2FA is enabled right now
-			// find this instance
-			const instance = await this._getInstance(id);
-			if (!instance) {
-				res.status(400);
-				res.json({
-					success: false,
-					error: 'invalid instance ID'
-				});
-				return;
-			}
+		this.parent.app.post('/api/instance/2fa/enable', 
+			this.parent.Routes.API.Instance.Twofactor.enable);
+		this.parent.app.post('/api/instance/2fa/disable', 
+			this.parent.Routes.API.Instance.Twofactor.disable);
+		this.parent.app.post('/api/instance/2fa/confirm',
+			this.parent.Routes.API.Instance.Twofactor.confirm);
+		this.parent.app.post('/api/instance/2fa/verify', 
+			this.parent.Routes.API.Instance.Twofactor.verify);
 
-			if (instance.twofactor_enabled === enable) {
-				res.status(200);
-				res.json({
-					success: true,
-					message: 'state unchanged (was already set)'
-				});
-				return;
-			}
+		this.parent.app.post('/api/password/set', 
+			this.parent.Routes.API.Password.set);
+		this.parent.app.post('/api/password/update', 
+			this.parent.Routes.API.Password.update);
+		this.parent.app.post('/api/password/remove',
+			this.parent.Routes.API.Password.remove);
+		this.parent.app.post('/api/password/get',
+			this.parent.Routes.API.Password.get);
+		this.parent.app.post('/api/password/getmeta',
+			this.parent.Routes.API.Password.getmeta);
+		this.parent.app.post('/api/password/query',
+			this.parent.Routes.API.Password.query);
+		this.parent.app.post('/api/password/allmeta',
+			this.parent.Routes.API.Password.allmeta);
 
-			if (instance.twofactor_enabled) {
-				//Require a 2FA key
-				if (!this._verify2FA(this._parent.database.Crypto.dbDecrypt(
-					instance.twofactor_secret), twofactor_token)) {
-						res.status(400);
-						res.json({
-							success: false,
-							error: 'invalid token'
-						});
-					}
-
-				await this._parent.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
-					_id: instance._id
-				}, {
-					twofactor_enabled: enable
-				});
-			} else {
-				//Enable it
-				const secret = speakeasy.generateSecret({
-					name: 'Password Manager'
-				});
-
-				await this._parent.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
-					_id: instance._id
-				}, {
-					twofactor_secret: this._parent.database.Crypto.dbEncrypt(secret.base32)
-				});
-
-				res.status(200);
-				res.json({
-					success: true,
-					data: {
-						auth_url: secret.otpauth_url
-					}
-				});
-			}
-		}));
-
-		this._parent.app.post('/api/instance/verify2fa', this._requireParams<{
-			id: StringifiedObjectId<Instance>;
-			twofactor_token: string;
-		},{
-			pw_verification_token: string;
-		}>([
-			'id', 'twofactor_token'
-		], [
-			'pw_verification_token'
-		], async (_req, res, { id, twofactor_token, pw_verification_token }) => {
-			const instance = await this._getInstance(id);
-			if (!instance) {
-				res.status(400);
-				res.json({
-					success: false,
-					error: 'invalid instance ID'
-				});
-				return;
-			}
-
-			if (!instance.twofactor_secret) {
-				res.status(400);
-				res.json({
-					success: false,
-					error: '2FA not enabled'
-				});
-			}
-
-			if (this._verify2FA(
-				this._parent.database.Crypto.dbDecrypt(instance.twofactor_secret), 
-					twofactor_token)) {
-						if (pw_verification_token) {
-							//This is a login attempt
-							if (this._parent.Auth.verifyLoginToken(pw_verification_token,
-								instance._id.toHexString())) {
-									res.status(200);
-									res.json({
-										success: true,
-										data: {
-											auth_token: this._parent.Auth.genLoginToken(
-												instance._id.toHexString())
-										}
-									});
-								} else {
-									res.status(200);
-									res.json({
-										success: false,
-										error: 'invalid 2fa auth token'
-									});
-								}
-						} else {
-							//This is an attempt to verify a 2FA secret after adding it
-							if (!instance.twofactor_enabled) {
-								//Enable it
-								await this._parent.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
-									_id: instance._id
-								}, {
-									twofactor_enabled: true
-								});
-							}
-							res.status(200);
-							res.json({
-								success: true
-							});
-						}
-					} else {
-						res.status(200);
-						res.json({
-							success: false,
-							error: 'invalid token'
-						});
-					}
-		}));
-
-		this._parent.app.post('/api/instance/login', this._requireParams<{
-			id: StringifiedObjectId<Instance>;
-			password: Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>;
-		}, {}>([
-			'id', 'password'
-		], [], async (_req, res, { id, password }) => {
-			//Get user from instance ID
-			const instance = await this._parent.database.Manipulation.findOne(
-				COLLECTIONS.INSTANCES, {
-					_id: new mongo.ObjectId(id)
-				});
-			
-			if (!instance) {
-				res.status(400);
-				res.json({
-					success: false,
-					//Invalid instance ID
-					error: 'invalid credentials'
-				});
-				return;
-			}
-
-			const user = await this._parent.database.Manipulation.findOne(
-				COLLECTIONS.USERS, {
-					_id: instance.user_id
-				});
-
-			//Check password
-			if (this._parent.database.Crypto.dbDecrypt(user.pw) !== password) {
-				res.status(400);
-				res.json({
-					success: false,
-					//Invalid instance ID
-					error: 'invalid credentials'
-				});
-				return;
-			}
-
-			if (instance.twofactor_enabled) {
-				//Require twofactor authentication before giving out token
-				res.status(200);
-				res.json({
-					success: true,
-					data: {
-						twofactor_required: true,
-						twofactor_auth_token: this._parent.Auth.genTwofactorToken(
-							instance._id.toHexString())
-					}
-				});
-			} else {
-				res.status(200);
-				res.json({
-					success: true,
-					data: {
-						twofactor_required: false,
-						auth_token: this._parent.Auth.genLoginToken(
-							instance._id.toHexString())
-					}
-				});
-			}
-		}));
+		//TODO: Master master password
 	}
 }
