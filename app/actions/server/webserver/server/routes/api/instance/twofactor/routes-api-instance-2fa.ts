@@ -4,12 +4,13 @@ import { Webserver } from '../../../../webserver';
 import speakeasy = require('speakeasy');
 import express = require('express');
 import mongo = require('mongodb');
+import { ResponseCaptured } from '../../../../modules/ratelimit';
 
 
 export class RoutesAPIInstanceTwofactor {
 	constructor(public server: Webserver) { }
 
-	public enable(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public enable(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			password: string;
@@ -28,7 +29,9 @@ export class RoutesAPIInstanceTwofactor {
 				res.status(200);
 				res.json({
 					success: true,
-					message: 'state unchanged (was already set)'
+					data: {
+						message: 'state unchanged (was already set)'
+					}
 				});
 				return;
 			}
@@ -76,7 +79,7 @@ export class RoutesAPIInstanceTwofactor {
 		})(req, res, next);
 	}	
 
-	public disable(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public disable(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			password: string;
@@ -96,7 +99,9 @@ export class RoutesAPIInstanceTwofactor {
 				res.status(200);
 				res.json({
 					success: true,
-					message: 'state unchanged (was already set)'
+					data: {
+						message: 'state unchanged (was already set)'
+					}
 				});
 				return;
 			}
@@ -127,7 +132,7 @@ export class RoutesAPIInstanceTwofactor {
 		})(req, res, next);
 	}
 
-	public confirm(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public confirm(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			twofactor_token: string;
@@ -151,7 +156,8 @@ export class RoutesAPIInstanceTwofactor {
 				}
 				res.status(200);
 				res.json({
-					success: true
+					success: true,
+					data: {}
 				});
 			} else {
 				res.status(200);
@@ -163,7 +169,7 @@ export class RoutesAPIInstanceTwofactor {
 		})(req, res, next);
 	}
 
-	public verify(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public verify(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			twofactor_token: string;

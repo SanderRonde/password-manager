@@ -2,10 +2,13 @@ import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, 
 import { Hashed, Padded, MasterPasswordVerificatonPadding } from "../../../../../lib/crypto";
 import { COLLECTIONS } from "../../../../../database/database";
 import { Webserver } from "../webserver";
-import { rateLimit } from "./rateLimit";
+import { getStores, ResponseCaptured, APIResponse } from "./ratelimit";
 import speakeasy = require('speakeasy');
 import express = require('express');
 import mongo = require('mongodb');
+
+type ResponseCapturedRequestHandler = (req: express.Request,
+	res: ResponseCaptured, next: express.NextFunction) => any;
 
 export class WebserverRouter {
 	constructor(public parent: Webserver) { 
@@ -16,11 +19,12 @@ export class WebserverRouter {
 		this._register();
 	}
 
-	public checkPassword(actualPasswordd: DatabaseEncrypted<EncodedString<Hashed<Padded<string,
+	public checkPassword(_req: express.Request, res: ResponseCaptured,
+		actualPassword: DatabaseEncrypted<EncodedString<Hashed<Padded<string,
 			MasterPasswordVerificatonPadding>>>>, 
 		expectedPassword: DatabaseEncrypted<EncodedString<Hashed<Padded<string,
-			MasterPasswordVerificatonPadding>>>>, _req: express.Request, res: express.Response) {
-				if (actualPasswordd !== expectedPassword) {
+			MasterPasswordVerificatonPadding>>>>) {
+				if (actualPassword !== expectedPassword) {
 					res.status(200);
 					res.json({
 						success: false,
@@ -31,7 +35,7 @@ export class WebserverRouter {
 				return true;
 			}
 
-	public async checkPasswordFromBody(req: express.Request, res: express.Response, 
+	public async checkPasswordFromBody(req: express.Request, res: ResponseCaptured, 
 		supressErr: boolean = false): Promise<false|MongoRecord<EncryptedAccount>> {
 			const { email, password } = req.body as {
 				email: string;
@@ -99,8 +103,8 @@ export class WebserverRouter {
 	}, O extends {
 		[key: string]: any;
 	} = {}>(requiredParams: (keyof T)[], 
-		optionalParams: (keyof O)[]|string[], handler: (req: express.Request, res: express.Response, 
-			params: T & Partial<O>) => void): express.RequestHandler {
+		optionalParams: (keyof O)[]|string[], handler: (req: express.Request, res: ResponseCaptured, 
+			params: T & Partial<O>) => void): ResponseCapturedRequestHandler {
 				return (req, res) => {
 					if (!req.body) {
 						res.status(400);
@@ -131,7 +135,7 @@ export class WebserverRouter {
 				}
 			}
 
-	public async verifyAndGetInstance(instanceId: StringifiedObjectId<EncryptedInstance>, res: express.Response) {
+	public async verifyAndGetInstance(instanceId: StringifiedObjectId<EncryptedInstance>, res: ResponseCaptured) {
 		const instance = await this._getInstance(instanceId);
 		if (!instance) {
 			res.status(400);
@@ -159,7 +163,7 @@ export class WebserverRouter {
 		};
 	}
 
-	public verifyLoginToken(token: string, instanceId: StringifiedObjectId<EncryptedInstance>, res: express.Response) {
+	public verifyLoginToken(token: string, instanceId: StringifiedObjectId<EncryptedInstance>, res: ResponseCaptured) {
 		if (!this.parent.Auth.verifyLoginToken(token, instanceId)) {
 			res.status(200);
 			res.json({
@@ -171,43 +175,62 @@ export class WebserverRouter {
 		return true;
 	}
 
+	
+
 	private _register() {
+		this.parent.app.enable('trust proxy');
+
 		//Main entrypoint
 		this.parent.app.get('/', this.parent.Routes.Dashboard.index);
 		this.parent.app.get('/login', this.parent.Routes.Dashboard.login);
 		this.parent.app.get('/dashboard', this.parent.Routes.Dashboard.dashboard);
 
+		this.parent.app.use((_req: express.Request, res: ResponseCaptured, next) => {
+			const originalFn = res.json;
+			res.json = (response: APIResponse) => {
+				res.__jsonResponse = response;
+				return originalFn(response);
+			}
+			next();
+		});
+
+		const { 
+			apiUseLimiter, 
+			instanceCreateLimiter, 
+			bruteforceLimiter 
+		} = getStores();
+
 		//API
-		this.parent.app.post('/api/instance/register', 
-			this.parent.Routes.API.Instance.register);
-		this.parent.app.post('/api/instance/login', 
-			this.parent.Routes.API.Instance.login);
-		this.parent.app.post('/api/instance/extend_key', 
-			this.parent.Routes.API.Instance.extendKey);
+		this.parent.app.post('/api/instance/register', bruteforceLimiter,
+			instanceCreateLimiter, this.parent.Routes.API.Instance.register);
+		this.parent.app.post('/api/instance/login', bruteforceLimiter,
+			instanceCreateLimiter, this.parent.Routes.API.Instance.login);
+		this.parent.app.post('/api/instance/extend_key', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Instance.extendKey);
 
-		this.parent.app.post('/api/instance/2fa/enable', 
-			this.parent.Routes.API.Instance.Twofactor.enable);
-		this.parent.app.post('/api/instance/2fa/disable', 
-			this.parent.Routes.API.Instance.Twofactor.disable);
-		this.parent.app.post('/api/instance/2fa/confirm',
-			this.parent.Routes.API.Instance.Twofactor.confirm);
-		this.parent.app.post('/api/instance/2fa/verify', 
-			this.parent.Routes.API.Instance.Twofactor.verify);
+		this.parent.app.post('/api/instance/2fa/enable', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Instance.Twofactor.enable);
+		this.parent.app.post('/api/instance/2fa/disable', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Instance.Twofactor.disable);
+		this.parent.app.post('/api/instance/2fa/confirm', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Instance.Twofactor.confirm);
+		this.parent.app.post('/api/instance/2fa/verify', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Instance.Twofactor.verify);
 
-		this.parent.app.post('/api/password/set', 
-			this.parent.Routes.API.Password.set);
-		this.parent.app.post('/api/password/update', 
-			this.parent.Routes.API.Password.update);
-		this.parent.app.post('/api/password/remove',
-			this.parent.Routes.API.Password.remove);
-		this.parent.app.post('/api/password/get',
-			this.parent.Routes.API.Password.get);
-		this.parent.app.post('/api/password/getmeta',
-			this.parent.Routes.API.Password.getmeta);
-		this.parent.app.post('/api/password/query',
-			this.parent.Routes.API.Password.query);
-		this.parent.app.post('/api/password/allmeta',
-			this.parent.Routes.API.Password.allmeta);
+		this.parent.app.post('/api/password/set', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Password.set);
+		this.parent.app.post('/api/password/update', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Password.update);
+		this.parent.app.post('/api/password/remove', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Password.remove);
+		this.parent.app.post('/api/password/get', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Password.get);
+		this.parent.app.post('/api/password/getmeta', bruteforceLimiter,
+			apiUseLimiter, 	this.parent.Routes.API.Password.getmeta);
+		this.parent.app.post('/api/password/query', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Password.query);
+		this.parent.app.post('/api/password/allmeta', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Password.allmeta);
 
 		//TODO: Master master password
 	}

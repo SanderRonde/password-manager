@@ -5,12 +5,13 @@ import { COLLECTIONS } from "../../../../../../../database/database";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
+import { ResponseCaptured } from "../../../modules/ratelimit";
 
 export class RoutesApiPassword {
 	constructor(public server: Webserver) { }
 
 	private async _getPasswordIfOwner(passwordId: StringifiedObjectId<EncryptedPassword>, 
-		instance: DecryptedInstance, res: express.Response) {
+		instance: DecryptedInstance, res: ResponseCaptured) {
 			//Make sure this password is actually theirs
 			const password = await this.server.database.Manipulation.findOne(COLLECTIONS.PASSWORDS, {
 				_id: new mongo.ObjectId(passwordId)
@@ -31,7 +32,7 @@ export class RoutesApiPassword {
 		}
 
 	private _verify2FAIfEnabled(twofactorSecret: string, twofactorToken: string,
-		password: MongoRecord<UnstringifyObjectIDs<EncryptedPassword>>, res: express.Response) {
+		password: MongoRecord<UnstringifyObjectIDs<EncryptedPassword>>, res: ResponseCaptured) {
 			const decryptedPassword = this.server.database.Crypto.dbDecryptPasswordRecord(password);
 			if (decryptedPassword.twofactor_enabled) {
 				//Password is secured with 2FA
@@ -46,7 +47,7 @@ export class RoutesApiPassword {
 				if (!this.server.Router.verify2FA(twofactorSecret, twofactorToken)) {
 					res.status(200);
 					res.json({
-						succes: false,
+						success: false,
 						error: 'failed'
 					});
 					return false;
@@ -55,7 +56,7 @@ export class RoutesApiPassword {
 			return true;
 		}
 
-	public set(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public set(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: string;
@@ -90,12 +91,13 @@ export class RoutesApiPassword {
 			await this.server.database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, record);
 			res.status(200);
 			res.json({
-				success: true
+				success: true,
+				data: {}
 			})
 		})(req, res, next);
 	}
 
-	public update(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public update(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: string;
@@ -148,12 +150,13 @@ export class RoutesApiPassword {
 			});
 			res.status(200);
 			res.json({
-				success: true
+				success: true,
+				data: {}
 			});
 		})(req, res, next);
 	}
 
-	public remove(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public remove(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: string;
@@ -184,12 +187,13 @@ export class RoutesApiPassword {
 			});
 			res.status(200);
 			res.json({
-				success: true
+				success: true,
+				data: {}
 			});
 		})(req, res, next);
 	}
 
-	public get(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public get(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: string;
@@ -224,12 +228,11 @@ export class RoutesApiPassword {
 					id: password._id.toHexString(),
 					encrypted: encrypted
 				}), decryptedInstance.public_key)
-			})
-
+			});
 		})(req, res, next);
 	}
 	
-	public getmeta(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public getmeta(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: string;
@@ -261,7 +264,7 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 
-	public allmeta(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public allmeta(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: string;
@@ -281,8 +284,8 @@ export class RoutesApiPassword {
 					_id: decryptedInstance.user_id
 				});
 
-			if (!this.server.Router.checkPassword(account.pw, 
-				this.server.database.Crypto.dbEncrypt(password_hash), req, res)) {
+			if (!this.server.Router.checkPassword(req, res, 
+				this.server.database.Crypto.dbEncrypt(password_hash), account.pw)) {
 					return;
 				}
 
@@ -307,7 +310,7 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 
-	public query(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public query(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		//TODO: 
 	}
 }

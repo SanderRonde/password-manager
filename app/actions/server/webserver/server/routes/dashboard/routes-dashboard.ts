@@ -1,5 +1,6 @@
 import { Webserver } from "../../webserver";
 import express = require('express');
+import { ResponseCaptured } from "../../modules/ratelimit";
 
 export class RoutesDashboard {
 	private readonly BASE_TIMEOUT = 1000 * 60 * 10;
@@ -26,7 +27,7 @@ export class RoutesDashboard {
 		});
 	}
 
-	public isDashboardAuthenticated(req: express.Request, res: express.Response) {
+	public isDashboardAuthenticated(req: express.Request, res: ResponseCaptured) {
 		//TODO: use auth for this instead
 		const { login_auth } = req.cookies;
 			if (!login_auth) {
@@ -43,18 +44,18 @@ export class RoutesDashboard {
 		return false;
 	}
 
-	public async index(req: express.Request, res: express.Response) {
+	public async index(req: express.Request, res: ResponseCaptured) {
 		if (this.isDashboardAuthenticated(req, res)) {
 			res.redirect('/dashboard');
 			return;
 		}
 	};
 
-	public async login(req: express.Request, res: express.Response) {
+	public async login(req: express.Request, res: ResponseCaptured) {
 		//TODO:
 	}
 
-	public async dashboard(req: express.Request, res: express.Response) {
+	public async dashboard(req: express.Request, res: ResponseCaptured) {
 		if (!this.isDashboardAuthenticated(req, res)) {
 			return;
 		}

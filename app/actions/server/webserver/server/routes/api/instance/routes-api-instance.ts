@@ -7,13 +7,14 @@ import { sendEmail } from "../../../../../../../lib/util";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
+import { ResponseCaptured } from "../../../modules/ratelimit";
 
 export class RoutesApiInstance {
 	public Twofactor = new RoutesAPIInstanceTwofactor(this.server);
 
 	constructor(public server: Webserver) { }
 
-	public register(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public register(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			email: string;
 			public_key: string;
@@ -52,7 +53,7 @@ export class RoutesApiInstance {
 		})(req, res, next);
 	}
 
-	public login(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public login(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>;
@@ -81,8 +82,8 @@ export class RoutesApiInstance {
 				});
 
 			//Check password
-			if (!this.server.Router.checkPassword(account.pw, 
-				this.server.database.Crypto.dbEncrypt(password_hash), req, res)) {
+			if (!this.server.Router.checkPassword(req, res, 
+				this.server.database.Crypto.dbEncrypt(password_hash), account.pw)) {
 					return;
 				}
 
@@ -111,7 +112,7 @@ export class RoutesApiInstance {
 		})(req, res, next);
 	}
 
-	public extendKey(req: express.Request, res: express.Response, next: express.NextFunction) {
+	public extendKey(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			oldToken: string;
