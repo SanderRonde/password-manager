@@ -2,10 +2,11 @@ import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPasswo
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificatonPadding } from "../../../../../../../lib/crypto";
 import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-manipulation";
 import { COLLECTIONS } from "../../../../../../../database/database";
+import { ResponseCaptured } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
-import { ResponseCaptured } from "../../../modules/ratelimit";
+import url = require('url');
 
 export class RoutesApiPassword {
 	constructor(public server: Webserver) { }
@@ -85,7 +86,17 @@ export class RoutesApiPassword {
 			const record: EncryptedPassword = {
 				user_id: this.server.database.Crypto.dbEncrypt(account._id.toHexString()),
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled),
-				websites: websites.map(website => this.server.database.Crypto.dbEncrypt(website)),
+				websites: websites.map((website) => {
+					return {
+						host: url.parse(website).hostname,
+						exact: website
+					}
+				}).map(({ host, exact }) => {
+					return {
+						host: this.server.database.Crypto.dbEncrypt(host),
+						exact: this.server.database.Crypto.dbEncrypt(exact)
+					}
+				}),
 				encrypted: this.server.database.Crypto.dbEncrypt(encrypted)
 			};
 			await this.server.database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, record);
@@ -144,7 +155,17 @@ export class RoutesApiPassword {
 				twofactor_enabled: typeof twofactor_enabled === 'boolean' ?
 					this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled) : undefined,
 				websites: Array.isArray(websites) ?
-					websites.map(website => this.server.database.Crypto.dbEncrypt(website)) : undefined,
+					websites.map((website) => {
+						return {
+							host: url.parse(website).hostname,
+							exact: website
+						}
+					}).map(({ host, exact }) => {
+						return {
+							host: this.server.database.Crypto.dbEncrypt(host),
+							exact: this.server.database.Crypto.dbEncrypt(exact)
+						}
+					}) : undefined,
 				encrypted: encrypted ?
 					this.server.database.Crypto.dbEncrypt(encrypted) : undefined
 			});
@@ -310,7 +331,45 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 
-	public query(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
-		//TODO: 
+	public querymeta(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+			token: string;
+			url: string;
+		}, {}>([
+			'instance_id', 'token', 'url'
+		], [], async (_req, res, { token, instance_id, url: website_url }) => {
+			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+
+			const { decryptedInstance } = 
+				await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (!decryptedInstance) return;
+
+			const account = await this.server.database.Manipulation.findOne(
+				COLLECTIONS.USERS, {
+					_id: decryptedInstance.user_id
+				});
+
+			const { hostname } = url.parse(website_url);
+			const passwords = await this.server.database.Manipulation.findMany(
+				COLLECTIONS.PASSWORDS, {
+					user_id: account._id,
+					"websites.host": this.server.database.Crypto.dbEncrypt(hostname)
+				});
+
+			res.status(200);
+			res.json({
+				success: true,
+				data: encryptWithPublicKey(JSON.stringify(passwords.map((password) => {
+					const decrypted = this.server.database.Crypto
+						.dbDecryptPasswordRecord(password);
+					return {
+						id: password._id.toHexString(),
+						websites: decrypted.websites,
+						twofactor_enabled: decrypted.twofactor_enabled
+					}
+				})), decryptedInstance.public_key)
+			});
+		})(req, res, next);
 	}
 }

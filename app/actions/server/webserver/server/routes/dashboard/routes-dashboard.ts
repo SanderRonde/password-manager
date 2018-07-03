@@ -51,7 +51,7 @@ export class RoutesDashboard {
 		}
 	};
 
-	public async login(req: express.Request, res: ResponseCaptured) {
+	public async login(_req: express.Request, _res: ResponseCaptured) {
 		//TODO:
 	}
 

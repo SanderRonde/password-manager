@@ -3,7 +3,6 @@ import { DatabaseEncrypted, EncryptedPassword, DecryptedPassword, EncryptedInsta
 import { UnstringifyObjectIDs } from "./db-manipulation";
 import { CONSTANTS } from "../../lib/constants";
 import { Database } from "../database";
-import mongo = require('mongodb');
 
 export class DatabaseEncryption {
 	private _obfuscatedKey: string;
@@ -96,7 +95,12 @@ export class DatabaseEncryption {
 	}: EncryptedPassword|UnstringifyObjectIDs<EncryptedPassword>): DecryptedPassword {
 		return {
 			user_id: this.dbDecrypt(user_id),
-			websites: websites.map(website => this.dbDecrypt(website)),
+			websites: websites.map(({ host, exact }) => {
+				return {
+					host: this.dbDecrypt(host),
+					exact: this.dbDecrypt(exact)
+				}
+			}),
 			encrypted: this.dbDecrypt(encrypted),
 			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled)
 		}

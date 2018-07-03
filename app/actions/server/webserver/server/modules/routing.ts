@@ -227,8 +227,8 @@ export class WebserverRouter {
 			apiUseLimiter, this.parent.Routes.API.Password.get);
 		this.parent.app.post('/api/password/getmeta', bruteforceLimiter,
 			apiUseLimiter, 	this.parent.Routes.API.Password.getmeta);
-		this.parent.app.post('/api/password/query', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Password.query);
+		this.parent.app.post('/api/password/querymeta', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Password.querymeta);
 		this.parent.app.post('/api/password/allmeta', bruteforceLimiter,
 			apiUseLimiter, this.parent.Routes.API.Password.allmeta);
 

@@ -63,7 +63,10 @@ export type StringifiedObjectId<T> = string & {
 //Password
 export interface EncryptedPassword {
 	user_id: DatabaseEncrypted<EncodedString<StringifiedObjectId<EncryptedAccount>>>;
-	websites: DatabaseEncrypted<EncodedString<string>>[];
+	websites: {
+		host: DatabaseEncrypted<EncodedString<string>>;
+		exact: DatabaseEncrypted<EncodedString<string>>;
+	}[];
 	twofactor_enabled: DatabaseEncryptedWithSalt<boolean>;
 	encrypted: DatabaseEncrypted<EncodedString<Encrypted<EncodedString<{
 		username: string;
@@ -74,7 +77,10 @@ export interface EncryptedPassword {
 
 export interface DecryptedPassword {
 	user_id: StringifiedObjectId<EncryptedAccount>;
-	websites: string[];
+	websites: {
+		host: string;
+		exact: string;
+	}[];
 	twofactor_enabled: boolean;
 	encrypted: Encrypted<EncodedString<{
 		username: string;
