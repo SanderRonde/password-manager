@@ -293,21 +293,8 @@ export class RoutesAPIAccount {
 				type: 'string'
 			}])) return;
 
-			//Get user from instance ID
-			const instance = await this.server.database.Manipulation.findOne(
-				COLLECTIONS.INSTANCES, {
-					_id: new mongo.ObjectId(instance_id)
-				});
-			
-			if (!instance) {
-				res.status(200);
-				res.json({
-					success: false,
-					//Invalid instance ID
-					error: 'invalid credentials'
-				});
-				return;
-			}
+			const { instance } = await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (!instance) return;
 
 			//Check if the master password is correct
 			const encryptedAccount = await this.server.database.Manipulation.findOne(
