@@ -26,6 +26,7 @@ export type DatabaseEncryptedWithSalt<T> = {
 export type DatabaseKey = string;
 export type MasterPassword = string;
 export type PublicKey = string;
+export type ResetKey = string;
 
 //Account
 export interface EncryptedAccount {
@@ -34,6 +35,13 @@ export interface EncryptedAccount {
 	twofactor_secret: DatabaseEncrypted<EncodedString<string>>;
 	pw: DatabaseEncrypted<EncodedString<Hashed<Padded<MasterPassword, 
 		MasterPasswordVerificatonPadding>>>>;
+	masterpassword: DatabaseEncrypted<EncodedString<{
+		data: Encrypted<EncodedString<{
+			integrity: true;
+			pw: MasterPassword;
+		}>, ResetKey>;
+		algorithm: EncryptionAlgorithm;
+	}>>;
 }
 
 export interface DecryptedAccount {
@@ -41,6 +49,13 @@ export interface DecryptedAccount {
 	twofactor_verified: boolean;
 	twofactor_secret: string
 	pw: Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>;
+	masterpassword: {
+		data: Encrypted<EncodedString<{
+			integrity: true;
+			pw: MasterPassword;
+		}>, ResetKey>;
+		algorithm: EncryptionAlgorithm;
+	};
 }
 
 //Instance
@@ -68,11 +83,14 @@ export interface EncryptedPassword {
 		exact: DatabaseEncrypted<EncodedString<string>>;
 	}[];
 	twofactor_enabled: DatabaseEncryptedWithSalt<boolean>;
-	encrypted: DatabaseEncrypted<EncodedString<Encrypted<EncodedString<{
-		username: string;
-		password: string;
-		notes: string[];
-	}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>>>;
+	encrypted: DatabaseEncrypted<EncodedString<{
+		data: Encrypted<EncodedString<{
+			username: string;
+			password: string;
+			notes: string[];
+		}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+		algorithm: EncryptionAlgorithm;
+	}>>;
 }
 
 export interface DecryptedPassword {
@@ -82,9 +100,12 @@ export interface DecryptedPassword {
 		exact: string;
 	}[];
 	twofactor_enabled: boolean;
-	encrypted: Encrypted<EncodedString<{
-		username: string;
-		password: string;
-		notes: string[];
-	}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+	encrypted: {
+		data: Encrypted<EncodedString<{
+			username: string;
+			password: string;
+			notes: string[];
+		}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+		algorithm: EncryptionAlgorithm;
+	}
 }

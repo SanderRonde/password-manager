@@ -29,7 +29,7 @@ export namespace Export {
 						const unEncryptedArchive = stdout;
 						console.log('Encrypting, this may take a while...');
 						const { data: encrypted } = encrypt(unEncryptedArchive, 
-							password, CONSTANTS.algorithm);
+							password, CONSTANTS.encryptionAlgorithm);
 						
 						resolve(encrypted);
 					}

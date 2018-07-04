@@ -290,5 +290,8 @@ export class WebserverRouter {
 			apiUseLimiter, this.parent.Routes.API.Password.querymeta);
 		this.parent.app.post('/api/password/allmeta', bruteforceLimiter,
 			apiUseLimiter, this.parent.Routes.API.Password.allmeta);
+
+		this.parent.app.post('/api/user/reset', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Account.reset);
 	}
 }

@@ -3,11 +3,11 @@ import { EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../..
 import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-manipulation";
 import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa";
 import { COLLECTIONS } from "../../../../../../../database/database";
+import { ResponseCaptured } from "../../../modules/ratelimit";
 import { sendEmail } from "../../../../../../../lib/util";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
-import { ResponseCaptured } from "../../../modules/ratelimit";
 
 export class RoutesApiInstance {
 	public Twofactor = new RoutesAPIInstanceTwofactor(this.server);

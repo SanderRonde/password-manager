@@ -1,16 +1,16 @@
 import { PublicKey } from '../database/db-types';
 import { genRandomString } from './util';
+import { CONSTANTS } from './constants';
 import NodeRSA = require('node-rsa');
 import crypto = require('crypto');
-import { CONSTANTS } from './constants';
 
-export type Encrypted<T, K, A extends EncryptionAlgorithm = CONSTANTS['algorithm']> = string & {
+export type Encrypted<T, K, A extends EncryptionAlgorithm = CONSTANTS['encryptionAlgorithm']> = string & {
 	__encrypted: T;
 	__key: K;
 	__algorithm: A;
 }
 
-export type SaltEncrypted<T, K, A extends EncryptionAlgorithm = CONSTANTS['algorithm']> = Encrypted<EncodedString<
+export type SaltEncrypted<T, K, A extends EncryptionAlgorithm = CONSTANTS['encryptionAlgorithm']> = Encrypted<EncodedString<
 	EncodedString<{
 		padded: string;
 		salt: string;

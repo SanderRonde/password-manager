@@ -1,11 +1,12 @@
-import { EncryptionAlgorithm } from "./crypto";
-
 export type CONSTANTS = {
-	algorithm: 'aes-256-ctr'
+	encryptionAlgorithm: 'aes-256-ctr'
+	resetKeyLength: number;
 }
 
 export const CONSTANTS: {
-	algorithm: EncryptionAlgorithm;
+	encryptionAlgorithm: 'aes-256-ctr';
+	resetKeyLength: number;
 } = {
-	algorithm: 'aes-256-ctr'
+	encryptionAlgorithm: 'aes-256-ctr',
+	resetKeyLength: 512
 };

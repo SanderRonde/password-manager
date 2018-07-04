@@ -52,7 +52,7 @@ export class DatabaseEncryption {
 
 	public dbEncrypt<T>(data: T, 
 		key: string = this._deObfuscateKey()): DatabaseEncrypted<EncodedString<T>> {
-			return encrypt(data, key, CONSTANTS.algorithm) as DatabaseEncrypted<EncodedString<T>>;
+			return encrypt(data, key, CONSTANTS.encryptionAlgorithm) as DatabaseEncrypted<EncodedString<T>>;
 		}
 
 	public dbDecrypt<T>(data: DatabaseEncrypted<EncodedString<T>>, 
@@ -62,7 +62,7 @@ export class DatabaseEncryption {
 
 	public dbEncryptWithSalt<T>(data: T,
 		key: string = this._deObfuscateKey()): DatabaseEncryptedWithSalt<T> {
-			return encryptWithSalt(data, key, CONSTANTS.algorithm) as DatabaseEncryptedWithSalt<T>;
+			return encryptWithSalt(data, key, CONSTANTS.encryptionAlgorithm) as DatabaseEncryptedWithSalt<T>;
 		}
 
 	public dbDecryptWithSalt<T>(data: DatabaseEncryptedWithSalt<T>,
@@ -117,13 +117,14 @@ export class DatabaseEncryption {
 	}
 
 	public dbDecryptAccountRecord({
-		email, pw, twofactor_secret, twofactor_enabled
+		email, pw, twofactor_secret, twofactor_enabled, masterpassword
 	}: EncryptedAccount|UnstringifyObjectIDs<EncryptedAccount>): DecryptedAccount {
 		return {
 			email: this.dbDecrypt(email),
 			pw: this.dbDecrypt(pw),
 			twofactor_secret: this.dbDecrypt(twofactor_secret),
-			twofactor_verified: this.dbDecryptWithSalt(twofactor_enabled)
+			twofactor_verified: this.dbDecryptWithSalt(twofactor_enabled),
+			masterpassword: this.dbDecrypt(masterpassword)
 		}
 	}
 }

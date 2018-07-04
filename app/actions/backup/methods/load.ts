@@ -28,7 +28,7 @@ export namespace Load {
 			console.log('Decrypting file...');
 			const decrypted = await decrypt<string, string>({
 				data: file,
-				algorithm: CONSTANTS.algorithm
+				algorithm: CONSTANTS.encryptionAlgorithm
 			}, password);
 
 			console.log('Restoring...');
