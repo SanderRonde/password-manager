@@ -1,8 +1,7 @@
 import { TypedObjectID, EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from './db-types';
 import { DatabaseManipulation } from './libs/db-manipulation';
 import { DatabaseEncryption } from './libs/db-encryption';
-import { exitWith } from '../lib/util';
-import promptly = require('promptly');
+import { exitWith, readPassword } from '../lib/util';
 import mongo = require('mongodb');
 import { Log } from '../main';
 
@@ -21,7 +20,7 @@ export async function getDatabase(log: Log, dbPath: string, key: string,
 			//Give them 5 tries
 			for (let i = 0; i < 5; i++) {
 				log.write(`Attempt ${i + 1}/5`);
-				const password = await promptly.password('Please enter the database password');
+				const password = await readPassword(log, 'Please enter the database password');
 				if (instance.Crypto.canDecrypt(password)) {
 					instance.Crypto.setKey(password);
 					return instance;

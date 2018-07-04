@@ -8,7 +8,7 @@ import * as commander from 'commander';
 
 export type Log = {
 	write(...args: any[]): void;
-	read?(): Promise<string>;
+	read?(description: string): Promise<string>;
 };
 
 export default async function main(argv: string[], log: Log = {

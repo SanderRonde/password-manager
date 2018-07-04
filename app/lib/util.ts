@@ -3,9 +3,9 @@ import commentJson = require('comment-json');
 import nodemailer = require('nodemailer');
 import promptly = require('promptly');
 import mkdirp = require('mkdirp');
+import { Log } from '../main';
 import path = require('path');
 import fs = require('fs');
-import { Log } from '../main';
 
 export function readFile(filePath: string): Promise<string> {
 	return new Promise<string>((resolve, reject) => {
@@ -61,8 +61,8 @@ export function exitWith(log: Log, err: string): never {
 
 export async function getConfirmedPassword(log: Log, msg: string): Promise<string> {
 	while (true) {
-		const password = await promptly.password(msg);
-		if (await promptly.password('Please confirm your password') === password) {
+		const password = await readPassword(log, msg);
+		if (await readPassword(log, 'Please confirm your password') === password) {
 			return password;
 		} else {
 			log.write('Passwords don\'t match, please try again\n');
@@ -155,4 +155,20 @@ export function genRandomString(length: number = 50): string {
 		str += chars[Math.floor(Math.random() * chars.length)];
 	}
 	return str;
+}
+
+export function readPassword(log: Log, text: string) {
+	if (!log.read) {
+		return promptly.password(text);
+	} else {
+		return log.read(text);
+	}
+}
+
+export function readConfirm(log: Log, text: string) {
+	if (!log.read) {
+		return promptly.confirm(text);
+	} else {
+		return log.read(text);
+	}
 }
