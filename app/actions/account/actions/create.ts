@@ -15,7 +15,7 @@ export namespace CreateAccount {
 			pw: database.Crypto.dbEncrypt(hash(pad(password, 'masterpwverify'))),
 			twofactor_enabled: database.Crypto.dbEncryptWithSalt(false),
 			twofactor_secret: database.Crypto.dbEncrypt(null),
-			masterpassword: database.Crypto.dbEncrypt(encrypt({
+			reset_key: database.Crypto.dbEncrypt(encrypt({
 				integrity: true as true,
 				pw: password
 			}, resetKey, CONSTANTS.encryptionAlgorithm))

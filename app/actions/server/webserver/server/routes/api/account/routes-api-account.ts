@@ -50,7 +50,7 @@ export class RoutesAPIAccount {
 				COLLECTIONS.USERS, {
 					_id: this.server.database.Crypto.dbDecrypt(instance.user_id)
 				});
-			const { masterpassword } = this.server.database.Crypto.dbDecryptAccountRecord(
+			const { reset_key: accountResetKey } = this.server.database.Crypto.dbDecryptAccountRecord(
 				encryptedAccount);
 
 			let decrypted: {
@@ -58,7 +58,7 @@ export class RoutesAPIAccount {
 				pw: string;
 			};
 			try {
-				decrypted = decrypt(masterpassword, reset_key);
+				decrypted = decrypt(accountResetKey, reset_key);
 			} catch(e) {
 				res.status(400);
 				res.json({
@@ -134,7 +134,7 @@ export class RoutesAPIAccount {
 			}, {
 				pw: this.server.database.Crypto.dbEncrypt(
 					hash(pad(newmasterpassword, 'masterpwverify'))),
-				masterpassword: this.server.database.Crypto.dbEncrypt(encrypt({
+				reset_key: this.server.database.Crypto.dbEncrypt(encrypt({
 						integrity: true as true, // ?
 						pw: newmasterpassword
 					}, newResetKey, CONSTANTS.encryptionAlgorithm)

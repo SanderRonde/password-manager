@@ -35,7 +35,7 @@ export interface EncryptedAccount {
 	twofactor_secret: DatabaseEncrypted<EncodedString<string>>;
 	pw: DatabaseEncrypted<EncodedString<Hashed<Padded<MasterPassword, 
 		MasterPasswordVerificatonPadding>>>>;
-	masterpassword: DatabaseEncrypted<EncodedString<{
+	reset_key: DatabaseEncrypted<EncodedString<{
 		data: Encrypted<EncodedString<{
 			integrity: true;
 			pw: MasterPassword;
@@ -49,7 +49,7 @@ export interface DecryptedAccount {
 	twofactor_verified: boolean;
 	twofactor_secret: string
 	pw: Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>;
-	masterpassword: {
+	reset_key: {
 		data: Encrypted<EncodedString<{
 			integrity: true;
 			pw: MasterPassword;
