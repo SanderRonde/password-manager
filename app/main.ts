@@ -6,126 +6,135 @@ import { getDatabase } from "./database/database";
 import { readJSON, exitWith } from "./lib/util";
 import * as commander from 'commander';
 
-commander
-	.version('0.1.0', '-v, --version');
+export default async function main(argv: string[]) {
+	commander
+		.version('0.1.0', '-v, --version');
 
-commander
-	.command('account <action>')
-	.description('create or delete an account')
-	.option('-a, --account <email>', 'Account name (email)')
-	.option('-p, --password <pw>', 'The password used to decrypt the database')
-	.option('-d, --database <location>', 'The path to the database', 
-		'mongodb://127.0.0.1:27017/pwmanager')
-	.action(async (action: string, { 
-		account: email,
-		database: databasePath,
-		password: dbPassword
-	}: { 
-		account: string;
-		database: string;
-		password?: string;
-	}) => {
-		if (!email) {
-			exitWith('Please supply the email of the account to edit through -a');
-		}
-		switch (action.toLowerCase()) {
-			case 'create':
-				Account.CreateAccount.createAccount(email, await getDatabase(databasePath, dbPassword, true));
-				break;
-			case 'delete':
-				Account.DeleteAccount.deleteAccount(email, await getDatabase(databasePath, dbPassword, true));
-				break;
-			default:
-				exitWith('Invalid account action, choose "create" or "delete"');
-		}
-	});
-
-commander
-	.command('backup <method>')
-	.description('backup the database')
-	.option('-c, --config', 'The path to a configuration file')
-	.option('-p, --password', 'A password that is used to encrpt/decrypt the backup file')
-	.option('-i, --input', 'The path to the backup file to load (if using "load")')
-	.option('-o, --output', 'The path to the backup file output (if using "local")')
-	.option('-d, --database <location>', 'The path to the database', 
-		'mongodb://127.0.0.1:27017/pwmanager')
-	.action(async (method: string, settings: BackupSettings) => {
-		if (settings.config) {
-			settings = {
-				...await readJSON<BackupConfig>(settings.config),
-				config: settings.config,
-				isConfig: true
+	commander
+		.command('account <action>')
+		.description('create or delete an account')
+		.option('-a, --account <email>', 'Account name (email)')
+		.option('-p, --password <pw>', 'The password used to decrypt the database')
+		.option('-d, --database <location>', 'The path to the database', 
+			'mongodb://127.0.0.1:27017/pwmanager')
+		.action(async (action: string, { 
+			account: email,
+			database: databasePath,
+			password: dbPassword
+		}: { 
+			account: string;
+			database: string;
+			password?: string;
+		}) => {
+			if (!email) {
+				exitWith('Please supply the email of the account to edit through -a');
 			}
-		}
-
-		switch (method.toLowerCase()) {
-			case 'load':
-			case 'open':
-				if (settings.config) {
-					exitWith('You specified a config file but you\'re using' + 
-						'the "load" option. This seems a bit conflicting,' +
-						' remove the config option to continue');
-				}
-				if (!settings.input) {
-					exitWith('No input was specified');
-				}
-				break;
-			case 'drive':
-			case 'google':
-			case 'googledrive':
-				Backup.GoogleDrive.backup(settings);
-				break;
-			case 'local':
-				if (!settings.output) {
-					exitWith('No output was specified');
-				}
-				Backup.Local.backup(settings);
-				break;
-			default:
-				exitWith('Invalid backup method, choose "load", "drive" or "local"');
-		}
-	});
-
-commander
-	.command('server')
-	.description('run the webserver and the API endpoint')
-	.option('-c, --config', 'The path to a configuration file')
-	.option('--http <http_port>', 'The port to use for non-https traffic', 80)
-	.option('--https <https_port>', 'The port to use for https traffic', 443)
-	.option('--https-key <https_key>', 'The path to the HTTPS key')
-	.option('--https-cert <https_cert>', 'The path to the HTTPS cert')
-	.option('-p, --password <pw>', 'The password used to decrypt the database')
-	.option('-d, --database <location>', 'The path to the database', 
-		'mongodb://127.0.0.1:27017/pwmanager')
-	.action(async (settings: ServerSettings) => {
-		if (settings.config) {
-			settings = {
-				...await readJSON<ServerConfig>(settings.config),
-				config: settings.config,
-				isConfig: true
+			switch (action.toLowerCase()) {
+				case 'create':
+					Account.CreateAccount.createAccount(email, await getDatabase(databasePath, dbPassword, true));
+					break;
+				case 'delete':
+					Account.DeleteAccount.deleteAccount(email, await getDatabase(databasePath, dbPassword, true));
+					break;
+				default:
+					exitWith('Invalid account action, choose "create" or "delete"');
 			}
-		}
-		Server.run(await getDatabase(settings.database, settings.password, false),
-			settings as  ServerConfig);
-	});
+		});
 
-commander
-	.command('genconfig <command>')
-	.description('generate a config file for given command')
-	.option('-o, --output', 'The path to the output location')
-	.action(async (command: string, settings: {
-		output?: string;
-	}) => {
-		switch (command) {
-			case 'server':
-				Server.genConfig(settings);
-				break;
-			case 'backup':
-				Backup.genConfig(settings);
-				break;
-			default:
-				exitWith('Given command has no config file, use "server" or "backup"');
-		}
-	});
+	commander
+		.command('backup <method>')
+		.description('backup the database')
+		.option('-c, --config', 'The path to a configuration file')
+		.option('-p, --password', 'A password that is used to encrpt/decrypt the backup file')
+		.option('-i, --input', 'The path to the backup file to load (if using "load")')
+		.option('-o, --output', 'The path to the backup file output (if using "local")')
+		.option('-d, --database <location>', 'The path to the database', 
+			'mongodb://127.0.0.1:27017/pwmanager')
+		.action(async (method: string, settings: BackupSettings) => {
+			if (settings.config) {
+				settings = {
+					...await readJSON<BackupConfig>(settings.config),
+					config: settings.config,
+					isConfig: true
+				}
+			}
 
-commander.parse(process.argv);
+			switch (method.toLowerCase()) {
+				case 'load':
+				case 'open':
+					if (settings.config) {
+						exitWith('You specified a config file but you\'re using' + 
+							'the "load" option. This seems a bit conflicting,' +
+							' remove the config option to continue');
+					}
+					if (!settings.input) {
+						exitWith('No input was specified');
+					}
+					break;
+				case 'drive':
+				case 'google':
+				case 'googledrive':
+					Backup.GoogleDrive.backup(settings);
+					break;
+				case 'local':
+					if (!settings.output) {
+						exitWith('No output was specified');
+					}
+					Backup.Local.backup(settings);
+					break;
+				default:
+					exitWith('Invalid backup method, choose "load", "drive" or "local"');
+			}
+		});
+
+	commander
+		.command('server')
+		.description('run the webserver and the API endpoint')
+		.option('-c, --config', 'The path to a configuration file')
+		.option('--http <http_port>', 'The port to use for non-https traffic', 80)
+		.option('--https <https_port>', 'The port to use for https traffic', 443)
+		.option('--https-key <https_key>', 'The path to the HTTPS key')
+		.option('--https-cert <https_cert>', 'The path to the HTTPS cert')
+		.option('-p, --password <pw>', 'The password used to decrypt the database')
+		.option('-d, --database <location>', 'The path to the database', 
+			'mongodb://127.0.0.1:27017/pwmanager')
+		.action(async (settings: ServerSettings) => {
+			if (settings.config) {
+				settings = {
+					...await readJSON<ServerConfig>(settings.config),
+					config: settings.config,
+					isConfig: true
+				}
+			}
+			Server.run(await getDatabase(settings.database, settings.password, false),
+				settings as  ServerConfig);
+		});
+
+	commander
+		.command('genconfig <command>')
+		.description('generate a config file for given command')
+		.option('-o, --output', 'The path to the output location')
+		.action(async (command: string, settings: {
+			output?: string;
+		}) => {
+			switch (command) {
+				case 'server':
+					Server.genConfig(settings);
+					break;
+				case 'backup':
+					Backup.genConfig(settings);
+					break;
+				default:
+					exitWith('Given command has no config file, use "server" or "backup"');
+			}
+		});
+
+	commander.parse(argv);
+}
+
+if (require.main === module) {
+	main(process.argv).catch(error => {
+	  	console.error(error.stack || error.message || error);
+	  	process.exitCode = 1;
+	});
+}
