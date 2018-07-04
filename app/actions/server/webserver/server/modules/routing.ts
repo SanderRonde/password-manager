@@ -290,7 +290,5 @@ export class WebserverRouter {
 			apiUseLimiter, this.parent.Routes.API.Password.querymeta);
 		this.parent.app.post('/api/password/allmeta', bruteforceLimiter,
 			apiUseLimiter, this.parent.Routes.API.Password.allmeta);
-
-		//TODO: Master master password
 	}
 }
