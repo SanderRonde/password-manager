@@ -7,8 +7,8 @@ export interface ServerArgs {
 	config?: string;
 	http: number;
 	https: number;
-	https_key?: string;
-	https_cert?: string;
+	httpsKey?: string;
+	httpsCert?: string;
 	dbpath: string;
 	password?: string;
 	database: string;

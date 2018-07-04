@@ -28,11 +28,11 @@ export class Webserver {
 		this.app = express();
 		this._initMiddleware();
 		
-		await Promise.all([...(this.config.https_key && this.config.https_cert ?
+		await Promise.all([...(this.config.httpsKey && this.config.httpsCert ?
 			[new Promise(async (resolve) => {
 				http2.createSecureServer({
-					key: await readFile(this.config.https_key),
-					cert: await readFile(this.config.https_cert)
+					key: await readFile(this.config.httpsKey),
+					cert: await readFile(this.config.httpsCert)
 				}, this.app as any).listen(this.config.https, () => {
 					console.log(`HTTPS server listening on port ${this.config.https}`);
 					resolve();
