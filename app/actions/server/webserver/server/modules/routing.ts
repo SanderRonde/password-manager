@@ -10,6 +10,16 @@ import mongo = require('mongodb');
 type ResponseCapturedRequestHandler = (req: express.Request,
 	res: ResponseCaptured, next: express.NextFunction) => any;
 
+type BasicType = 'string'|'boolean'|'number';;
+type TypecheckConfig = {
+	val: string;
+	type: BasicType;
+}|{
+	val: string;
+	type: 'array';
+	inner: BasicType;
+}
+
 export class WebserverRouter {
 	constructor(public parent: Webserver) { 
 		this._init();
@@ -175,7 +185,56 @@ export class WebserverRouter {
 		return true;
 	}
 
-	
+	private _printTypeErr(res: ResponseCaptured, val: string, type: BasicType|'array', inner?: BasicType) {
+		if (inner) {
+			res.status(400);
+			res.json({
+				success: false,
+				error: `param "${val}" not of type ${type}[]`
+			});
+		} else {
+			res.status(400);
+			res.json({
+				success: false,
+				error: `param "${val}" not of type ${type}`
+			});
+		}
+	}
+
+	public typeCheck(req: express.Request, res: ResponseCaptured, configs: TypecheckConfig[]) {
+		const body = req.body;
+		for (const config of configs) {
+			const { val, type } = config;
+			if (!(val in body)) {
+				continue;
+			}
+			const value = body[val];
+			switch (config.type) {
+				case 'boolean':
+				case 'number':
+				case 'string':
+					if (typeof value !== type) {
+						this._printTypeErr(res, val, type);
+						return false;
+					}
+					break;
+				case 'array':
+					if (!Array.isArray(value)) {
+						this._printTypeErr(res, val, type);
+						return false;
+					} else {
+						for (const item of value) {
+							if (typeof item !== config.inner) {
+								this._printTypeErr(res, val, type, config.inner);
+								return false;
+							}
+						}
+					}
+					break;
+			}
+		}
+		return true;
+	}
 
 	private _register() {
 		this.parent.app.enable('trust proxy');

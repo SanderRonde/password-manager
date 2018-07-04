@@ -22,6 +22,16 @@ export class RoutesApiInstance {
 		}, { }>([
 			'public_key', 'email', 'password'
 		], [], async (req, res, { public_key }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'email',
+				type: 'string'
+			}, {
+				val: 'public_key',
+				type: 'string'
+			}, {
+				val: 'password',
+				type: 'string'
+			}])) return;
 			const auth = await this.server.Router.checkPasswordFromBody(req, res);
 			if (auth === false) {
 				return;
@@ -60,6 +70,14 @@ export class RoutesApiInstance {
 		}, {}>([
 			'instance_id', 'password_hash'
 		], [], async (_req, res, { instance_id, password_hash }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'password_hash',
+				type: 'string'
+			}])) return;
+
 			//Get user from instance ID
 			const instance = await this.server.database.Manipulation.findOne(
 				COLLECTIONS.INSTANCES, {
@@ -119,6 +137,14 @@ export class RoutesApiInstance {
 		}, {}>([
 			'instance_id', 'oldToken'
 		], [], async (_req, res, { instance_id, oldToken }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'oldToken',
+				type: 'string'
+			}])) return;
+
 			const { instance } = await this.server.Router.verifyAndGetInstance(instance_id, res);
 			if (!instance) return;
 

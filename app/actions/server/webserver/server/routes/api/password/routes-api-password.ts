@@ -71,6 +71,24 @@ export class RoutesApiPassword {
 		}, {}>([
 			'instance_id', 'token', 'websites', 'encrypted', 'twofactor_enabled'
 		], [], async (_req, res, { instance_id, token, websites, encrypted, twofactor_enabled }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}, {
+				val: 'websites',
+				type: 'array',
+				inner: 'string'
+			}, {
+				val: 'twofactor_enabled',
+				type: 'boolean'
+			}, {
+				val: 'encrypted',
+				type: 'string'
+			}])) return;
+
 			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
 
 			const { decryptedInstance } = 
@@ -135,6 +153,30 @@ export class RoutesApiPassword {
 			twofactor_enabled, 
 			websites 
 		}) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}, {
+				val: 'password_id',
+				type: 'string'
+			}, {
+				val: 'websites',
+				type: 'array',
+				inner: 'string'
+			}, {
+				val: 'twofactor_enabled',
+				type: 'boolean'
+			}, {
+				val: 'twofactor_token',
+				type: 'string'
+			}, {
+				val: 'encrypted',
+				type: 'string'
+			}])) return;
+
 			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
 
 			const { decryptedInstance, accountPromise } = 
@@ -189,6 +231,20 @@ export class RoutesApiPassword {
 		], [
 			'twofactor_token'
 		], async (_req, res, { token, instance_id, password_id, twofactor_token }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}, {
+				val: 'password_id',
+				type: 'string'
+			}, {
+				val: 'twofactor_token',
+				type: 'string'
+			}])) return;
+
 			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
 
 			const { decryptedInstance, accountPromise } = 
@@ -226,6 +282,20 @@ export class RoutesApiPassword {
 		], [
 			'twofactor_token'
 		], async (_req, res, { token, instance_id, password_id, twofactor_token }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}, {
+				val: 'password_id',
+				type: 'string'
+			}, {
+				val: 'twofactor_token',
+				type: 'string'
+			}])) return;
+
 			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
 
 			const { decryptedInstance, accountPromise } = 
@@ -261,6 +331,17 @@ export class RoutesApiPassword {
 		}, {}>([
 			'instance_id', 'token', 'password_id'
 		], [], async (_req, res, { token, instance_id, password_id }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}, {
+				val: 'password_id',
+				type: 'string'
+			}])) return;
+
 			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
 
 			const { decryptedInstance } = 
@@ -293,6 +374,17 @@ export class RoutesApiPassword {
 		}, {}>([
 			'instance_id', 'token', 'password_hash'
 		], [], async (_req, res, { token, instance_id, password_hash }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}, {
+				val: 'password_hash',
+				type: 'string'
+			}])) return;
+
 			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
 
 			const { decryptedInstance } = 
@@ -339,6 +431,17 @@ export class RoutesApiPassword {
 		}, {}>([
 			'instance_id', 'token', 'url'
 		], [], async (_req, res, { token, instance_id, url: website_url }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}, {
+				val: 'url',
+				type: 'string'
+			}])) return;
+			
 			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
 
 			const { decryptedInstance } = 

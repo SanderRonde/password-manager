@@ -18,6 +18,17 @@ export class RoutesAPIInstanceTwofactor {
 		},{ }>([
 			'instance_id', 'password', 'email'
 		], [], async (req, res, { instance_id }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'password',
+				type: 'string'
+			}, {
+				val: 'email',
+				type: 'string'
+			},])) return;
+
 			const auth = await this.server.Router.checkPasswordFromBody(req, res);
 			if (auth === false) return;
 
@@ -88,6 +99,20 @@ export class RoutesAPIInstanceTwofactor {
 		},{ }>([
 			'instance_id', 'password', 'email', 'twofactor_token'
 		], [], async (req, res, { instance_id, twofactor_token }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'password',
+				type: 'string'
+			}, {
+				val: 'email',
+				type: 'string'
+			}, {
+				val: 'twofactor_token',
+				type: 'string'
+			}])) return;
+
 			const auth = await this.server.Router.checkPasswordFromBody(req, res);
 			if (auth === false) return;
 
@@ -139,6 +164,14 @@ export class RoutesAPIInstanceTwofactor {
 		},{ }>([
 			'instance_id', 'twofactor_token'
 		], [], async (_req, res, { instance_id, twofactor_token }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'twofactor_token',
+				type: 'string'
+			}])) return;
+
 			const { instance, decryptedInstance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
 			if (!instance) return;
@@ -178,6 +211,17 @@ export class RoutesAPIInstanceTwofactor {
 		}>([
 			'instance_id', 'twofactor_token', 'pw_verification_token'
 		], [], async (_req, res, { instance_id, twofactor_token, pw_verification_token }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'twofactor_token',
+				type: 'string'
+			}, {
+				val: 'pw_verification_token',
+				type: 'string'
+			}])) return;
+
 			const { instance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
 			if (!instance) return;
