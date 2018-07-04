@@ -130,6 +130,63 @@ export class RoutesApiInstance {
 		})(req, res, next);
 	}
 
+	public logout(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+			token: string;
+		}, {}>([
+			'instance_id', 'token'
+		], [], async (_req, res, { instance_id, token }) => {
+			if (!this.server.Router.typeCheck(req, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}])) return;
+
+			const { instance } = await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (!instance) return;
+
+			if (!this.server.Auth.invalidateToken(token, instance._id.toHexString())) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'invalid credentials'
+				});
+			} else {
+				res.status(200);
+				res.json({
+					success: true,
+					data: {}
+				});
+			}
+
+			if (instance.twofactor_enabled) {
+				//Require twofactor authentication before giving out token
+				res.status(200);
+				res.json({
+					success: true,
+					data: {
+						twofactor_required: true,
+						twofactor_auth_token: this.server.Auth.genTwofactorToken(
+							instance._id.toHexString())
+					}
+				});
+			} else {
+				res.status(200);
+				res.json({
+					success: true,
+					data: {
+						twofactor_required: false,
+						auth_token: this.server.Auth.genLoginToken(
+							instance._id.toHexString())
+					}
+				});
+			}
+		})(req, res, next);
+	}
+
 	public extendKey(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;

@@ -71,6 +71,14 @@ export class WebserverAuth {
 		return false;
 	}
 
+	public invalidateToken(token: string, instance: StringifiedObjectId<EncryptedInstance>) {
+		if (this.verifyLoginToken(token, instance)) {
+			this._loginTokens.delete(token);
+			return true;
+		}
+		return false;
+	}
+
 	public genTwofactorToken(instance: StringifiedObjectId<EncryptedInstance>) {
 			const token = this._genRandomToken();
 			this._twofactorTokens.set(token, {

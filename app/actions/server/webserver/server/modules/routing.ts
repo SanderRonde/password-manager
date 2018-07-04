@@ -264,6 +264,8 @@ export class WebserverRouter {
 			instanceCreateLimiter, this.parent.Routes.API.Instance.register);
 		this.parent.app.post('/api/instance/login', bruteforceLimiter,
 			instanceCreateLimiter, this.parent.Routes.API.Instance.login);
+		this.parent.app.post('/api/instance/logout', bruteforceLimiter,
+			instanceCreateLimiter, this.parent.Routes.API.Instance.logout);
 		this.parent.app.post('/api/instance/extend_key', bruteforceLimiter,
 			apiUseLimiter, this.parent.Routes.API.Instance.extendKey);
 
