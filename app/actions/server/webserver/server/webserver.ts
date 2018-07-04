@@ -7,6 +7,7 @@ import { ServerConfig } from "../../server";
 import bodyParser = require('body-parser');
 import express = require('express');
 import http2 = require('http2');
+import { Log } from "../../../../main";
 
 
 export class Webserver {
@@ -15,7 +16,7 @@ export class Webserver {
 	public Routes: WebserverRoutes = new WebserverRoutes(this);
 	public Router: WebserverRouter = new WebserverRouter(this);
 
-	constructor(public database: Database, public config: ServerConfig) {
+	constructor(public database: Database, public config: ServerConfig, public log: Log) {
 		this._init();
 	}
 
@@ -34,13 +35,13 @@ export class Webserver {
 					key: await readFile(this.config.httpsKey),
 					cert: await readFile(this.config.httpsCert)
 				}, this.app as any).listen(this.config.https, () => {
-					console.log(`HTTPS server listening on port ${this.config.https}`);
+					this.log.write(`HTTPS server listening on port ${this.config.https}`);
 					resolve();
 				});
 			})] : []), 
 			new Promise((resolve) => {
 				http2.createSecureServer({}, this.app as any).listen(this.config.http, () => {
-					console.log(`HTTP server listening on port ${this.config.http}`);
+					this.log.write(`HTTP server listening on port ${this.config.http}`);
 					resolve();
 				});
 			})

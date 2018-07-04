@@ -1,13 +1,14 @@
 import { TypedObjectID, EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from './db-types';
+import { DatabaseManipulation } from './libs/db-manipulation';
 import { DatabaseEncryption } from './libs/db-encryption';
 import { exitWith } from '../lib/util';
 import promptly = require('promptly');
 import mongo = require('mongodb');
-import { DatabaseManipulation } from './libs/db-manipulation';
+import { Log } from '../main';
 
-export async function getDatabase(dbPath: string, key: string, 
+export async function getDatabase(log: Log, dbPath: string, key: string, 
 		quitOnError: boolean): Promise<Database> {
-		const instance = await new Database(dbPath, quitOnError).init();
+		const instance = await new Database(dbPath, quitOnError, log).init();
 
 		const isReadline = !!key;
 		if (!isReadline) {
@@ -15,11 +16,11 @@ export async function getDatabase(dbPath: string, key: string,
 				instance.Crypto.setKey(key);
 				return instance;
 			}
-			exitWith('Database can\'t be decrypted with that key; password invalid');		
+			exitWith(log, 'Database can\'t be decrypted with that key; password invalid');		
 		} else {
 			//Give them 5 tries
 			for (let i = 0; i < 5; i++) {
-				console.log(`Attempt ${i + 1}/5`);
+				log.write(`Attempt ${i + 1}/5`);
 				const password = await promptly.password('Please enter the database password');
 				if (instance.Crypto.canDecrypt(password)) {
 					instance.Crypto.setKey(password);
@@ -27,7 +28,7 @@ export async function getDatabase(dbPath: string, key: string,
 				}
 			}
 		}
-		return exitWith('Database can\'t be decrypted with that key; password invalid');
+		return exitWith(log, 'Database can\'t be decrypted with that key; password invalid');
 	}
 
 export interface TypedCollection<C = any> extends mongo.Collection<MongoRecord<C>> {
@@ -64,7 +65,7 @@ export class Database {
 	public Crypto: DatabaseEncryption = new DatabaseEncryption(this)
 	public Manipulation: DatabaseManipulation = new DatabaseManipulation(this)
 
-	constructor(private _dbPath: string, private _quitOnError: boolean) { }
+	constructor(private _dbPath: string, private _quitOnError: boolean, public log: Log) { }
 
 	public async init() {
 		if (this._initialized) {
@@ -80,9 +81,9 @@ export class Database {
 		return await mongo.connect(this._dbPath).catch((err) => {
 			if (err !== null && err) {
 				if (err.message.includes('ECONNREFUSED')) {
-					exitWith('Looks like you didn\'t start the mongodb service');
+					exitWith(this.log, 'Looks like you didn\'t start the mongodb service');
 				}
-				exitWith(err.message);
+				exitWith(this.log, err.message);
 			}
 		}) as mongo.Db;
 	}
@@ -99,7 +100,7 @@ export class Database {
 		if (this._quitOnError) {
 			throw new Error(message);
 		} else {
-			console.log(message);
+			this.log.write(message);
 		}
 	}
 }

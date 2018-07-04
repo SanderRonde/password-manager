@@ -2,13 +2,14 @@ import { CONSTANTS } from '../../lib/constants';
 import { encrypt } from '../../lib/crypto';
 import { exitWith } from '../../lib/util';
 import { exec } from 'child_process';
+import { Log } from '../../main';
 
 export namespace Export {
-	function assertDumpExists() {
+	function assertDumpExists(log: Log) {
 		return new Promise<boolean>((resolve) => {
 			exec('mongodump --help', (err) => {
 				if (err) {
-					exitWith('Please install the tools from' + 
+					exitWith(log, 'Please install the tools from' + 
 						' https://github.com/mongodb/mongo-tools');
 				}
 				resolve(!err);
@@ -16,18 +17,18 @@ export namespace Export {
 		});
 	}
 
-	export async function exportDatabase(dbPath: string, password: string): Promise<string> {
+	export async function exportDatabase(log: Log, dbPath: string, password: string): Promise<string> {
 		return new Promise<string>(async (resolve) => {
-			await assertDumpExists();
-			console.log('Dumping...');
+			await assertDumpExists(log);
+			log.write('Dumping...');
 			exec(`mongodump --uri ${dbPath}` + 
 				` --archive`, (err, stdout, stderr) => {
 					if (err || stderr) {
-						console.log(stderr);
-						exitWith('Failed to run dumping program');
+						log.write(stderr);
+						exitWith(log, 'Failed to run dumping program');
 					} else {
 						const unEncryptedArchive = stdout;
-						console.log('Encrypting, this may take a while...');
+						log.write('Encrypting, this may take a while...');
 						const { data: encrypted } = encrypt(unEncryptedArchive, 
 							password, CONSTANTS.encryptionAlgorithm);
 						

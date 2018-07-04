@@ -6,7 +6,16 @@ import { getDatabase } from "./database/database";
 import { readJSON, exitWith } from "./lib/util";
 import * as commander from 'commander';
 
-export default async function main(argv: string[], isRequired: boolean = true) {
+export type Log = {
+	write(...args: any[]): void;
+	read?(): Promise<string>;
+};
+
+export default async function main(argv: string[], log: Log = {
+	write(...args) {
+		console.log(...args);
+	}
+}) {
 	commander
 		.version('0.1.0', '-v, --version');
 
@@ -27,17 +36,17 @@ export default async function main(argv: string[], isRequired: boolean = true) {
 			password?: string;
 		}) => {
 			if (!email) {
-				exitWith('Please supply the email of the account to edit through -a');
+				exitWith(log, 'Please supply the email of the account to edit through -a');
 			}
 			switch (action.toLowerCase()) {
 				case 'create':
-					Account.CreateAccount.createAccount(email, await getDatabase(databasePath, dbPassword, true));
+					Account.CreateAccount.createAccount(log, email, await getDatabase(log, databasePath, dbPassword, true));
 					break;
 				case 'delete':
-					Account.DeleteAccount.deleteAccount(email, await getDatabase(databasePath, dbPassword, true));
+					Account.DeleteAccount.deleteAccount(log, email, await getDatabase(log, databasePath, dbPassword, true));
 					break;
 				default:
-					exitWith('Invalid account action, choose "create" or "delete"');
+					exitWith(log, 'Invalid account action, choose "create" or "delete"');
 			}
 		});
 
@@ -63,27 +72,27 @@ export default async function main(argv: string[], isRequired: boolean = true) {
 				case 'load':
 				case 'open':
 					if (settings.config) {
-						exitWith('You specified a config file but you\'re using' + 
+						exitWith(log, 'You specified a config file but you\'re using' + 
 							'the "load" option. This seems a bit conflicting,' +
 							' remove the config option to continue');
 					}
 					if (!settings.input) {
-						exitWith('No input was specified');
+						exitWith(log, 'No input was specified');
 					}
 					break;
 				case 'drive':
 				case 'google':
 				case 'googledrive':
-					Backup.GoogleDrive.backup(settings);
+					Backup.GoogleDrive.backup(log, settings);
 					break;
 				case 'local':
 					if (!settings.output) {
-						exitWith('No output was specified');
+						exitWith(log, 'No output was specified');
 					}
-					Backup.Local.backup(settings);
+					Backup.Local.backup(log, settings);
 					break;
 				default:
-					exitWith('Invalid backup method, choose "load", "drive" or "local"');
+					exitWith(log, 'Invalid backup method, choose "load", "drive" or "local"');
 			}
 		});
 
@@ -107,7 +116,7 @@ export default async function main(argv: string[], isRequired: boolean = true) {
 					isConfig: true
 				}
 			}
-			Server.run(await getDatabase(settings.database, settings.password, false),
+			Server.run(await getDatabase(log, settings.database, settings.password, false),
 				settings as  ServerConfig);
 		});
 
@@ -126,7 +135,7 @@ export default async function main(argv: string[], isRequired: boolean = true) {
 					Backup.genConfig(settings);
 					break;
 				default:
-					exitWith('Given command has no config file, use "server" or "backup"');
+					exitWith(log, 'Given command has no config file, use "server" or "backup"');
 			}
 		});
 
@@ -134,7 +143,7 @@ export default async function main(argv: string[], isRequired: boolean = true) {
 }
 
 if (require.main === module) {
-	main(process.argv, false).catch(error => {
+	main(process.argv).catch(error => {
 	  	console.error(error.stack || error.message || error);
 	  	process.exitCode = 1;
 	});

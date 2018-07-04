@@ -76,7 +76,7 @@ export class DatabaseEncryption {
 		});
 		if (!record) {
 			//Uninitialized database, initialize now
-			console.log('Empty database, creating with this key');
+			this._parent.log.write('Empty database, creating with this key');
 			await this._parent.mongoInstance.collection('meta').insertOne({
 				type: 'database',
 				data: this.dbEncrypt('decrypted', key)

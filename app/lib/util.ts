@@ -5,6 +5,7 @@ import promptly = require('promptly');
 import mkdirp = require('mkdirp');
 import path = require('path');
 import fs = require('fs');
+import { Log } from '../main';
 
 export function readFile(filePath: string): Promise<string> {
 	return new Promise<string>((resolve, reject) => {
@@ -53,18 +54,18 @@ export async function readJSON<T>(filePath: string): Promise<T> {
 	return commentJson.parse(await readFile(filePath) as EncodedString<T>);
 }
 
-export function exitWith(err: string): never {
-	console.log(err);
+export function exitWith(log: Log, err: string): never {
+	log.write(err);
 	return process.exit(1);
 }
 
-export async function getConfirmedPassword(msg: string): Promise<string> {
+export async function getConfirmedPassword(log: Log, msg: string): Promise<string> {
 	while (true) {
 		const password = await promptly.password(msg);
 		if (await promptly.password('Please confirm your password') === password) {
 			return password;
 		} else {
-			console.log('Passwords don\'t match, please try again\n');
+			log.write('Passwords don\'t match, please try again\n');
 		}
 	}
 }
@@ -81,7 +82,7 @@ interface Secrets {
 }
 
 let _secrets: Secrets;
-export function getSecrets(): Secrets {
+export function getSecrets(log: Log): Secrets {
 	if (_secrets) {
 		return _secrets;
 	}
@@ -89,7 +90,7 @@ export function getSecrets(): Secrets {
 		_secrets = require('../../secrets');
 		return _secrets;
 	} catch(e) {
-		return exitWith('Please provide a ./secrets.js file');
+		return exitWith(log, 'Please provide a ./secrets.js file');
 	}
 }
 
@@ -108,11 +109,11 @@ export async function createTempFile(filePath: string, data: string) {
 	}
 }
 
-export function sendEmail({ email }: ServerConfig, to: string,
+export function sendEmail(log: Log, { email }: ServerConfig, to: string,
 	subject: string, content: string) {
 		if (!email) {
-			console.log('Attempting to send email while no email settings are' + 
-			' configured, skipping');
+			log.write('Attempting to send email while no email settings are' + 
+				' configured, skipping');
 			return;
 		}
 
@@ -141,7 +142,7 @@ export function sendEmail({ email }: ServerConfig, to: string,
 			text: content
 		}, (err) => {
 			if (err) {
-				console.log(err);
+				log.write(err);
 			}
 		});
 	}

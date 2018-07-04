@@ -140,7 +140,7 @@ export class RoutesAPIAccount {
 				}
 			});
 
-			sendEmail(this.server.config, email, 'Account reset',
+			sendEmail(this.server.log, this.server.config, email, 'Account reset',
 				'Your master password has been changed and so has your reset key.' + 
 				' If you know the previous reset key, go to your favorite' + 
 				' client and hit the "undo reset" button.');
@@ -273,7 +273,7 @@ export class RoutesAPIAccount {
 				}
 			});
 
-			sendEmail(this.server.config, email, 'Account reset undone',
+			sendEmail(this.server.log, this.server.config, email, 'Account reset undone',
 				'Your master password has been changed through an undo and so has your reset key.');
 		})(req, res, next);
 	}
@@ -333,7 +333,7 @@ export class RoutesAPIAccount {
 				}
 			});
 
-			sendEmail(this.server.config, email, 'Reset key changed',
+			sendEmail(this.server.log, this.server.config, email, 'Reset key changed',
 				'Your reset key has been changed');
 		})(req, res, next);
 	}
