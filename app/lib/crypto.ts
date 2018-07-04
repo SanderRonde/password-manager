@@ -26,9 +26,9 @@ export type Hashed<T, A extends HashingAlgorithms = 'sha512'> = string & {
 	__agorithm: A;
 }
 
-export type MasterPasswordVerificatonPadding = 'masterpwverify';
+export type MasterPasswordVerificationPadding = 'masterpwverify';
 export type MasterPasswordDecryptionpadding = 'masterpwdecrypt';
-export type Paddings = MasterPasswordVerificatonPadding | 
+export type Paddings = MasterPasswordVerificationPadding | 
 	MasterPasswordDecryptionpadding;
 
 export type Padded<T extends string, P extends Paddings> = string & {

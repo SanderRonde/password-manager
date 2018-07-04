@@ -1,5 +1,5 @@
 import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword, DatabaseEncrypted } from "../../../../../database/db-types";
-import { Hashed, Padded, MasterPasswordVerificatonPadding } from "../../../../../lib/crypto";
+import { Hashed, Padded, MasterPasswordVerificationPadding } from "../../../../../lib/crypto";
 import { COLLECTIONS } from "../../../../../database/database";
 import { Webserver } from "../webserver";
 import { getStores, ResponseCaptured, APIResponse } from "./ratelimit";
@@ -31,9 +31,9 @@ export class WebserverRouter {
 
 	public checkPassword(_req: express.Request, res: ResponseCaptured,
 		actualPassword: DatabaseEncrypted<EncodedString<Hashed<Padded<string,
-			MasterPasswordVerificatonPadding>>>>, 
+			MasterPasswordVerificationPadding>>>>, 
 		expectedPassword: DatabaseEncrypted<EncodedString<Hashed<Padded<string,
-			MasterPasswordVerificatonPadding>>>>) {
+			MasterPasswordVerificationPadding>>>>) {
 				if (actualPassword !== expectedPassword) {
 					res.status(200);
 					res.json({
@@ -49,7 +49,7 @@ export class WebserverRouter {
 		supressErr: boolean = false): Promise<false|MongoRecord<EncryptedAccount>> {
 			const { email, password } = req.body as {
 				email: string;
-				password: Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>;
+				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 			};
 			if (!email || !password) {
 				res.status(400);
@@ -293,5 +293,9 @@ export class WebserverRouter {
 
 		this.parent.app.post('/api/user/reset', bruteforceLimiter,
 			apiUseLimiter, this.parent.Routes.API.Account.reset);
+		this.parent.app.post('/api/user/undoreset', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Account.undoreset);
+		this.parent.app.post('/api/user/genresetkey', bruteforceLimiter,
+			apiUseLimiter, this.parent.Routes.API.Account.regenkey);
 	}
 }

@@ -1,4 +1,4 @@
-import { Encrypted, Hashed, Padded, MasterPasswordVerificatonPadding, MasterPasswordDecryptionpadding, SaltEncrypted, EncryptionAlgorithm } from "../lib/crypto";
+import { Encrypted, Hashed, Padded, MasterPasswordVerificationPadding, MasterPasswordDecryptionpadding, SaltEncrypted, EncryptionAlgorithm } from "../lib/crypto";
 import mongo = require('mongodb');
 
 //Database stuff
@@ -34,7 +34,7 @@ export interface EncryptedAccount {
 	twofactor_enabled: DatabaseEncryptedWithSalt<boolean>;
 	twofactor_secret: DatabaseEncrypted<EncodedString<string>>;
 	pw: DatabaseEncrypted<EncodedString<Hashed<Padded<MasterPassword, 
-		MasterPasswordVerificatonPadding>>>>;
+		MasterPasswordVerificationPadding>>>>;
 	reset_key: DatabaseEncrypted<EncodedString<{
 		data: Encrypted<EncodedString<{
 			integrity: true;
@@ -42,13 +42,22 @@ export interface EncryptedAccount {
 		}>, ResetKey>;
 		algorithm: EncryptionAlgorithm;
 	}>>;
+	reset_reset_keys: DatabaseEncrypted<EncodedString<{
+		data: Encrypted<EncodedString<{
+			data: Encrypted<EncodedString<{
+				integrity: true;
+			}>, ResetKey>;
+			algorithm: EncryptionAlgorithm;
+		}>, MasterPassword>;
+		algorithm: EncryptionAlgorithm;
+	}>>[];
 }
 
 export interface DecryptedAccount {
 	email: string;
 	twofactor_verified: boolean;
 	twofactor_secret: string
-	pw: Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>;
+	pw: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 	reset_key: {
 		data: Encrypted<EncodedString<{
 			integrity: true;
@@ -56,6 +65,15 @@ export interface DecryptedAccount {
 		}>, ResetKey>;
 		algorithm: EncryptionAlgorithm;
 	};
+	reset_reset_keys: {
+		data: Encrypted<EncodedString<{
+			data: Encrypted<EncodedString<{
+				integrity: true;
+			}>, ResetKey>;
+			algorithm: EncryptionAlgorithm;
+		}>, MasterPassword>;
+		algorithm: EncryptionAlgorithm;
+	}[];
 }
 
 //Instance

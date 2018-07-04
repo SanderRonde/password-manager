@@ -1,5 +1,5 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord } from "../../../../../../../database/db-types";
-import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificatonPadding } from "../../../../../../../lib/crypto";
+import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
 import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-manipulation";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
@@ -63,11 +63,14 @@ export class RoutesApiPassword {
 			token: string;
 			websites: string[];
 			twofactor_enabled: boolean;
-			encrypted: Encrypted<EncodedString<{
-				username: string;
-				password: string;
-				notes: string[];
-			}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+			encrypted: {
+				data: Encrypted<EncodedString<{
+					username: string;
+					password: string;
+					notes: string[];
+				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+				algorithm: EncryptionAlgorithm;
+			}
 		}, {}>([
 			'instance_id', 'token', 'websites', 'encrypted', 'twofactor_enabled'
 		], [], async (_req, res, { instance_id, token, websites, encrypted, twofactor_enabled }) => {
@@ -135,11 +138,14 @@ export class RoutesApiPassword {
 			websites: string[];
 			twofactor_enabled: boolean;
 			twofactor_token: string;
-			encrypted: Encrypted<EncodedString<{
-				username: string;
-				password: string;
-				notes: string[];
-			}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+			encrypted: {
+				data: Encrypted<EncodedString<{
+					username: string;
+					password: string;
+					notes: string[];
+				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+				algorithm: EncryptionAlgorithm;
+			}
 		}>([
 			'instance_id', 'token'
 		], [
@@ -370,7 +376,7 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: string;
-			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>;
+			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, {}>([
 			'instance_id', 'token', 'password_hash'
 		], [], async (_req, res, { token, instance_id, password_hash }) => {

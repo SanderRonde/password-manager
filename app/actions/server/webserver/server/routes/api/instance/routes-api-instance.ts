@@ -1,4 +1,4 @@
-import { encryptWithPublicKey, Hashed, Padded, MasterPasswordVerificatonPadding } from "../../../../../../../lib/crypto";
+import { encryptWithPublicKey, Hashed, Padded, MasterPasswordVerificationPadding } from "../../../../../../../lib/crypto";
 import { EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../../../database/db-types";
 import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-manipulation";
 import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa";
@@ -66,7 +66,7 @@ export class RoutesApiInstance {
 	public login(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificatonPadding>>;
+			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, {}>([
 			'instance_id', 'password_hash'
 		], [], async (_req, res, { instance_id, password_hash }) => {
@@ -85,7 +85,7 @@ export class RoutesApiInstance {
 				});
 			
 			if (!instance) {
-				res.status(400);
+				res.status(200);
 				res.json({
 					success: false,
 					//Invalid instance ID
