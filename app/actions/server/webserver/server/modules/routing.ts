@@ -236,6 +236,20 @@ export class WebserverRouter {
 		return true;
 	}
 
+	private _wrapInErrorHandler(fn: (req: express.Request, res: ResponseCaptured, next: express.NextFunction) => any) {
+		return (req: express.Request, res: ResponseCaptured, next: express.NextFunction) => {
+			try {
+				fn(req, res, next);
+			} catch(e) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'server error'
+				});
+			}
+		}
+	}
+
 	private _register() {
 		this.parent.app.enable('trust proxy');
 
@@ -261,43 +275,61 @@ export class WebserverRouter {
 
 		//API
 		this.parent.app.post('/api/instance/register', bruteforceLimiter,
-			instanceCreateLimiter, this.parent.Routes.API.Instance.register);
+			instanceCreateLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Instance.register));
 		this.parent.app.post('/api/instance/login', bruteforceLimiter,
-			instanceCreateLimiter, this.parent.Routes.API.Instance.login);
+			instanceCreateLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Instance.login));
 		this.parent.app.post('/api/instance/logout', bruteforceLimiter,
-			instanceCreateLimiter, this.parent.Routes.API.Instance.logout);
+			instanceCreateLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Instance.logout));
 		this.parent.app.post('/api/instance/extend_key', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Instance.extendKey);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Instance.extendKey));
 
 		this.parent.app.post('/api/instance/2fa/enable', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Instance.Twofactor.enable);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Instance.Twofactor.enable));
 		this.parent.app.post('/api/instance/2fa/disable', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Instance.Twofactor.disable);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Instance.Twofactor.disable));
 		this.parent.app.post('/api/instance/2fa/confirm', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Instance.Twofactor.confirm);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Instance.Twofactor.confirm));
 		this.parent.app.post('/api/instance/2fa/verify', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Instance.Twofactor.verify);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Instance.Twofactor.verify));
 
 		this.parent.app.post('/api/password/set', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Password.set);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Password.set));
 		this.parent.app.post('/api/password/update', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Password.update);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Password.update));
 		this.parent.app.post('/api/password/remove', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Password.remove);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Password.remove));
 		this.parent.app.post('/api/password/get', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Password.get);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Password.get));
 		this.parent.app.post('/api/password/getmeta', bruteforceLimiter,
-			apiUseLimiter, 	this.parent.Routes.API.Password.getmeta);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Password.getmeta));
 		this.parent.app.post('/api/password/querymeta', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Password.querymeta);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Password.querymeta));
 		this.parent.app.post('/api/password/allmeta', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Password.allmeta);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Password.allmeta));
 
 		this.parent.app.post('/api/user/reset', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Account.reset);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Account.reset));
 		this.parent.app.post('/api/user/undoreset', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Account.undoreset);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Account.undoreset));
 		this.parent.app.post('/api/user/genresetkey', bruteforceLimiter,
-			apiUseLimiter, this.parent.Routes.API.Account.regenkey);
+			apiUseLimiter, this._wrapInErrorHandler(
+				this.parent.Routes.API.Account.regenkey));
 	}
 }
