@@ -271,7 +271,7 @@ export class WebserverRouter {
 			apiUseLimiter, 
 			instanceCreateLimiter, 
 			bruteforceLimiter 
-		} = getStores();
+		} = getStores(this.parent.config);
 
 		//API
 		this.parent.app.post('/api/instance/register', bruteforceLimiter,

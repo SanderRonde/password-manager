@@ -12,6 +12,7 @@ export interface ServerArgs {
 	dbpath: string;
 	password?: string;
 	database: string;
+	rateLimit: boolean;
 }
 
 export interface ServerConfig extends ServerArgs {

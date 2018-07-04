@@ -6,7 +6,7 @@ import { getDatabase } from "./database/database";
 import { readJSON, exitWith } from "./lib/util";
 import * as commander from 'commander';
 
-export default async function main(argv: string[]) {
+export default async function main(argv: string[], isRequired: boolean = true) {
 	commander
 		.version('0.1.0', '-v, --version');
 
@@ -95,6 +95,7 @@ export default async function main(argv: string[]) {
 		.option('--https <https_port>', 'The port to use for https traffic', 443)
 		.option('--https-key <https_key>', 'The path to the HTTPS key')
 		.option('--https-cert <https_cert>', 'The path to the HTTPS cert')
+		.option('--no-rate-limit', 'Disable rate limiting')
 		.option('-p, --password <pw>', 'The password used to decrypt the database')
 		.option('-d, --database <location>', 'The path to the database', 
 			'mongodb://127.0.0.1:27017/pwmanager')
@@ -133,7 +134,7 @@ export default async function main(argv: string[]) {
 }
 
 if (require.main === module) {
-	main(process.argv).catch(error => {
+	main(process.argv, false).catch(error => {
 	  	console.error(error.stack || error.message || error);
 	  	process.exitCode = 1;
 	});
