@@ -34,7 +34,7 @@ export namespace DeleteAccount {
 	export async function deleteAccount(log: Log, email: string, database: Database) {
 		const record = await getPassword(log, email, database);
 		if (record === false) {
-			log.write('Failed 3 times, exitting');
+			log.write('Failed 3 times, exiting');
 			process.exit(1);
 			return;
 		}

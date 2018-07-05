@@ -5,9 +5,10 @@ import { readFile } from "../../../../lib/util";
 import { WebserverAuth } from "./modules/auth";
 import { ServerConfig } from "../../server";
 import bodyParser = require('body-parser');
-import express = require('express');
-import http2 = require('http2');
 import { Log } from "../../../../main";
+import express = require('express');
+import https = require('https');
+import http = require('http');
 
 
 export class Webserver {
@@ -31,16 +32,16 @@ export class Webserver {
 		
 		await Promise.all([...(this.config.httpsKey && this.config.httpsCert ?
 			[new Promise(async (resolve) => {
-				http2.createSecureServer({
+				https.createServer({
 					key: await readFile(this.config.httpsKey),
 					cert: await readFile(this.config.httpsCert)
-				}, this.app as any).listen(this.config.https, () => {
+				}, this.app).listen(this.config.https, () => {
 					this.log.write(`HTTPS server listening on port ${this.config.https}`);
 					resolve();
 				});
 			})] : []), 
 			new Promise((resolve) => {
-				http2.createSecureServer({}, this.app as any).listen(this.config.http, () => {
+				http.createServer(this.app).listen(this.config.http, () => {
 					this.log.write(`HTTP server listening on port ${this.config.http}`);
 					resolve();
 				});

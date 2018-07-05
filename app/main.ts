@@ -4,20 +4,21 @@ import { ServerConfig, ServerSettings, Server } from "./actions/server/server";
 import { Account } from "./actions/account/account";
 import { getDatabase } from "./database/database";
 import { readJSON, exitWith } from "./lib/util";
+import { CONSTANTS } from "./lib/constants";
 import * as commander from 'commander';
 
-export type Log = {
+export interface Log {
 	write(...args: any[]): void;
 	read?(description: string): Promise<string>;
 };
 
-export default async function main(argv: string[], log: Log = {
+export async function main(argv: string[], log: Log = {
 	write(...args) {
 		console.log(...args);
 	}
-}) {
+}, overrideStdout: boolean = false) {
 	commander
-		.version('0.1.0', '-v, --version');
+		.version(CONSTANTS.version, '-v, --version');
 
 	commander
 		.command('account <action>')
@@ -139,7 +140,22 @@ export default async function main(argv: string[], log: Log = {
 			}
 		});
 
+	commander
+		.command('*')
+		.action(() => {
+			commander.help();
+		});
+
+	const originalWrite = process.stdout.write;
+	if (overrideStdout) {
+		process.stdout.write = ((...vals: any[]) => {
+			log.write.apply(log, vals);
+		}) as any;
+	}
 	commander.parse(argv);
+	if (overrideStdout) {
+		process.stdout.write = originalWrite;
+	}
 }
 
 if (require.main === module) {

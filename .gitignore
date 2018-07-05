@@ -63,3 +63,4 @@ app/*.js
 secrets.js
 
 app/**/*.js
+test/**/*.js

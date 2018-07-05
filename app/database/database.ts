@@ -6,7 +6,7 @@ import mongo = require('mongodb');
 import { Log } from '../main';
 
 export async function getDatabase(log: Log, dbPath: string, key: string, 
-		quitOnError: boolean): Promise<Database> {
+	quitOnError: boolean): Promise<Database> {
 		const instance = await new Database(dbPath, quitOnError, log).init();
 
 		const isReadline = !!key;
@@ -20,7 +20,8 @@ export async function getDatabase(log: Log, dbPath: string, key: string,
 			//Give them 5 tries
 			for (let i = 0; i < 5; i++) {
 				log.write(`Attempt ${i + 1}/5`);
-				const password = await readPassword(log, 'Please enter the database password');
+				const password = await readPassword(log, await instance.Crypto.hasEncryptionPassword() ?
+					'Please enter the database password' : 'Please enter a new database password');
 				if (instance.Crypto.canDecrypt(password)) {
 					instance.Crypto.setKey(password);
 					return instance;

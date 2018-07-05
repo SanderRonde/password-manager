@@ -22,5 +22,6 @@
     "compileOnSave": true,
     "include": [
         "app/",
+        "test/"
     ]
 }

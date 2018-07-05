@@ -70,6 +70,13 @@ export class DatabaseEncryption {
 			return decryptWithSalt(data, key) as T;
 		}
 
+	public async hasEncryptionPassword() {
+		const record = await this._parent.mongoInstance.collection('meta').findOne({
+			type: 'database'
+		});
+		return !!record;
+	}
+
 	public async canDecrypt(key: string) {
 		const record = await this._parent.mongoInstance.collection('meta').findOne({
 			type: 'database'
