@@ -12,6 +12,17 @@ export interface Log {
 	read?(description: string): Promise<string>;
 };
 
+const HELP_ARGS = ['-v', '--version', '-h', '--help'];
+
+function calledHelpArg(argv: string[]) {
+	for (const helpArg of HELP_ARGS) {
+		if (argv.indexOf(helpArg) !== -1) {
+			return true;
+		}
+	}
+	return false;
+}
+
 export async function main(argv: string[], log: Log = {
 	write(...args) {
 		console.log(...args);
@@ -154,7 +165,7 @@ export async function main(argv: string[], log: Log = {
 	}
 
 	commander.parse(argv);
-	if (!handled) {
+	if (!handled && !calledHelpArg(argv)) {
 		commander.help();
 	}
 
