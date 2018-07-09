@@ -23,7 +23,7 @@ export async function main(argv: string[], log: Log = {
 		.version(VERSION, '-v, --version');
 
 	commander
-		.command('account <action>')
+		.command('account <create/delete>')
 		.description('create or delete an account')
 		.option('-a, --account <email>', 'Account name (email)')
 		.option('-p, --password <pw>', 'The password used to decrypt the database')
@@ -55,7 +55,7 @@ export async function main(argv: string[], log: Log = {
 		});
 
 	commander
-		.command('backup <method>')
+		.command('backup <load/googledrive/local>')
 		.description('backup the database')
 		.option('-c, --config', 'The path to a configuration file')
 		.option('-p, --password', 'A password that is used to encrpt/decrypt the backup file')
@@ -127,7 +127,7 @@ export async function main(argv: string[], log: Log = {
 		});
 
 	commander
-		.command('genconfig <command>')
+		.command('genconfig <server/backup>')
 		.description('generate a config file for given command')
 		.option('-o, --output', 'The path to the output location')
 		.action(async (command: string, settings: {
