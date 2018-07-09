@@ -17,6 +17,8 @@ export async function main(argv: string[], log: Log = {
 		console.log(...args);
 	}
 }, overrideStdout: boolean = false) {
+	let handled: boolean = false;
+
 	commander
 		.version(VERSION, '-v, --version');
 
@@ -36,6 +38,7 @@ export async function main(argv: string[], log: Log = {
 			database: string;
 			password?: string;
 		}) => {
+			handled = true;
 			if (!email) {
 				exitWith(log, 'Please supply the email of the account to edit through -a');
 			}
@@ -61,6 +64,7 @@ export async function main(argv: string[], log: Log = {
 		.option('-d, --database <location>', 'The path to the database', 
 			'mongodb://127.0.0.1:27017/pwmanager')
 		.action(async (method: string, settings: BackupSettings) => {
+			handled = true;
 			if (settings.config) {
 				settings = {
 					...await readJSON<BackupConfig>(settings.config),
@@ -110,6 +114,7 @@ export async function main(argv: string[], log: Log = {
 		.option('-d, --database <location>', 'The path to the database', 
 			'mongodb://127.0.0.1:27017/pwmanager')
 		.action(async (settings: ServerSettings) => {
+			handled = true;
 			if (settings.config) {
 				settings = {
 					...await readJSON<ServerConfig>(settings.config),
@@ -128,6 +133,7 @@ export async function main(argv: string[], log: Log = {
 		.action(async (command: string, settings: {
 			output?: string;
 		}) => {
+			handled = true;
 			switch (command) {
 				case 'server':
 					Server.genConfig(settings);
@@ -140,19 +146,18 @@ export async function main(argv: string[], log: Log = {
 			}
 		});
 
-	commander
-		.command('*')
-		.action(() => {
-			commander.help();
-		});
-
 	const originalWrite = process.stdout.write;
 	if (overrideStdout) {
 		process.stdout.write = ((...vals: any[]) => {
 			log.write.apply(log, vals);
 		}) as any;
 	}
+
 	commander.parse(argv);
+	if (!handled) {
+		commander.help();
+	}
+
 	if (overrideStdout) {
 		process.stdout.write = originalWrite;
 	}
