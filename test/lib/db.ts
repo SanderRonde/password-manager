@@ -1,7 +1,7 @@
+import { TEST_DATABASE } from '../../app/lib/constants';
 import mongo = require('mongodb');
-import { CONSTANTS } from '../../app/lib/constants';
 
 export async function clearDB() {
-	const instance = await mongo.connect(CONSTANTS.testDatabase);
+	const instance = await mongo.connect(TEST_DATABASE);
 	await instance.dropDatabase();
 }

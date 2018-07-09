@@ -1,6 +1,6 @@
 import { decrypt, EncryptionAlgorithm, Encrypted } from "../../../lib/crypto";
+import { ENCRYPTION_ALGORITHM } from "../../../lib/constants";
 import { exitWith, readFile } from "../../../lib/util";
-import { CONSTANTS } from "../../../lib/constants";
 import { BackupSettings } from "../backup";
 import { exec } from "child_process";
 import { Log } from "../../../main";
@@ -29,7 +29,7 @@ export namespace Load {
 			log.write('Decrypting file...');
 			const decrypted = await decrypt<string, EncryptionAlgorithm, string>({
 				data: file as Encrypted<EncodedString<string>, string, EncryptionAlgorithm>,
-				algorithm: CONSTANTS.encryptionAlgorithm
+				algorithm: ENCRYPTION_ALGORITHM
 			}, password);
 
 			log.write('Restoring...');

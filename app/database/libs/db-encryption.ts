@@ -1,8 +1,8 @@
 import { encrypt, decrypt, encryptWithSalt, decryptWithSalt } from "../../lib/crypto";
 import { DatabaseEncrypted, EncryptedPassword, DecryptedPassword, EncryptedInstance, DecryptedInstance, EncryptedAccount, DecryptedAccount, DatabaseEncryptedWithSalt } from "../db-types";
 import { UnstringifyObjectIDs } from "./db-manipulation";
-import { CONSTANTS } from "../../lib/constants";
 import { Database } from "../database";
+import { ENCRYPTION_ALGORITHM } from "../../lib/constants";
 
 export class DatabaseEncryption {
 	private _obfuscatedKey: string;
@@ -52,7 +52,7 @@ export class DatabaseEncryption {
 
 	public dbEncrypt<T>(data: T, 
 		key: string = this._deObfuscateKey()): DatabaseEncrypted<EncodedString<T>> {
-			return encrypt(data, key, CONSTANTS.encryptionAlgorithm) as DatabaseEncrypted<EncodedString<T>>;
+			return encrypt(data, key, ENCRYPTION_ALGORITHM) as DatabaseEncrypted<EncodedString<T>>;
 		}
 
 	public dbDecrypt<T>(data: DatabaseEncrypted<EncodedString<T>>, 
@@ -62,7 +62,7 @@ export class DatabaseEncryption {
 
 	public dbEncryptWithSalt<T>(data: T,
 		key: string = this._deObfuscateKey()): DatabaseEncryptedWithSalt<T> {
-			return encryptWithSalt(data, key, CONSTANTS.encryptionAlgorithm) as DatabaseEncryptedWithSalt<T>;
+			return encryptWithSalt(data, key, ENCRYPTION_ALGORITHM) as DatabaseEncryptedWithSalt<T>;
 		}
 
 	public dbDecryptWithSalt<T>(data: DatabaseEncryptedWithSalt<T>,

@@ -1,4 +1,4 @@
-import { CONSTANTS } from '../../lib/constants';
+import { ENCRYPTION_ALGORITHM } from '../../lib/constants';
 import { encrypt } from '../../lib/crypto';
 import { exitWith } from '../../lib/util';
 import { exec } from 'child_process';
@@ -30,7 +30,7 @@ export namespace Export {
 						const unEncryptedArchive = stdout;
 						log.write('Encrypting, this may take a while...');
 						const { data: encrypted } = encrypt(unEncryptedArchive, 
-							password, CONSTANTS.encryptionAlgorithm);
+							password, ENCRYPTION_ALGORITHM);
 						
 						resolve(encrypted);
 					}

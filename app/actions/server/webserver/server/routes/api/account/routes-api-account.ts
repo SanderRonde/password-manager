@@ -1,8 +1,8 @@
 import { EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../../../database/db-types";
+import { ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from "../../../../../../../lib/constants";
 import { decrypt, encrypt, hash, pad } from "../../../../../../../lib/crypto";
 import { genRandomString, sendEmail } from "../../../../../../../lib/util";
 import { COLLECTIONS } from "../../../../../../../database/database";
-import { CONSTANTS } from "../../../../../../../lib/constants";
 import { ResponseCaptured } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
 import express = require('express');
@@ -78,7 +78,7 @@ export class RoutesAPIAccount {
 					
 					//Re-encrypt it
 					const reEncrypted = encrypt(decryptedEncrypedSection, newEncryptionHash,
-						CONSTANTS.encryptionAlgorithm as 'aes-256-ctr');				
+						ENCRYPTION_ALGORITHM);				
 
 					await this.server.database.Manipulation.findAndUpdateOne(
 						COLLECTIONS.PASSWORDS, {
@@ -111,7 +111,7 @@ export class RoutesAPIAccount {
 			}));
 
 			//Change password verification key and master password
-			const newResetKey = genRandomString(CONSTANTS.resetKeyLength);
+			const newResetKey = genRandomString(RESET_KEY_LENGTH);
 
 			await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
 				_id: encryptedAccount._id
@@ -121,13 +121,13 @@ export class RoutesAPIAccount {
 				reset_key: this.server.database.Crypto.dbEncrypt(encrypt({
 						integrity: true as true, // ?
 						pw: newmasterpassword
-					}, newResetKey, CONSTANTS.encryptionAlgorithm)
+					}, newResetKey, ENCRYPTION_ALGORITHM)
 				),
 				reset_reset_keys: [...reset_reset_keys, encrypt(
 					encrypt({
 						integrity: true as true
-					}, reset_key, CONSTANTS.encryptionAlgorithm), 
-						decryptedMasterPassword, CONSTANTS.encryptionAlgorithm)].map((key) => {
+					}, reset_key, ENCRYPTION_ALGORITHM), 
+						decryptedMasterPassword, ENCRYPTION_ALGORITHM)].map((key) => {
 							return this.server.database.Crypto.dbEncrypt(key);
 						})
 			});
@@ -214,7 +214,7 @@ export class RoutesAPIAccount {
 					
 					//Re-encrypt it
 					const reEncrypted = encrypt(decryptedEncrypedSection, newEncryptionHash,
-						CONSTANTS.encryptionAlgorithm as 'aes-256-ctr');				
+						ENCRYPTION_ALGORITHM);				
 
 					await this.server.database.Manipulation.findAndUpdateOne(
 						COLLECTIONS.PASSWORDS, {
@@ -247,7 +247,7 @@ export class RoutesAPIAccount {
 			}));
 
 			//Change password verification key and master password
-			const newResetKey = genRandomString(CONSTANTS.resetKeyLength);
+			const newResetKey = genRandomString(RESET_KEY_LENGTH);
 
 			reset_reset_keys.splice(matchIndex, 1);
 			await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
@@ -258,7 +258,7 @@ export class RoutesAPIAccount {
 				reset_key: this.server.database.Crypto.dbEncrypt(encrypt({
 						integrity: true as true, // ?
 						pw: newmasterpassword
-					}, newResetKey, CONSTANTS.encryptionAlgorithm)
+					}, newResetKey, ENCRYPTION_ALGORITHM)
 				),
 				reset_reset_keys: reset_reset_keys.map((key) => {
 					return this.server.database.Crypto.dbEncrypt(key);
@@ -313,7 +313,7 @@ export class RoutesAPIAccount {
 			}
 
 			//Change password verification key and master password
-			const newResetKey = genRandomString(CONSTANTS.resetKeyLength);
+			const newResetKey = genRandomString(RESET_KEY_LENGTH);
 
 			await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
 				_id: encryptedAccount._id
@@ -321,7 +321,7 @@ export class RoutesAPIAccount {
 				reset_key: this.server.database.Crypto.dbEncrypt(encrypt({
 						integrity: true as true, // ?
 						pw: master_password
-					}, newResetKey, CONSTANTS.encryptionAlgorithm)
+					}, newResetKey, ENCRYPTION_ALGORITHM)
 				)
 			});
 

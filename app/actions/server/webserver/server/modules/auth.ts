@@ -1,5 +1,5 @@
 import { StringifiedObjectId, EncryptedInstance } from "../../../../../database/db-types";
-import { CONSTANTS } from "../../../../../lib/constants";
+import { EXPIRE_TIME } from "../../../../../lib/constants";
 
 interface InstanceAuthRepresentation {
 	instance: StringifiedObjectId<EncryptedInstance>;
@@ -45,7 +45,7 @@ export class WebserverAuth {
 		const token = this._genRandomToken();
 		this._loginTokens.set(token, {
 			instance,
-			exprires: Date.now() + CONSTANTS.expireTime
+			exprires: Date.now() + EXPIRE_TIME
 		});
 		return token;
 	}

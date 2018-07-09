@@ -1,7 +1,7 @@
+import { RESET_KEY_LENGTH, ENCRYPTION_ALGORITHM } from "../../../lib/constants";
 import { getConfirmedPassword, genRandomString } from "../../../lib/util";
 import { Database, COLLECTIONS } from "../../../database/database";
 import { EncryptedAccount } from "../../../database/db-types";
-import { CONSTANTS } from "../../../lib/constants";
 import { hash, pad, encrypt } from "../../../lib/crypto";
 import { Log } from "../../../main";
 
@@ -10,7 +10,7 @@ export namespace CreateAccount {
 		//Get a master password
 		const password = await getConfirmedPassword(log, 'Please enter a master password');
 
-		const resetKey = genRandomString(CONSTANTS.resetKeyLength);
+		const resetKey = genRandomString(RESET_KEY_LENGTH);
 		const record: EncryptedAccount = {
 			email: database.Crypto.dbEncrypt(email),
 			pw: database.Crypto.dbEncrypt(hash(pad(password, 'masterpwverify'))),
@@ -19,7 +19,7 @@ export namespace CreateAccount {
 			reset_key: database.Crypto.dbEncrypt(encrypt({
 				integrity: true as true,
 				pw: password
-			}, resetKey, CONSTANTS.encryptionAlgorithm)),
+			}, resetKey, ENCRYPTION_ALGORITHM)),
 			reset_reset_keys: []
 		}
 

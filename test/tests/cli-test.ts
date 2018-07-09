@@ -1,4 +1,4 @@
-import { CONSTANTS } from '../../app/lib/constants';
+import { VERSION } from '../../app/lib/constants';
 import { hookIntoExit } from '../lib/util';
 import { LogCapturer } from '../lib/log';
 import { main } from '../../app/main';
@@ -29,7 +29,7 @@ export function cliTest() {
 					const exit = hookIntoExit(reject);
 					const log = new LogCapturer(reject)
 
-					log.expectWrite(CONSTANTS.version);
+					log.expectWrite(VERSION);
 					exit.expect(0);
 
 					main(['/usr/bin/node', './main.ts', '-v'], log, true);

@@ -4,7 +4,7 @@ import { ServerConfig, ServerSettings, Server } from "./actions/server/server";
 import { Account } from "./actions/account/account";
 import { getDatabase } from "./database/database";
 import { readJSON, exitWith } from "./lib/util";
-import { CONSTANTS } from "./lib/constants";
+import { VERSION } from "./lib/constants";
 import * as commander from 'commander';
 
 export interface Log {
@@ -18,7 +18,7 @@ export async function main(argv: string[], log: Log = {
 	}
 }, overrideStdout: boolean = false) {
 	commander
-		.version(CONSTANTS.version, '-v, --version');
+		.version(VERSION, '-v, --version');
 
 	commander
 		.command('account <action>')
