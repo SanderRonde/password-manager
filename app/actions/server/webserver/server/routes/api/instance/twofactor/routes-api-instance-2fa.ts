@@ -234,8 +234,8 @@ export class RoutesAPIInstanceTwofactor {
 					res.json({
 						success: true,
 						data: {
-							auth_token: this.server.Auth.genLoginToken(
-								instance_id)
+							auth_token: this.server.Auth.genLoginToken(instance_id, 
+								this.server.database.Crypto.dbDecrypt(instance.user_id))
 						}
 					});
 				}

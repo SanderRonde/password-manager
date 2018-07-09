@@ -113,7 +113,7 @@ export class RoutesApiInstance {
 					data: {
 						twofactor_required: true,
 						twofactor_auth_token: this.server.Auth.genTwofactorToken(
-							instance._id.toHexString())
+							instance._id.toHexString(), account._id.toHexString())
 					}
 				});
 			} else {
@@ -123,7 +123,7 @@ export class RoutesApiInstance {
 					data: {
 						twofactor_required: false,
 						auth_token: this.server.Auth.genLoginToken(
-							instance._id.toHexString())
+							instance._id.toHexString(), account._id.toHexString())
 					}
 				});
 			}
@@ -170,7 +170,8 @@ export class RoutesApiInstance {
 					data: {
 						twofactor_required: true,
 						twofactor_auth_token: this.server.Auth.genTwofactorToken(
-							instance._id.toHexString())
+							instance._id.toHexString(), 
+							this.server.database.Crypto.dbDecrypt(instance.user_id))
 					}
 				});
 			} else {
@@ -180,7 +181,8 @@ export class RoutesApiInstance {
 					data: {
 						twofactor_required: false,
 						auth_token: this.server.Auth.genLoginToken(
-							instance._id.toHexString())
+							instance._id.toHexString(),
+							this.server.database.Crypto.dbDecrypt(instance.user_id))
 					}
 				});
 			}
@@ -205,7 +207,8 @@ export class RoutesApiInstance {
 			const { instance } = await this.server.Router.verifyAndGetInstance(instance_id, res);
 			if (!instance) return;
 
-			const newToken = this.server.Auth.extendLoginToken(oldToken, instance_id);
+			const newToken = this.server.Auth.extendLoginToken(oldToken, instance_id,
+				this.server.database.Crypto.dbDecrypt(instance.user_id));
 			if (newToken === false) {
 				res.status(200);
 				res.json({
