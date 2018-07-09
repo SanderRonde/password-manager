@@ -17,5 +17,5 @@ export const CONSTANTS: {
 	resetKeyLength: 512,
 	version: '0.1.0',
 	testDatabase: 'mongodb://127.0.0.1:27017/__pwmanager_test_db',
-	expireTime: 1000 * 60 * 65
+	expireTime: 1000 * 60 * 20
 };
