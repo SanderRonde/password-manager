@@ -1,12 +1,19 @@
-import { captureLogs, getFreshMain } from '../lib/util';
+import { captureLogs, getFreshMain, finalizeLogs } from '../lib/util';
+import { DEFAULT_ARGS, EXECUTABLE_SPECIFIC_HELP } from '../lib/consts';
 import { VERSION } from '../../app/lib/constants';
-import { DEFAULT_HELP } from '../lib/consts';
 // import { clearDB } from '../lib/db';
 
 export function cliTest() {
 	describe('CLI Test', () => {
 		it('should display help information when called without args', () => {
-			DEFAULT_HELP;
+			const { log, exit } = captureLogs();
+
+			log.expectWrite(EXECUTABLE_SPECIFIC_HELP);
+			exit.expect(0);
+
+			getFreshMain().main(DEFAULT_ARGS, log, true);
+
+			finalizeLogs(log, exit);
 		});
 		// beforeEach(async () => {
 		// 	await clearDB();
@@ -26,16 +33,14 @@ export function cliTest() {
 		// });
 		describe('Version', () => {
 			it('should display the version when calling it with -v', () => {
-				return captureLogs(async ({exit, log}) => {
-					log.expectWrite(VERSION);
-					exit.expect(0);
+				const { log, exit } = captureLogs();
 
-					getFreshMain().main([
-						'/usr/bin/node', 
-						'./app/main.js',
-						'-v'
-					], log, true);
-				});
+				log.expectWrite(VERSION);
+				exit.expect(0);
+
+				getFreshMain().main([...DEFAULT_ARGS, '-v'], log, true);
+
+				finalizeLogs(log, exit);
 			});
 		});
 	});

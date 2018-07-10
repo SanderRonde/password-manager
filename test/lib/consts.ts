@@ -12,3 +12,8 @@ function getDefaultHelp() {
 }
 
 export const DEFAULT_HELP = getDefaultHelp();
+
+export const EXECUTABLE_SPECIFIC_HELP = DEFAULT_HELP
+	.replace(/ \[options\]/, 'main [options]');
+
+export const DEFAULT_ARGS = ['/usr/bin/node', './app/main.js'];

@@ -6,8 +6,8 @@ type CustomExitFunction = ((code: number) => never) & {
 	__isOverridden: boolean;
 }
 
-export function hookIntoExit(reject: (err: Error) => void) {
-	const capturer = new ExitCodeCapturer(reject);
+export function hookIntoExit() {
+	const capturer = new ExitCodeCapturer();
 	if ((process.exit as CustomExitFunction).__isOverridden) {
 		const originalExit = process.exit;
 		process.exit = ((code: number) => {
@@ -24,21 +24,17 @@ export function hookIntoExit(reject: (err: Error) => void) {
 	return capturer;
 }
 
-export function captureLogs(handler: (data: { 
-	log: LogCapturer;
-	exit: ExitCodeCapturer;
-}) => Promise<any>) {
-	return new Promise(async (resolve, reject) => {
-		const exit = hookIntoExit(reject);
-		const log = new LogCapturer(reject)
+export function finalizeLogs(log: LogCapturer, exit: ExitCodeCapturer) {
+	log.finalize();
+	exit.finalize();
+}
 
-		await handler({log, exit});
-
-		await log.finalize();
-		await exit.finalize();
-
-		resolve();
-	});
+export function captureLogs() {
+	const exit = hookIntoExit();
+	const log = new LogCapturer()
+	return {
+		exit, log
+	};
 }
 
 export function getFreshMain(): MainExports {
