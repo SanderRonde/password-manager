@@ -1,4 +1,6 @@
 import { ExitCodeCapturer, LogCapturer } from "./log";
+import { MainExports } from "../../app/main";
+import importFresh = require('import-fresh');
 
 type CustomExitFunction = ((code: number) => never) & {
 	__isOverridden: boolean;
@@ -37,4 +39,8 @@ export function captureLogs(handler: (data: {
 
 		resolve();
 	});
+}
+
+export function getFreshMain(): MainExports {
+	return importFresh('../../app/main');
 }

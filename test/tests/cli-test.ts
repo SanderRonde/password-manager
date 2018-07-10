@@ -1,11 +1,7 @@
+import { captureLogs, getFreshMain } from '../lib/util';
 import { VERSION } from '../../app/lib/constants';
 import { DEFAULT_HELP } from '../lib/consts';
-import { MainExports } from '../../app/main';
-import importFresh = require('import-fresh');
-import { captureLogs } from '../lib/util';
 // import { clearDB } from '../lib/db';
-
-const { main } = importFresh('../../app/main') as MainExports;
 
 export function cliTest() {
 	describe('CLI Test', () => {
@@ -34,7 +30,11 @@ export function cliTest() {
 					log.expectWrite(VERSION);
 					exit.expect(0);
 
-					main(['/usr/bin/node', './app/main.js', '-v'], log, true);
+					getFreshMain().main([
+						'/usr/bin/node', 
+						'./app/main.js',
+						'-v'
+					], log, true);
 				});
 			});
 		});

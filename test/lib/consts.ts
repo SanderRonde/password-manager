@@ -1,11 +1,8 @@
-import { MainExports } from '../../app/main';
-import importFresh = require('import-fresh');
-
-const { initCommander } = importFresh('../../app/main') as MainExports;
+import { getFreshMain } from "./util";
 
 function getDefaultHelp() {
 	let helpText: string = '';
-	initCommander({
+	getFreshMain().initCommander({
 		write(..._args: any[]) {}
 	}, { handled: true }).outputHelp((text: string) => {
 		helpText = text;
