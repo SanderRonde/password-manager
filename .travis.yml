@@ -1,0 +1,18 @@
+language: node_js
+cache: yarn
+
+branches:
+  only:
+  - master
+stages:
+- test
+  
+install:
+- yarn --ignore-engines
+script:
+- yarn compile
+- yarn test
+notifications:
+  email:
+    on_success: change
+    on_failure: change

@@ -39,5 +39,9 @@
     "gulp-typescript": "^5.0.0-alpha.3",
     "import-fresh": "^2.0.0",
     "mocha": "^5.2.0"
+  },
+  "scripts": {
+    "compile": "gulp compile",
+    "test": "mocha test/test.js"
   }
 }
