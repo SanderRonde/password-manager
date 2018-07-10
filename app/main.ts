@@ -52,14 +52,23 @@ export function initCommander(log: Log = {
 			password?: string;
 		}) => {
 			handledHolder.handled = true;
-			if (!email) {
-				exitWith(log, 'Please supply the email of the account to edit through -a');
+
+			if (!action) {
+				return;
 			}
-			switch (action.toLowerCase()) {
+			switch ((action || '').toLowerCase()) {
 				case 'create':
+					if (!email) {
+						exitWith(log, 'Please supply the email of the account to edit through -a or --account');
+						return;
+					}
 					Account.CreateAccount.createAccount(log, email, await getDatabase(log, databasePath, dbPassword, true));
 					break;
 				case 'delete':
+					if (!email) {
+						exitWith(log, 'Please supply the email of the account to edit through -a or --account');
+						return;
+					}
 					Account.DeleteAccount.deleteAccount(log, email, await getDatabase(log, databasePath, dbPassword, true));
 					break;
 				default:
@@ -78,6 +87,11 @@ export function initCommander(log: Log = {
 			'mongodb://127.0.0.1:27017/pwmanager')
 		.action(async (method: string, settings: BackupSettings) => {
 			handledHolder.handled = true;
+
+			if (!method) {
+				return;
+			}
+
 			if (settings.config) {
 				settings = {
 					...await readJSON<BackupConfig>(settings.config),
@@ -86,16 +100,18 @@ export function initCommander(log: Log = {
 				}
 			}
 
-			switch (method.toLowerCase()) {
+			switch ((method || '').toLowerCase()) {
 				case 'load':
 				case 'open':
 					if (settings.config) {
 						exitWith(log, 'You specified a config file but you\'re using' + 
 							'the "load" option. This seems a bit conflicting,' +
 							' remove the config option to continue');
+						return;
 					}
 					if (!settings.input) {
 						exitWith(log, 'No input was specified');
+						return;
 					}
 					break;
 				case 'drive':
@@ -106,6 +122,7 @@ export function initCommander(log: Log = {
 				case 'local':
 					if (!settings.output) {
 						exitWith(log, 'No output was specified');
+						return;
 					}
 					Backup.Local.backup(log, settings);
 					break;
@@ -147,6 +164,10 @@ export function initCommander(log: Log = {
 			output?: string;
 		}) => {
 			handledHolder.handled = true;
+
+			if (!command) {
+				return;
+			}
 			switch (command) {
 				case 'server':
 					Server.genConfig(settings);
@@ -171,8 +192,12 @@ export async function main(argv: string[], log: Log = {
 	initCommander(log, handledHolder);
 
 	const originalWrite = process.stdout.write;
+	const originalError = console.error;
 	if (overrideStdout) {
 		process.stdout.write = ((...vals: any[]) => {
+			log.write.apply(log, vals);
+		}) as any;
+		console.error = ((...vals: any[]) => {
 			log.write.apply(log, vals);
 		}) as any;
 	}
@@ -184,6 +209,7 @@ export async function main(argv: string[], log: Log = {
 
 	if (overrideStdout) {
 		process.stdout.write = originalWrite;
+		console.error = originalError;
 	}
 }
 

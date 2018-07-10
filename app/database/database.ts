@@ -82,8 +82,10 @@ export class Database {
 			if (err !== null && err) {
 				if (err.message.includes('ECONNREFUSED')) {
 					exitWith(this.log, 'Looks like you didn\'t start the mongodb service');
+					return;
 				}
 				exitWith(this.log, err.message);
+				return;
 			}
 		}) as mongo.Db;
 	}

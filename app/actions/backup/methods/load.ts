@@ -13,6 +13,7 @@ export namespace Load {
 				if (err) {
 					exitWith(log, 'Please install the tools from' + 
 						' https://github.com/mongodb/mongo-tools');
+					return;
 				}
 				resolve(!err);
 			});
