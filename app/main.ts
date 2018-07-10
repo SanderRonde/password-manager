@@ -4,8 +4,11 @@ import { ServerConfig, ServerSettings, Server } from "./actions/server/server";
 import { Account } from "./actions/account/account";
 import { getDatabase } from "./database/database";
 import { readJSON, exitWith } from "./lib/util";
+import importFresh = require('import-fresh');
+import { CommanderStatic } from "commander";
 import { VERSION } from "./lib/constants";
-import * as commander from 'commander';
+
+const commander: CommanderStatic = importFresh('commander');
 
 export interface Log {
 	write(...args: any[]): void;
@@ -13,7 +16,6 @@ export interface Log {
 };
 
 const HELP_ARGS = ['-v', '--version', '-h', '--help'];
-
 function calledHelpArg(argv: string[]) {
 	for (const helpArg of HELP_ARGS) {
 		if (argv.indexOf(helpArg) !== -1) {
@@ -23,13 +25,13 @@ function calledHelpArg(argv: string[]) {
 	return false;
 }
 
-export async function main(argv: string[], log: Log = {
+export function initCommander(log: Log = {
 	write(...args) {
 		console.log(...args);
 	}
-}, overrideStdout: boolean = false) {
-	let handled: boolean = false;
-
+}, handledHolder: {
+	handled: boolean;
+}) {
 	commander
 		.version(VERSION, '-v, --version');
 
@@ -49,7 +51,7 @@ export async function main(argv: string[], log: Log = {
 			database: string;
 			password?: string;
 		}) => {
-			handled = true;
+			handledHolder.handled = true;
 			if (!email) {
 				exitWith(log, 'Please supply the email of the account to edit through -a');
 			}
@@ -75,7 +77,7 @@ export async function main(argv: string[], log: Log = {
 		.option('-d, --database <location>', 'The path to the database', 
 			'mongodb://127.0.0.1:27017/pwmanager')
 		.action(async (method: string, settings: BackupSettings) => {
-			handled = true;
+			handledHolder.handled = true;
 			if (settings.config) {
 				settings = {
 					...await readJSON<BackupConfig>(settings.config),
@@ -125,7 +127,7 @@ export async function main(argv: string[], log: Log = {
 		.option('-d, --database <location>', 'The path to the database', 
 			'mongodb://127.0.0.1:27017/pwmanager')
 		.action(async (settings: ServerSettings) => {
-			handled = true;
+			handledHolder.handled = true;
 			if (settings.config) {
 				settings = {
 					...await readJSON<ServerConfig>(settings.config),
@@ -144,7 +146,7 @@ export async function main(argv: string[], log: Log = {
 		.action(async (command: string, settings: {
 			output?: string;
 		}) => {
-			handled = true;
+			handledHolder.handled = true;
 			switch (command) {
 				case 'server':
 					Server.genConfig(settings);
@@ -156,6 +158,17 @@ export async function main(argv: string[], log: Log = {
 					exitWith(log, 'Given command has no config file, use "server" or "backup"');
 			}
 		});
+	return commander;
+}
+
+export async function main(argv: string[], log: Log = {
+	write(...args) {
+		console.log(...args);
+	}
+}, overrideStdout: boolean = false) {
+	const handledHolder = { handled: false };
+
+	initCommander(log, handledHolder);
 
 	const originalWrite = process.stdout.write;
 	if (overrideStdout) {
@@ -165,7 +178,7 @@ export async function main(argv: string[], log: Log = {
 	}
 
 	commander.parse(argv);
-	if (!handled && !calledHelpArg(argv)) {
+	if (!handledHolder.handled && !calledHelpArg(argv)) {
 		commander.help();
 	}
 
@@ -179,4 +192,9 @@ if (require.main === module) {
 	  	console.error(error.stack || error.message || error);
 	  	process.exitCode = 1;
 	});
+}
+
+export type MainExports = {
+	main: typeof main;
+	initCommander: typeof initCommander;
 }
