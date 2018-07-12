@@ -4,6 +4,7 @@ import { genRandomString } from "../../app/lib/util";
 import { EventEmitter } from "events";
 import { getDB, clearDB } from "./db";
 import { Readable } from "stream";
+import mongo = require('mongodb');
 
 export function unref(...emitters: (EventEmitter|{
 	unref(): void;
@@ -47,4 +48,8 @@ export function captureURIs(t: RegisterContextual<any>): string[] {
 		await Promise.all(arr.map(clearDB));
 	});
 	return arr;
+}
+
+export async function getCollectionLength(collection: mongo.Collection) {
+	return await (collection as any).countDocuments();
 }

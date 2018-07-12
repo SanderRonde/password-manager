@@ -3,6 +3,7 @@ import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt } f
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../../app/lib/constants';
 import { genRandomString, getDBFromURI } from '../../app/lib/util';
 import { GenericTestContext, Context } from 'ava';
+import { getCollectionLength } from './util';
 import { DEFAULT_EMAIL } from './consts';
 import mongo = require('mongodb');
 
@@ -242,7 +243,7 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 
 	const { db, done } = await getDB(uri);
 
-	t.is(await (db.collection('users') as any).countDocuments(), 1,
+	t.is(await getCollectionLength(db.collection('users')), 1,
 		'a single user was created');
 	
 	//Get record
@@ -341,7 +342,7 @@ export async function hasDeletedAccount(t: GenericTestContext<Context<any>>, {
 }) {
 	const { db, done } = await getDB(uri);
 
-	t.is(await (db.collection('users') as any).countDocuments(), 2,
+	t.is(await getCollectionLength(db.collection('users')), 2,
 		'remaining users did not get deleted');
 	const [ firstAcc, secondAcc ] = await db.collection('users').find().toArray() as 
 		EncryptedAccount[];
@@ -351,9 +352,9 @@ export async function hasDeletedAccount(t: GenericTestContext<Context<any>>, {
 	t.not(secondAcc.email, DEFAULT_EMAIL,
 		'only original account was deleted');
 
-	t.is(await (db.collection('instances') as any).countDocuments(), 2,
+	t.is(await getCollectionLength(db.collection('instances')), 2,
 		'remaining instances did not get deleted');
-	t.is(await (db.collection('passwords') as any).countDocuments(), 2,
+	t.is(await getCollectionLength(db.collection('passwords')), 2,
 		'remaining passwords did not get deleted');
 
 	done();
