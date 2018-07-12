@@ -9,7 +9,7 @@ export namespace DeleteAccount {
 
 		const record: Partial<EncryptedAccount> = {
 			email: database.Crypto.dbEncrypt(email),
-			pw: database.Crypto.dbEncrypt(hash(password))
+			pw: database.Crypto.dbEncrypt(hash(pad(password, 'masterpwverify')))
 		};
 
 		const result = await database.Manipulation.findOne(COLLECTIONS.USERS, record);
