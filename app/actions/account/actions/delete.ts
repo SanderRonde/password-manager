@@ -1,7 +1,7 @@
 import { Database, COLLECTIONS } from "../../../database/database";
 import { EncryptedAccount } from "../../../database/db-types";
 import { readPassword, readConfirm } from "../../../lib/util";
-import { hash } from "../../../lib/crypto";
+import { hash, pad } from "../../../lib/crypto";
 
 export namespace DeleteAccount {
 	async function tryPasswordOnce(email: string, database: Database) {
@@ -67,5 +67,6 @@ export namespace DeleteAccount {
 		});
 
 		console.log('Done deleting user with email', email);
+		await database.kill();
 	}
 }

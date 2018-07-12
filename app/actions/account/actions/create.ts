@@ -29,5 +29,6 @@ export namespace CreateAccount {
 		console.log('Successfully created user!');
 		console.log('Your reset key is', resetKey);
 		console.log('Do not lose this');
+		await database.kill();
 	}
 }

@@ -54,6 +54,7 @@ export class Database {
 	private _initialized: boolean = false;
 	
 	public mongoInstance: mongo.Db;
+	public mongoClient: mongo.MongoClient;
 	public collections: {
 		users: TypedCollection<MongoRecord<EncryptedAccount>>;
 		instances: TypedCollection<MongoRecord<EncryptedInstance>>;
@@ -76,7 +77,7 @@ export class Database {
 	}
 
 	private async _connectToMongo(): Promise<mongo.Db> {
-		return (await mongo.MongoClient.connect(this._dbPath, {
+		this.mongoClient = await mongo.MongoClient.connect(this._dbPath, {
 			useNewUrlParser: true
 		} as mongo.MongoClientOptions).catch((err) => {
 			if (err !== null && err) {
@@ -87,7 +88,8 @@ export class Database {
 				exitWith(err.message);
 				return;
 			}
-		}) as mongo.MongoClient).db(getDBFromURI(this._dbPath)) as mongo.Db;
+		}) as mongo.MongoClient;
+		return this.mongoClient.db(getDBFromURI(this._dbPath)) as mongo.Db;
 	}
 
 	private _getCollections() {
@@ -104,5 +106,9 @@ export class Database {
 		} else {
 			console.log(message);
 		}
+	}
+
+	public async kill() {
+		await this.mongoClient.close();
 	}
 }
