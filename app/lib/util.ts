@@ -14,6 +14,8 @@ class StdinCapturer {
 		process.stdin.on('data', (chunk) => {
 			this._read += chunk.toString();
 			this._updateListeners();
+
+			(process.stdin as any).unref();
 		});
 	}
 
