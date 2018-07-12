@@ -61,11 +61,14 @@ export namespace DeleteAccount {
 			});
 		}));
 
-		console.log('Deleting passwords...');
-		//Delete all passwords from the passwords collection
-		await database.Manipulation.deleteMany(COLLECTIONS.PASSWORDS, {
+		if ((await database.Manipulation.findMany(COLLECTIONS.PASSWORDS, {
 			user_id: id
-		});
+		})).length) {
+			//Delete all passwords from the passwords collection
+			await database.Manipulation.deleteMany(COLLECTIONS.PASSWORDS, {
+				user_id: id
+			});
+		}
 
 		console.log('Deleting user record...');
 		//Delete the record from the users collection
