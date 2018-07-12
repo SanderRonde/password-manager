@@ -151,7 +151,7 @@ export interface DecryptedAccount {
 	/**
 	 * Whether 2FA is enbled
 	 */
-	twofactor_verified: boolean;
+	twofactor_enabled: boolean;
 	/**
 	 * The 2FA secret used to generate codes
 	 */

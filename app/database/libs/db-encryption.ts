@@ -130,7 +130,7 @@ export class DatabaseEncryption {
 			email: this.dbDecrypt(email),
 			pw: this.dbDecrypt(pw),
 			twofactor_secret: this.dbDecrypt(twofactor_secret),
-			twofactor_verified: this.dbDecryptWithSalt(twofactor_enabled),
+			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled),
 			reset_key: this.dbDecrypt(reset_key),
 			reset_reset_keys: reset_reset_keys.map((key) => {
 				return this.dbDecrypt(key);
