@@ -1,6 +1,7 @@
 import RateLimit = require('express-rate-limit');
 import { ServerConfig } from '../../../server';
 import express = require('express');
+import { unref } from '../../../../../../test/lib/util';
 
 export type APIResponse = {
 	success: true;
@@ -31,9 +32,7 @@ class RatelimitStore<K extends string> {
 			this._shiftStack();
 			this._secondCache.clear();
 		}, 1000);
-		if (interval.unref) {
-			interval.unref();
-		}
+		unref(interval);
 	}
 
 	private _shiftStack() {
@@ -128,7 +127,7 @@ function getBruteforceLimiter() {
 		},
 		skipFailedRequests: true,
 		skip(req, res: ResponseCaptured) {
-			res.on('finish', () => {
+			res.once('finish', () => {
 				if (res.__jsonResponse && res.__jsonResponse.success === false) {
 					//If API request was unsuccessful count this request 
 					store.incr((req.body && req.body.instance_id) || req.ip, () => {});

@@ -1,4 +1,5 @@
 import { ServerConfig } from '../actions/server/server';
+import { listenWithoutRef } from '../../test/lib/util';
 import commentJson = require('comment-json');
 import nodemailer = require('nodemailer');
 import Mute = require('mute-stream');
@@ -11,11 +12,10 @@ class StdinCapturer {
 	private _listeners: ((text: string) => void)[] = [];
 
 	constructor() {
-		process.stdin.on('data', (chunk) => {
+		listenWithoutRef(process.stdin, (chunk) => {
 			this._read += chunk.toString();
 			this._updateListeners();
 
-			(process.stdin as any).unref();
 		});
 	}
 

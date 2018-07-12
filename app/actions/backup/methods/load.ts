@@ -1,5 +1,6 @@
 import { decrypt, EncryptionAlgorithm, Encrypted } from "../../../lib/crypto";
 import { ENCRYPTION_ALGORITHM } from "../../../lib/constants";
+import { listenWithoutRef } from "../../../../test/lib/util";
 import { exitWith, readFile } from "../../../lib/util";
 import { BackupSettings } from "../backup";
 import { exec } from "child_process";
@@ -35,7 +36,7 @@ export namespace Load {
 			console.log('Restoring...');
 			const proc = exec(`mongorestore --uri ${database} --archive`);
 			let stderr: string = '';
-			proc.stderr.on('data', (data) => {
+			listenWithoutRef(proc.stderr, (data) => {
 				stderr += data.toString();
 			});
 
@@ -46,7 +47,7 @@ export namespace Load {
 			dataStream.write(decrypted);
 			dataStream.write(null);
 
-			proc.on('exit', (code) => {
+			proc.once('exit', (code) => {
 				if (code) {
 					console.log(stderr);
 					exitWith('Failed to run restore program (password might be wrong)');

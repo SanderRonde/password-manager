@@ -13,18 +13,20 @@ export function cliTest() {
 		});
 	});
 	describe('CLI Test', function() {
-		this.timeout(15000);
+		this.timeout(10000);
+		this.slow(9000);
+
 		it('should display help information when called without args', async () => {
 			const proc = new ProcRunner([]);
-			proc.expectWrite(EXECUTABLE_SPECIFIC_HELP);
+			for (const line of EXECUTABLE_SPECIFIC_HELP.split('\n').slice(0, -1)) {
+				proc.expectWrite(line);
+			}
 			proc.expectExit(0);
 
 			await proc.run();
 			proc.check();
 		});
 		describe('Account', function() {
-			this.timeout(10000);
-			this.slow(9000);
 			it('should print an error when no command is passed', async () => {
 				const proc = new ProcRunner(['account']);
 				proc.expectWrite();
@@ -121,13 +123,18 @@ export function cliTest() {
 						'-d', TEST_DB_URI,
 						'-a', 'some@email.com'
 					]);
+					proc.expectWrite('Attempt 1/5');
 					proc.expectWrite('Please enter the database password');
 					proc.expectRead(pw);
 
 					proc.expectWrite('Please enter a master password');
 					proc.expectRead('somepw');
+					proc.expectWrite('Please confirm your password');
 					proc.expectRead('somepw');
-					proc.expectExit(1);
+					proc.expectWrite('Successfully created user!');
+					proc.expectWrite(/Your reset key is (\w|\d)+/)
+					proc.expectWrite('Do not lose this');
+					proc.expectExit(0);
 
 					await proc.run();
 					proc.check();
@@ -143,13 +150,14 @@ export function cliTest() {
 						'-a', 'some@email.com',
 						'-p', pw
 					]);
-					proc.expectWrite('Please enter the database password');
-					proc.expectRead(pw);
-
 					proc.expectWrite('Please enter a master password');
 					proc.expectRead('somepw');
+					proc.expectWrite('Please confirm your password');
 					proc.expectRead('somepw');
-					proc.expectExit(1);
+					proc.expectWrite('Successfully created user!');
+					proc.expectWrite(/Your reset key is (\w|\d)+/)
+					proc.expectWrite('Do not lose this');
+					proc.expectExit(0);
 
 					await proc.run();
 					proc.check();
@@ -161,13 +169,18 @@ export function cliTest() {
 						'-d', TEST_DB_URI,
 						'-a', 'some@email.com'
 					]);
+					proc.expectWrite('Attempt 1/5');
 					proc.expectWrite('Please enter a new database password');
 					proc.expectRead('dbpw')
 					proc.expectWrite('Empty database, creating with this key');
 
 					proc.expectWrite('Please enter a master password');
 					proc.expectRead('somepw');
+					proc.expectWrite('Please confirm your password');
 					proc.expectRead('somepw');
+					proc.expectWrite('Successfully created user!');
+					proc.expectWrite(/Your reset key is (\w|\d)+/)
+					proc.expectWrite('Do not lose this');
 					proc.expectExit(0);
 
 					await proc.run();
@@ -188,7 +201,11 @@ export function cliTest() {
 
 					proc.expectWrite('Please enter a master password');
 					proc.expectRead('somepw');
+					proc.expectWrite('Please confirm your password');
 					proc.expectRead('somepw');
+					proc.expectWrite('Successfully created user!');
+					proc.expectWrite(/Your reset key is (\w|\d)+/)
+					proc.expectWrite('Do not lose this');
 					proc.expectExit(0);
 
 					await proc.run();
