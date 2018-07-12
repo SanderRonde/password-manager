@@ -142,7 +142,7 @@ export function decrypt<T, A extends EncryptionAlgorithm, K extends string>({ da
 	const ciphertext = input.slice(16);
 	const decipher = crypto.createDecipheriv(algorithm, hash(key).slice(0, 32), iv);
 	const plaintext = decipher.update(ciphertext);
-
+	
 	const final = plaintext.toString() + decipher.final();
 	try {
 		return JSON.parse(final);

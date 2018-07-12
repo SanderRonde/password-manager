@@ -5,49 +5,21 @@ import { UnstringifyObjectIDs } from "./db-manipulation";
 import { Database } from "../database";
 
 export class DatabaseEncryption {
-	private _obfuscatedKey: string;
-	private _keySpacing: number;
-	private readonly _obfuscateChars = 
-		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
+	protected _obfuscatedKey: string;
 
 	constructor(private _parent: Database) {
 		
 	}
 
-	private _obfuscateKey(key: string) {
-		const firstPart = key.slice(0, 256);
-		
-		const obfuscateCharsLength = this._obfuscateChars.length;
-		const spacing = this._keySpacing = Math.floor(256 / firstPart.length + 1);
-		const finalKey: string[] = [];
-		for (const char of firstPart) {
-			for (let i = 0; i < spacing; i++) {
-				const index = Math.floor(Math.random() * obfuscateCharsLength);
-				finalKey.push(this._obfuscateChars[index]);
-			}
-			finalKey.push(char);
-		}
-		for (let i = finalKey.length; finalKey.length < 256; i++) {
-			const index = Math.floor(Math.random() * obfuscateCharsLength);
-			finalKey.push(this._obfuscateChars[index]);
-		}
-		return `${finalKey.join('')}${key.slice(256)}`;
+	protected _obfuscateKey(key: string) {
+		return Buffer
+			.from(key.toString(), 'binary')
+			.toString('base64');
 	}
 
-	private _deObfuscateKey() {
-		const firstPart = this._obfuscatedKey.slice(0, 256);
-		const originalKey: string[] = [];
-
-		const totalSpacing = this._keySpacing + 1;
-		let paddingRemaining = totalSpacing;
-		for (const char of firstPart) {
-			paddingRemaining--;
-			if (paddingRemaining === 0) {
-				originalKey.push(char);
-				paddingRemaining = totalSpacing;
-			}
-		}
-		return `${originalKey.join('')}${this._obfuscatedKey.slice(256)}`;
+	protected _deObfuscateKey() {
+		return Buffer.from(this._obfuscatedKey, 'base64')
+			.toString('binary');
 	}
 
 	public dbEncrypt<T>(data: T, 

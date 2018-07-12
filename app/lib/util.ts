@@ -1,12 +1,12 @@
 import { ServerConfig } from '../actions/server/server';
 import commentJson = require('comment-json');
 import nodemailer = require('nodemailer');
+import { EventEmitter } from 'events';
 import Mute = require('mute-stream');
+import { Readable } from 'stream';
 import mkdirp = require('mkdirp');
 import path = require('path');
 import fs = require('fs');
-import { EventEmitter } from 'events';
-import { Readable } from 'stream';
 
 //Prevent circular import
 function unref(...emitters: (EventEmitter|{

@@ -1,4 +1,9 @@
-import { getFreshMain } from "./util";
+import { MainExports } from "../../app/main";
+import importFresh = require('import-fresh');
+
+function getFreshMain(): MainExports {
+	return importFresh('../../app/main');
+}
 
 function getDefaultHelp() {
 	let helpText: string = '';
@@ -15,3 +20,5 @@ export const EXECUTABLE_SPECIFIC_HELP = DEFAULT_HELP
 	.replace(/ \[options\]/, 'main [options]');
 
 export const DEFAULT_ARGS = ['/usr/bin/node', './app/main.js'];
+
+export const DEFAULT_EMAIL = 'some@email.com';

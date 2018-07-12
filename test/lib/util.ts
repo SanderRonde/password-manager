@@ -1,15 +1,9 @@
 import { GenericTestContext, Context, RegisterContextual } from "ava";
 import { TEST_DB_URI } from "../../app/lib/constants";
 import { genRandomString } from "../../app/lib/util";
-import { MainExports } from "../../app/main";
-import importFresh = require('import-fresh');
 import { EventEmitter } from "events";
 import { getDB, clearDB } from "./db";
 import { Readable } from "stream";
-
-export function getFreshMain(): MainExports {
-	return importFresh('../../app/main');
-}
 
 export function unref(...emitters: (EventEmitter|{
 	unref(): void;

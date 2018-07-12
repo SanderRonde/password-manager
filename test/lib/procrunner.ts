@@ -12,7 +12,15 @@ export class ProcRunner {
 	private _exitCode: number;
 	private _exitCodeExpected: number;
 	private _reads: string[] = [];
-	private _writtenExpected: (string|LOG_VALS|RegExp)[] = [];
+	private _writtenExpected: ({
+		type: 'regular';
+		content: string|LOG_VALS|RegExp;
+	}|{
+		type: 'captureRegxp';
+		content: RegExp;
+	})[] = [];
+
+	private _capturedRegex: RegExpExecArray[] = [];
 	
 	constructor(private _t: GenericTestContext<Context<any>>, private _args: string[]) { }
 
@@ -24,13 +32,29 @@ export class ProcRunner {
 		this._reads.push(answer);
 	}
 
+	public captureRegExp(expr: RegExp) {
+		this._writtenExpected.push({
+			type: 'captureRegxp',
+			content: expr
+		});
+	}
+
 	public expectWrite(text?: string|LOG_VALS|RegExp) {
 		if (text instanceof RegExp) {
-			this._writtenExpected.push(text);
+			this._writtenExpected.push({
+				type: 'regular',
+				content: text
+			});
 		} else if (text) {
-			this._writtenExpected.push(text + '\n');
+			this._writtenExpected.push({
+				type: 'regular',
+				content: text + '\n'
+			});
 		} else {
-			this._writtenExpected.push('\n');		
+			this._writtenExpected.push({
+				type: 'regular',
+				content: '\n'
+			});		
 		}
 	}
 
@@ -38,21 +62,29 @@ export class ProcRunner {
 		this._exitCodeExpected = code;
 	}
 
-	private _areEqual(actual: string, expected: string|LOG_VALS|RegExp): boolean {
-		if (actual === undefined || actual === null || 
-			expected === undefined || expected === null) {
-				return false;
-			}
-
-		if (expected instanceof RegExp) {
-			return !!expected.exec(actual.trim());
-		} else if (typeof expected === 'string') {
-			return actual.trim() === expected.trim();
-		} else {
-			switch (expected) {
-				case LOG_VALS.ANY_STRING:
-					return typeof actual === 'string';
-			}
+	private _areEqual(actual: string, expected:  {
+		type: "regular";
+		content: string | RegExp | LOG_VALS;
+	} | {
+		type: "captureRegxp";
+		content: RegExp;
+	}): boolean {
+		switch (expected.type) {
+			case 'regular':
+				if (expected.content instanceof RegExp) {
+					return !!expected.content.exec(actual.trim());
+				} else if (typeof expected.content === 'string') {
+					return actual.trim() === expected.content.trim();
+				} else {
+					switch (expected.content) {
+						case LOG_VALS.ANY_STRING:
+							return typeof actual === 'string';
+							break;
+					}
+				}
+				break;
+			case 'captureRegxp':
+				return !!expected.content.exec(actual.trim());
 		}
 		return true;
 	}
@@ -65,7 +97,7 @@ export class ProcRunner {
 			const expected = this._writtenExpected[i];
 
 			if (!this._areEqual(written, expected)) {
-				// this._t.log('written', writtenLines, 'expected', this._writtenExpected);
+				this._t.log('written', writtenLines, 'expected', this._writtenExpected);
 			}
 
 			this._t.not(written, undefined, 
@@ -77,19 +109,28 @@ export class ProcRunner {
 			this._t.not(expected, null, 
 				`a value was expected (while writing "${written && written.toString()}")`);
 
-			if (expected instanceof RegExp) {
-				this._t.regex(written.trim(), expected,
-					'written is the same as expected');
-			} else if (typeof expected === 'string') {
-				this._t.is(written.trim(), expected.trim(),
-					'written is the same as expected');
-			} else {
-				switch (expected) {
-					case LOG_VALS.ANY_STRING:
-						this._t.is(typeof written, 'string', 
-							'Written value is string');
-						break;
-				}
+			switch (expected.type) {
+				case 'regular':
+					if (expected.content instanceof RegExp) {
+						this._t.regex(written.trim(), expected.content,
+							'written is the same as expected');
+					} else if (typeof expected.content === 'string') {
+						this._t.is(written.trim(), expected.content.trim(),
+							'written is the same as expected');
+					} else {
+						switch (expected.content) {
+							case LOG_VALS.ANY_STRING:
+								this._t.is(typeof written, 'string', 
+									'Written value is string');
+								break;
+						}
+					}
+					break;
+				case 'captureRegxp':
+					this._t.regex(written.trim(), expected.content,
+						'written is the same as expected');
+					this._capturedRegex.push(expected.content.exec(written.trim()));
+					break;
 			}
 		}
 	}
@@ -126,7 +167,7 @@ export class ProcRunner {
 			this._readText(chunk);
 		});
 
-	for (const val of this._reads) {
+		for (const val of this._reads) {
 			proc.stdin.write(val + '\n');
 		}
 		proc.stdin.end();
@@ -138,5 +179,9 @@ export class ProcRunner {
 				ondone = resolve;
 			}
 		});
+	}
+
+	public getRegexps() {
+		return this._capturedRegex;
 	}
 }
