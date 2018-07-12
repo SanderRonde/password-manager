@@ -335,11 +335,7 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 	done();
 }
 
-export async function hasDeletedAccount(t: GenericTestContext<Context<any>>, {
-	uri
-}: {
-	uri: string;
-}) {
+export async function hasDeletedAccount(t: GenericTestContext<Context<any>>, uri: string) {
 	const { db, done } = await getDB(uri);
 
 	t.is(await getCollectionLength(db.collection('users')), 2,

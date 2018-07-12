@@ -116,9 +116,7 @@ test('it is possible to enter the password manually', async t => {
 	await proc.run();
 	proc.check();
 
-	await hasDeletedAccount(t, {
-		uri
-	});
+	await hasDeletedAccount(t, uri);
 });
 test('work when entering pasword correctly the third time', async t => {
 	const uri = await genTempDatabase(t);
@@ -166,9 +164,7 @@ test('work when entering pasword correctly the third time', async t => {
 	await proc.run();
 	proc.check();
 
-	await hasDeletedAccount(t, {
-		uri
-	});
+	await hasDeletedAccount(t, uri);
 })
 test('it is possible to pass the password', async t => {
 	const uri = await genTempDatabase(t);
@@ -205,9 +201,7 @@ test('it is possible to pass the password', async t => {
 	await proc.run();
 	proc.check();
 
-	await hasDeletedAccount(t, {
-		uri
-	});
+	await hasDeletedAccount(t, uri);
 });
 test('ask for a new database password if not set yet', async t => {
 	const uri = await genTempDatabase(t);
@@ -250,9 +244,7 @@ test('ask for a new database password if not set yet', async t => {
 
 	t.true(await hasCreatedDBWithPW(dbpw, uri),
 		'the database has been initialized with given password');
-	await hasDeletedAccount(t, {
-		uri
-	});
+	await hasDeletedAccount(t, uri);
 });
 test('use the passed password to initialize the database if not set yet', async t => {
 	const uri = await genTempDatabase(t);
@@ -294,7 +286,5 @@ test('use the passed password to initialize the database if not set yet', async 
 
 	t.true(await hasCreatedDBWithPW(dbpw, uri),
 		'the database has been initialized with given password');
-	await hasDeletedAccount(t, {
-		uri
-	});
+	await hasDeletedAccount(t, uri);
 });
