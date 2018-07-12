@@ -61,6 +61,7 @@ export namespace DeleteAccount {
 			});
 		}));
 
+		console.log('Deleting passwords...');
 		if ((await database.Manipulation.findMany(COLLECTIONS.PASSWORDS, {
 			user_id: id
 		})).length) {
