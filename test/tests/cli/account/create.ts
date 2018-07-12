@@ -1,9 +1,9 @@
 import { genDBWithPW, hasCreatedDBWithPW, hasCreatedAccount } from '../../../lib/db';
 import { captureURIs, genTempDatabase } from '../../../lib/util';
+import { genRandomString } from '../../../../app/lib/util';
 import { ProcRunner } from '../../../lib/procrunner';
 import { DEFAULT_EMAIL } from '../../../lib/consts';
 import { test } from 'ava';
-import { genRandomString } from '../../../../app/lib/util';
 
 const uris = captureURIs(test);
 test('print an error when no account is passed', async t => {
