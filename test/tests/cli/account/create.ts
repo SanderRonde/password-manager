@@ -103,6 +103,41 @@ test('it is possible to enter the password manually', async t => {
 	await proc.run();
 	proc.check();
 });
+test('work when entering pasword correctly the third time', async t => {
+	const uri = await genTempDatabase(t);
+	uris.push(uri);
+
+	const pw = await genDBWithPW(uri);
+	const wrongPw = pw === 'wrongpwwrongpwwrongpwwrongpwwron' ? 
+		'otherwrongpwotherwrongpwotherwro' : 'wrongpwwrongpwwrongpwwrongpwwron';
+	const proc = new ProcRunner(t, [
+		'account', 
+		'create',
+		'-d', uri,
+		'-a', 'some@email.com'
+	]);
+	proc.expectWrite('Attempt 1/5');
+	proc.expectWrite('Please enter the database password');
+	proc.expectRead(wrongPw);
+	proc.expectWrite('Attempt 2/5');
+	proc.expectWrite('Please enter the database password');
+	proc.expectRead(wrongPw);
+	proc.expectWrite('Attempt 3/5');
+	proc.expectWrite('Please enter the database password');
+	proc.expectRead(pw);
+
+	proc.expectWrite('Please enter a master password');
+	proc.expectRead('somepw');
+	proc.expectWrite('Please confirm your password');
+	proc.expectRead('somepw');
+	proc.expectWrite('Successfully created user!');
+	proc.expectWrite(/Your reset key is (\w|\d)+/)
+	proc.expectWrite('Do not lose this');
+	proc.expectExit(0);
+
+	await proc.run();
+	proc.check();
+})
 test('it is possible to pass the password', async t => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
