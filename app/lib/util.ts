@@ -1,11 +1,29 @@
 import { ServerConfig } from '../actions/server/server';
-import { listenWithoutRef } from '../../test/lib/util';
 import commentJson = require('comment-json');
 import nodemailer = require('nodemailer');
 import Mute = require('mute-stream');
 import mkdirp = require('mkdirp');
 import path = require('path');
 import fs = require('fs');
+import { EventEmitter } from 'events';
+import { Readable } from 'stream';
+
+//Prevent circular import
+function unref(...emitters: (EventEmitter|{
+	unref(): void;
+})[]) {
+	for (const emitter of emitters) {
+		(emitter as any).unref &&
+			(emitter as any).unref();
+	}
+}
+
+function listenWithoutRef(src: Readable, handler: (chunk: string) => void) {
+	src.on('data', (chunk) => {
+		handler(chunk.toString());
+	});
+	unref(src);
+}
 
 class StdinCapturer {
 	private _read: string = '';
@@ -15,7 +33,6 @@ class StdinCapturer {
 		listenWithoutRef(process.stdin, (chunk) => {
 			this._read += chunk.toString();
 			this._updateListeners();
-
 		});
 	}
 

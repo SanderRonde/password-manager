@@ -1,7 +1,7 @@
+import { GenericTestContext, Context } from "ava";
+import { listenWithoutRef } from "./util";
 import { spawn } from "child_process";
-import { assert } from 'chai';
 import path = require('path');
-import { unref, listenWithoutRef } from "./util";
 
 export enum LOG_VALS {
 	ANY_STRING
@@ -14,7 +14,7 @@ export class ProcRunner {
 	private _reads: string[] = [];
 	private _writtenExpected: (string|LOG_VALS|RegExp)[] = [];
 	
-	constructor(private _args: string[]) { }
+	constructor(private _t: GenericTestContext<Context<any>>, private _args: string[]) { }
 
 	private _readText(chunk: string|Buffer) {
 		this._written.push(chunk.toString());
@@ -65,22 +65,29 @@ export class ProcRunner {
 			const expected = this._writtenExpected[i];
 
 			if (!this._areEqual(written, expected)) {
-				console.log('written', writtenLines, 'expected', this._writtenExpected);
+				// this._t.log('written', writtenLines, 'expected', this._writtenExpected);
 			}
 
-			assert.exists(written, `a value was written (while expecting "${expected && expected.toString()}")`);
-			assert.exists(expected, `a value was expected (while writing "${written && written.toString()}")`);
+			this._t.not(written, undefined, 
+				`a value was written (while expecting "${expected && expected.toString()}")`);
+			this._t.not(expected, null, 
+				`a value was written (while expecting "${expected && expected.toString()}")`);
+			this._t.not(written, undefined, 
+				`a value was expected (while writing "${written && written.toString()}")`);
+			this._t.not(expected, null, 
+				`a value was expected (while writing "${written && written.toString()}")`);
 
 			if (expected instanceof RegExp) {
-				assert.match(written.trim(), expected,
+				this._t.regex(written.trim(), expected,
 					'written is the same as expected');
 			} else if (typeof expected === 'string') {
-				assert.strictEqual(written.trim(), expected.trim(),
+				this._t.is(written.trim(), expected.trim(),
 					'written is the same as expected');
 			} else {
 				switch (expected) {
 					case LOG_VALS.ANY_STRING:
-						assert.isString(written, 'Written value is string');
+						this._t.is(typeof written, 'string', 
+							'Written value is string');
 						break;
 				}
 			}
@@ -88,7 +95,7 @@ export class ProcRunner {
 	}
 
 	private _checkExitCode() {
-		assert.strictEqual(this._exitCode, this._exitCodeExpected,
+		this._t.is(this._exitCode, this._exitCodeExpected,
 			'exit code matches expected exit code');
 	}
 
