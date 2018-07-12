@@ -22,9 +22,19 @@ export class ProcRunner {
 
 	private _capturedRegex: RegExpExecArray[] = [];
 	
-	constructor(private _t: GenericTestContext<Context<any>>, private _args: string[]) { }
+	constructor(private _t: GenericTestContext<Context<any>>, 
+		private _args: string[], private _config: {
+			printlogs: boolean;
+			printifnomatch: boolean;
+		} = {
+			printifnomatch: false,
+			printlogs: false
+		}) { }
 
 	private _readText(chunk: string|Buffer) {
+		if (this._config.printlogs) {
+			console.log(chunk);
+		}
 		this._written.push(chunk.toString());
 	}
 
@@ -96,8 +106,8 @@ export class ProcRunner {
 			const written = writtenLines[i];
 			const expected = this._writtenExpected[i];
 
-			if (!this._areEqual(written, expected)) {
-				// this._t.log('written', writtenLines, 'expected', this._writtenExpected);
+			if (this._config.printifnomatch && !this._areEqual(written, expected)) {
+				this._t.log('written', writtenLines, 'expected', this._writtenExpected);
 			}
 
 			this._t.not(written, undefined, 
