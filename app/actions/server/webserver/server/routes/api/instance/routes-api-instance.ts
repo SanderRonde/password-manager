@@ -1,10 +1,9 @@
 import { encryptWithPublicKey, Hashed, Padded, MasterPasswordVerificationPadding } from "../../../../../../../lib/crypto";
-import { EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../../../database/db-types";
-import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-manipulation";
+import { EncryptedInstance, StringifiedObjectId, MasterPassword, MongoRecord } from "../../../../../../../database/db-types";
 import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
-import { sendEmail } from "../../../../../../../lib/util";
+import { sendEmail, genID } from "../../../../../../../lib/util";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
@@ -37,7 +36,9 @@ export class RoutesApiInstance {
 				return;
 			}
 
-			const record: UnstringifyObjectIDs<EncryptedInstance> = {
+			const _id = genID();
+			const record: MongoRecord<EncryptedInstance> = {
+				_id: _id,
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
 				public_key: this.server.database.Crypto.dbEncrypt(public_key),
 				user_id: this.server.database.Crypto.dbEncrypt(auth._id.toHexString())
@@ -45,20 +46,15 @@ export class RoutesApiInstance {
 			await this.server.database.Manipulation.insertOne(
 				COLLECTIONS.INSTANCES, record);
 			
-			//Find the record again
-			const insertedRecord = await this.server.database.Manipulation.findOne(
-				COLLECTIONS.INSTANCES, record);
-			const id = insertedRecord._id.toHexString();
-
 			res.status(200);
 			res.json({
 				success: true,
 				data: {
-					id: encryptWithPublicKey(public_key, id)
+					id: encryptWithPublicKey(public_key, _id.toHexString())
 				}
 			});
 
-			sendEmail(this.server.config, this.server.database.Crypto.dbDecrypt(auth.email),
+			sendEmail(this.server.config, auth.email,
 				'New instance registered', 'A new instance was registered to your email');
 		})(req, res, next);
 	}

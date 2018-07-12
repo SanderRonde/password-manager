@@ -22,6 +22,10 @@ export class DatabaseEncryption {
 			.toString('binary');
 	}
 
+	public getKey() {
+		return this._deObfuscateKey();
+	}
+
 	public dbEncrypt<T>(data: T, 
 		key: string = this._deObfuscateKey()): DatabaseEncrypted<EncodedString<T>> {
 			return encrypt(data, key, ENCRYPTION_ALGORITHM) as DatabaseEncrypted<EncodedString<T>>;
@@ -73,7 +77,7 @@ export class DatabaseEncryption {
 		user_id, encrypted, websites , twofactor_enabled
 	}: EncryptedPassword|UnstringifyObjectIDs<EncryptedPassword>): DecryptedPassword {
 		return {
-			user_id: this.dbDecrypt(user_id),
+			user_id: user_id,
 			websites: websites.map(({ host, exact }) => {
 				return {
 					host: this.dbDecrypt(host),
@@ -99,9 +103,9 @@ export class DatabaseEncryption {
 		email, pw, twofactor_secret, twofactor_enabled, reset_key, reset_reset_keys
 	}: EncryptedAccount|UnstringifyObjectIDs<EncryptedAccount>): DecryptedAccount {
 		return {
-			email: this.dbDecrypt(email),
+			email: email,
 			pw: this.dbDecrypt(pw),
-			twofactor_secret: this.dbDecrypt(twofactor_secret),
+			twofactor_secret: this.dbDecryptWithSalt(twofactor_secret),
 			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled),
 			reset_key: this.dbDecrypt(reset_key),
 			reset_reset_keys: reset_reset_keys.map((key) => {

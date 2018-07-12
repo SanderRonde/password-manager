@@ -73,7 +73,7 @@ export interface EncryptedAccount {
 	/**
 	 * (encrypted) The email of the user
 	 */
-	email: DatabaseEncrypted<EncodedString<string>>;
+	email: string;
 	/**
 	 * (encrypted) Whether 2FA is enbled
 	 */
@@ -81,7 +81,7 @@ export interface EncryptedAccount {
 	/**
 	 * (encrypted) The 2FA secret used to generate codes
 	 */
-	twofactor_secret: DatabaseEncrypted<EncodedString<string>>;
+	twofactor_secret: DatabaseEncryptedWithSalt<string>;
 	/**
 	 * (encrypted) The master password, padded and hashed
 	 */
@@ -264,7 +264,7 @@ export interface EncryptedPassword {
 	/**
 	 * (encrypted) The user ID that this password belongs to
 	 */
-	user_id: DatabaseEncrypted<EncodedString<StringifiedObjectId<EncryptedAccount>>>;
+	user_id: TypedObjectID<EncryptedAccount>;
 	/**
 	 * (encrypted) The websites for which this password is used
 	 */
@@ -318,7 +318,7 @@ export interface DecryptedPassword {
 	/**
 	 * The user ID that this password belongs to
 	 */
-	user_id: StringifiedObjectId<EncryptedAccount>;
+	user_id: TypedObjectID<EncryptedAccount>;
 	/**
 	 * The websites for which this password is used
 	 */

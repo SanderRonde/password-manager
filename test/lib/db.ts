@@ -1,10 +1,10 @@
-import { TEST_DB_URI, ENCRYPTION_ALGORITHM } from '../../app/lib/constants';
+import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, StringifiedObjectId, EncryptedPassword, TypedObjectID } from '../../app/database/db-types';
+import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt } from '../../app/lib/crypto';
+import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../../app/lib/constants';
 import { genRandomString, getDBFromURI } from '../../app/lib/util';
-import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt } from '../../app/database/db-types';
-import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS } from '../../app/lib/crypto';
 import { GenericTestContext, Context } from 'ava';
-import mongo = require('mongodb');
 import { DEFAULT_EMAIL } from './consts';
+import mongo = require('mongodb');
 
 export async function clearDB(uri: string) {
 	const { db, done } = await getDB(uri);
@@ -89,6 +89,147 @@ function doesNotThrow(t: GenericTestContext<Context<any>>, callback: () => Promi
 	});
 }
 
+export async function genMockAcount({
+	dbpw, uri, userpw
+}: {
+	uri: string;
+	dbpw: string;
+	userpw: string;
+}) {
+	const { db, done } = await getDB(uri);
+
+	const resetKey = genRandomString(RESET_KEY_LENGTH);
+	const accountRecords: EncryptedAccount[] = [{
+		email: DEFAULT_EMAIL,
+		pw: encrypt(hash(pad(userpw, 'masterpwverify')), dbpw, ENCRYPTION_ALGORITHM),
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		twofactor_secret: encryptWithSalt(null, dbpw, ENCRYPTION_ALGORITHM),
+		reset_key: encrypt(encrypt({
+			integrity: true as true,
+			pw: userpw
+		}, resetKey, ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM),
+		reset_reset_keys: []
+	}, {
+		email: 'other@email.com',
+		pw: encrypt(hash(pad('otherpw', 'masterpwverify')), dbpw, ENCRYPTION_ALGORITHM),
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		twofactor_secret: encryptWithSalt(null, dbpw, ENCRYPTION_ALGORITHM),
+		reset_key: encrypt(encrypt({
+			integrity: true as true,
+			pw: userpw
+		}, genRandomString(RESET_KEY_LENGTH), 
+			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM),
+		reset_reset_keys: []
+	}, {
+		email: 'other@email.com',
+		pw: encrypt(hash(pad('otherpw', 'masterpwverify')), dbpw, ENCRYPTION_ALGORITHM),
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		twofactor_secret: encryptWithSalt(null, dbpw, ENCRYPTION_ALGORITHM),
+		reset_key: encrypt(encrypt({
+			integrity: true as true,
+			pw: userpw
+		}, genRandomString(RESET_KEY_LENGTH), 
+			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM),
+		reset_reset_keys: []
+	}]
+
+	await db.collection('users').insertMany(accountRecords);
+	const [{
+		_id
+	}] = await db.collection('users').find().toArray() as MongoRecord<EncryptedAccount>[];
+
+	//Generate some fake instances
+	const instanceRecords: EncryptedInstance[] = [{
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
+		user_id: encrypt(_id.toHexString(), dbpw, ENCRYPTION_ALGORITHM)
+	}, {
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
+		user_id: encrypt(_id.toHexString(), dbpw, ENCRYPTION_ALGORITHM)
+	}, {
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
+		user_id: encrypt(_id.toHexString(), dbpw, ENCRYPTION_ALGORITHM)
+	}, {
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
+		user_id: encrypt(
+			new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedAccount>, 
+			dbpw, ENCRYPTION_ALGORITHM)
+	}, {
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
+		user_id: encrypt(
+			new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedAccount>, 
+			dbpw, ENCRYPTION_ALGORITHM)
+	}];
+	await db.collection('instances').insertMany(instanceRecords);
+
+	//Generate some fake passwords
+	const passwordRecords: EncryptedPassword[] = [{
+		user_id: _id,
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		websites: [],
+		encrypted: encrypt(encrypt({
+			username: 'someusername',
+			password: 'somepw',
+			notes: []
+		}, hash(pad(userpw, 'masterpwdecrypt')), 
+			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
+	}, {
+		user_id: _id,
+		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
+		websites: [{
+			exact: encrypt('someexacturl', dbpw, ENCRYPTION_ALGORITHM),
+			host: encrypt('somehost', dbpw, ENCRYPTION_ALGORITHM)
+		}],
+		encrypted: encrypt(encrypt({
+			username: 'someusername',
+			password: 'somepw',
+			notes: []
+		}, hash(pad(userpw, 'masterpwdecrypt')), 
+			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
+	}, {
+		user_id: _id,
+		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
+		websites: [],
+		encrypted: encrypt(encrypt({
+			username: 'someusername',
+			password: 'somepw',
+			notes: []
+		}, hash(pad(userpw, 'masterpwdecrypt')), 
+			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
+	}, {
+		user_id: new mongo.ObjectId() as TypedObjectID<EncryptedAccount>, 
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		websites: [],
+		encrypted: encrypt(encrypt({
+			username: 'someusername',
+			password: 'somepw',
+			notes: []
+		}, hash(pad(userpw, 'masterpwdecrypt')), 
+			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
+	}, {
+		user_id: new mongo.ObjectId() as TypedObjectID<EncryptedAccount>, 
+		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
+		websites: [{
+			exact: encrypt('someexacturl', dbpw, ENCRYPTION_ALGORITHM),
+			host: encrypt('somehost', dbpw, ENCRYPTION_ALGORITHM)
+		}],
+		encrypted: encrypt(encrypt({
+			username: 'someusername',
+			password: 'somepw',
+			notes: []
+		}, hash(pad(userpw, 'masterpwdecrypt')), 
+			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
+	}];
+
+	await db.collection('passwords').insertMany(passwordRecords);
+
+	done();
+}
+
 export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 	dbpw, resetKey, userpw, uri	
 }: {
@@ -113,18 +254,12 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 	t.truthy(encrypted, 'record is truthy');
 
 	let decrypted: Partial<DecryptedAccount> = { 
-		reset_reset_keys: encrypted.reset_reset_keys as any[]
+		reset_reset_keys: encrypted.reset_reset_keys as any[],
+		email: encrypted.email
 	};
 
 	//Decrypt everything
 	await Promise.all([
-		doesNotThrow(t, async () => {
-			const res = await doDbDecrypt(encrypted.email, dbpw);
-			t.not(res, ERRS.INVALID_DECRYPT,
-				'decrypting email does not result in invalid decrypt');
-			if (res === ERRS.INVALID_DECRYPT) return;
-			decrypted.email = res;
-		}, 'email can be decrypted'),
 		doesNotThrow(t, async () => {
 			const res = await doDbDecrypt(encrypted.pw, dbpw);
 			t.not(res, ERRS.INVALID_DECRYPT,
@@ -140,7 +275,7 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 			decrypted.twofactor_enabled = res;
 		}, 'twofactor_enabled can be decrypted'),
 		doesNotThrow(t, async () => {
-			const res = await doDbDecrypt(encrypted.twofactor_secret, dbpw);
+			const res = await doDbDecryptWithSalt(encrypted.twofactor_secret, dbpw);
 			t.not(res, ERRS.INVALID_DECRYPT,
 				'decrypting twofactor_secret does not result in invalid decrypt');
 			if (res === ERRS.INVALID_DECRYPT) return;
@@ -196,5 +331,30 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 	t.true(decryptedResetKey.integrity, 'integrity is true');
 	t.is(decryptedResetKey.pw, userpw, 'decrypted reset key holds password');
 	
+	done();
+}
+
+export async function hasDeletedAccount(t: GenericTestContext<Context<any>>, {
+	uri
+}: {
+	uri: string;
+}) {
+	const { db, done } = await getDB(uri);
+
+	t.is(await (db.collection('users') as any).countDocuments(), 2,
+		'remaining users did not get deleted');
+	const [ firstAcc, secondAcc ] = await db.collection('users').find().toArray() as 
+		EncryptedAccount[];
+
+	t.not(firstAcc.email, DEFAULT_EMAIL,
+		'only original account was deleted');
+	t.not(secondAcc.email, DEFAULT_EMAIL,
+		'only original account was deleted');
+
+	t.is(await (db.collection('instances') as any).countDocuments(), 2,
+		'remaining instances did not get deleted');
+	t.is(await (db.collection('passwords') as any).countDocuments(), 2,
+		'remaining passwords did not get deleted');
+
 	done();
 }

@@ -4,9 +4,11 @@ import nodemailer = require('nodemailer');
 import { EventEmitter } from 'events';
 import Mute = require('mute-stream');
 import { Readable } from 'stream';
+import mongo = require('mongodb');
 import mkdirp = require('mkdirp');
 import path = require('path');
 import fs = require('fs');
+import { TypedObjectID } from '../database/db-types';
 
 //Prevent circular import
 function unref(...emitters: (EventEmitter|{
@@ -234,7 +236,7 @@ export function readPassword(text: string) {
 		m.mute();
 		capturer.getLine((text) => {
 			m.unmute();
-			resolve(text);
+			resolve(text.trim());
 		});
 	});
 }
@@ -243,11 +245,15 @@ export function readConfirm(text: string) {
 	console.log(text);
 	return new Promise<string>((resolve) => {
 		capturer.getLine((text) => {
-			resolve(text);
+			resolve(text.trim());
 		});
 	});
 }
 
 export function getDBFromURI(uri: string) {
 	return uri.split('/').slice(-1).join('');
+}
+
+export function genID<T>(): TypedObjectID<T> {
+	return new mongo.ObjectId() as TypedObjectID<T>;
 }

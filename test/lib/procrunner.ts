@@ -97,7 +97,7 @@ export class ProcRunner {
 			const expected = this._writtenExpected[i];
 
 			if (!this._areEqual(written, expected)) {
-				this._t.log('written', writtenLines, 'expected', this._writtenExpected);
+				// this._t.log('written', writtenLines, 'expected', this._writtenExpected);
 			}
 
 			this._t.not(written, undefined, 

@@ -1,19 +1,19 @@
-import { genDBWithPW, hasCreatedDBWithPW, hasCreatedAccount } from '../../../lib/db';
+import { genDBWithPW, hasCreatedDBWithPW, genMockAcount, hasDeletedAccount } from '../../../lib/db';
 import { captureURIs, genTempDatabase } from '../../../lib/util';
+import { genRandomString } from '../../../../app/lib/util';
 import { ProcRunner } from '../../../lib/procrunner';
 import { DEFAULT_EMAIL } from '../../../lib/consts';
 import { test } from 'ava';
-import { genRandomString } from '../../../../app/lib/util';
 
 const uris = captureURIs(test);
-test.skip('print an error when no account is passed', async t => {
+test('print an error when no account is passed', async t => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
 	const proc = new ProcRunner(t, [
 		'account',
 		'-d', uri,
-		'create'
+		'delete'
 	]);
 	proc.expectWrite('Please supply the email of the account to edit through -a or --account');
 	proc.expectExit(1);
@@ -32,7 +32,7 @@ test('fail if the database password is wrong when passed', async t => {
 
 	const proc = new ProcRunner(t, [
 		'account',
-		'create',
+		'delete',
 		'-d', uri,
 		'-a', DEFAULT_EMAIL,
 		'-p', wrongPw
@@ -43,7 +43,7 @@ test('fail if the database password is wrong when passed', async t => {
 	await proc.run();
 	proc.check();
 });
-test.skip('fail if the database password is wrong when entered', async t => {
+test('fail if the database password is wrong when entered', async t => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -53,7 +53,7 @@ test.skip('fail if the database password is wrong when entered', async t => {
 
 	const proc = new ProcRunner(t, [
 		'account', 
-		'create',
+		'delete',
 		'-d', uri,
 		'-a', DEFAULT_EMAIL
 	]);
@@ -78,15 +78,20 @@ test.skip('fail if the database password is wrong when entered', async t => {
 	await proc.run();
 	proc.check();
 });
-test.skip('it is possible to enter the password manually', async t => {
+test('it is possible to enter the password manually', async t => {
 	const uri = await genTempDatabase(t);
-	const userpw = genRandomString(15);
+	const userpw = genRandomString(25);
 	uris.push(uri);
 
 	const dbpw = await genDBWithPW(uri);
+	await genMockAcount({
+		userpw,
+		dbpw,
+		uri
+	});
 	const proc = new ProcRunner(t, [
 		'account', 
-		'create',
+		'delete',
 		'-d', uri,
 		'-a', DEFAULT_EMAIL
 	]);
@@ -94,34 +99,43 @@ test.skip('it is possible to enter the password manually', async t => {
 	proc.expectWrite('Please enter the database password');
 	proc.expectRead(dbpw);
 
-	proc.expectWrite('Please enter a master password');
+	proc.expectWrite('Attempt 1/3');
+	proc.expectWrite('Please enter the account\'s password');
 	proc.expectRead(userpw);
-	proc.expectWrite('Please confirm your password');
-	proc.expectRead(userpw);
-	proc.expectWrite('Successfully created user!');
-	proc.captureRegExp(/Your reset key is ((\w|\d)+)/)
-	proc.expectWrite('Do not lose this');
+	proc.expectWrite(`Deleting user with email "${DEFAULT_EMAIL}"`);
+	proc.expectWrite('Are you sure?');
+	proc.expectRead('');
+	proc.expectWrite('Are you very very sure?');
+	proc.expectRead('');
+	proc.expectWrite('Deleting instances...');
+	proc.expectWrite('Deleting passwords...');
+	proc.expectWrite('Deleting user record...');
+	proc.expectWrite(`Done deleting user with email "${DEFAULT_EMAIL}"`);
 	proc.expectExit(0);
 
 	await proc.run();
 	proc.check();
 
-	const [ [, resetKey ] ] = proc.getRegexps();
-	await hasCreatedAccount(t, {
-		dbpw, userpw, resetKey, uri
-	})
+	await hasDeletedAccount(t, {
+		uri
+	});
 });
-test.skip('work when entering pasword correctly the third time', async t => {
+test('work when entering pasword correctly the third time', async t => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);
 
 	const dbpw = await genDBWithPW(uri);
+	await genMockAcount({
+		userpw,
+		dbpw,
+		uri
+	});
 	const wrongPw = dbpw === 'wrongpwwrongpwwrongpwwrongpwwron' ? 
 		'otherwrongpwotherwrongpwotherwro' : 'wrongpwwrongpwwrongpwwrongpwwron';
 	const proc = new ProcRunner(t, [
 		'account', 
-		'create',
+		'delete',
 		'-d', uri,
 		'-a', DEFAULT_EMAIL
 	]);
@@ -135,62 +149,80 @@ test.skip('work when entering pasword correctly the third time', async t => {
 	proc.expectWrite('Please enter the database password');
 	proc.expectRead(dbpw);
 
-	proc.expectWrite('Please enter a master password');
+	proc.expectWrite('Attempt 1/3');
+	proc.expectWrite('Please enter the account\'s password');
 	proc.expectRead(userpw);
-	proc.expectWrite('Please confirm your password');
-	proc.expectRead(userpw);
-	proc.expectWrite('Successfully created user!');
-	proc.captureRegExp(/Your reset key is ((\w|\d)+)/)
-	proc.expectWrite('Do not lose this');
+	proc.expectWrite(`Deleting user with email "${DEFAULT_EMAIL}"`);
+	proc.expectWrite('Are you sure?');
+	proc.expectRead('');
+	proc.expectWrite('Are you very very sure?');
+	proc.expectRead('');
+	proc.expectWrite('Deleting instances...');
+	proc.expectWrite('Deleting passwords...');
+	proc.expectWrite('Deleting user record...');
+	proc.expectWrite(`Done deleting user with email "${DEFAULT_EMAIL}"`);
 	proc.expectExit(0);
 
 	await proc.run();
 	proc.check();
 
-	const [ [, resetKey ] ] = proc.getRegexps();
-	await hasCreatedAccount(t, {
-		dbpw, userpw, resetKey, uri
-	})
+	await hasDeletedAccount(t, {
+		uri
+	});
 })
-test.skip('it is possible to pass the password', async t => {
+test('it is possible to pass the password', async t => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);
 
 	const dbpw = await genDBWithPW(uri);
+	await genMockAcount({
+		userpw,
+		dbpw,
+		uri
+	});
 	const proc = new ProcRunner(t, [
 		'account', 
-		'create',
+		'delete',
 		'-d', uri,
 		'-a', DEFAULT_EMAIL,
 		'-p', dbpw
 	]);
-	proc.expectWrite('Please enter a master password');
+	proc.expectWrite('Attempt 1/3');
+	proc.expectWrite('Please enter the account\'s password');
 	proc.expectRead(userpw);
-	proc.expectWrite('Please confirm your password');
-	proc.expectRead(userpw);
-	proc.expectWrite('Successfully created user!');
-	proc.captureRegExp(/Your reset key is ((\w|\d)+)/)
-	proc.expectWrite('Do not lose this');
+	proc.expectWrite(`Deleting user with email "${DEFAULT_EMAIL}"`);
+	proc.expectWrite('Are you sure?');
+	proc.expectRead('');
+	proc.expectWrite('Are you very very sure?');
+	proc.expectRead('');
+	proc.expectWrite('Deleting instances...');
+	proc.expectWrite('Deleting passwords...');
+	proc.expectWrite('Deleting user record...');
+	proc.expectWrite(`Done deleting user with email "${DEFAULT_EMAIL}"`);
 	proc.expectExit(0);
 
 	await proc.run();
 	proc.check();
 
-	const [ [, resetKey ] ] = proc.getRegexps();
-	await hasCreatedAccount(t, {
-		dbpw, userpw, resetKey, uri
-	})
+	await hasDeletedAccount(t, {
+		uri
+	});
 });
-test.skip('ask for a new database password if not set yet', async t => {
+test('ask for a new database password if not set yet', async t => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	const dbpw = genRandomString(15);
 	uris.push(uri);
+	await genMockAcount({
+		userpw,
+		dbpw,
+		uri
+	});
 
 	const proc = new ProcRunner(t, [
 		'account', 
-		'create',
+		'delete',
 		'-d', uri,
 		'-a', DEFAULT_EMAIL
 	]);
@@ -199,13 +231,18 @@ test.skip('ask for a new database password if not set yet', async t => {
 	proc.expectRead(dbpw)
 	proc.expectWrite('Empty database, creating with this key');
 
-	proc.expectWrite('Please enter a master password');
+	proc.expectWrite('Attempt 1/3');
+	proc.expectWrite('Please enter the account\'s password');
 	proc.expectRead(userpw);
-	proc.expectWrite('Please confirm your password');
-	proc.expectRead(userpw);
-	proc.expectWrite('Successfully created user!');
-	proc.captureRegExp(/Your reset key is ((\w|\d)+)/)
-	proc.expectWrite('Do not lose this');
+	proc.expectWrite(`Deleting user with email "${DEFAULT_EMAIL}"`);
+	proc.expectWrite('Are you sure?');
+	proc.expectRead('');
+	proc.expectWrite('Are you very very sure?');
+	proc.expectRead('');
+	proc.expectWrite('Deleting instances...');
+	proc.expectWrite('Deleting passwords...');
+	proc.expectWrite('Deleting user record...');
+	proc.expectWrite(`Done deleting user with email "${DEFAULT_EMAIL}"`);
 	proc.expectExit(0);
 
 	await proc.run();
@@ -213,34 +250,43 @@ test.skip('ask for a new database password if not set yet', async t => {
 
 	t.true(await hasCreatedDBWithPW(dbpw, uri),
 		'the database has been initialized with given password');
-	const [ [, resetKey ] ] = proc.getRegexps();
-	await hasCreatedAccount(t, {
-		dbpw, userpw, resetKey, uri
+	await hasDeletedAccount(t, {
+		uri
 	});
 });
-test.skip('use the passed password to initialize the database if not set yet', async t => {
+test('use the passed password to initialize the database if not set yet', async t => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);
 
-	const dbpw = await genDBWithPW(uri);
+	const dbpw = genRandomString(25);
+	await genMockAcount({
+		userpw,
+		dbpw,
+		uri
+	});
 
 	const proc = new ProcRunner(t, [
 		'account', 
-		'create',
+		'delete',
 		'-d', uri,
 		'-a', DEFAULT_EMAIL,
 		'-p', dbpw
 	]);
 	proc.expectWrite('Empty database, creating with this key');
 
-	proc.expectWrite('Please enter a master password');
+	proc.expectWrite('Attempt 1/3');
+	proc.expectWrite('Please enter the account\'s password');
 	proc.expectRead(userpw);
-	proc.expectWrite('Please confirm your password');
-	proc.expectRead(userpw);
-	proc.expectWrite('Successfully created user!');
-	proc.captureRegExp(/Your reset key is ((\w|\d)+)/)
-	proc.expectWrite('Do not lose this');
+	proc.expectWrite(`Deleting user with email "${DEFAULT_EMAIL}"`);
+	proc.expectWrite('Are you sure?');
+	proc.expectRead('');
+	proc.expectWrite('Are you very very sure?');
+	proc.expectRead('');
+	proc.expectWrite('Deleting instances...');
+	proc.expectWrite('Deleting passwords...');
+	proc.expectWrite('Deleting user record...');
+	proc.expectWrite(`Done deleting user with email "${DEFAULT_EMAIL}"`);
 	proc.expectExit(0);
 
 	await proc.run();
@@ -248,9 +294,7 @@ test.skip('use the passed password to initialize the database if not set yet', a
 
 	t.true(await hasCreatedDBWithPW(dbpw, uri),
 		'the database has been initialized with given password');
-
-	const [ [, resetKey ] ] = proc.getRegexps();
-	await hasCreatedAccount(t, {
-		dbpw, userpw, resetKey, uri
+	await hasDeletedAccount(t, {
+		uri
 	});
 });

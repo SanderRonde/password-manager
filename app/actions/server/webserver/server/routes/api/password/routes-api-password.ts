@@ -18,7 +18,7 @@ export class RoutesApiPassword {
 				_id: new mongo.ObjectId(passwordId)
 			});
 
-			if (!password || instance.user_id !== this.server.database.Crypto.dbDecrypt(password.user_id)) {
+			if (!password || instance.user_id !== password.user_id.toHexString()) {
 				//Either the password is non-existent or it isn't theirs
 				res.status(200);
 				res.json({
@@ -105,7 +105,7 @@ export class RoutesApiPassword {
 
 			//All don't exist
 			const record: EncryptedPassword = {
-				user_id: this.server.database.Crypto.dbEncrypt(account._id.toHexString()),
+				user_id: account._id,
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled),
 				websites: websites.map((website) => {
 					return {
@@ -460,10 +460,16 @@ export class RoutesApiPassword {
 				});
 
 			const { hostname } = url.parse(website_url);
-			const passwords = await this.server.database.Manipulation.findMany(
+			const passwords = (await this.server.database.Manipulation.findMany(
 				COLLECTIONS.PASSWORDS, {
-					user_id: account._id,
-					"websites.host": this.server.database.Crypto.dbEncrypt(hostname)
+					user_id: account._id
+				})).filter(({ websites }) => {
+					for (const website of websites) {
+						if (this.server.database.Crypto.dbDecrypt(website.host) === hostname) {
+							return true;
+						}
+					}
+					return false;
 				});
 
 			res.status(200);

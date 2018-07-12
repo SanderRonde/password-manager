@@ -14,10 +14,10 @@ export namespace CreateAccount {
 
 		const resetKey = genRandomString(RESET_KEY_LENGTH);
 		const record: EncryptedAccount = {
-			email: database.Crypto.dbEncrypt(email),
+			email: email,
 			pw: database.Crypto.dbEncrypt(hash(pad(password, 'masterpwverify'))),
 			twofactor_enabled: database.Crypto.dbEncryptWithSalt(false),
-			twofactor_secret: database.Crypto.dbEncrypt(null),
+			twofactor_secret: database.Crypto.dbEncryptWithSalt(null),
 			reset_key: database.Crypto.dbEncrypt(encrypt({
 				integrity: true as true,
 				pw: password

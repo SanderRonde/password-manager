@@ -59,7 +59,7 @@ export class RoutesAPIInstanceTwofactor {
 				await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
 					_id: new mongo.ObjectId(this.server.database.Crypto.dbDecrypt(instance.user_id))
 				}, {
-					twofactor_secret: this.server.database.Crypto.dbEncrypt(secret.base32),
+					twofactor_secret: this.server.database.Crypto.dbEncryptWithSalt(secret.base32),
 					twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
 				});
 	

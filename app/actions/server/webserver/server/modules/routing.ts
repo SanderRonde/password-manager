@@ -1,5 +1,5 @@
 import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword, DatabaseEncrypted } from "../../../../../database/db-types";
-import { Hashed, Padded, MasterPasswordVerificationPadding } from "../../../../../lib/crypto";
+import { Hashed, Padded, MasterPasswordVerificationPadding, hash, pad } from "../../../../../lib/crypto";
 import { COLLECTIONS } from "../../../../../database/database";
 import { Webserver } from "../webserver";
 import { getStores, ResponseCaptured, APIResponse } from "./ratelimit";
@@ -72,20 +72,22 @@ export class WebserverRouter {
 			//Check if the password is correct
 			const record = await this.parent.database.Manipulation.findOne(
 				COLLECTIONS.USERS, {
-					email: this.parent.database.Crypto.dbEncrypt(email),
-					pw: this.parent.database.Crypto.dbEncrypt(password)
+					email: this.parent.database.Crypto.dbEncrypt(email)
 				});
+			
+				pw: this.parent.database.Crypto.dbEncrypt(password)
 
-			if (!record) {
-				if (!supressErr) {
-					res.status(400);
-					res.json({
-						success: false,
-						error: 'Incorrect combination'
-					});
+			if (this.parent.database.Crypto.dbDecrypt(record.pw) === 
+				hash(pad(password, 'masterpwverify'))) {
+					if (!supressErr) {
+						res.status(400);
+						res.json({
+							success: false,
+							error: 'Incorrect combination'
+						});
+					}
+					return false;
 				}
-				return false;
-			}
 			return record;
 		}
 
