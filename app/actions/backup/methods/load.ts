@@ -3,15 +3,14 @@ import { ENCRYPTION_ALGORITHM } from "../../../lib/constants";
 import { exitWith, readFile } from "../../../lib/util";
 import { BackupSettings } from "../backup";
 import { exec } from "child_process";
-import { Log } from "../../../main";
 import { Writable } from "stream";
 
 export namespace Load {
-	function assertRestoreExists(log: Log) {
+	function assertRestoreExists() {
 		return new Promise<boolean>((resolve) => {
 			exec('mongorestore --help', (err) => {
 				if (err) {
-					exitWith(log, 'Please install the tools from' + 
+					exitWith('Please install the tools from' + 
 						' https://github.com/mongodb/mongo-tools');
 					return;
 				}
@@ -20,20 +19,20 @@ export namespace Load {
 		});
 	}
 	
-	export async function load(log: Log, { database, input, password }: BackupSettings) {
+	export async function load({ database, input, password }: BackupSettings) {
 		return new Promise<void>(async (resolve) => {
-			await assertRestoreExists(log);
+			await assertRestoreExists();
 			
-			log.write('Reading file...');
+			console.log('Reading file...');
 			const file = await readFile(input);
 
-			log.write('Decrypting file...');
+			console.log('Decrypting file...');
 			const decrypted = await decrypt<string, EncryptionAlgorithm, string>({
 				data: file as Encrypted<EncodedString<string>, string, EncryptionAlgorithm>,
 				algorithm: ENCRYPTION_ALGORITHM
 			}, password);
 
-			log.write('Restoring...');
+			console.log('Restoring...');
 			const proc = exec(`mongorestore --uri ${database} --archive`);
 			let stderr: string = '';
 			proc.stderr.on('data', (data) => {
@@ -49,10 +48,10 @@ export namespace Load {
 
 			proc.on('exit', (code) => {
 				if (code) {
-					log.write(stderr);
-					exitWith(log, 'Failed to run restore program (password might be wrong)');
+					console.log(stderr);
+					exitWith('Failed to run restore program (password might be wrong)');
 				} else {
-					log.write('Done!');
+					console.log('Done!');
 					resolve();
 				}
 			});

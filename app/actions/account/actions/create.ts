@@ -3,12 +3,14 @@ import { getConfirmedPassword, genRandomString } from "../../../lib/util";
 import { Database, COLLECTIONS } from "../../../database/database";
 import { EncryptedAccount } from "../../../database/db-types";
 import { hash, pad, encrypt } from "../../../lib/crypto";
-import { Log } from "../../../main";
 
 export namespace CreateAccount {
-	export async function createAccount(log: Log, email: string, database: Database) {
+	export async function createAccount(email: string, database: Database) {
+		if (!database) {
+			return;
+		}
 		//Get a master password
-		const password = await getConfirmedPassword(log, 'Please enter a master password');
+		const password = await getConfirmedPassword('Please enter a master password');
 
 		const resetKey = genRandomString(RESET_KEY_LENGTH);
 		const record: EncryptedAccount = {
@@ -24,8 +26,8 @@ export namespace CreateAccount {
 		}
 
 		await database.Manipulation.insertOne(COLLECTIONS.USERS, record);
-		log.write('Successfully created user!');
-		log.write('Your reset key is', resetKey);
-		log.write('Do not lose this');
+		console.log('Successfully created user!');
+		console.log('Your reset key is', resetKey);
+		console.log('Do not lose this');
 	}
 }

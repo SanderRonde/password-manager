@@ -64,6 +64,10 @@ export type Padded<T extends string, P extends Paddings> = string & {
 	__padding: P;
 }
 
+export enum ERRS {
+	INVALID_DECRYPT
+}
+
 export function pad<T extends string, P extends Paddings>(data: T, padding: P): Padded<T, P> {
 	return `${data}${padding}` as Padded<T, P>;
 }
@@ -95,11 +99,18 @@ export function encryptWithSalt<T, A extends EncryptionAlgorithm, K extends stri
 export function decryptWithSalt<T, A extends EncryptionAlgorithm, K extends string>(data: {
 	data: SaltEncrypted<T, K, A>
 	algorithm: A;
-}, key: K): T {
+}, key: K): T|ERRS {
 	const decrypted = decrypt(data, key);
+	if (decrypted === ERRS.INVALID_DECRYPT) {
+		return ERRS.INVALID_DECRYPT;
+	}
 	const { salt, padded: salted } = JSON.parse(decrypted);
 	const unsalted = salted.slice(0, salted.length - salt.length);
-	return JSON.parse(unsalted);
+	try {
+		return JSON.parse(unsalted);
+	} catch(e) {
+		return ERRS.INVALID_DECRYPT;
+	}
 }
 
 export function encrypt<T, A extends EncryptionAlgorithm, K extends string>(data: T, key: K, algorithm: A): {
@@ -107,8 +118,9 @@ export function encrypt<T, A extends EncryptionAlgorithm, K extends string>(data
 	algorithm: A;
 } {
 	const iv = crypto.randomBytes(16);
-	const plaintext = new Buffer(JSON.stringify(data));
-	const cipher = crypto.createCipheriv(algorithm, hash(key), iv);
+	const plaintext = Buffer.from(JSON.stringify(data));
+	const enckey = hash(key).slice(0, 32);
+	const cipher = crypto.createCipheriv(algorithm, enckey, iv);
 	const ciphertext = cipher.update(plaintext);
 	const finalText = Buffer.concat([iv, ciphertext, cipher.final()]);
 
@@ -124,14 +136,19 @@ export function encrypt<T, A extends EncryptionAlgorithm, K extends string>(data
 export function decrypt<T, A extends EncryptionAlgorithm, K extends string>({ data, algorithm }: {
 	data: Encrypted<EncodedString<T>, K, A>;
 	algorithm: A;
-}, key: K): T {
-	const input = new Buffer(data, 'base64');
+}, key: K): T|ERRS {
+	const input = Buffer.from(data, 'base64');
 	const iv = input.slice(0, 16);
 	const ciphertext = input.slice(16);
-	const decipher = crypto.createDecipheriv(algorithm, hash(key), iv);
+	const decipher = crypto.createDecipheriv(algorithm, hash(key).slice(0, 32), iv);
 	const plaintext = decipher.update(ciphertext);
 
-	return JSON.parse(plaintext.toString() + decipher.final());
+	const final = plaintext.toString() + decipher.final();
+	try {
+		return JSON.parse(final);
+	} catch(e) {
+		return ERRS.INVALID_DECRYPT;
+	}
 }
 
 export function encryptWithPublicKey<T>(data: T, 

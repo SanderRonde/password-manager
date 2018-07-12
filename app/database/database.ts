@@ -1,34 +1,32 @@
 import { TypedObjectID, EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from './db-types';
 import { DatabaseManipulation } from './libs/db-manipulation';
 import { DatabaseEncryption } from './libs/db-encryption';
-import { exitWith, readPassword } from '../lib/util';
+import { exitWith, readPassword, getDBFromURI } from '../lib/util';
 import mongo = require('mongodb');
-import { Log } from '../main';
 
-export async function getDatabase(log: Log, dbPath: string, key: string, 
+export async function getDatabase(dbPath: string, key: string, 
 	quitOnError: boolean): Promise<Database> {
-		const instance = await new Database(dbPath, quitOnError, log).init();
+		const instance = await new Database(dbPath, quitOnError).init();
 
-		const isReadline = !!key;
+		const isReadline = !key;
 		if (!isReadline) {
-			if (instance.Crypto.canDecrypt(key)) {
+			if (await instance.Crypto.canDecrypt(key)) {
 				instance.Crypto.setKey(key);
 				return instance;
 			}
-			exitWith(log, 'Database can\'t be decrypted with that key; password invalid');		
+			exitWith('Database can\'t be decrypted with that key; password invalid');		
 		} else {
-			//Give them 5 tries
 			for (let i = 0; i < 5; i++) {
-				log.write(`Attempt ${i + 1}/5`);
-				const password = await readPassword(log, await instance.Crypto.hasEncryptionPassword() ?
+				console.log(`Attempt ${i + 1}/5`);
+				const password = await readPassword(await instance.Crypto.hasEncryptionPassword() ?
 					'Please enter the database password' : 'Please enter a new database password');
-				if (instance.Crypto.canDecrypt(password)) {
+				if (await instance.Crypto.canDecrypt(password)) {
 					instance.Crypto.setKey(password);
 					return instance;
 				}
 			}
 		}
-		return exitWith(log, 'Database can\'t be decrypted with that key; password invalid');
+		return exitWith('Database can\'t be decrypted with that key; password invalid');
 	}
 
 export interface TypedCollection<C = any> extends mongo.Collection<MongoRecord<C>> {
@@ -65,7 +63,7 @@ export class Database {
 	public Crypto: DatabaseEncryption = new DatabaseEncryption(this)
 	public Manipulation: DatabaseManipulation = new DatabaseManipulation(this)
 
-	constructor(private _dbPath: string, private _quitOnError: boolean, public log: Log) { }
+	constructor(private _dbPath: string, private _quitOnError: boolean) { }
 
 	public async init() {
 		if (this._initialized) {
@@ -78,16 +76,18 @@ export class Database {
 	}
 
 	private async _connectToMongo(): Promise<mongo.Db> {
-		return await mongo.connect(this._dbPath).catch((err) => {
+		return (await mongo.MongoClient.connect(this._dbPath, {
+			useNewUrlParser: true
+		} as mongo.MongoClientOptions).catch((err) => {
 			if (err !== null && err) {
 				if (err.message.includes('ECONNREFUSED')) {
-					exitWith(this.log, 'Looks like you didn\'t start the mongodb service');
+					exitWith('Looks like you didn\'t start the mongodb service');
 					return;
 				}
-				exitWith(this.log, err.message);
+				exitWith(err.message);
 				return;
 			}
-		}) as mongo.Db;
+		}) as mongo.MongoClient).db(getDBFromURI(this._dbPath)) as mongo.Db;
 	}
 
 	private _getCollections() {
@@ -102,7 +102,7 @@ export class Database {
 		if (this._quitOnError) {
 			throw new Error(message);
 		} else {
-			this.log.write(message);
+			console.log(message);
 		}
 	}
 }

@@ -1,69 +1,216 @@
-import { captureLogs, getFreshMain, finalizeLogs } from '../lib/util';
-import { DEFAULT_ARGS, EXECUTABLE_SPECIFIC_HELP } from '../lib/consts';
-import { VERSION } from '../../app/lib/constants';
-import { clearDB } from '../lib/db';
+import { isMongoConnected, clearDB, genDBWithPW, hasCreatedDBWithPW } from '../lib/db';
+import { VERSION, TEST_DB_URI } from '../../app/lib/constants';
+import { EXECUTABLE_SPECIFIC_HELP } from '../lib/consts';
+import { ProcRunner } from '../lib/procrunner';
+import { assert } from 'chai';
 
 export function cliTest() {
-	describe('CLI Test', () => {
-		it('should display help information when called without args', () => {
-			const { log, exit } = captureLogs();
-
-			log.expectWrite(EXECUTABLE_SPECIFIC_HELP);
-			exit.expect(0);
-
-			getFreshMain().main(DEFAULT_ARGS, log, true);
-
-			finalizeLogs(log, exit);
+	describe('Env Checks', function() {
+		this.timeout(10000);
+		this.slow(9000);
+		it('should have set up mongo', async () => {
+			assert.isTrue(await isMongoConnected());
 		});
-		describe('Account', () => {
-			it('should print an error when no command is passed', () => {
-				const { log, exit } = captureLogs();
+	});
+	describe('CLI Test', function() {
+		this.timeout(15000);
+		it('should display help information when called without args', async () => {
+			const proc = new ProcRunner([]);
+			proc.expectWrite(EXECUTABLE_SPECIFIC_HELP);
+			proc.expectExit(0);
 
-				log.expectWrite();
-				log.expectWrite('\terror: missing required argument `%s\'', 'create/delete');
-				log.expectWrite();
-				exit.expect(1);
+			await proc.run();
+			proc.check();
+		});
+		describe('Account', function() {
+			this.timeout(10000);
+			this.slow(9000);
+			it('should print an error when no command is passed', async () => {
+				const proc = new ProcRunner(['account']);
+				proc.expectWrite();
+				proc.expectWrite('\terror: missing required argument `create/delete\'');
+				proc.expectWrite();
+				proc.expectExit(1);
 
-				getFreshMain().main([...DEFAULT_ARGS, 'account'], log, true);
+				await proc.run();
+				proc.check();
+			}); 
+			it('should print an error when a non-command is used', async () => {
+				const proc = new ProcRunner(['account', 'noncommand']);
+				proc.expectWrite('Invalid account action, choose "create" or "delete"');
+				proc.expectExit(1);
 
-				finalizeLogs(log, exit);
+				await proc.run();
+				proc.check();
 			});
-			it('should print an error when a non-command is used', () => {
-				const { log, exit } = captureLogs();
-
-				log.expectWrite('Invalid account action, choose "create" or "delete"');
-				exit.expect(1);
-
-				getFreshMain().main([
-					...DEFAULT_ARGS, 
-					'account', 
-					'noncommand'
-				], log, true);
-
-				finalizeLogs(log, exit);
-			});
-			describe('create', () => {
+			describe('Create', () => {
 				beforeEach(async () => {
 					await clearDB();
 				});	
+				it('should print an error when no account is passed', async () => {
+					const proc = new ProcRunner([
+						'account',
+						'-d', TEST_DB_URI,
+						'create'
+					]);
+					proc.expectWrite('Please supply the email of the account to edit through -a or --account');
+					proc.expectExit(1);
 
+					await proc.run();
+					proc.check();
+				});
+				it('should fail if the database password is wrong when passed', async () => {
+					const pw = await genDBWithPW();
+					const wrongPw = pw === 'wrongpwwrongpwwrongpwwrongpwwron' ? 
+						'otherwrongpwotherwrongpwotherwro' : 
+						'wrongpwwrongpwwrongpwwrongpwwron';
+
+					const proc = new ProcRunner([
+						'account',
+						'create',
+						'-d', TEST_DB_URI,
+						'-a', 'some@email.com',
+						'-p', wrongPw
+					]);
+					proc.expectWrite('Database can\'t be decrypted with that key; password invalid');
+					proc.expectExit(1);
+
+					await proc.run();
+					proc.check();
+				});
+				it('should fail if the database password is wrong when entered', async function() {
+					this.timeout(30000);
+
+					const pw = await genDBWithPW();
+					const wrongPw = pw === 'wrongpwwrongpwwrongpwwrongpwwron' ? 
+						'otherwrongpwotherwrongpwotherwro' : 'wrongpwwrongpwwrongpwwrongpwwron';
+
+					const proc = new ProcRunner([
+						'account', 
+						'create',
+						'-d', TEST_DB_URI,
+						'-a', 'some@email.com'
+					]);
+					proc.expectWrite('Attempt 1/5');
+					proc.expectWrite('Please enter the database password');
+					proc.expectRead(wrongPw + '1');
+					proc.expectWrite('Attempt 2/5');
+					proc.expectWrite('Please enter the database password');
+					proc.expectRead(wrongPw + '2');
+					proc.expectWrite('Attempt 3/5');
+					proc.expectWrite('Please enter the database password');
+					proc.expectRead(wrongPw + '3');
+					proc.expectWrite('Attempt 4/5');
+					proc.expectWrite('Please enter the database password');
+					proc.expectRead(wrongPw + '4');
+					proc.expectWrite('Attempt 5/5');
+					proc.expectWrite('Please enter the database password');
+					proc.expectRead(wrongPw + '5');
+					proc.expectWrite('Database can\'t be decrypted with that key; password invalid');
+					proc.expectExit(1);
+
+					await proc.run();
+					proc.check();
+				});
+				it('should be possible to enter the password manually', async () => {
+
+					const pw = await genDBWithPW();
+					const proc = new ProcRunner([
+						'account', 
+						'create',
+						'-d', TEST_DB_URI,
+						'-a', 'some@email.com'
+					]);
+					proc.expectWrite('Please enter the database password');
+					proc.expectRead(pw);
+
+					proc.expectWrite('Please enter a master password');
+					proc.expectRead('somepw');
+					proc.expectRead('somepw');
+					proc.expectExit(1);
+
+					await proc.run();
+					proc.check();
+				});
+				it('should be possible to enter the password through -p', async () => {
+					this.timeout(30000);
+
+					const pw = await genDBWithPW();
+					const proc = new ProcRunner([
+						'account', 
+						'create',
+						'-d', TEST_DB_URI,
+						'-a', 'some@email.com',
+						'-p', pw
+					]);
+					proc.expectWrite('Please enter the database password');
+					proc.expectRead(pw);
+
+					proc.expectWrite('Please enter a master password');
+					proc.expectRead('somepw');
+					proc.expectRead('somepw');
+					proc.expectExit(1);
+
+					await proc.run();
+					proc.check();
+				});
+				it('should ask for a new database password if not set yet', async () => {
+					const proc = new ProcRunner([
+						'account', 
+						'create',
+						'-d', TEST_DB_URI,
+						'-a', 'some@email.com'
+					]);
+					proc.expectWrite('Please enter a new database password');
+					proc.expectRead('dbpw')
+					proc.expectWrite('Empty database, creating with this key');
+
+					proc.expectWrite('Please enter a master password');
+					proc.expectRead('somepw');
+					proc.expectRead('somepw');
+					proc.expectExit(0);
+
+					await proc.run();
+					proc.check();
+
+					assert.isTrue(await hasCreatedDBWithPW('dbpw'),
+						'the database has been initialized with given password');
+				});
+				it('should use the passed password to initialize the database if not set yet', async () => {
+					const proc = new ProcRunner([
+						'account', 
+						'create',
+						'-d', TEST_DB_URI,
+						'-a', 'some@email.com',
+						'-p', 'dbpw'
+					]);
+					proc.expectWrite('Empty database, creating with this key');
+
+					proc.expectWrite('Please enter a master password');
+					proc.expectRead('somepw');
+					proc.expectRead('somepw');
+					proc.expectExit(0);
+
+					await proc.run();
+					proc.check();
+
+					assert.isTrue(await hasCreatedDBWithPW('dbpw'),
+						'the database has been initialized with given password');
+				});
 			});
-			describe('delete', () => {
+			describe('Delete', () => {
 				beforeEach(async () => {
 					await clearDB();
 				});
 			});
 		});
 		describe('Version', () => {
-			it('should display the version when calling it with -v', () => {
-				const { log, exit } = captureLogs();
-
-				log.expectWrite(VERSION);
-				exit.expect(0);
-
-				getFreshMain().main([...DEFAULT_ARGS, '-v'], log, true);
-
-				finalizeLogs(log, exit);
+			it('should display the version when calling it with -v', async () => {
+				const proc = new ProcRunner(['-v']);
+				proc.expectWrite(VERSION);
+				proc.expectExit(0);
+				await proc.run();
+				proc.check();
 			});
 		});
 	});

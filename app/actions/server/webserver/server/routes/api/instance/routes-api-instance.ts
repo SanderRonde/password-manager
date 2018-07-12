@@ -58,7 +58,7 @@ export class RoutesApiInstance {
 				}
 			});
 
-			sendEmail(this.server.log, this.server.config, this.server.database.Crypto.dbDecrypt(auth.email),
+			sendEmail(this.server.config, this.server.database.Crypto.dbDecrypt(auth.email),
 				'New instance registered', 'A new instance was registered to your email');
 		})(req, res, next);
 	}

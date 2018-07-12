@@ -4,7 +4,6 @@ import { google, drive_v3 } from 'googleapis';
 import querystring = require('querystring');
 import { BackupSettings } from "../backup";
 import progress = require('progress');
-import { Log } from "../../../main";
 import { Export } from "../export";
 import path = require('path');
 import http = require('http');
@@ -12,7 +11,7 @@ import url = require('url');
 import fs = require('fs');
 
 export namespace GoogleDrive {
-	function authenticate(log: Log, client: OAuth2Client) {
+	function authenticate(client: OAuth2Client) {
 		return new Promise<void>((resolve, reject) => {
 			const authUrl = client.generateAuthUrl({
 				access_type: 'offline',
@@ -32,7 +31,7 @@ export namespace GoogleDrive {
 				  	reject(e);
 				}
 			}).listen(3000, () => {
-				log.write('Open this URL in your browser', authUrl);
+				console.log('Open this URL in your browser', authUrl);
 			});
 		});
 	}
@@ -70,10 +69,10 @@ export namespace GoogleDrive {
 		});
 	}
 
-	export async function backup(log: Log, config: BackupSettings) {
+	export async function backup(config: BackupSettings) {
 		const {
 			google: { web: { client_id, client_secret } }
-		} = getSecrets(log);
+		} = getSecrets();
 
 		const client = new google.auth.OAuth2(
 			client_id, client_secret, '');
@@ -83,9 +82,9 @@ export namespace GoogleDrive {
 			auth: client
 		});
 
-		await authenticate(log, client);
-		await doUpload(await Export.exportDatabase(log, config.database, config.password),
+		await authenticate(client);
+		await doUpload(await Export.exportDatabase(config.database, config.password),
 			drive);
-		log.write('Done uploading');
+		console.log('Done uploading');
 	}
 }

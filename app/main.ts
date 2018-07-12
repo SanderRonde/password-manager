@@ -25,11 +25,7 @@ function calledHelpArg(argv: string[]) {
 	return false;
 }
 
-export function initCommander(log: Log = {
-	write(...args) {
-		console.log(...args);
-	}
-}, handledHolder: {
+export function initCommander(handledHolder: {
 	handled: boolean;
 }) {
 	commander
@@ -59,20 +55,20 @@ export function initCommander(log: Log = {
 			switch ((action || '').toLowerCase()) {
 				case 'create':
 					if (!email) {
-						exitWith(log, 'Please supply the email of the account to edit through -a or --account');
-						return;
+						exitWith('Please supply the email of the account to edit through -a or --account');
+					} else {
+						await Account.CreateAccount.createAccount(email, await getDatabase(databasePath, dbPassword, true));
 					}
-					Account.CreateAccount.createAccount(log, email, await getDatabase(log, databasePath, dbPassword, true));
 					break;
 				case 'delete':
 					if (!email) {
-						exitWith(log, 'Please supply the email of the account to edit through -a or --account');
-						return;
+						exitWith('Please supply the email of the account to edit through -a or --account');
+					} else {
+						await Account.DeleteAccount.deleteAccount(email, await getDatabase(databasePath, dbPassword, true));
 					}
-					Account.DeleteAccount.deleteAccount(log, email, await getDatabase(log, databasePath, dbPassword, true));
 					break;
 				default:
-					exitWith(log, 'Invalid account action, choose "create" or "delete"');
+					exitWith('Invalid account action, choose "create" or "delete"');
 			}
 		});
 
@@ -104,30 +100,29 @@ export function initCommander(log: Log = {
 				case 'load':
 				case 'open':
 					if (settings.config) {
-						exitWith(log, 'You specified a config file but you\'re using' + 
+						exitWith('You specified a config file but you\'re using' + 
 							'the "load" option. This seems a bit conflicting,' +
 							' remove the config option to continue');
-						return;
-					}
-					if (!settings.input) {
-						exitWith(log, 'No input was specified');
-						return;
+					} else if (!settings.input) {
+						exitWith('No input was specified');
+					} else {
+						await Backup.Load.load(settings);
 					}
 					break;
 				case 'drive':
 				case 'google':
 				case 'googledrive':
-					Backup.GoogleDrive.backup(log, settings);
+					await Backup.GoogleDrive.backup(settings);
 					break;
 				case 'local':
 					if (!settings.output) {
-						exitWith(log, 'No output was specified');
-						return;
+						exitWith('No output was specified');
+					} else {
+						await Backup.Local.backup(settings);
 					}
-					Backup.Local.backup(log, settings);
 					break;
 				default:
-					exitWith(log, 'Invalid backup method, choose "load", "drive" or "local"');
+					exitWith('Invalid backup method, choose "load", "drive" or "local"');
 			}
 		});
 
@@ -152,7 +147,7 @@ export function initCommander(log: Log = {
 					isConfig: true
 				}
 			}
-			Server.run(await getDatabase(log, settings.database, settings.password, false),
+			Server.run(await getDatabase(settings.database, settings.password, false),
 				settings as  ServerConfig);
 		});
 
@@ -170,53 +165,32 @@ export function initCommander(log: Log = {
 			}
 			switch (command) {
 				case 'server':
-					Server.genConfig(settings);
+					await Server.genConfig(settings);
 					break;
 				case 'backup':
-					Backup.genConfig(settings);
+					await Backup.genConfig(settings);
 					break;
 				default:
-					exitWith(log, 'Given command has no config file, use "server" or "backup"');
+					exitWith('Given command has no config file, use "server" or "backup"');
 			}
 		});
 	return commander;
 }
 
-export async function main(argv: string[], log: Log = {
-	write(...args) {
-		console.log(...args);
-	}
-}, overrideStdout: boolean = false) {
+export async function main(argv: string[]) {
 	const handledHolder = { handled: false };
-
-	initCommander(log, handledHolder);
-
-	const originalWrite = process.stdout.write;
-	const originalError = console.error;
-	if (overrideStdout) {
-		process.stdout.write = ((...vals: any[]) => {
-			log.write.apply(log, vals);
-		}) as any;
-		console.error = ((...vals: any[]) => {
-			log.write.apply(log, vals);
-		}) as any;
-	}
+	initCommander(handledHolder);
 
 	commander.parse(argv);
 	if (!handledHolder.handled && !calledHelpArg(argv)) {
 		commander.help();
-	}
-
-	if (overrideStdout) {
-		process.stdout.write = originalWrite;
-		console.error = originalError;
 	}
 }
 
 if (require.main === module) {
 	main(process.argv).catch(error => {
 	  	console.error(error.stack || error.message || error);
-	  	process.exitCode = 1;
+	  	process.exit(1);
 	});
 }
 

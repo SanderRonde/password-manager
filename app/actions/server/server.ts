@@ -32,7 +32,7 @@ export type ServerSettings = ServerArgs|ServerConfig;
 
 export namespace Server {
 	export function run(database: Database, config: ServerConfig) {
-		new Webserver(database, config, database.log);
+		new Webserver(database, config);
 	}
 
 	export async function genConfig(settings: {

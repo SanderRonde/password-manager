@@ -1,6 +1,6 @@
 import { EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../../../database/db-types";
 import { ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from "../../../../../../../lib/constants";
-import { decrypt, encrypt, hash, pad } from "../../../../../../../lib/crypto";
+import { decrypt, encrypt, hash, pad, ERRS } from "../../../../../../../lib/crypto";
 import { genRandomString, sendEmail } from "../../../../../../../lib/util";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
@@ -42,7 +42,11 @@ export class RoutesAPIAccount {
 				pw: string;
 			};
 			try {
-				decrypted = decrypt(accountResetKey, reset_key);
+				const initialDecrypt = decrypt(accountResetKey, reset_key);
+				if (initialDecrypt === ERRS.INVALID_DECRYPT) {
+					throw new Error('invalid decrypt');
+				}
+				decrypted = initialDecrypt;
 			} catch(e) {
 				res.status(200);
 				res.json({
@@ -75,6 +79,11 @@ export class RoutesAPIAccount {
 						encryptedPassword.encrypted);
 					const decryptedEncrypedSection = decrypt(encryptedSection, 
 						decryptedMasterPassword)
+					
+					if (decryptedEncrypedSection === ERRS.INVALID_DECRYPT) {
+						resolve();
+						return;
+					}
 					
 					//Re-encrypt it
 					const reEncrypted = encrypt(decryptedEncrypedSection, newEncryptionHash,
@@ -140,7 +149,7 @@ export class RoutesAPIAccount {
 				}
 			});
 
-			sendEmail(this.server.log, this.server.config, email, 'Account reset',
+			sendEmail(this.server.config, email, 'Account reset',
 				'Your master password has been changed and so has your reset key.' + 
 				' If you know the previous reset key, go to your favorite' + 
 				' client and hit the "undo reset" button.');
@@ -181,8 +190,16 @@ export class RoutesAPIAccount {
 			for (let i = 0; i < reset_reset_keys.length; i++) {
 				const reset_reset_key = reset_reset_keys[i];
 				try {
-					decrypted = decrypt(decrypt(reset_reset_key, reset_key),
+					const initialDecrypt = decrypt(reset_reset_key, reset_key);
+					if (initialDecrypt === ERRS.INVALID_DECRYPT) {
+						throw new Error('Invalid decrypt');
+					}
+					const secondDecrypt = decrypt(initialDecrypt,
 						master_password);
+					if (secondDecrypt === ERRS.INVALID_DECRYPT) {
+						throw new Error('Invalid decrypt');
+					}
+					decrypted = secondDecrypt;
 				} catch(e) { continue; }
 				if (decrypted && decrypted.integrity === true) {
 					matchIndex = i;
@@ -210,7 +227,11 @@ export class RoutesAPIAccount {
 					const encryptedSection = this.server.database.Crypto.dbDecrypt(
 						encryptedPassword.encrypted);
 					const decryptedEncrypedSection = decrypt(encryptedSection, 
-						decryptedMasterPassword)
+						decryptedMasterPassword);
+					if (decryptedEncrypedSection === ERRS.INVALID_DECRYPT) {
+						resolve();
+						return;
+					}
 					
 					//Re-encrypt it
 					const reEncrypted = encrypt(decryptedEncrypedSection, newEncryptionHash,
@@ -273,7 +294,7 @@ export class RoutesAPIAccount {
 				}
 			});
 
-			sendEmail(this.server.log, this.server.config, email, 'Account reset undone',
+			sendEmail(this.server.config, email, 'Account reset undone',
 				'Your master password has been changed through an undo and so has your reset key.');
 		})(req, res, next);
 	}
@@ -333,7 +354,7 @@ export class RoutesAPIAccount {
 				}
 			});
 
-			sendEmail(this.server.log, this.server.config, email, 'Reset key changed',
+			sendEmail(this.server.config, email, 'Reset key changed',
 				'Your reset key has been changed');
 		})(req, res, next);
 	}

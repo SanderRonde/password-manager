@@ -1,11 +1,60 @@
 import { ServerConfig } from '../actions/server/server';
 import commentJson = require('comment-json');
 import nodemailer = require('nodemailer');
-import promptly = require('promptly');
+import Mute = require('mute-stream');
 import mkdirp = require('mkdirp');
-import { Log } from '../main';
 import path = require('path');
 import fs = require('fs');
+
+class StdinCapturer {
+	private _read: string = '';
+	private _listeners: ((text: string) => void)[] = [];
+
+	constructor() {
+		process.stdin.on('data', (chunk) => {
+			this._read += chunk.toString();
+			this._updateListeners();
+		});
+	}
+
+	private _getLine() {
+		let currentText: string = '';
+		for (let i = 0; i < this._read.length; i++) {
+			const char = this._read[i];
+			if (char === '\n') {
+				return {
+					isNewLine: true,
+					text: currentText
+				}
+			}
+			currentText += char;
+		}
+		return {
+			isNewLine: false,
+			text: ''
+		}
+	}
+
+	private _updateListeners() {
+		if (this._listeners.length === 0) {
+			return;
+		}
+
+		for (let { isNewLine, text } = this._getLine(); 
+			isNewLine && this._listeners.length; 
+			{ isNewLine, text } = this._getLine()) {
+				this._read = this._read.slice(text.length + 1);
+				this._listeners.shift()(text);
+			}
+	}
+
+	public getLine(callback: (text: string) => void) {
+		this._listeners.push(callback);
+		this._updateListeners();
+	}
+}
+
+const capturer = new StdinCapturer();
 
 export function readFile(filePath: string): Promise<string> {
 	return new Promise<string>((resolve, reject) => {
@@ -54,18 +103,18 @@ export async function readJSON<T>(filePath: string): Promise<T> {
 	return commentJson.parse(await readFile(filePath) as EncodedString<T>);
 }
 
-export function exitWith(log: Log, err: string): never {
-	log.write(err);
+export function exitWith(err: string): never {
+	console.log(err);
 	return process.exit(1);
 }
 
-export async function getConfirmedPassword(log: Log, msg: string): Promise<string> {
+export async function getConfirmedPassword(msg: string): Promise<string> {
 	while (true) {
-		const password = await readPassword(log, msg);
-		if (await readPassword(log, 'Please confirm your password') === password) {
+		const password = await readPassword(msg);
+		if (await readPassword('Please confirm your password') === password) {
 			return password;
 		} else {
-			log.write('Passwords don\'t match, please try again\n');
+			console.log('Passwords don\'t match, please try again\n');
 		}
 	}
 }
@@ -82,7 +131,7 @@ interface Secrets {
 }
 
 let _secrets: Secrets;
-export function getSecrets(log: Log): Secrets {
+export function getSecrets(): Secrets {
 	if (_secrets) {
 		return _secrets;
 	}
@@ -90,7 +139,7 @@ export function getSecrets(log: Log): Secrets {
 		_secrets = require('../../secrets');
 		return _secrets;
 	} catch(e) {
-		return exitWith(log, 'Please provide a ./secrets.js file');
+		return exitWith('Please provide a ./secrets.js file');
 	}
 }
 
@@ -109,10 +158,10 @@ export async function createTempFile(filePath: string, data: string) {
 	}
 }
 
-export function sendEmail(log: Log, { email }: ServerConfig, to: string,
+export function sendEmail({ email }: ServerConfig, to: string,
 	subject: string, content: string) {
 		if (!email) {
-			log.write('Attempting to send email while no email settings are' + 
+			console.log('Attempting to send email while no email settings are' + 
 				' configured, skipping');
 			return;
 		}
@@ -142,7 +191,7 @@ export function sendEmail(log: Log, { email }: ServerConfig, to: string,
 			text: content
 		}, (err) => {
 			if (err) {
-				log.write(err);
+				console.log(err);
 			}
 		});
 	}
@@ -157,18 +206,29 @@ export function genRandomString(length: number = 50): string {
 	return str;
 }
 
-export function readPassword(log: Log, text: string) {
-	if (!log.read) {
-		return promptly.password(text);
-	} else {
-		return log.read(text);
-	}
+export function readPassword(text: string) {
+	console.log(text);
+	return new Promise<string>((resolve) => {
+		const m = new Mute({ replace: '*', prompt: text });
+		m.pipe(process.stdout, { end: false });
+
+		m.mute();
+		capturer.getLine((text) => {
+			m.unmute();
+			resolve(text);
+		});
+	});
 }
 
-export function readConfirm(log: Log, text: string) {
-	if (!log.read) {
-		return promptly.confirm(text);
-	} else {
-		return log.read(text);
-	}
+export function readConfirm(text: string) {
+	console.log(text);
+	return new Promise<string>((resolve) => {
+		capturer.getLine((text) => {
+			resolve(text);
+		});
+	});
+}
+
+export function getDBFromURI(uri: string) {
+	return uri.split('/').slice(-1).join('');
 }

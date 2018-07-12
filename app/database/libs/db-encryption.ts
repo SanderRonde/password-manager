@@ -1,8 +1,8 @@
-import { encrypt, decrypt, encryptWithSalt, decryptWithSalt } from "../../lib/crypto";
 import { DatabaseEncrypted, EncryptedPassword, DecryptedPassword, EncryptedInstance, DecryptedInstance, EncryptedAccount, DecryptedAccount, DatabaseEncryptedWithSalt } from "../db-types";
+import { encrypt, decrypt, encryptWithSalt, decryptWithSalt } from "../../lib/crypto";
+import { ENCRYPTION_ALGORITHM } from "../../lib/constants";
 import { UnstringifyObjectIDs } from "./db-manipulation";
 import { Database } from "../database";
-import { ENCRYPTION_ALGORITHM } from "../../lib/constants";
 
 export class DatabaseEncryption {
 	private _obfuscatedKey: string;
@@ -57,7 +57,7 @@ export class DatabaseEncryption {
 
 	public dbDecrypt<T>(data: DatabaseEncrypted<EncodedString<T>>, 
 		key: string = this._deObfuscateKey()): T {
-			return decrypt(data, key);
+			return decrypt(data, key) as T;
 		}
 
 	public dbEncryptWithSalt<T>(data: T,
@@ -83,7 +83,7 @@ export class DatabaseEncryption {
 		});
 		if (!record) {
 			//Uninitialized database, initialize now
-			this._parent.log.write('Empty database, creating with this key');
+			console.log('Empty database, creating with this key');
 			await this._parent.mongoInstance.collection('meta').insertOne({
 				type: 'database',
 				data: this.dbEncrypt('decrypted', key)
