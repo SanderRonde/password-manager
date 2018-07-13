@@ -75,11 +75,11 @@ export function initCommander(handledHolder: {
 	commander
 		.command('backup <load/googledrive/local>')
 		.description('backup the database')
-		.option('-c, --config', 'The path to a configuration file')
-		.option('-p, --password', 'A password that is used to encrpt/decrypt the backup file')
-		.option('-i, --input', 'The path to the backup file to load (if using "load")')
-		.option('-o, --output', 'The path to the backup file output (if using "local")')
-		.option('-d, --database <location>', 'The path to the database', 
+		.option('-c, --config <config>', 'The path to a configuration file')
+		.option('-p, --password <password>', 'A password that is used to encrpt/decrypt the backup file')
+		.option('-i, --input <input>', 'The path to the backup file to load (if using "load")')
+		.option('-o, --output <output>', 'The path to the backup file output (if using "local")')
+		.option('-d, --database <database>', 'The path to the database', 
 			'mongodb://127.0.0.1:27017/pwmanager')
 		.action(async (method: string, settings: BackupSettings) => {
 			handledHolder.handled = true;
@@ -154,7 +154,7 @@ export function initCommander(handledHolder: {
 	commander
 		.command('genconfig <server/backup>')
 		.description('generate a config file for given command')
-		.option('-o, --output', 'The path to the output location')
+		.option('-o, --output <output>', 'The path to the output location')
 		.action(async (command: string, settings: {
 			output?: string;
 		}) => {
