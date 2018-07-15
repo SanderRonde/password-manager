@@ -1,7 +1,8 @@
+import { unref } from '../../../../../../test/lib/util';
 import RateLimit = require('express-rate-limit');
 import { ServerConfig } from '../../../server';
+import { API_ERRS } from '../../../../../api';
 import express = require('express');
-import { unref } from '../../../../../../test/lib/util';
 
 export type APIResponse = {
 	success: true;
@@ -12,6 +13,7 @@ export type APIResponse = {
 }|{
 	success: false;
 	error: string;
+	ERR: API_ERRS;
 }
 
 export interface ResponseCaptured extends express.Response {

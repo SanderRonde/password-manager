@@ -5,6 +5,7 @@ import speakeasy = require('speakeasy');
 import express = require('express');
 import mongo = require('mongodb');
 import { ResponseCaptured } from '../../../../modules/ratelimit';
+import { API_ERRS } from '../../../../../../../../api';
 
 
 export class RoutesAPIInstanceTwofactor {
@@ -137,7 +138,8 @@ export class RoutesAPIInstanceTwofactor {
 				res.status(200);
 				res.json({
 					success: false,
-					error: 'invalid token'
+					error: 'invalid token',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return;
 			}
@@ -196,7 +198,8 @@ export class RoutesAPIInstanceTwofactor {
 				res.status(200);
 				res.json({
 					success: false,
-					error: 'invalid token'
+					error: 'invalid token',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 			}
 		})(req, res, next);
@@ -243,7 +246,8 @@ export class RoutesAPIInstanceTwofactor {
 				res.status(200);
 				res.json({
 					success: false,
-					error: 'invalid token'
+					error: 'invalid token',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 			}
 		})(req, res, next);

@@ -1,8 +1,9 @@
 import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword, DatabaseEncrypted } from "../../../../../database/db-types";
 import { Hashed, Padded, MasterPasswordVerificationPadding, hash, pad } from "../../../../../lib/crypto";
-import { COLLECTIONS } from "../../../../../database/database";
-import { Webserver } from "../webserver";
 import { getStores, ResponseCaptured, APIResponse } from "./ratelimit";
+import { COLLECTIONS } from "../../../../../database/database";
+import { API_ERRS } from "../../../../../api";
+import { Webserver } from "../webserver";
 import speakeasy = require('speakeasy');
 import express = require('express');
 import mongo = require('mongodb');
@@ -38,7 +39,8 @@ export class WebserverRouter {
 					res.status(200);
 					res.json({
 						success: false,
-						error: 'invalid credentials'
+						error: 'invalid credentials',
+						ERR: API_ERRS.INVALID_CREDENTIALS
 					});
 					return false;
 				}
@@ -64,7 +66,8 @@ export class WebserverRouter {
 					res.status(400);
 					res.json({
 						success: false,
-						error: 'Incorrect combination'
+						error: 'Incorrect combination',
+						ERR: API_ERRS.INVALID_CREDENTIALS
 					});
 					return false;
 				}
@@ -83,7 +86,8 @@ export class WebserverRouter {
 						res.status(400);
 						res.json({
 							success: false,
-							error: 'Incorrect combination'
+							error: 'Incorrect combination',
+							ERR: API_ERRS.INVALID_CREDENTIALS
 						});
 					}
 					return false;
@@ -122,7 +126,8 @@ export class WebserverRouter {
 						res.status(400);
 						res.json({
 							success: false,
-							error: 'no request body'
+							error: 'no request body',
+							ERR: API_ERRS.NO_REQUEST_BODY
 						});
 						return;
 					}
@@ -133,7 +138,8 @@ export class WebserverRouter {
 							res.status(400);
 							res.json({
 								success: false,
-								error: 'missing parameters'
+								error: 'missing parameters',
+								ERR: API_ERRS.MISSING_PARAMS
 							});
 							return;
 						}
@@ -153,7 +159,8 @@ export class WebserverRouter {
 			res.status(400);
 			res.json({
 				success: false,
-				error: 'invalid instance ID'
+				error: 'invalid instance ID',
+				ERR: API_ERRS.INVALID_CREDENTIALS
 			});
 			return { instance: null, decryptedInstance: null, accountPromise: null };
 		}
@@ -180,7 +187,8 @@ export class WebserverRouter {
 			res.status(200);
 			res.json({
 				success: false,
-				error: 'invalid token'
+				error: 'invalid token',
+				ERR: API_ERRS.INVALID_CREDENTIALS
 			});
 			return false;
 		}
@@ -192,13 +200,15 @@ export class WebserverRouter {
 			res.status(400);
 			res.json({
 				success: false,
-				error: `param "${val}" not of type ${type}[]`
+				error: `param "${val}" not of type ${type}[]`,
+				ERR: API_ERRS.INVALID_PARAM_TYPES
 			});
 		} else {
 			res.status(400);
 			res.json({
 				success: false,
-				error: `param "${val}" not of type ${type}`
+				error: `param "${val}" not of type ${type}`,
+				ERR: API_ERRS.INVALID_PARAM_TYPES
 			});
 		}
 	}
@@ -246,7 +256,8 @@ export class WebserverRouter {
 				res.status(500);
 				res.json({
 					success: false,
-					error: 'server error'
+					error: 'server error',
+					ERR: API_ERRS.SERVER_ERROR
 				});
 			}
 		}

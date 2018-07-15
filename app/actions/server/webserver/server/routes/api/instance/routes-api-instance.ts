@@ -4,6 +4,7 @@ import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa"
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
 import { sendEmail, genID } from "../../../../../../../lib/util";
+import { API_ERRS } from "../../../../../../../api";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
@@ -50,7 +51,7 @@ export class RoutesApiInstance {
 			res.json({
 				success: true,
 				data: {
-					id: encryptWithPublicKey(public_key, _id.toHexString())
+					id: encryptWithPublicKey(_id.toHexString(), public_key)
 				}
 			});
 
@@ -85,7 +86,8 @@ export class RoutesApiInstance {
 				res.json({
 					success: false,
 					//Invalid instance ID
-					error: 'invalid credentials'
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return;
 			}
@@ -148,38 +150,14 @@ export class RoutesApiInstance {
 				res.status(200);
 				res.json({
 					success: false,
-					error: 'invalid credentials'
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 			} else {
 				res.status(200);
 				res.json({
 					success: true,
 					data: {}
-				});
-			}
-
-			if (instance.twofactor_enabled) {
-				//Require twofactor authentication before giving out token
-				res.status(200);
-				res.json({
-					success: true,
-					data: {
-						twofactor_required: true,
-						twofactor_auth_token: this.server.Auth.genTwofactorToken(
-							instance._id.toHexString(), 
-							this.server.database.Crypto.dbDecrypt(instance.user_id))
-					}
-				});
-			} else {
-				res.status(200);
-				res.json({
-					success: true,
-					data: {
-						twofactor_required: false,
-						auth_token: this.server.Auth.genLoginToken(
-							instance._id.toHexString(),
-							this.server.database.Crypto.dbDecrypt(instance.user_id))
-					}
 				});
 			}
 		})(req, res, next);
@@ -209,7 +187,8 @@ export class RoutesApiInstance {
 				res.status(200);
 				res.json({
 					success: false,
-					error: 'invalid key'
+					error: 'invalid key',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 			} else {
 				res.status(200);

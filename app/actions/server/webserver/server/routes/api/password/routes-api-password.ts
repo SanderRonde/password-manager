@@ -3,6 +3,7 @@ import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWith
 import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-manipulation";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
+import { API_ERRS } from "../../../../../../../api";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
@@ -23,7 +24,8 @@ export class RoutesApiPassword {
 				res.status(200);
 				res.json({
 					success: false,
-					error: 'failed'
+					error: 'failed',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return { password: null }
 			}
@@ -41,7 +43,8 @@ export class RoutesApiPassword {
 					res.status(400);
 					res.json({
 						success: false,
-						error: 'no 2FA token supplied'
+						error: 'no 2FA token supplied',
+						ERR: API_ERRS.INVALID_CREDENTIALS
 					})
 					return false;
 				}
@@ -49,7 +52,8 @@ export class RoutesApiPassword {
 					res.status(200);
 					res.json({
 						success: false,
-						error: 'failed'
+						error: 'failed',
+						ERR: API_ERRS.INVALID_CREDENTIALS
 					});
 					return false;
 				}
@@ -321,10 +325,12 @@ export class RoutesApiPassword {
 			res.status(200);
 			res.json({
 				success: true,
-				data: encryptWithPublicKey(JSON.stringify({
-					id: password._id.toHexString(),
-					encrypted: encrypted
-				}), decryptedInstance.public_key)
+				data: {
+					encrypted: encryptWithPublicKey(JSON.stringify({
+						id: password._id.toHexString(),
+						encrypted: encrypted
+					}), decryptedInstance.public_key)
+				}
 			});
 		})(req, res, next);
 	}
@@ -363,11 +369,13 @@ export class RoutesApiPassword {
 			res.status(200);
 			res.json({
 				success: true,
-				data: encryptWithPublicKey(JSON.stringify({
-					id: password._id.toHexString(),
-					websites: websites,
-					twofactor_enabled: twofactor_enabled		
-				}), decryptedInstance.public_key)
+				data: {
+					encrypted: encryptWithPublicKey(JSON.stringify({
+						id: password._id.toHexString(),
+						websites: websites,
+						twofactor_enabled: twofactor_enabled		
+					}), decryptedInstance.public_key)
+				}
 			});
 		})(req, res, next);
 	}
@@ -416,15 +424,17 @@ export class RoutesApiPassword {
 			res.status(200);
 			res.json({
 				success: true,
-				data: encryptWithPublicKey(JSON.stringify(passwords.map((password) => {
-					const decrypted = this.server.database.Crypto
-						.dbDecryptPasswordRecord(password);
-					return {
-						id: password._id.toHexString(),
-						websites: decrypted.websites,
-						twofactor_enabled: decrypted.twofactor_enabled
-					}
-				})), decryptedInstance.public_key)
+				data: {
+					encrypted: encryptWithPublicKey(JSON.stringify(passwords.map((password) => {
+						const decrypted = this.server.database.Crypto
+							.dbDecryptPasswordRecord(password);
+						return {
+							id: password._id.toHexString(),
+							websites: decrypted.websites,
+							twofactor_enabled: decrypted.twofactor_enabled
+						}
+					})), decryptedInstance.public_key)
+				}
 			});
 		})(req, res, next);
 	}
@@ -475,15 +485,17 @@ export class RoutesApiPassword {
 			res.status(200);
 			res.json({
 				success: true,
-				data: encryptWithPublicKey(JSON.stringify(passwords.map((password) => {
-					const decrypted = this.server.database.Crypto
-						.dbDecryptPasswordRecord(password);
-					return {
-						id: password._id.toHexString(),
-						websites: decrypted.websites,
-						twofactor_enabled: decrypted.twofactor_enabled
-					}
-				})), decryptedInstance.public_key)
+				data: {
+					encrypted: encryptWithPublicKey(JSON.stringify(passwords.map((password) => {
+						const decrypted = this.server.database.Crypto
+							.dbDecryptPasswordRecord(password);
+						return {
+							id: password._id.toHexString(),
+							websites: decrypted.websites,
+							twofactor_enabled: decrypted.twofactor_enabled
+						}
+					})), decryptedInstance.public_key)
+				}
 			});
 		})(req, res, next);
 	}

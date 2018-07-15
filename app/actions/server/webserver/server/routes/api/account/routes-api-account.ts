@@ -4,6 +4,7 @@ import { decrypt, encrypt, hash, pad, ERRS } from "../../../../../../../lib/cryp
 import { genRandomString, sendEmail } from "../../../../../../../lib/util";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
+import { API_ERRS } from "../../../../../../../api";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
@@ -52,7 +53,8 @@ export class RoutesAPIAccount {
 				res.json({
 					success: false,
 					//Failed to parse JSON, incorrect key
-					error: 'invalid credentials'
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return;
 			}
@@ -61,7 +63,8 @@ export class RoutesAPIAccount {
 				res.json({
 					success: false,
 					//Failed to parse JSON, incorrect key
-					error: 'invalid credentials'
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return;
 			}
@@ -211,7 +214,8 @@ export class RoutesAPIAccount {
 				res.json({
 					success: false,
 					//Failed to parse JSON, incorrect key
-					error: 'invalid credentials'
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return;
 			}
@@ -328,7 +332,8 @@ export class RoutesAPIAccount {
 				res.json({
 					success: false,
 					//Invalid password
-					error: 'invalid credentials'
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return;
 			}
