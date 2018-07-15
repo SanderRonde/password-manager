@@ -45,7 +45,7 @@ export async function genTempDatabase(t: GenericTestContext<Context<any>>): Prom
 
 export function captureCreatedFiles(t: RegisterContextual<any>): string[] {
 	const arr: string[] = [];
-	t.after('Deete files', async () => {
+	t.after.always('Delete files', async () => {
 		await Promise.all(arr.map(async (filepath) => {
 			await fs.unlink(filepath);
 		}));
@@ -55,7 +55,7 @@ export function captureCreatedFiles(t: RegisterContextual<any>): string[] {
 
 export function captureURIs(t: RegisterContextual<any>): string[] {
 	const arr: string[] = [];
-	t.after('Clear databases', async () => {
+	t.after.always('Clear databases', async () => {
 		await Promise.all(arr.map(clearDB));
 	});
 	return arr;
