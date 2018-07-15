@@ -22,12 +22,12 @@ export namespace Export {
 	function createDumpFile(dbPath: string, silent: boolean = false) {
 		return new Promise<string>((resolve, reject) => {
 			//Create ./out directory
-			mkdirp(path.join(__dirname, '../../../out'), (err) => {
+			mkdirp(path.join(__dirname, '../../../temp'), (err) => {
 				if (err) {
 					if (silent) {
 						reject(err);
 					} else {
-						exitWith('Failed to create ./out');
+						exitWith('Failed to create ./temp');
 					}
 				} else {
 					const filePath = path.join(__dirname, `../../../temp/${genRandomString(25)}.dump`);
