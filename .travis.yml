@@ -17,6 +17,7 @@ before_script:
 script:
 - yarn compile
 - yarn test
+- go -h
 notifications:
   email:
     on_success: change
