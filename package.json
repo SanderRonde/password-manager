@@ -39,7 +39,8 @@
     "ava": "^0.25.0",
     "gulp": "^3.9.1",
     "gulp-typescript": "^5.0.0-alpha.3",
-    "import-fresh": "^2.0.0"
+    "import-fresh": "^2.0.0",
+    "typescript": "^2.9.2"
   },
   "scripts": {
     "compile": "gulp compile",
