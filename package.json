@@ -44,6 +44,6 @@
   },
   "scripts": {
     "compile": "gulp compile",
-    "test": "ava test/tests/**/*.test.js"
+    "test": "ava test/tests/**/*.js"
   }
 }
