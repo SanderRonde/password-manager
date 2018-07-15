@@ -25,7 +25,9 @@ export namespace Load {
 			await assertRestoreExists();
 			
 			console.log('Reading file...');
-			const file = await readFile(input);
+			const file = await readFile(input).catch(() => {
+				exitWith('Failed to find input file');
+			});
 
 			console.log('Decrypting file...');
 			const decrypted = await decrypt<string, EncryptionAlgorithm, string>({
