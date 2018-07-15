@@ -109,7 +109,7 @@ test('it is possible to enter the password manually', async t => {
 	const [ [, resetKey ] ] = proc.getRegexps();
 	await hasCreatedAccount(t, {
 		dbpw, userpw, resetKey, uri
-	})
+	});
 });
 test('work when entering pasword correctly the third time', async t => {
 	const uri = await genTempDatabase(t);

@@ -8,6 +8,7 @@ export namespace Export {
 		return new Promise<boolean>((resolve) => {
 			exec('mongodump --help', (err) => {
 				if (err) {
+					console.log(err);
 					exitWith('Please install the tools from' + 
 						' https://github.com/mongodb/mongo-tools');
 					return;
@@ -23,12 +24,17 @@ export namespace Export {
 			console.log('Dumping...');
 			exec(`mongodump --uri ${dbPath}` + 
 				` --archive`, (err, stdout, stderr) => {
-					if (err || stderr) {
+					if (err) {
 						console.log(stderr);
 						exitWith('Failed to run dumping program');
 					} else {
-						const unEncryptedArchive = stdout;
+						const unEncryptedArchive = stdout.toString();
 						console.log('Encrypting, this may take a while...');
+						if (!password) {
+							resolve(unEncryptedArchive);
+							return;
+						}
+
 						const { data: encrypted } = encrypt(unEncryptedArchive, 
 							password, ENCRYPTION_ALGORITHM);
 						

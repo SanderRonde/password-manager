@@ -11,5 +11,6 @@ export namespace Local {
 		console.log('Writing file...');
 		await writeFile(config.output || path.join(__dirname,
 			'../../../../backup.archive'), data);
+		console.log('Done writing file');
 	}
 }

@@ -5,6 +5,7 @@ import { EventEmitter } from "events";
 import { getDB, clearDB } from "./db";
 import { Readable } from "stream";
 import mongo = require('mongodb');
+import fs = require('fs');
 
 export function unref(...emitters: (EventEmitter|{
 	unref(): void;
@@ -40,6 +41,24 @@ export async function genTempDatabase(t: GenericTestContext<Context<any>>): Prom
 	});
 
 	return uri;
+}
+
+export function captureCreatedFiles(t: RegisterContextual<any>): string[] {
+	const arr: string[] = [];
+	t.after('Deete files', async () => {
+		await Promise.all(arr.map((filepath) => {
+			return new Promise((resolve, reject) => {
+				fs.unlink(filepath, (err) => {
+					if (err) {
+						reject(err);
+					} else {
+						resolve();
+					}
+				})
+			});
+		}));
+	});
+	return arr;
 }
 
 export function captureURIs(t: RegisterContextual<any>): string[] {

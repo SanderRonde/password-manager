@@ -24,8 +24,8 @@ export class ProcRunner {
 	
 	constructor(private _t: GenericTestContext<Context<any>>, 
 		private _args: string[], private _config: {
-			printlogs: boolean;
-			printifnomatch: boolean;
+			printlogs?: boolean;
+			printifnomatch?: boolean;
 		} = {
 			printifnomatch: false,
 			printlogs: false
