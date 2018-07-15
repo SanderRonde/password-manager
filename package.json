@@ -37,6 +37,7 @@
     "@types/progress": "^2.0.1",
     "@types/speakeasy": "^2.0.2",
     "ava": "^0.25.0",
+    "gulp": "^3.9.1",
     "gulp-typescript": "^5.0.0-alpha.3",
     "import-fresh": "^2.0.0"
   },
