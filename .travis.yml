@@ -11,6 +11,9 @@ stages:
 install:
 - yarn --ignore-engines
 - npm install -g gulp
+before_script:
+  - sleep 15
+  - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 script:
 - yarn compile
 - yarn test
@@ -18,3 +21,5 @@ notifications:
   email:
     on_success: change
     on_failure: change
+services:
+  - mongodb
