@@ -28,7 +28,7 @@ test('print an error when a non-command is used', async t => {
 });
 test('a backupped file can be used to restore', async t => {
 	const dumpName = genRandomString(10);
-	const dumpPath = path.join(__dirname, `../../../out/mongodump${dumpName}.dump`);
+	const dumpPath = path.join(__dirname, `../../../temp/mongodump${dumpName}.dump`);
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 	const dbpw = await genDBWithPW(uri);

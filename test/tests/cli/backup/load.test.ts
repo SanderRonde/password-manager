@@ -10,7 +10,7 @@ import fs = require('fs');
 const dumps: string[] = [];
 async function createDummyDump(uri: string) {
 	const dumpPath = path.join(__dirname,
-		`../../../out/dummpydump${genRandomString(25)}.dump`);
+		`../../../temp/dummpydump${genRandomString(25)}.dump`);
 	dumps.push(dumpPath);
 	const dbpw = await genDBWithPW(uri);
 	const data = await Export.exportDatabase(uri, true);

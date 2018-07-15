@@ -30,7 +30,7 @@ export namespace Export {
 						exitWith('Failed to create ./out');
 					}
 				} else {
-					const filePath = path.join(__dirname, `../../../out/${genRandomString(25)}.dump`);
+					const filePath = path.join(__dirname, `../../../temp/${genRandomString(25)}.dump`);
 					exec(`mongodump --uri ${dbPath}` + 
 						` --archive="${filePath}"`, (err, _, stderr) => {
 							if (err) {

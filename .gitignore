@@ -65,5 +65,5 @@ secrets.js
 app/**/*.js
 test/**/*.js
 
-test/out/
-out/
+test/temp/
+temp/
