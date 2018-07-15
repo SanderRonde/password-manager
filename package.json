@@ -7,6 +7,15 @@
   "author": "Sander Ronde <awsdfgvhbjn@gmail.com>",
   "license": "MIT",
   "private": true,
+  "ava": {
+    "files": [
+      "test/tests/*.js",
+      "test/tests/imports/*.js",
+      "test/tests/cli/*.js",
+      "test/tests/cli/account/*.js",
+      "test/tests/cli/backup/*.js"
+    ]
+  },
   "dependencies": {
     "@types/express-rate-limit": "^2.9.3",
     "body-parser": "^1.18.3",
@@ -44,6 +53,6 @@
   },
   "scripts": {
     "compile": "gulp compile",
-    "test": "ava test/tests/**/*.js"
+    "test": "ava"
   }
 }
