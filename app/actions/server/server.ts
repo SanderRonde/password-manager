@@ -38,11 +38,13 @@ export namespace Server {
 	export async function genConfig(settings: {
 		output?: string;
 	}) {
-		const file = await fs.readFile('./config.json', {
+		const file = await fs.readFile(path.join(__dirname, './config.json'), {
 			encoding: 'utf8'
 		});
 		const filePath = settings.output || 
 			path.join(__dirname, '../../../cfg/server.json');
+		await fs.mkdirp(path.dirname(filePath));
 		await fs.writeFile(filePath, file);
+		console.log('Done!');
 	}
 }

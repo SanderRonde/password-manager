@@ -67,3 +67,4 @@ test/**/*.js
 
 test/temp/
 temp/
+cfg/
