@@ -10,6 +10,7 @@ stages:
   
 install:
 - yarn --ignore-engines
+- npm install -g gulp
 script:
 - yarn compile
 - yarn test
