@@ -1,4 +1,5 @@
 import { ServerConfig } from '../actions/server/server';
+import { TypedObjectID } from '../database/db-types';
 import commentJson = require('comment-json');
 import nodemailer = require('nodemailer');
 import { EventEmitter } from 'events';
@@ -7,8 +8,7 @@ import { Readable } from 'stream';
 import mongo = require('mongodb');
 import mkdirp = require('mkdirp');
 import path = require('path');
-import fs = require('fs');
-import { TypedObjectID } from '../database/db-types';
+import fs = require('fs-extra');
 
 //Prevent circular import
 function unref(...emitters: (EventEmitter|{
@@ -77,20 +77,6 @@ class StdinCapturer {
 
 const capturer = new StdinCapturer();
 
-export function readFile(filePath: string): Promise<string> {
-	return new Promise<string>((resolve, reject) => {
-		fs.readFile(filePath, {
-			encoding: 'utf8'
-		}, (err, data) => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve(data.toString());
-			}
-		});
-	});
-}
-
 export function assertDir(dirPath: string) {
 	return new Promise((resolve, reject) => {
 		mkdirp(dirPath, (err) => {
@@ -103,14 +89,12 @@ export function assertDir(dirPath: string) {
 	});
 }
 
-export function writeFile(filePath: string, data: string) {
+export function writeBuffer(filePath: string, data: Buffer) {
 	return new Promise(async (resolve, reject) => {
 		await assertDir(path.dirname(filePath)).catch((err) => {
 			resolve(err);
 		});
-		fs.writeFile(filePath, data, {
-			encoding: 'utf8'
-		}, (err) => {
+		fs.writeFile(filePath, data, (err) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -121,7 +105,9 @@ export function writeFile(filePath: string, data: string) {
 }
 
 export async function readJSON<T>(filePath: string): Promise<T> {
-	return commentJson.parse(await readFile(filePath) as EncodedString<T>);
+	return commentJson.parse(await fs.readFile(filePath, {
+		encoding: 'utf8'
+	}) as EncodedString<T>);
 }
 
 export function exitWith(err: string): never {
@@ -164,8 +150,8 @@ export function getSecrets(): Secrets {
 	}
 }
 
-export async function createTempFile(filePath: string, data: string) {
-	await writeFile(filePath, data);
+export async function createTempFile(filePath: string, data: Buffer) {
+	await writeBuffer(filePath, data);
 	return (): Promise<void> => {
 		return new Promise<void>((resolve, reject) => {
 			fs.unlink(filePath, (err) => {
@@ -256,4 +242,8 @@ export function getDBFromURI(uri: string) {
 
 export function genID<T>(): TypedObjectID<T> {
 	return new mongo.ObjectId() as TypedObjectID<T>;
+}
+
+export function isVoid(val: any): val is void {
+	return val === undefined || val === null;
 }

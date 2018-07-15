@@ -113,6 +113,39 @@ export function decryptWithSalt<T, A extends EncryptionAlgorithm, K extends stri
 	}
 }
 
+export function encryptBuffer<T extends Buffer, A extends EncryptionAlgorithm, K extends string>(buf: T, key: K,
+	algorithm: A): {
+		data: Buffer;
+		algorithm: A;
+	} {
+		const iv = crypto.randomBytes(16);
+		const enckey = hash(key).slice(0, 32);
+		const cipher = crypto.createCipheriv(algorithm, enckey, iv);
+		const ciphertext = cipher.update(buf);
+		const finalText = Buffer.concat([iv, ciphertext, cipher.final()]);	
+
+		return {
+			data: finalText,
+			algorithm: algorithm
+		 } as {
+			data: Buffer;
+			algorithm: A;
+		};
+	}
+
+export function decryptBuffer<T extends string, A extends EncryptionAlgorithm, K extends string>({
+	data, algorithm
+}: {
+	data: Buffer;
+	algorithm: A;
+}, key: K): T {
+	const iv = data.slice(0, 16);
+	const decipher = crypto.createDecipheriv(algorithm, hash(key).slice(0, 32), iv);
+	const plaintext = decipher.update(data.slice(16));
+	
+	return plaintext.toString() + decipher.final() as T;
+}
+
 export function encrypt<T, A extends EncryptionAlgorithm, K extends string>(data: T, key: K, algorithm: A): {
 	data: Encrypted<EncodedString<T>, K, A>;
 	algorithm: A;

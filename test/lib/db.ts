@@ -59,12 +59,14 @@ export async function isMongoConnected() {
 
 export async function hasCreatedDBWithPW(pw: string, uri: string): Promise<boolean> {
 	const { db, done } = await getDB(uri);
-
 	const record = await db.collection('meta').findOne({
 		type: 'database'
 	});
 	done();
 
+	if (!record) {
+		return false;
+	}
 	const res = decrypt(record.data, pw);
 	if (res === 'decrypted') {
 		return true;

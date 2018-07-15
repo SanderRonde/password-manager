@@ -11,14 +11,14 @@ const files = captureCreatedFiles(test);
 test('print an error when no output is passed', async t => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
-	const dbpw = await genDBWithPW(uri);
 
 	const proc = new ProcRunner(t, [
 		'backup',
 		'local',
-		'-d', uri,
-		'-p', dbpw
-	]);
+		'-d', uri
+	], {
+		printlogs: true
+	});
 	proc.expectWrite('No output was specified');
 	proc.expectExit(1);
 
@@ -38,42 +38,8 @@ test('creates dump with regular args', async t => {
 		'local',
 		'-d', uri,
 		'-o', dumpPath
-	], {
-		printifnomatch: true
-	});
-	proc.expectWrite('Dumping...');
-	proc.expectWrite('Encrypting, this may take a while...');
-	proc.expectWrite('Writing file...');
-	proc.expectWrite('Done writing file');
-	proc.expectExit(0);
-
-	await proc.run();
-	proc.check();
-
-	const exists = await new Promise<boolean>((resolve) => {
-		fs.exists(dumpPath, (exists) => {
-			resolve(exists);
-		});
-	});
-	t.true(exists, 'dump file exists');
-});
-test('should be encryptable with a password', async t => {
-	const uri = await genTempDatabase(t);
-	uris.push(uri);
-	await genDBWithPW(uri);
-
-	const dumpName = genRandomString(10);
-	const dumpPath = path.join(__dirname, `../../../out/mongodump${dumpName}.dump`);
-	files.push(dumpPath);
-	const proc = new ProcRunner(t, [
-		'backup',
-		'local',
-		'-d', uri,
-		'-p', 'somepassword',
-		'-o', dumpPath
 	]);
 	proc.expectWrite('Dumping...');
-	proc.expectWrite('Encrypting, this may take a while...');
 	proc.expectWrite('Writing file...');
 	proc.expectWrite('Done writing file');
 	proc.expectExit(0);

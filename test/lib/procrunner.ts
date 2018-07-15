@@ -4,7 +4,11 @@ import { spawn } from "child_process";
 import path = require('path');
 
 export enum LOG_VALS {
-	ANY_STRING
+	ANY_STRING = 0
+}
+
+function isLogVal(value: any): value is LOG_VALS {
+	return value === LOG_VALS.ANY_STRING;
 }
 
 export class ProcRunner {
@@ -14,10 +18,13 @@ export class ProcRunner {
 	private _reads: string[] = [];
 	private _writtenExpected: ({
 		type: 'regular';
-		content: string|LOG_VALS|RegExp;
+		content: string|RegExp;
 	}|{
 		type: 'captureRegxp';
 		content: RegExp;
+	}|{
+		type: 'specials';
+		content: LOG_VALS;
 	})[] = [];
 
 	private _capturedRegex: RegExpExecArray[] = [];
@@ -49,16 +56,21 @@ export class ProcRunner {
 		});
 	}
 
-	public expectWrite(text?: string|LOG_VALS|RegExp) {
-		if (text instanceof RegExp) {
+	public expectWrite(value?: string|LOG_VALS|RegExp) {
+		if (value instanceof RegExp) {
 			this._writtenExpected.push({
 				type: 'regular',
-				content: text
+				content: value
 			});
-		} else if (text) {
+		} else if (isLogVal(value)) {
+			this._writtenExpected.push({
+				type: 'specials',
+				content: value
+			})
+		} else if (value) {
 			this._writtenExpected.push({
 				type: 'regular',
-				content: text + '\n'
+				content: value + '\n'
 			});
 		} else {
 			this._writtenExpected.push({
@@ -78,19 +90,22 @@ export class ProcRunner {
 	} | {
 		type: "captureRegxp";
 		content: RegExp;
+	}|{
+		type: 'specials';
+		content: LOG_VALS;
 	}): boolean {
 		switch (expected.type) {
+			case 'specials':
+				switch (expected.content) {
+					case LOG_VALS.ANY_STRING:
+						return typeof actual === 'string';
+				}
+				break;
 			case 'regular':
 				if (expected.content instanceof RegExp) {
 					return !!expected.content.exec(actual.trim());
 				} else if (typeof expected.content === 'string') {
 					return actual.trim() === expected.content.trim();
-				} else {
-					switch (expected.content) {
-						case LOG_VALS.ANY_STRING:
-							return typeof actual === 'string';
-							break;
-					}
 				}
 				break;
 			case 'captureRegxp':
@@ -120,6 +135,14 @@ export class ProcRunner {
 				`a value was expected (while writing "${written && written.toString()}")`);
 
 			switch (expected.type) {
+				case 'specials':
+					switch (expected.content) {
+						case LOG_VALS.ANY_STRING:
+							this._t.is(typeof written, 'string', 
+								'Written value is string');
+							break;
+					}
+					break;
 				case 'regular':
 					if (expected.content instanceof RegExp) {
 						this._t.regex(written.trim(), expected.content,
@@ -127,13 +150,6 @@ export class ProcRunner {
 					} else if (typeof expected.content === 'string') {
 						this._t.is(written.trim(), expected.content.trim(),
 							'written is the same as expected');
-					} else {
-						switch (expected.content) {
-							case LOG_VALS.ANY_STRING:
-								this._t.is(typeof written, 'string', 
-									'Written value is string');
-								break;
-						}
 					}
 					break;
 				case 'captureRegxp':

@@ -76,7 +76,6 @@ export function initCommander(handledHolder: {
 		.command('backup <load/googledrive/local>')
 		.description('backup the database')
 		.option('-c, --config <config>', 'The path to a configuration file')
-		.option('-p, --password <password>', 'A password that is used to encrpt/decrypt the backup file')
 		.option('-i, --input <input>', 'The path to the backup file to load (if using "load")')
 		.option('-o, --output <output>', 'The path to the backup file output (if using "local")')
 		.option('-d, --database <database>', 'The path to the database', 

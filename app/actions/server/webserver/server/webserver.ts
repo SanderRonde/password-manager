@@ -1,12 +1,12 @@
 import { Database } from "../../../../database/database";
 import { WebserverRouter } from "./modules/routing";
 import { WebserverRoutes } from "./modules/routes";
-import { readFile } from "../../../../lib/util";
 import { WebserverAuth } from "./modules/auth";
 import { ServerConfig } from "../../server";
 import bodyParser = require('body-parser');
 import express = require('express');
 import https = require('https');
+import fs = require('fs-extra');
 import http = require('http');
 
 
@@ -32,8 +32,12 @@ export class Webserver {
 		await Promise.all([...(this.config.httpsKey && this.config.httpsCert ?
 			[new Promise(async (resolve) => {
 				https.createServer({
-					key: await readFile(this.config.httpsKey),
-					cert: await readFile(this.config.httpsCert)
+					key: await fs.readFile(this.config.httpsKey, {
+						encoding: 'utf8'
+					}),
+					cert: await fs.readFile(this.config.httpsCert, {
+						encoding: 'utf8'
+					})
 				}, this.app).listen(this.config.https, () => {
 					console.log(`HTTPS server listening on port ${this.config.https}`);
 					resolve();

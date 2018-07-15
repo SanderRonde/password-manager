@@ -1,12 +1,11 @@
 import { GoogleDrive as _GoogleDrive } from "./methods/googledrive";
-import { readFile, writeFile } from "../../lib/util";
 import { Local as _Local } from "./methods/local";
 import { Load as _Load } from "./methods/load";
+import fs = require('fs-extra');
 import path = require('path');
 
 export interface BackupArgs {
 	config?: string;
-	password?: string;
 	input?: string;
 	output?: string;
 	database: string;
@@ -27,9 +26,11 @@ export namespace Backup {
 	export async function genConfig(settings: {
 		output?: string;
 	}) {
-		const file = await readFile('./config.json');
+		const file = await fs.readFile('./config.json', {
+			encoding: 'utf8'
+		});
 		const filePath = settings.output || 
 			path.join(__dirname, '../../../cfg/backup.json');
-		await writeFile(filePath, file);
+		await fs.writeFile(filePath, file);
 	}
 }

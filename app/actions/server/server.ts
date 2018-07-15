@@ -1,6 +1,6 @@
 import { Webserver } from "./webserver/server/webserver";
-import { readFile, writeFile } from "../../lib/util";
 import { Database } from "../../database/database";
+import fs = require('fs-extra');
 import path = require('path');
 
 export interface ServerArgs {
@@ -38,9 +38,11 @@ export namespace Server {
 	export async function genConfig(settings: {
 		output?: string;
 	}) {
-		const file = await readFile('./config.json');
+		const file = await fs.readFile('./config.json', {
+			encoding: 'utf8'
+		});
 		const filePath = settings.output || 
 			path.join(__dirname, '../../../cfg/server.json');
-		await writeFile(filePath, file);
+		await fs.writeFile(filePath, file);
 	}
 }

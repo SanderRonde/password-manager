@@ -1,7 +1,8 @@
-import { ENCRYPTION_ALGORITHM } from '../../lib/constants';
-import { encrypt } from '../../lib/crypto';
-import { exitWith } from '../../lib/util';
+import { exitWith, genRandomString } from '../../lib/util';
 import { exec } from 'child_process';
+import mkdirp = require('mkdirp');
+import fs = require('fs-extra');
+import path = require('path');
 
 export namespace Export {
 	function assertDumpExists() {
@@ -18,29 +19,60 @@ export namespace Export {
 		});
 	}
 
-	export async function exportDatabase(dbPath: string, password: string): Promise<string> {
-		return new Promise<string>(async (resolve) => {
-			await assertDumpExists();
-			console.log('Dumping...');
-			exec(`mongodump --uri ${dbPath}` + 
-				` --archive`, (err, stdout, stderr) => {
-					if (err) {
-						console.log(stderr);
-						exitWith('Failed to run dumping program');
+	function createDumpFile(dbPath: string, silent: boolean = false) {
+		return new Promise<string>((resolve, reject) => {
+			//Create ./out directory
+			mkdirp(path.join(__dirname, '../../../out'), (err) => {
+				if (err) {
+					if (silent) {
+						reject(err);
 					} else {
-						const unEncryptedArchive = stdout.toString();
-						console.log('Encrypting, this may take a while...');
-						if (!password) {
-							resolve(unEncryptedArchive);
-							return;
-						}
+						exitWith('Failed to create ./out');
+					}
+				} else {
+					const filePath = path.join(__dirname, `../../../out/${genRandomString(25)}.dump`);
+					exec(`mongodump --uri ${dbPath}` + 
+						` --archive="${filePath}"`, (err, _, stderr) => {
+							if (err) {
+								!silent && console.log(stderr);
+								if (silent) {
+									reject(err);
+								} else {
+									exitWith('Failed to run dumping program');
+								}
+							} else {						
+								resolve(filePath);
+							}
+						});
+				}
+			});
+		});
+	}
 
-						const { data: encrypted } = encrypt(unEncryptedArchive, 
-							password, ENCRYPTION_ALGORITHM);
-						
-						resolve(encrypted);
+	export async function exportDatabase(dbPath: string, silent: boolean = false): Promise<Buffer> {
+			return new Promise<Buffer>(async (resolve, reject) => {
+				await assertDumpExists();
+				!silent && console.log('Dumping...');
+
+				const dumpFile = await createDumpFile(dbPath, silent);
+				const data = await fs.readFile(dumpFile).catch((err) => {
+					if (silent) {
+						reject(err);
+					} else {
+						exitWith(`Failed to read written dump file ${err.message}`);
 					}
 				});
-		});
+				if (!data) return;
+
+				fs.unlink(dumpFile).catch((err) => {
+					if (silent) {
+						reject(err);
+					} else {
+						exitWith(`Failed to remove temp dump ${err.message}`);
+					}
+				}).then(() => {
+					resolve(data);
+				});
+			});
 	}
 }

@@ -36,7 +36,7 @@ export namespace GoogleDrive {
 		});
 	}
 
-	async function doUpload(data: string, drive: drive_v3.Drive) {
+	async function doUpload(data: Buffer, drive: drive_v3.Drive) {
 		return new Promise<void>(async (resolve) => {
 			const filePath = path.join(__dirname, 'backup.archive');
 			const deleteFile = await createTempFile(filePath, data);
@@ -83,7 +83,7 @@ export namespace GoogleDrive {
 		});
 
 		await authenticate(client);
-		await doUpload(await Export.exportDatabase(config.database, config.password),
+		await doUpload(await Export.exportDatabase(config.database),
 			drive);
 		console.log('Done uploading');
 	}
