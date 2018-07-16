@@ -1,6 +1,5 @@
 import { exitWith, genRandomString } from '../../lib/util';
 import { exec } from 'child_process';
-import mkdirp = require('mkdirp');
 import fs = require('fs-extra');
 import path = require('path');
 
@@ -20,32 +19,23 @@ export namespace Export {
 	}
 
 	function createDumpFile(dbPath: string, silent: boolean = false) {
-		return new Promise<string>((resolve, reject) => {
+		return new Promise<string>(async (resolve, reject) => {
 			//Create ./out directory
-			mkdirp(path.join(__dirname, '../../../temp'), (err) => {
-				if (err) {
-					if (silent) {
-						reject(err);
+			await fs.mkdirp(path.join(__dirname, '../../../temp'));
+			const filePath = path.join(__dirname, `../../../temp/${genRandomString(25)}.dump`);
+			exec(`mongodump --uri ${dbPath}` + 
+				` --archive="${filePath}"`, (err, _, stderr) => {
+					if (err) {
+						!silent && console.log(stderr);
+						if (silent) {
+							reject(err);
+						} else {
+							exitWith('Failed to run dumping program');
+						}
 					} else {
-						exitWith('Failed to create ./temp');
+						resolve(filePath);
 					}
-				} else {
-					const filePath = path.join(__dirname, `../../../temp/${genRandomString(25)}.dump`);
-					exec(`mongodump --uri ${dbPath}` + 
-						` --archive="${filePath}"`, (err, _, stderr) => {
-							if (err) {
-								!silent && console.log(stderr);
-								if (silent) {
-									reject(err);
-								} else {
-									exitWith('Failed to run dumping program');
-								}
-							} else {						
-								resolve(filePath);
-							}
-						});
-				}
-			});
+				});
 		});
 	}
 
@@ -55,6 +45,7 @@ export namespace Export {
 				!silent && console.log('Dumping...');
 
 				const dumpFile = await createDumpFile(dbPath, silent);
+				console.log('Done dumping');
 				const data = await fs.readFile(dumpFile).catch((err) => {
 					if (silent) {
 						reject(err);
