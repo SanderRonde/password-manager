@@ -12,9 +12,7 @@ test('server can be started', async t => {
 		'--no-rate-limit',
 		'-p', dbpw,
 		'-d', uri
-	], {
-		printlogs: true
-	});
+	]);
 
 	proc.expectWrite(`HTTP server listening on port ${http}`)
 	proc.expectExit(-1);
