@@ -17,7 +17,7 @@ export class RoutesAPIInstanceTwofactor {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 			email: string;
-		},{ }>([
+		}, {}, {}, {}>([
 			'instance_id', 'password', 'email'
 		], [], async (req, res, { instance_id }) => {
 			if (!this.server.Router.typeCheck(req, res, [{
@@ -98,7 +98,7 @@ export class RoutesAPIInstanceTwofactor {
 			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 			email: string;
 			twofactor_token: string;
-		},{ }>([
+		}, {}, {}, {}>([
 			'instance_id', 'password', 'email', 'twofactor_token'
 		], [], async (req, res, { instance_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(req, res, [{
@@ -164,7 +164,7 @@ export class RoutesAPIInstanceTwofactor {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			twofactor_token: string;
-		},{ }>([
+		}, {}, {}, {}>([
 			'instance_id', 'twofactor_token'
 		], [], async (_req, res, { instance_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(req, res, [{
@@ -211,8 +211,7 @@ export class RoutesAPIInstanceTwofactor {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			twofactor_token: string;
 			pw_verification_token: string;
-		},{
-		}>([
+		}, {}, {}, {}>([
 			'instance_id', 'twofactor_token', 'pw_verification_token'
 		], [], async (_req, res, { instance_id, twofactor_token, pw_verification_token }) => {
 			if (!this.server.Router.typeCheck(req, res, [{

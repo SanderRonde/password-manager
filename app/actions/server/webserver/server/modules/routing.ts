@@ -1,5 +1,5 @@
 import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword, DatabaseEncrypted } from "../../../../../database/db-types";
-import { Hashed, Padded, MasterPasswordVerificationPadding, hash, pad } from "../../../../../lib/crypto";
+import { Hashed, Padded, MasterPasswordVerificationPadding, hash, pad, decryptWithPrivateKey, ERRS } from "../../../../../lib/crypto";
 import { getStores, ResponseCaptured, APIResponse } from "./ratelimit";
 import { COLLECTIONS } from "../../../../../database/database";
 import { API_ERRS } from "../../../../../api";
@@ -114,14 +114,46 @@ export class WebserverRouter {
 		});
 	}
 
-	public requireParams<T extends {
+	public requireParams<R extends {
+		instance_id: StringifiedObjectId<EncryptedInstance>;
 		[key: string]: any;
 	}, O extends {
 		[key: string]: any;
-	} = {}>(requiredParams: (keyof T)[], 
-		optionalParams: (keyof O)[]|string[], handler: (req: express.Request, res: ResponseCaptured, 
-			params: T & Partial<O>) => void): ResponseCapturedRequestHandler {
-				return (req, res) => {
+	} = {}, E extends {
+		[key: string]: any;
+	} = {}, OE extends {
+		[key: string]: any;
+	} = {}>(requiredParams: (keyof R|keyof E)[], 
+		optionalParams: (keyof O|keyof OE)[]|string[], 
+		handler: (req: express.Request, res: ResponseCaptured, 
+			params: R & E & Partial<O> & Partial<OE>) => void): ResponseCapturedRequestHandler
+	public requireParams<R extends {
+		[key: string]: any;
+	}, O extends {
+		[key: string]: any;
+	} = {}, E extends {
+		[key: string]: any;
+	} = {}, OE extends {
+		[key: string]: any;
+	} = {}>(requiredParams: (keyof R)[], 
+		optionalParams: (keyof O|keyof OE)[]|string[], 
+		handler: (req: express.Request, res: ResponseCaptured, 
+			params: R & E & Partial<O> & Partial<OE>) => void): ResponseCapturedRequestHandler;
+	public requireParams<R extends {
+		[key: string]: any;
+	}, O extends {
+		[key: string]: any;
+	} = {}, E extends {
+		[key: string]: any;
+	} = {}, OE extends {
+		[key: string]: any;
+	} = {}>(requiredParams: (keyof R|keyof E)[], 
+		optionalParams: (keyof O|keyof OE)[]|string[], 
+		handler: (req: express.Request, res: ResponseCaptured, 
+			params: R & E & Partial<O> & Partial<OE>) => void): ResponseCapturedRequestHandler {
+				return async (req, res) => {
+					let toCheckSrc: any & R & E = {...req.body};
+
 					if (!req.body) {
 						res.status(400);
 						res.json({
@@ -132,9 +164,9 @@ export class WebserverRouter {
 						return;
 					}
 
-					const values: T & O = {} as T & O;
-					for (const key of requiredParams) {
-						if (req.body[key] === undefined || req.body[key] === null) {
+					//Decrypt encrypted params
+					if (req.body.encrypted) {
+						if (!req.body.instance_id) {
 							res.status(400);
 							res.json({
 								success: false,
@@ -143,7 +175,49 @@ export class WebserverRouter {
 							});
 							return;
 						}
-						values[key] = req.body[key];
+
+						const instance = await this.parent.database.Manipulation.findOne(
+							COLLECTIONS.INSTANCES, {
+								_id: new mongo.ObjectId(req.body.instance_id)
+							});
+						if (!instance) {
+							res.status(400);
+							res.json({
+								success: false,
+								error: 'missing parameters',
+								ERR: API_ERRS.MISSING_PARAMS
+							});
+							return;
+						}
+
+						const privateKey = this.parent.database.Crypto.dbDecrypt(
+							instance.server_private_key);
+						const decrypted = decryptWithPrivateKey(req.body.encrypted,
+							privateKey);
+						if (decrypted === ERRS.INVALID_DECRYPT) {
+							res.status(400);
+							res.json({
+								success: false,
+								error: 'missing parameters',
+								ERR: API_ERRS.MISSING_PARAMS
+							});
+							return;
+						}
+						toCheckSrc = {...toCheckSrc, ...decrypted};
+					}
+
+					const values: R & O & E & OE = {} as R & O & E & OE;
+					for (const key of requiredParams) {
+						if (toCheckSrc[key] === undefined || toCheckSrc[key] === null) {
+							res.status(400);
+							res.json({
+								success: false,
+								error: 'missing parameters',
+								ERR: API_ERRS.MISSING_PARAMS
+							});
+							return;
+						}
+						values[key] = toCheckSrc[key];
 					}
 					for (const key of optionalParams) {
 						values[key] = req.body[key];

@@ -19,7 +19,7 @@ export class RoutesApiInstance {
 			email: string;
 			public_key: string;
 			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-		}, { }>([
+		}, {}, {}, {}>([
 			'public_key', 'email', 'password'
 		], [], async (req, res, { public_key }) => {
 			if (!this.server.Router.typeCheck(req, res, [{
@@ -72,7 +72,7 @@ export class RoutesApiInstance {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			challenge: Encrypted<EncodedString<string>, ServerPrivateKey, 'RSA'>;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-		}, {}>([
+		}, {}, {}, {}>([
 			'instance_id', 'password_hash', 'challenge'
 		], [], async (_req, res, { instance_id, password_hash, challenge }) => {
 			if (!this.server.Router.typeCheck(req, res, [{
@@ -149,7 +149,7 @@ export class RoutesApiInstance {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: string;
-		}, {}>([
+		}, {}, {}, {}>([
 			'instance_id', 'token'
 		], [], async (_req, res, { instance_id, token }) => {
 			if (!this.server.Router.typeCheck(req, res, [{
@@ -184,7 +184,7 @@ export class RoutesApiInstance {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			oldToken: string;
-		}, {}>([
+		}, {}, {}, {}>([
 			'instance_id', 'oldToken'
 		], [], async (_req, res, { instance_id, oldToken }) => {
 			if (!this.server.Router.typeCheck(req, res, [{

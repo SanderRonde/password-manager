@@ -1,5 +1,5 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, InstancePublicKey, ResetKey, ServerPublicKey, ServerPrivateKey } from "./database/db-types";
-import { Hashed, Padded, MasterPasswordVerificationPadding, Encrypted, EncryptionAlgorithm, MasterPasswordDecryptionpadding } from "./lib/crypto";
+import { Hashed, Padded, MasterPasswordVerificationPadding, EncryptionAlgorithm, MasterPasswordDecryptionpadding, Encrypted } from "./lib/crypto";
 import { UnstringifyObjectIDs } from "./database/libs/db-manipulation";
 
 export interface APIFns {
@@ -27,7 +27,7 @@ export interface APIFns {
 }
 
 export type APIArgs = {
-	[P in keyof APIFns]: GetArgs<APIFns[P]>;
+	[P in keyof APIFns]: [GetArg1<APIFns[P]>, GetArg2<APIFns[P]>];
 }
 
 export type APIReturns = {
@@ -35,7 +35,8 @@ export type APIReturns = {
 }
 
 export type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
-export type GetArgs<T> = T extends (arg: infer R) => void ? R : any;
+export type GetArg1<T> = T extends (arg: infer R) => void ? R : any;
+export type GetArg2<T> = T extends (arg1: any, arg: infer R) => void ? R : void;
 
 export const enum API_ERRS {
 	INVALID_CREDENTIALS,
@@ -130,6 +131,7 @@ export declare namespace APIRoutes {
 	export namespace Password {
 		export function set(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
 			token: string;
 			websites: string[];
 			twofactor_enabled: boolean;
@@ -145,18 +147,21 @@ export declare namespace APIRoutes {
 
 		export function update(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
 			token: string;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}): JSONResponse<{}>;
 
 		export function remove(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
 			token: string;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}): JSONResponse<{}>;
 
 		export function get(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
 			token: string;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}): JSONResponse<{
@@ -175,6 +180,7 @@ export declare namespace APIRoutes {
 
 		export function getmeta<P extends StringifiedObjectId<EncryptedPassword>> (params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
 			token: string;
 			password_id: P;
 		}): JSONResponse<{
@@ -190,6 +196,7 @@ export declare namespace APIRoutes {
 
 		export function allmeta(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
 			token: string;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}): JSONResponse<{
@@ -205,6 +212,7 @@ export declare namespace APIRoutes {
 
 		export function querymeta(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
 			token: string;
 			url: string;
 		}): JSONResponse<{
@@ -221,6 +229,8 @@ export declare namespace APIRoutes {
 
 	export namespace Account {
 		export function reset(params: {
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
 			reset_key: string;
 			email: string;
 			newmasterpassword: MasterPassword;
@@ -229,6 +239,8 @@ export declare namespace APIRoutes {
 		}>;
 
 		export function undoreset(params: {
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
 			reset_key: string;
 			email: string
 			master_password: MasterPassword;
@@ -238,8 +250,9 @@ export declare namespace APIRoutes {
 		}>;
 
 		export function regenkey(params: {
-			master_password: MasterPassword;
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
+			master_password: MasterPassword;
 		}): JSONResponse<{
 			new_reset_key: ResetKey;
 		}>;

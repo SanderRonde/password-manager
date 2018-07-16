@@ -24,6 +24,16 @@ test('encrypted value can be decrypted', t => {
 		'is not an invalid decrypt');
 	t.is(decrypted, startValue);
 });
+test('encrypt throws error on invalid decrypt', t => {
+	const startValue = genRandomString(25);
+	const key = genRandomString(25);
+	
+	const encrypted = encrypt(startValue, key, ENCRYPTION_ALGORITHM);
+	const decrypted = decrypt(encrypted + 'somepadding' as any, key);
+
+	t.is(decrypted, ERRS.INVALID_DECRYPT,
+		'is an invalid decrypt');
+});
 test('salt-encrypted value can be decrypted', t => {
 	const startValue = genRandomString(25);
 	const key = genRandomString(25);
@@ -34,6 +44,16 @@ test('salt-encrypted value can be decrypted', t => {
 	t.not(decrypted, ERRS.INVALID_DECRYPT,
 		'is not an invalid decrypt');
 	t.is(decrypted, startValue);
+});
+test('salt encrypt throws error on invalid decrypt', t => {
+	const startValue = genRandomString(25);
+	const key = genRandomString(25);
+	
+	const encrypted = encryptWithSalt(startValue, key, ENCRYPTION_ALGORITHM);
+	const decrypted = decryptWithSalt(encrypted + 'somepadding' as any, key);
+
+	t.is(decrypted, ERRS.INVALID_DECRYPT,
+		'is an invalid decrypt');
 });
 test('encrypted value can be decrypted with long key', t => {
 	const startValue = genRandomString(150);
@@ -90,4 +110,12 @@ test('values encrypted with a public key can be decrypted', t => {
 
 	t.is(decryptWithPrivateKey(encryptWithPublicKey(input, publicKey), privateKey),
 		input, 'decrypted value is the same as input');
+});
+test('public/private key encryption returns error on invalid decrypt', t => {
+	const input  = genRandomString(25);
+	const { publicKey, privateKey } = genRSAKeyPair();
+
+	const decrypted = decryptWithPrivateKey(
+		encryptWithPublicKey(input, publicKey) + 'somepadding' as any, privateKey);
+	t.is(decrypted, ERRS.INVALID_DECRYPT, 'throws invalid decrypt error');
 });

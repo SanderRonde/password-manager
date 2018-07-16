@@ -195,10 +195,15 @@ export function encryptWithPublicKey<T, K extends InstancePublicKey|ServerPublic
 
 export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: Encrypted<EncodedString<T>, 
 	InstancePublicKey|ServerPublicKey, 'RSA'>, 
-		privateKey: K): T {
+		privateKey: K): T|ERRS {
 			const key = new NodeRSA();
 			key.importKey(privateKey, 'pkcs1-pem');
-			return JSON.parse(key.decrypt(data, 'base64'));
+
+			try {
+				return JSON.parse(key.decrypt(data, 'base64'));
+			} catch(e) {
+				return ERRS.INVALID_DECRYPT;
+			}
 		}
 
 export function genRSAKeyPair() {

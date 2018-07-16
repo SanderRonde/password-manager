@@ -14,10 +14,12 @@ export class RoutesAPIAccount {
 
 	public reset(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, {}, {
 			reset_key: string;
 			email: string
-			newmasterpassword: MasterPassword;
-		}, {}>([
+			newmasterpassword: MasterPassword;	
+		}>([
 			'email', 'reset_key', 'newmasterpassword'
 		], [], async (req, res, { email, reset_key, newmasterpassword }) => {
 			if (!this.server.Router.typeCheck(req, res, [{
@@ -161,11 +163,13 @@ export class RoutesAPIAccount {
 
 	public undoreset(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, {}, {
 			reset_key: string;
 			email: string
 			master_password: MasterPassword;
-			newmasterpassword: MasterPassword;
-		}, {}>([
+			newmasterpassword: MasterPassword;	
+		}>([
 			'email', 'reset_key', 'newmasterpassword', 'master_password'
 		], [], async (req, res, { email, reset_key, newmasterpassword, master_password }) => {
 			if (!this.server.Router.typeCheck(req, res, [{
@@ -305,9 +309,10 @@ export class RoutesAPIAccount {
 
 	public regenkey(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
-			master_password: MasterPassword;
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-		}, {}>([
+		}, {}, {
+			master_password: MasterPassword;	
+		}>([
 			'instance_id', 'master_password'
 		], [], async (req, res, { instance_id, master_password }) => {
 			if (!this.server.Router.typeCheck(req, res, [{
