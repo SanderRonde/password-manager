@@ -1,9 +1,9 @@
 import { captureURIs, genUserAndDb } from '../../lib/util';
-import { test } from 'ava';
 import { ProcRunner } from '../../lib/procrunner';
+import { test } from 'ava';
 
 const uris = captureURIs(test);
-test('server can be started', async t => {
+test.failing('server can be started', async t => {
 	const { dbpw, uri, http, https } = await genUserAndDb(t);
 	uris.push(uri);
 	const proc = new ProcRunner(t, [
