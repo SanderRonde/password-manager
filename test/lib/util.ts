@@ -53,7 +53,7 @@ export function captureCreatedFiles(t: RegisterContextual<any>): string[] {
 	const arr: string[] = [];
 	t.after.always('Delete files', async () => {
 		await Promise.all(arr.map(async (filepath) => {
-			await fs.unlink(filepath);
+			await fs.unlink(filepath).catch(() => {});
 		}));
 	});
 	return arr;
