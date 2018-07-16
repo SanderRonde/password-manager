@@ -1,7 +1,7 @@
 import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../lib/util';
+import { hash, pad } from '../../../../app/lib/crypto';
 import { DEFAULT_EMAIL } from '../../../lib/consts';
 import { test } from 'ava';
-import { hash, pad } from '../../../../app/lib/crypto';
 
 const uris = captureURIs(test);
 test.skip('instance can be created', async t => {
@@ -10,7 +10,7 @@ test.skip('instance can be created', async t => {
 	const { http, userpw, uri } = config;
 	uris.push(uri);
 
-	JSON.parse(await doAPIRequest(http, '/api/instance/register', {
+	JSON.parse(await doAPIRequest({ port: http }, '/api/instance/register', {
 		email: DEFAULT_EMAIL,
 		password: hash(pad(userpw, 'masterpwverify')),
 		//TODO: generate public key

@@ -1,9 +1,10 @@
 import { GenericTestContext, Context, RegisterContextual } from "ava";
 import { getDB, clearDB, genDBWithPW, genMockAcount } from "./db";
+import { encryptWithPublicKey } from "../../app/lib/crypto";
+import { APIFns, APIArgs, APIReturns } from "../../app/api";
 import { TEST_DB_URI } from "../../app/lib/constants";
 import { genRandomString } from "../../app/lib/util";
 import { spawn, ChildProcess } from "child_process";
-import { APIFns, APIArgs, APIReturns } from "../../app/api";
 import querystring = require('querystring');
 import { EventEmitter } from "events";
 import { Readable } from "stream";
@@ -141,10 +142,15 @@ export function createServer({
 	});
 }
 
-export async function doAPIRequest<K extends keyof APIFns>(port: number, path: K,
-	args: APIArgs[K]): Promise<EncodedString<APIReturns[K]>> {
+export async function doAPIRequest<K extends keyof APIFns>({ port, publicKey }: {
+	port: number;
+	publicKey?: string;
+}, path: K,
+	args: APIArgs[K][0], encrypted?: APIArgs[K][1]): Promise<EncodedString<APIReturns[K]>> {
 		return new Promise<EncodedString<APIReturns[K]>>((resolve, reject) => {
-			const postData = querystring.stringify(args);
+			const postData = querystring.stringify({...args as Object, ...(encrypted && publicKey ? {
+				encrypted: encryptWithPublicKey(encrypted, publicKey)
+			} : {})});
 			const req = http.request({
 				port,
 				hostname: '127.0.0.1',
