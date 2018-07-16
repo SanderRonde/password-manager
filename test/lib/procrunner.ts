@@ -173,7 +173,7 @@ export class ProcRunner {
 		this._checkExitCode();
 	}
 
-	public run(timeout: number = 30000): Promise<void> {
+	public run(timeout?: number): Promise<void> {
 		let done: boolean = false;
 		let ondone: () => void = null;
 
@@ -191,17 +191,19 @@ export class ProcRunner {
 			}
 		});
 
-		setTimeout(() => {
-			proc.kill();
-			if (!done) {
-				this._exitCode = -1;
-				done = true;
+		if (timeout) {
+			setTimeout(() => {
+				proc.kill();
+				if (!done) {
+					this._exitCode = -1;
+					done = true;
 
-				if (ondone) {
-					ondone();
+					if (ondone) {
+						ondone();
+					}
 				}
-			}
-		}, timeout);
+			}, timeout);
+		}
 		
 		listenWithoutRef(proc.stdout, (chunk) => {
 			this._readText(chunk);
