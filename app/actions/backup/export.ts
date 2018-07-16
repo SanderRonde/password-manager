@@ -45,7 +45,6 @@ export namespace Export {
 				!silent && console.log('Dumping...');
 
 				const dumpFile = await createDumpFile(dbPath, silent);
-				console.log('Done dumping');
 				const data = await fs.readFile(dumpFile).catch((err) => {
 					if (silent) {
 						reject(err);
