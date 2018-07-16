@@ -16,9 +16,7 @@ test('print an error when no output is passed', async t => {
 		'backup',
 		'local',
 		'-d', uri
-	], {
-		printlogs: true
-	});
+	]);
 	proc.expectWrite('No output was specified');
 	proc.expectExit(1);
 
