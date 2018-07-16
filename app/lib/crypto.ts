@@ -170,14 +170,14 @@ export function decrypt<T, A extends EncryptionAlgorithm, K extends string>({ da
 	data: Encrypted<EncodedString<T>, K, A>;
 	algorithm: A;
 }, key: K): T|ERRS {
-	const input = Buffer.from(data, 'base64');
-	const iv = input.slice(0, 16);
-	const ciphertext = input.slice(16);
-	const decipher = crypto.createDecipheriv(algorithm, hash(key).slice(0, 32), iv);
-	const plaintext = decipher.update(ciphertext);
-	
-	const final = plaintext.toString() + decipher.final();
 	try {
+		const input = Buffer.from(data, 'base64');
+		const iv = input.slice(0, 16);
+		const ciphertext = input.slice(16);
+		const decipher = crypto.createDecipheriv(algorithm, hash(key).slice(0, 32), iv);
+		const plaintext = decipher.update(ciphertext);
+		
+		const final = plaintext.toString() + decipher.final();
 		return JSON.parse(final);
 	} catch(e) {
 		return ERRS.INVALID_DECRYPT;
@@ -200,7 +200,7 @@ export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: Encry
 			key.importKey(privateKey, 'pkcs1-pem');
 
 			try {
-				return JSON.parse(key.decrypt(data, 'base64'));
+				return JSON.parse(key.decrypt(data, 'utf8'));
 			} catch(e) {
 				return ERRS.INVALID_DECRYPT;
 			}
