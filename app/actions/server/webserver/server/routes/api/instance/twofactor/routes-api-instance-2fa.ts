@@ -1,11 +1,12 @@
-import { StringifiedObjectId, EncryptedInstance } from '../../../../../../../../database/db-types';
+import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../../../../../database/db-types';
+import { Hashed, Padded, MasterPasswordVerificationPadding } from '../../../../../../../../lib/crypto';
 import { COLLECTIONS } from '../../../../../../../../database/database';
+import { ResponseCaptured } from '../../../../modules/ratelimit';
+import { API_ERRS } from '../../../../../../../../api';
 import { Webserver } from '../../../../webserver';
 import speakeasy = require('speakeasy');
 import express = require('express');
 import mongo = require('mongodb');
-import { ResponseCaptured } from '../../../../modules/ratelimit';
-import { API_ERRS } from '../../../../../../../../api';
 
 
 export class RoutesAPIInstanceTwofactor {
@@ -14,7 +15,7 @@ export class RoutesAPIInstanceTwofactor {
 	public enable(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			password: string;
+			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 			email: string;
 		},{ }>([
 			'instance_id', 'password', 'email'
@@ -94,7 +95,7 @@ export class RoutesAPIInstanceTwofactor {
 	public disable(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			password: string;
+			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 			email: string;
 			twofactor_token: string;
 		},{ }>([

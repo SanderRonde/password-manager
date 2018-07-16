@@ -18,7 +18,7 @@ export class RoutesApiInstance {
 		this.server.Router.requireParams<{
 			email: string;
 			public_key: string;
-			password: string;
+			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, { }>([
 			'public_key', 'email', 'password'
 		], [], async (req, res, { public_key }) => {

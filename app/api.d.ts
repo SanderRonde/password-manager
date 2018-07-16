@@ -58,7 +58,7 @@ export declare namespace APIRoutes {
 		export function register(params: {
 			email: string;
 			public_key: string;
-			password: string;
+			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}): JSONResponse<{
 			id: Encrypted<EncodedString<StringifiedObjectId<EncryptedInstance>>, PublicKey>
 		}>;
@@ -86,7 +86,7 @@ export declare namespace APIRoutes {
 		export namespace Twofactor {
 			export function enable(params: {
 				instance_id: StringifiedObjectId<EncryptedInstance>;
-				password: string;
+				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 				email: string;
 			}): JSONResponse<{
 				message: 'state unchanged (was already set)'
@@ -100,7 +100,7 @@ export declare namespace APIRoutes {
 
 			export function disable(params: {
 				instance_id: StringifiedObjectId<EncryptedInstance>;
-				password: string;
+				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 				email: string;
 				twofactor_token: string;
 			}): JSONResponse<{
