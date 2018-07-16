@@ -173,13 +173,13 @@ export declare namespace APIRoutes {
 			}>>, InstancePublicKey>;
 		}>;
 
-		export function getmeta(params: {
+		export function getmeta<P extends StringifiedObjectId<EncryptedPassword>> (params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: string;
-			password_id: StringifiedObjectId<EncryptedPassword>;
+			password_id: P;
 		}): JSONResponse<{
 			encrypted: Encrypted<EncodedString<EncodedString<{
-				id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
+				id: P;
 				websites: {
 					host: string;
 					exact: string;
