@@ -1,4 +1,4 @@
-import { encrypt, encryptWithSalt, decrypt, ERRS, decryptWithSalt, pad, hash } from '../../../app/lib/crypto';
+import { encrypt, encryptWithSalt, decrypt, ERRS, decryptWithSalt, pad, hash, encryptWithPublicKey, genRSAKeyPair, decryptWithPrivateKey } from '../../../app/lib/crypto';
 import { ENCRYPTION_ALGORITHM } from '../../../app/lib/constants';
 import { genRandomString } from '../../../app/lib/util';
 import { test } from 'ava';
@@ -76,4 +76,18 @@ test('hashing different values produces different results', t => {
 	const input = genRandomString(25);
 	t.not(hash(input), hash(input) + 'x',
 		'hashed values are not the same');
+});
+test('encrypting with public key works', t => {
+	const input  = genRandomString(25);
+	const { publicKey } = genRSAKeyPair();
+	t.notThrows(() => {
+		encryptWithPublicKey(input, publicKey);
+	}, 'public key encrypt can be called without error');
+});
+test('values encrypted with a public key can be decrypted', t => {
+	const input  = genRandomString(25);
+	const { publicKey, privateKey } = genRSAKeyPair();
+
+	t.is(decryptWithPrivateKey(encryptWithPublicKey(input, publicKey), privateKey),
+		input, 'decrypted value is the same as input');
 });

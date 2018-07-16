@@ -1,8 +1,8 @@
-import { PublicKey } from '../database/db-types';
+import { InstancePublicKey, ServerPublicKey, ServerPrivateKey } from '../database/db-types';
+import { ENCRYPTION_ALGORITHM } from './constants';
 import { genRandomString } from './util';
 import NodeRSA = require('node-rsa');
 import crypto = require('crypto');
-import { ENCRYPTION_ALGORITHM } from './constants';
 
 /**
  * Data (T) that is encrypted with key (K) using algorithm (A)
@@ -184,11 +184,29 @@ export function decrypt<T, A extends EncryptionAlgorithm, K extends string>({ da
 	}
 }
 
-export function encryptWithPublicKey<T>(data: T, 
-	publicKey: string): Encrypted<EncodedString<T>, PublicKey, 'RSA'> {
+export function encryptWithPublicKey<T, K extends InstancePublicKey|ServerPublicKey>(data: T, 
+	publicKey: K): Encrypted<EncodedString<T>, K, 'RSA'> {
 		const key = new NodeRSA();
-		key.importKey(publicKey, 'public');
+		key.importKey(publicKey, 'pkcs8-public-pem');
 
 		return key.encrypt(JSON.stringify(data), 'base64') as 
-			Encrypted<EncodedString<T>, PublicKey, 'RSA'>;
+			Encrypted<EncodedString<T>, K, 'RSA'>;
 	}
+
+export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: Encrypted<EncodedString<T>, 
+	InstancePublicKey|ServerPublicKey, 'RSA'>, 
+		privateKey: K): T {
+			const key = new NodeRSA();
+			key.importKey(privateKey, 'pkcs1-pem');
+			return JSON.parse(key.decrypt(data, 'base64'));
+		}
+
+export function genRSAKeyPair() {
+	const key = new NodeRSA({
+		b: 512
+	});
+	return {
+		publicKey: key.exportKey('pkcs8-public-pem'),
+		privateKey: key.exportKey('pkcs1-pem')
+	}
+}

@@ -1,5 +1,5 @@
+import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, InstancePublicKey, ResetKey, ServerPublicKey, ServerPrivateKey } from "./database/db-types";
 import { Hashed, Padded, MasterPasswordVerificationPadding, Encrypted, EncryptionAlgorithm, MasterPasswordDecryptionpadding } from "./lib/crypto";
-import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, PublicKey, ResetKey } from "./database/db-types";
 import { UnstringifyObjectIDs } from "./database/libs/db-manipulation";
 
 export interface APIFns {
@@ -60,15 +60,18 @@ export declare namespace APIRoutes {
 			public_key: string;
 			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}): JSONResponse<{
-			id: Encrypted<EncodedString<StringifiedObjectId<EncryptedInstance>>, PublicKey>
+			id: Encrypted<EncodedString<StringifiedObjectId<EncryptedInstance>>, InstancePublicKey>
+			server_key: Encrypted<EncodedString<ServerPublicKey>, InstancePublicKey>;
 		}>;
 
-		export function login(params: {
+		export function login<C extends string>(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+			challenge: Encrypted<EncodedString<C>, ServerPrivateKey>;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}): JSONResponse<{
 			twofactor_required: boolean;
 			twofactor_auth_token: string;	
+			challenge: C;
 		}>;
 
 		export function logout(params: {
@@ -167,7 +170,7 @@ export declare namespace APIRoutes {
 					}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 					algorith: EncryptionAlgorithm;
 				}
-			}>>, PublicKey>;
+			}>>, InstancePublicKey>;
 		}>;
 
 		export function getmeta(params: {
@@ -182,7 +185,7 @@ export declare namespace APIRoutes {
 					exact: string;
 				}[];
 				twofactor_enabled: boolean;
-			}>>, PublicKey>;
+			}>>, InstancePublicKey>;
 		}>;
 
 		export function allmeta(params: {
@@ -197,7 +200,7 @@ export declare namespace APIRoutes {
 					exact: string;
 				}[];
 				twofactor_enabled: boolean;
-			}[]>>, PublicKey>;
+			}[]>>, InstancePublicKey>;
 		}>;
 
 		export function querymeta(params: {
@@ -212,7 +215,7 @@ export declare namespace APIRoutes {
 					exact: string;
 				}[];
 				twofactor_enabled: boolean;
-			}[]>>, PublicKey>;
+			}[]>>, InstancePublicKey>;
 		}>;
 	}
 

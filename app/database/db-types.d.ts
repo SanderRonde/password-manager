@@ -60,7 +60,15 @@ export type MasterPassword = string;
 /**
  * The public key of an instance
  */
-export type PublicKey = string;
+export type InstancePublicKey = string;
+/**
+ * The public key of this server for a specific instance
+ */
+export type ServerPublicKey = string;
+/**
+ * The private key of this server for a specific instance
+ */
+export type ServerPrivateKey = string;
 /**
  * A key used to reset an account
  */
@@ -224,11 +232,15 @@ export type EncryptedInstance = {
 	/**
 	 * (encrypted) The public key used to encrypt data sent to this instance
 	 */
-	public_key: DatabaseEncrypted<EncodedString<string>>; 
+	public_key: DatabaseEncrypted<EncodedString<InstancePublicKey>>; 
 	/**
 	 * (encrypted) The user ID belonging to this account
 	 */
 	user_id: DatabaseEncrypted<EncodedString<StringifiedObjectId<EncryptedAccount>>>;
+	/**
+	 * (encrypted) The private key of this server. Used to decrypt messages by an instance
+	 */
+	server_private_key: DatabaseEncrypted<EncodedString<ServerPrivateKey>>;
 };
 
 /**
@@ -242,11 +254,15 @@ export type DecryptedInstance = {
 	/**
 	 * The public key used to encrypt data sent to this instance
 	 */
-	public_key: string;
+	public_key: InstancePublicKey;
 	/**
 	 * The user ID belonging to this account
 	 */
 	user_id: StringifiedObjectId<EncryptedAccount>;
+	/**
+	 * (encrypted) The private key of this server. Used to decrypt messages by an instance
+	 */
+	server_private_key: ServerPrivateKey;
 }
 
 /**

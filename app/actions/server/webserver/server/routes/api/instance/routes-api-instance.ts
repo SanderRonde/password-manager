@@ -1,5 +1,5 @@
-import { encryptWithPublicKey, Hashed, Padded, MasterPasswordVerificationPadding } from "../../../../../../../lib/crypto";
-import { EncryptedInstance, StringifiedObjectId, MasterPassword, MongoRecord } from "../../../../../../../database/db-types";
+import { encryptWithPublicKey, Hashed, Padded, MasterPasswordVerificationPadding, genRSAKeyPair, Encrypted, decryptWithPrivateKey } from "../../../../../../../lib/crypto";
+import { EncryptedInstance, StringifiedObjectId, MasterPassword, MongoRecord, ServerPrivateKey } from "../../../../../../../database/db-types";
 import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
@@ -37,12 +37,18 @@ export class RoutesApiInstance {
 				return;
 			}
 
+			const { 
+				privateKey: serverPrivateKey,
+				publicKey: serverPublicKey
+			} = genRSAKeyPair();
+
 			const _id = genID();
 			const record: MongoRecord<EncryptedInstance> = {
 				_id: _id,
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
 				public_key: this.server.database.Crypto.dbEncrypt(public_key),
-				user_id: this.server.database.Crypto.dbEncrypt(auth._id.toHexString())
+				user_id: this.server.database.Crypto.dbEncrypt(auth._id.toHexString()),
+				server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey)
 			};
 			await this.server.database.Manipulation.insertOne(
 				COLLECTIONS.INSTANCES, record);
@@ -51,7 +57,8 @@ export class RoutesApiInstance {
 			res.json({
 				success: true,
 				data: {
-					id: encryptWithPublicKey(_id.toHexString(), public_key)
+					id: encryptWithPublicKey(_id.toHexString(), public_key),
+					server_key: encryptWithPublicKey(serverPublicKey, public_key)
 				}
 			});
 
@@ -63,15 +70,19 @@ export class RoutesApiInstance {
 	public login(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+			challenge: Encrypted<EncodedString<string>, ServerPrivateKey, 'RSA'>;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, {}>([
-			'instance_id', 'password_hash'
-		], [], async (_req, res, { instance_id, password_hash }) => {
+			'instance_id', 'password_hash', 'challenge'
+		], [], async (_req, res, { instance_id, password_hash, challenge }) => {
 			if (!this.server.Router.typeCheck(req, res, [{
 				val: 'instance_id',
 				type: 'string'
 			}, {
 				val: 'password_hash',
+				type: 'string'
+			}, {
+				val: 'challenge',
 				type: 'string'
 			}])) return;
 
@@ -102,8 +113,12 @@ export class RoutesApiInstance {
 				this.server.database.Crypto.dbEncrypt(password_hash), account.pw)) {
 					return;
 				}
+			
+			//Solve challenge
+			const privateKey = this.server.database.Crypto.dbDecrypt(instance.server_private_key);
+			const solved = decryptWithPrivateKey(challenge, privateKey);
 
-			if (instance.twofactor_enabled) {
+			if (this.server.database.Crypto.dbDecryptWithSalt(instance.twofactor_enabled)) {
 				//Require twofactor authentication before giving out token
 				res.status(200);
 				res.json({
@@ -111,7 +126,8 @@ export class RoutesApiInstance {
 					data: {
 						twofactor_required: true,
 						twofactor_auth_token: this.server.Auth.genTwofactorToken(
-							instance._id.toHexString(), account._id.toHexString())
+							instance._id.toHexString(), account._id.toHexString()),
+						challenge: solved
 					}
 				});
 			} else {
@@ -121,7 +137,8 @@ export class RoutesApiInstance {
 					data: {
 						twofactor_required: false,
 						auth_token: this.server.Auth.genLoginToken(
-							instance._id.toHexString(), account._id.toHexString())
+							instance._id.toHexString(), account._id.toHexString()),
+						challenge: solved
 					}
 				});
 			}

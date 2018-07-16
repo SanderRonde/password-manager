@@ -1,11 +1,10 @@
 import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, StringifiedObjectId, EncryptedPassword, TypedObjectID } from '../../app/database/db-types';
-import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt } from '../../app/lib/crypto';
+import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, genRSAKeyPair } from '../../app/lib/crypto';
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../../app/lib/constants';
 import { genRandomString, getDBFromURI } from '../../app/lib/util';
 import { GenericTestContext, Context } from 'ava';
 import { getCollectionLength } from './util';
 import { DEFAULT_EMAIL } from './consts';
-import NodeRSA = require('node-rsa');
 import mongo = require('mongodb');
 
 export async function clearDB(uri: string) {
@@ -156,16 +155,6 @@ export async function genAccountOnly(suppliedDb: SuppliedDatabase, {
 	return _id;
 }
 
-export function genRSAKeyPair() {
-	const key = new NodeRSA({
-		b: 512
-	});
-	return {
-		public: key.exportKey('pkcs8-public-pem'),
-		private: key.exportKey('pkcs1-pem')
-	}
-}
-
 export async function genInstancesOnly(suppliedDb: SuppliedDatabase, id: TypedObjectID<EncryptedAccount>, {
 	dbpw
 }: {
@@ -177,8 +166,8 @@ export async function genInstancesOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 	instance_public_key: string;
 	server_private_key: string;
 } = {
-	instance_public_key: genRSAKeyPair().public,
-	server_private_key: genRSAKeyPair().private
+	instance_public_key: genRSAKeyPair().publicKey,
+	server_private_key: genRSAKeyPair().privateKey
 }) {
 	const { db, done } = await getSuppliedDatabase(suppliedDb);
 
