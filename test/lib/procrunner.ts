@@ -126,13 +126,15 @@ export class ProcRunner {
 			}
 
 			this._t.not(written, undefined, 
-				`a value was written (while expecting "${expected && expected.toString()}")`);
+				`a value should be written (while expecting "${
+					expected && expected.content && expected.content.toString()}")`);
+			this._t.not(written, null, 
+				`a value should be written (while expecting "${
+					expected && expected.content && expected.content.toString()}")`);
+			this._t.not(expected, undefined, 
+				`a value should be expected (while writing "${written && written.toString()}")`);
 			this._t.not(expected, null, 
-				`a value was written (while expecting "${expected && expected.toString()}")`);
-			this._t.not(written, undefined, 
-				`a value was expected (while writing "${written && written.toString()}")`);
-			this._t.not(expected, null, 
-				`a value was expected (while writing "${written && written.toString()}")`);
+				`a value should be expected (while writing "${written && written.toString()}")`);
 
 			switch (expected.type) {
 				case 'specials':
