@@ -5,6 +5,7 @@ import { genRandomString, getDBFromURI } from '../../app/lib/util';
 import { GenericTestContext, Context } from 'ava';
 import { getCollectionLength } from './util';
 import { DEFAULT_EMAIL } from './consts';
+import NodeRSA = require('node-rsa');
 import mongo = require('mongodb');
 
 export async function clearDB(uri: string) {
@@ -92,14 +93,25 @@ function doesNotThrow(t: GenericTestContext<Context<any>>, callback: () => Promi
 	});
 }
 
-export async function genMockAcount({
-	dbpw, uri, userpw
+type SuppliedDatabase = mongo.Db|string;
+
+async function getSuppliedDatabase(db: SuppliedDatabase) {
+	if (typeof db !== 'string') {
+		return {
+			db,
+			done: () => {}
+		}
+	}
+	return await getDB(db);
+}
+
+export async function genAccountOnly(suppliedDb: SuppliedDatabase, {
+	dbpw, userpw
 }: {
-	uri: string;
 	dbpw: string;
 	userpw: string;
-}) {
-	const { db, done } = await getDB(uri);
+}): Promise<TypedObjectID<EncryptedAccount>> {
+	const { db, done } = await getSuppliedDatabase(suppliedDb);
 
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const accountRecords: EncryptedAccount[] = [{
@@ -140,38 +152,82 @@ export async function genMockAcount({
 	const [{
 		_id
 	}] = await db.collection('users').find().toArray() as MongoRecord<EncryptedAccount>[];
+	done();
+	return _id;
+}
+
+export function genRSAKeyPair() {
+	const key = new NodeRSA({
+		b: 512
+	});
+	return {
+		public: key.exportKey('pkcs8-public-pem'),
+		private: key.exportKey('pkcs1-pem')
+	}
+}
+
+export async function genInstancesOnly(suppliedDb: SuppliedDatabase, id: TypedObjectID<EncryptedAccount>, {
+	dbpw
+}: {
+	dbpw: string;
+}, {
+	instance_public_key,
+	server_private_key
+}: {
+	instance_public_key: string;
+	server_private_key: string;
+} = {
+	instance_public_key: genRSAKeyPair().public,
+	server_private_key: genRSAKeyPair().private
+}) {
+	const { db, done } = await getSuppliedDatabase(suppliedDb);
 
 	//Generate some fake instances
 	const instanceRecords: EncryptedInstance[] = [{
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
-		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
-		user_id: encrypt(_id.toHexString(), dbpw, ENCRYPTION_ALGORITHM)
+		public_key: encrypt(instance_public_key, dbpw, ENCRYPTION_ALGORITHM),
+		user_id: encrypt(id.toHexString(), dbpw, ENCRYPTION_ALGORITHM),
+		server_private_key: encrypt(server_private_key, dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
-		user_id: encrypt(_id.toHexString(), dbpw, ENCRYPTION_ALGORITHM)
+		user_id: encrypt(id.toHexString(), dbpw, ENCRYPTION_ALGORITHM),
+		server_private_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
-		user_id: encrypt(_id.toHexString(), dbpw, ENCRYPTION_ALGORITHM)
+		user_id: encrypt(id.toHexString(), dbpw, ENCRYPTION_ALGORITHM),
+		server_private_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
 		user_id: encrypt(
 			new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedAccount>, 
-			dbpw, ENCRYPTION_ALGORITHM)
+			dbpw, ENCRYPTION_ALGORITHM),
+		server_private_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
 		user_id: encrypt(
 			new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedAccount>, 
-			dbpw, ENCRYPTION_ALGORITHM)
+			dbpw, ENCRYPTION_ALGORITHM),
+		server_private_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM)
 	}];
 	await db.collection('instances').insertMany(instanceRecords);
+	done();
+}
+
+export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedObjectID<EncryptedAccount>, {
+	dbpw, userpw
+}: {
+	dbpw: string;
+	userpw: string;
+}) {
+	const { db, done } = await getSuppliedDatabase(suppliedDb);
 
 	//Generate some fake passwords
 	const passwordRecords: EncryptedPassword[] = [{
-		user_id: _id,
+		user_id: id,
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 		websites: [],
 		encrypted: encrypt(encrypt({
@@ -181,7 +237,7 @@ export async function genMockAcount({
 		}, hash(pad(userpw, 'masterpwdecrypt')), 
 			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
 	}, {
-		user_id: _id,
+		user_id: id,
 		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
 		websites: [{
 			exact: encrypt('someexacturl', dbpw, ENCRYPTION_ALGORITHM),
@@ -194,7 +250,7 @@ export async function genMockAcount({
 		}, hash(pad(userpw, 'masterpwdecrypt')), 
 			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
 	}, {
-		user_id: _id,
+		user_id: id,
 		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
 		websites: [],
 		encrypted: encrypt(encrypt({
@@ -229,6 +285,27 @@ export async function genMockAcount({
 	}];
 
 	await db.collection('passwords').insertMany(passwordRecords);
+	done();
+}
+
+export async function genMockAcount({
+	dbpw, uri, userpw
+}: {
+	uri: string;
+	dbpw: string;
+	userpw: string;
+}) {
+	const { db, done } = await getDB(uri);
+	const _id = await genAccountOnly(db, {
+		dbpw,
+		userpw
+	});
+	await genInstancesOnly(db, _id, {
+		dbpw,
+	});
+	await genPasswordsOnly(db, _id, {
+		dbpw, userpw
+	});	
 
 	done();
 }
