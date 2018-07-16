@@ -13,7 +13,7 @@ function isLogVal(value: any): value is LOG_VALS {
 
 export class ProcRunner {
 	private _written: string[] = [];
-	private _exitCode: number;
+	private _exitCode: number = null;
 	private _exitCodeExpected: number;
 	private _reads: string[] = [];
 	private _writtenExpected: ({
@@ -171,7 +171,7 @@ export class ProcRunner {
 		this._checkExitCode();
 	}
 
-	public run(): Promise<void> {
+	public run(timeout: number = 30000): Promise<void> {
 		let done: boolean = false;
 		let ondone: () => void = null;
 
@@ -179,13 +179,28 @@ export class ProcRunner {
 			path.join(__dirname, './../../app/main.js'),
 			...this._args
 		]).once('exit', (code: number) => {
-			this._exitCode = code;
-			done = true;
+			if (!done) {
+				this._exitCode = code;
+				done = true;
 
-			if (ondone) {
-				ondone();
+				if (ondone) {
+					ondone();
+				}
 			}
 		});
+
+		setTimeout(() => {
+			proc.kill();
+			if (!done) {
+				this._exitCode = -1;
+				done = true;
+
+				if (ondone) {
+					ondone();
+				}
+			}
+		}, timeout);
+		
 		listenWithoutRef(proc.stdout, (chunk) => {
 			this._readText(chunk);
 		});

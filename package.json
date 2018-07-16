@@ -13,7 +13,8 @@
       "test/tests/imports/*.js",
       "test/tests/cli/*.js",
       "test/tests/cli/account/*.js",
-      "test/tests/cli/backup/*.js"
+      "test/tests/cli/backup/*.js",
+      "test/tests/server/*.js"
     ]
   },
   "dependencies": {
