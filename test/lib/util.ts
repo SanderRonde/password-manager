@@ -92,7 +92,6 @@ export function getFreePort(startRange: number, endRange: number): Promise<numbe
 
 export interface UserAndDbData {
 	userpw: string;
-	https: number;
 	http: number;
 	dbpw: string;
 	uri: string;
@@ -113,12 +112,10 @@ export async function genUserAndDb(t: GenericTestContext<Context<any>>): Promise
 		dbpw,
 		uri,
 		http: await getFreePort(30000, 50000),
-		https: await getFreePort(30000, 50000)
 	}
 }
 
 export function createServer({ 
-	https, 
 	uri, 
 	http, 
 	dbpw 
@@ -128,7 +125,6 @@ export function createServer({
 			path.join(__dirname, './../../app/main.js'),
 			'server',
 			'--http', http + '',
-			'--https', https + '',
 			'--no-rate-limit',
 			'-p', dbpw,
 			'-d', uri

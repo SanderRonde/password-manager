@@ -22,7 +22,7 @@ export class DatabaseManipulation {
 
 	}
 
-	private _getCollection<C extends COLLECTIONS>(collection: C): TypedCollection<EncryptedCollectionRecords[C]> {
+	private _getCollection<C extends COLLECTIONS>(collection: C): TypedCollection<EncryptedCollectionRecords[C]>|null {
 		switch (collection) {
 			case COLLECTIONS.USERS:
 				return this._parent.collections.users;

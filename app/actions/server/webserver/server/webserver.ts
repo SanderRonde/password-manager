@@ -12,11 +12,15 @@ import http = require('http');
 
 export class Webserver {
 	public app: express.Express;
+	public Routes: WebserverRoutes;
+	public Router: WebserverRouter;
 	public Auth: WebserverAuth = new WebserverAuth();
-	public Routes: WebserverRoutes = new WebserverRoutes(this);
-	public Router: WebserverRouter = new WebserverRouter(this);
 
 	constructor(public database: Database, public config: ServerConfig) {
+		this.app = express();
+		this.Routes = new WebserverRoutes(this);
+		this.Router = new WebserverRouter(this);
+
 		this._init();
 	}
 
@@ -26,16 +30,15 @@ export class Webserver {
 	}
 
 	private async _init() {
-		this.app = express();
 		this._initMiddleware();
 		
 		await Promise.all([...(this.config.httpsKey && this.config.httpsCert ?
 			[new Promise(async (resolve) => {
 				https.createServer({
-					key: await fs.readFile(this.config.httpsKey, {
+					key: await fs.readFile(this.config.httpsKey!, {
 						encoding: 'utf8'
 					}),
-					cert: await fs.readFile(this.config.httpsCert, {
+					cert: await fs.readFile(this.config.httpsCert!, {
 						encoding: 'utf8'
 					})
 				}, this.app).listen(this.config.https, () => {

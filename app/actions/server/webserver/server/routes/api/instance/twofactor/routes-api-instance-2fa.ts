@@ -36,7 +36,7 @@ export class RoutesAPIInstanceTwofactor {
 
 			const { instance, decryptedInstance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
-			if (!instance) return;
+			if (instance === null || decryptedInstance === null || accountPromise === null) return;
 
 			if (decryptedInstance.twofactor_enabled === true) {
 				res.status(200);
@@ -120,9 +120,10 @@ export class RoutesAPIInstanceTwofactor {
 
 			const { instance, decryptedInstance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
-			if (!instance) return;
+			if (instance === null || decryptedInstance === null || accountPromise === null) return;
 
-			if (decryptedInstance.twofactor_enabled === false) {
+			const { twofactor_secret } = await accountPromise
+			if (decryptedInstance.twofactor_enabled === false || twofactor_secret === null) {
 				res.status(200);
 				res.json({
 					success: true,
@@ -131,9 +132,7 @@ export class RoutesAPIInstanceTwofactor {
 					}
 				});
 				return;
-			}
-
-			const { twofactor_secret } = await accountPromise;
+			};
 
 			if (!this.server.Router.verify2FA(twofactor_secret, twofactor_token)) {
 				res.status(200);
@@ -177,8 +176,18 @@ export class RoutesAPIInstanceTwofactor {
 
 			const { instance, decryptedInstance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
-			if (!instance) return;
+			if (instance === null || decryptedInstance === null || accountPromise === null) return;
 			const { twofactor_secret } = await accountPromise;
+
+			if (twofactor_secret === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'server error',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 
 			if (this.server.Router.verify2FA(twofactor_secret, twofactor_token)) {
 				//This is an attempt to verify a 2FA secret after adding it
@@ -227,8 +236,18 @@ export class RoutesAPIInstanceTwofactor {
 
 			const { instance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
-			if (!instance) return;
+			if (instance === null || accountPromise === null) return;
 			const { twofactor_secret } = await accountPromise;
+
+			if (twofactor_secret === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'server error',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 
 			if (this.server.Router.verify2FA(twofactor_secret, twofactor_token)) {
 				//This is a login attempt

@@ -46,7 +46,7 @@ class RatelimitStore<K extends string> {
 
 	private _getIfAvailable(store: Map<K, number>, key: K): number {
 		if (store.has(key)) {
-			return store.get(key);
+			return store.get(key)!;
 		}
 		return 0;
 	}
@@ -54,7 +54,7 @@ class RatelimitStore<K extends string> {
 	private _getTotalForKey(key: K) {
 		const latest = this._stack[this._stack.length - 1];
 		if (this._secondCache.has(key)) {
-			return this._secondCache.get(key) + 
+			return this._secondCache.get(key)! + 
 				this._getIfAvailable(latest, key);
 		}
 		let total: number = 0;
@@ -65,22 +65,22 @@ class RatelimitStore<K extends string> {
 		return total + this._getIfAvailable(latest, key);
 	}
 
-	incr(key: K, callback: (err: Error, current: number) => void) {
+	incr(key: K, callback: (err: Error|undefined, current: number) => void) {
 		//Get latest "second"
 		const latest = this._stack[this._stack.length - 1];
 		if (latest.has(key)) {
-			latest.set(key, latest.get(key) + 1);
+			latest.set(key, latest.get(key)! + 1);
 		} else {
 			latest.set(key, 1);
 		}
 
-		callback(null, this._getTotalForKey(key));
+		callback(undefined, this._getTotalForKey(key));
 	}
 
 	decrement(key: K) {
 		const latest = this._stack[this._stack.length - 1];
 		if (latest.has(key)) {
-			latest.set(key, latest.get(key) - 1);
+			latest.set(key, latest.get(key)! - 1);
 		} else {
 			latest.set(key, -1);
 		}

@@ -5,7 +5,7 @@ import { UnstringifyObjectIDs } from "./db-manipulation";
 import { Database } from "../database";
 
 export class DatabaseEncryption {
-	protected _obfuscatedKey: string;
+	protected _obfuscatedKey: string | undefined;
 
 	constructor(private _parent: Database) {
 		
@@ -18,7 +18,7 @@ export class DatabaseEncryption {
 	}
 
 	protected _deObfuscateKey() {
-		return Buffer.from(this._obfuscatedKey, 'base64')
+		return Buffer.from(this._obfuscatedKey!, 'base64')
 			.toString('binary');
 	}
 

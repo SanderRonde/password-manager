@@ -34,12 +34,12 @@ export class RoutesApiPassword {
 			}
 		}
 
-	private _verify2FAIfEnabled(twofactorSecret: string, twofactorToken: string,
+	private _verify2FAIfEnabled(twofactorSecret: string|null, twofactorToken: string|undefined,
 		password: MongoRecord<UnstringifyObjectIDs<EncryptedPassword>>, res: ResponseCaptured) {
 			const decryptedPassword = this.server.database.Crypto.dbDecryptPasswordRecord(password);
-			if (decryptedPassword.twofactor_enabled) {
+			if (decryptedPassword.twofactor_enabled && twofactorSecret !== null) {
 				//Password is secured with 2FA
-				if (!twofactorSecret) {
+				if (!twofactorToken) {
 					res.status(400);
 					res.json({
 						success: false,
@@ -108,13 +108,23 @@ export class RoutesApiPassword {
 					_id: new mongo.ObjectId(decryptedInstance.user_id)
 				});
 
+			if (account === null) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
+
 			//All don't exist
 			const record: EncryptedPassword = {
 				user_id: account._id,
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled),
 				websites: websites.map((website) => {
 					return {
-						host: url.parse(website).hostname,
+						host: url.parse(website).hostname || url.parse(website).host || website,
 						exact: website
 					}
 				}).map(({ host, exact }) => {
@@ -193,13 +203,23 @@ export class RoutesApiPassword {
 
 			const { decryptedInstance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
-			if (!decryptedInstance) return;
+			if (decryptedInstance === null || accountPromise === null) return;
 
 			const { password } = await this._getPasswordIfOwner(password_id,
 				decryptedInstance, res);
 			if (!password) return;
 
 			const { twofactor_secret } = await accountPromise;
+			if (twofactor_secret && twofactor_token === undefined) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'missing parameters',
+					ERR: API_ERRS.MISSING_PARAMS
+				});
+				return;
+			}
+
 			if (!this._verify2FAIfEnabled(twofactor_secret, twofactor_token,
 				password, res)) return;
 
@@ -211,7 +231,7 @@ export class RoutesApiPassword {
 				websites: Array.isArray(websites) ?
 					websites.map((website) => {
 						return {
-							host: url.parse(website).hostname,
+							host: url.parse(website).hostname || url.parse(website).host || website,
 							exact: website
 						}
 					}).map(({ host, exact }) => {
@@ -262,7 +282,7 @@ export class RoutesApiPassword {
 
 			const { decryptedInstance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
-			if (!decryptedInstance) return;
+			if (decryptedInstance === null || accountPromise === null) return;
 
 			const { password } = await this._getPasswordIfOwner(password_id,
 				decryptedInstance, res);
@@ -314,7 +334,7 @@ export class RoutesApiPassword {
 
 			const { decryptedInstance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
-			if (!decryptedInstance) return;
+			if (decryptedInstance === null || accountPromise === null) return;
 
 			const { password } = await this._getPasswordIfOwner(password_id,
 				decryptedInstance, res);
@@ -417,6 +437,16 @@ export class RoutesApiPassword {
 					_id: decryptedInstance.user_id
 				});
 
+			if (!account) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
+
 			if (!this.server.Router.checkPassword(req, res, 
 				this.server.database.Crypto.dbEncrypt(password_hash), account.pw)) {
 					return;
@@ -475,14 +505,24 @@ export class RoutesApiPassword {
 				COLLECTIONS.USERS, {
 					_id: decryptedInstance.user_id
 				});
+		
+			if (!account) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
 
-			const { hostname } = url.parse(website_url);
+			const host = url.parse(website_url).hostname || url.parse(website_url).host || website_url;
 			const passwords = (await this.server.database.Manipulation.findMany(
 				COLLECTIONS.PASSWORDS, {
 					user_id: account._id
 				})).filter(({ websites }) => {
 					for (const website of websites) {
-						if (this.server.database.Crypto.dbDecrypt(website.host) === hostname) {
+						if (this.server.database.Crypto.dbDecrypt(website.host) === host) {
 							return true;
 						}
 					}

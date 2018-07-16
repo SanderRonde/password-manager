@@ -13,8 +13,8 @@ function isLogVal(value: any): value is LOG_VALS {
 
 export class ProcRunner {
 	private _written: string[] = [];
-	private _exitCode: number = null;
-	private _exitCodeExpected: number;
+	private _exitCode: number|undefined;
+	private _exitCodeExpected: number|undefined;
 	private _reads: string[] = [];
 	private _writtenExpected: ({
 		type: 'regular';
@@ -27,7 +27,7 @@ export class ProcRunner {
 		content: LOG_VALS;
 	})[] = [];
 
-	private _capturedRegex: RegExpExecArray[] = [];
+	private _capturedRegex: (RegExpExecArray|string[])[] = [];
 	
 	constructor(private _t: GenericTestContext<Context<any>>, 
 		private _args: string[], private _config: {
@@ -157,7 +157,12 @@ export class ProcRunner {
 				case 'captureRegxp':
 					this._t.regex(written.trim(), expected.content,
 						'written is the same as expected');
-					this._capturedRegex.push(expected.content.exec(written.trim()));
+					const captured = expected.content.exec(written.trim());
+					if (captured !== null) {
+						this._capturedRegex.push(captured);
+					} else {
+						this._capturedRegex.push([]);
+					}
 					break;
 			}
 		}
@@ -174,54 +179,52 @@ export class ProcRunner {
 	}
 
 	public run(timeout?: number): Promise<void> {
-		let done: boolean = false;
-		let ondone: () => void = null;
+		return new Promise((resolve) => {
+			let done: boolean = false;
+			let ondone: () => void = resolve;
 
-		const proc = spawn('node', [
-			path.join(__dirname, './../../app/main.js'),
-			...this._args
-		]).once('exit', (code: number) => {
-			if (!done) {
-				this._exitCode = code;
-				done = true;
-
-				if (ondone) {
-					ondone();
-				}
-			}
-		});
-
-		if (timeout) {
-			setTimeout(() => {
-				proc.kill();
+			const proc = spawn('node', [
+				path.join(__dirname, './../../app/main.js'),
+				...this._args
+			]).once('exit', (code: number) => {
 				if (!done) {
-					this._exitCode = -1;
+					this._exitCode = code;
 					done = true;
 
 					if (ondone) {
 						ondone();
 					}
 				}
-			}, timeout);
-		}
-		
-		listenWithoutRef(proc.stdout, (chunk) => {
-			this._readText(chunk);
-		});
-		listenWithoutRef(proc.stderr, (chunk) => {
-			this._readText(chunk);
-		});
+			});
 
-		for (const val of this._reads) {
-			proc.stdin.write(val + '\n');
-		}
-		proc.stdin.end();
+			if (timeout) {
+				setTimeout(() => {
+					proc.kill();
+					if (!done) {
+						this._exitCode = -1;
+						done = true;
 
-		return new Promise((resolve) => {
+						if (ondone) {
+							ondone();
+						}
+					}
+				}, timeout);
+			}
+			
+			listenWithoutRef(proc.stdout, (chunk) => {
+				this._readText(chunk);
+			});
+			listenWithoutRef(proc.stderr, (chunk) => {
+				this._readText(chunk);
+			});
+
+			for (const val of this._reads) {
+				proc.stdin.write(val + '\n');
+			}
+			proc.stdin.end();
+
 			if (done) {
-				resolve(null);
-			} else {
-				ondone = resolve;
+				resolve(undefined);
 			}
 		});
 	}

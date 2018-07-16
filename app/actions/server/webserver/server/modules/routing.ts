@@ -77,9 +77,16 @@ export class WebserverRouter {
 				COLLECTIONS.USERS, {
 					email: this.parent.database.Crypto.dbEncrypt(email)
 				});
+			if (record === null) {
+				res.status(400);
+				res.json({
+					success: false,
+					error: 'Incorrect combination',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return false;
+			}
 			
-				pw: this.parent.database.Crypto.dbEncrypt(password)
-
 			if (this.parent.database.Crypto.dbDecrypt(record.pw) === 
 				hash(pad(password, 'masterpwverify'))) {
 					if (!supressErr) {
@@ -247,10 +254,10 @@ export class WebserverRouter {
 			get accountPromise() {
 				return (async() => {
 					return _this.parent.database.Crypto.dbDecryptAccountRecord(
-						await _this.parent.database.Manipulation.findOne(
+						(await _this.parent.database.Manipulation.findOne(
 							COLLECTIONS.USERS, {
 								_id: new mongo.ObjectId(decryptedInstance.user_id)
-							}));
+							}))!);
 				})();
 			}
 		};

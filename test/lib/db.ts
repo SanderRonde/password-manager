@@ -1,5 +1,5 @@
 import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, StringifiedObjectId, EncryptedPassword, TypedObjectID } from '../../app/database/db-types';
-import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, genRSAKeyPair } from '../../app/lib/crypto';
+import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, genRSAKeyPair, Encrypted, EncryptionAlgorithm } from '../../app/lib/crypto';
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../../app/lib/constants';
 import { genRandomString, getDBFromURI } from '../../app/lib/util';
 import { GenericTestContext, Context } from 'ava';
@@ -83,11 +83,10 @@ function doDbDecryptWithSalt<T>(data: DatabaseEncryptedWithSalt<T>, key: string)
 	return decryptWithSalt(data, key);
 }
 
-function doesNotThrow(t: GenericTestContext<Context<any>>, callback: () => Promise<void>, message: string) {
-	return new Promise<void>((resolve) => {
+function doesNotThrow<R>(t: GenericTestContext<Context<any>>, callback: () => Promise<R>, message: string): Promise<R> {
+	return new Promise<R>((resolve) => {
 		t.notThrows(async () => {
-			await callback();
-			resolve();
+			resolve(await callback());
 		}, message);
 	});
 }
@@ -322,10 +321,21 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 	const [ encrypted ] = records;
 	t.truthy(encrypted, 'record is truthy');
 
-	let decrypted: Partial<DecryptedAccount> = { 
+	let decrypted = { 
 		reset_reset_keys: encrypted.reset_reset_keys as any[],
 		email: encrypted.email
-	};
+	} as Partial<DecryptedAccount> & {
+		email: string;
+		reset_reset_keys: DatabaseEncrypted<EncodedString<{
+			data: Encrypted<EncodedString<{
+				data: Encrypted<EncodedString<{
+					integrity: true;
+				}>, string, "aes-256-ctr">;
+				algorithm: EncryptionAlgorithm;
+			}>, string, "aes-256-ctr">;
+			algorithm: EncryptionAlgorithm;
+		}>>[]
+	}
 
 	//Decrypt everything
 	await Promise.all([
@@ -382,15 +392,14 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 		return;
 	}
 	
-	let decryptedResetKey: {
+	const decryptedResetKey: {
 		integrity: true;
 		pw: string;
-	} = null;
-	await doesNotThrow(t, async () => {
-		const res = await decrypt(decrypted.reset_key, resetKey);
+	} = await doesNotThrow(t, async () => {
+		const res = await decrypt(decrypted.reset_key!, resetKey);
 		t.not(res, ERRS.INVALID_DECRYPT,
 			'is not an invalid decrypt');
-		decryptedResetKey = res as {
+		return res as {
 			integrity: true;
 			pw: string;
 		};

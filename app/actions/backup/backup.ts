@@ -6,7 +6,7 @@ import path = require('path');
 
 export interface BackupArgs {
 	config?: string;
-	input?: string;
+	input: string;
 	output?: string;
 	database: string;
 }

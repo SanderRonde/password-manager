@@ -19,12 +19,16 @@ export namespace GoogleDrive {
 			});
 			const server = http.createServer(async (req, res) => {
 				try {
+					if (!req.url) {
+						reject('Missing source url');
+						return;
+					}
 					if (req.url.indexOf('/oauth2callback') > -1) {
-						const qs = querystring.parse(url.parse(req.url).query);
+						const qs = querystring.parse(url.parse(req.url).query!);
 						res.end('Authentication successful! Please return to the console.');
 						const {tokens} = await client.getToken((qs as any).code);
 						client.credentials = tokens;
-						resolve(null);
+						resolve(undefined);
 						server.close();
 					}
 				} catch (e) {

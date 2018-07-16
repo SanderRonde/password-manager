@@ -89,7 +89,7 @@ export interface EncryptedAccount {
 	/**
 	 * (encrypted) The 2FA secret used to generate codes
 	 */
-	twofactor_secret: DatabaseEncryptedWithSalt<string>;
+	twofactor_secret: DatabaseEncryptedWithSalt<string|null>;
 	/**
 	 * (encrypted) The master password, padded and hashed
 	 */
@@ -163,7 +163,7 @@ export interface DecryptedAccount {
 	/**
 	 * The 2FA secret used to generate codes
 	 */
-	twofactor_secret: string
+	twofactor_secret: string|null;
 	/**
 	 * The master password, padded and hashed
 	 */

@@ -65,7 +65,7 @@ class StdinCapturer {
 			isNewLine && this._listeners.length; 
 			{ isNewLine, text } = this._getLine()) {
 				this._read = this._read.slice(text.length + 1);
-				this._listeners.shift()(text);
+				this._listeners.shift()!(text);
 			}
 	}
 
@@ -158,7 +158,7 @@ export async function createTempFile(filePath: string, data: Buffer) {
 				if (err) {
 					reject(err);
 				} else {
-					resolve(null);
+					resolve(undefined);
 				}
 			});
 		});

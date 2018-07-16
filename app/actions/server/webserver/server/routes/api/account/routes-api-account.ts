@@ -37,6 +37,16 @@ export class RoutesAPIAccount {
 				COLLECTIONS.USERS, {
 					email: this.server.database.Crypto.dbEncrypt(email)
 				});
+			if (encryptedAccount === null) {
+				res.status(200);
+				res.json({
+					success: false,
+					//Failed to parse JSON, incorrect key
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
 			const { reset_key: accountResetKey, reset_reset_keys } = 
 				this.server.database.Crypto.dbDecryptAccountRecord(encryptedAccount);
 
@@ -187,12 +197,22 @@ export class RoutesAPIAccount {
 				COLLECTIONS.USERS, {
 					email: this.server.database.Crypto.dbEncrypt(email)
 				});
+			if (encryptedAccount === null) {
+				res.status(200);
+				res.json({
+					success: false,
+					//Failed to parse JSON, incorrect key
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
 			const { reset_reset_keys } = 
 				this.server.database.Crypto.dbDecryptAccountRecord(encryptedAccount);
 
 			let decrypted: {
 				integrity: true;
-			};
+			}|undefined;
 			let matchIndex: number = -1;
 			for (let i = 0; i < reset_reset_keys.length; i++) {
 				const reset_reset_key = reset_reset_keys[i];
@@ -213,7 +233,7 @@ export class RoutesAPIAccount {
 					break;
 				}
 			}
-			if (!decrypted || !decrypted.integrity) {
+			if (decrypted === undefined || !decrypted.integrity) {
 				res.status(200);
 				res.json({
 					success: false,
@@ -331,6 +351,16 @@ export class RoutesAPIAccount {
 				COLLECTIONS.USERS, {
 					_id: new mongo.ObjectId(this.server.database.Crypto.dbDecrypt(instance.user_id))
 				});
+			if (encryptedAccount === null) {
+				res.status(200);
+				res.json({
+					success: false,
+					//Failed to parse JSON, incorrect key
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
 			const { pw, email } = this.server.database.Crypto.dbDecryptAccountRecord(encryptedAccount);
 			if (pw !== hash(pad(master_password, 'masterpwverify'))) {
 				res.status(200);

@@ -108,6 +108,16 @@ export class RoutesApiInstance {
 					_id: this.server.database.Crypto.dbDecrypt(instance.user_id)
 				});
 
+			if (account === null) {
+				res.status(200);
+				res.json({
+					success: false,
+					//Failed to parse JSON, incorrect key
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
 			//Check password
 			if (!this.server.Router.checkPassword(req, res, 
 				this.server.database.Crypto.dbEncrypt(password_hash), account.pw)) {

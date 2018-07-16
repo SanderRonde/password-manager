@@ -16,7 +16,9 @@
         "noUnusedLocals": true,
         "target": "es2015",
         "noUnusedParameters": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "strictPropertyInitialization": true,
+        "strictNullChecks": true
 	}, 
     "allowJs": true,
     "compileOnSave": true,

@@ -4,12 +4,11 @@ import { DatabaseEncryption } from './libs/db-encryption';
 import { exitWith, readPassword, getDBFromURI } from '../lib/util';
 import mongo = require('mongodb');
 
-export async function getDatabase(dbPath: string, key: string, 
+export async function getDatabase(dbPath: string, key: string|undefined, 
 	quitOnError: boolean): Promise<Database> {
 		const instance = await new Database(dbPath, quitOnError).init();
 
-		const isReadline = !key;
-		if (!isReadline) {
+		if (key !== undefined) {
 			if (await instance.Crypto.canDecrypt(key)) {
 				instance.Crypto.setKey(key);
 				return instance;
@@ -53,18 +52,21 @@ export enum COLLECTIONS {
 export class Database {
 	private _initialized: boolean = false;
 	
-	public mongoInstance: mongo.Db;
-	public mongoClient: mongo.MongoClient;
-	public collections: {
+	public mongoInstance!: mongo.Db;
+	public mongoClient!: mongo.MongoClient;
+	public collections!: {
 		users: TypedCollection<MongoRecord<EncryptedAccount>>;
 		instances: TypedCollection<MongoRecord<EncryptedInstance>>;
 		passwords: TypedCollection<MongoRecord<EncryptedPassword>>;
 	}
 
-	public Crypto: DatabaseEncryption = new DatabaseEncryption(this)
-	public Manipulation: DatabaseManipulation = new DatabaseManipulation(this)
+	public Crypto: DatabaseEncryption;
+	public Manipulation: DatabaseManipulation;
 
-	constructor(private _dbPath: string, private _quitOnError: boolean) { }
+	constructor(private _dbPath: string, private _quitOnError: boolean) { 
+		this.Crypto = new DatabaseEncryption(this);
+		this.Manipulation = new DatabaseManipulation(this);
+	}
 
 	public async init() {
 		if (this._initialized) {
