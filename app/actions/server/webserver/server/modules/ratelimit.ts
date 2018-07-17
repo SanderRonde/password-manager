@@ -26,7 +26,7 @@ export interface ResponseCaptured extends express.Response {
 class RatelimitStore<K extends string> {
 	private _maxLength: number;
 	private _secondCache: Map<K, number> = new Map();
-	private _stack: Map<K, number>[] = [];
+	private _stack: Map<K, number>[] = [new Map()];
 
 	constructor(timeout: number) {
 		this._maxLength = timeout / 1000;
@@ -38,9 +38,9 @@ class RatelimitStore<K extends string> {
 	}
 
 	private _shiftStack() {
+		this._stack.push(new Map());
 		if (this._stack.length >= this._maxLength) {
 			this._stack.shift();
-			this._stack.push(new Map());
 		}
 	}
 
