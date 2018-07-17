@@ -43,11 +43,11 @@ export type GetOptional<T> = T extends (arg1: any, arg2: any, arg3: infer R, arg
 export type GetOptionalEncrypted<T> = T extends (arg1: any, arg2: any, arg3: any, arg4: infer R) => void ? R : any;
 
 export const enum API_ERRS {
-	INVALID_CREDENTIALS,
-	NO_REQUEST_BODY,
-	MISSING_PARAMS,
-	INVALID_PARAM_TYPES,
-	SERVER_ERROR
+	INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
+	NO_REQUEST_BODY = 'NO_REQUEST_BODY',
+	MISSING_PARAMS = 'MISSING_PARAMS',
+	INVALID_PARAM_TYPES = 'INVALID_PARAM_TYPES',
+	SERVER_ERROR = 'SERVER_ERROR'
 }
 
 export type JSONResponse<S> = {
