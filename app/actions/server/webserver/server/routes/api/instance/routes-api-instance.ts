@@ -47,7 +47,7 @@ export class RoutesApiInstance {
 				_id: id,
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
 				public_key: this.server.database.Crypto.dbEncrypt(public_key),
-				user_id: this.server.database.Crypto.dbEncrypt(auth._id.toHexString()),
+				user_id: auth._id,
 				server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey)
 			};
 			await this.server.database.Manipulation.insertOne(
@@ -105,7 +105,7 @@ export class RoutesApiInstance {
 
 			const account = await this.server.database.Manipulation.findOne(
 				COLLECTIONS.USERS, {
-					_id: this.server.database.Crypto.dbDecrypt(instance.user_id)
+					_id: instance.user_id
 				});
 
 			if (account === null) {
@@ -120,7 +120,7 @@ export class RoutesApiInstance {
 			}
 			//Check password
 			if (!this.server.Router.checkPassword(req, res, 
-				this.server.database.Crypto.dbEncrypt(password_hash), account.pw)) {
+				password_hash, this.server.database.Crypto.dbDecrypt(account.pw))) {
 					return;
 				}
 			
@@ -209,7 +209,7 @@ export class RoutesApiInstance {
 			if (!instance) return;
 
 			const newToken = this.server.Auth.extendLoginToken(oldToken, instance_id,
-				this.server.database.Crypto.dbDecrypt(instance.user_id));
+				instance.user_id.toHexString());
 			if (newToken === false) {
 				res.status(200);
 				res.json({

@@ -1,4 +1,4 @@
-import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword, DatabaseEncrypted } from "../../../../../database/db-types";
+import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../database/db-types";
 import { Hashed, Padded, MasterPasswordVerificationPadding, hash, pad, decryptWithPrivateKey, ERRS } from "../../../../../lib/crypto";
 import { getStores, ResponseCaptured, APIResponse } from "./ratelimit";
 import { COLLECTIONS } from "../../../../../database/database";
@@ -29,10 +29,8 @@ export class WebserverRouter {
 	}
 
 	public checkPassword(_req: express.Request, res: ResponseCaptured,
-		actualPassword: DatabaseEncrypted<EncodedString<Hashed<Padded<string,
-			MasterPasswordVerificationPadding>>>>, 
-		expectedPassword: DatabaseEncrypted<EncodedString<Hashed<Padded<string,
-			MasterPasswordVerificationPadding>>>>) {
+		actualPassword: Hashed<Padded<string, MasterPasswordVerificationPadding>>,
+		expectedPassword: Hashed<Padded<string, MasterPasswordVerificationPadding>>) {
 				if (actualPassword !== expectedPassword) {
 					res.status(200);
 					res.json({

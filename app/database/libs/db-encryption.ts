@@ -93,7 +93,7 @@ export class DatabaseEncryption {
 		public_key, twofactor_enabled, user_id, server_private_key
 	}: EncryptedInstance|UnstringifyObjectIDs<EncryptedInstance>): DecryptedInstance {
 		return {
-			user_id: this.dbDecrypt(user_id),
+			user_id: user_id,
 			public_key: this.dbDecrypt(public_key),
 			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled),
 			server_private_key: this.dbDecrypt(server_private_key)

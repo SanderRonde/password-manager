@@ -19,7 +19,7 @@ export class RoutesApiPassword {
 				_id: new mongo.ObjectId(passwordId)
 			});
 
-			if (!password || instance.user_id !== password.user_id.toHexString()) {
+			if (!password || instance.user_id.toHexString() !== password.user_id.toHexString()) {
 				//Either the password is non-existent or it isn't theirs
 				res.status(200);
 				res.json({
@@ -448,7 +448,7 @@ export class RoutesApiPassword {
 			}
 
 			if (!this.server.Router.checkPassword(req, res, 
-				this.server.database.Crypto.dbEncrypt(password_hash), account.pw)) {
+				password_hash, this.server.database.Crypto.dbDecrypt(account.pw))) {
 					return;
 				}
 

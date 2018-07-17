@@ -236,7 +236,7 @@ export type EncryptedInstance = {
 	/**
 	 * (encrypted) The user ID belonging to this account
 	 */
-	user_id: DatabaseEncrypted<EncodedString<StringifiedObjectId<EncryptedAccount>>>;
+	user_id: TypedObjectID<EncryptedAccount>;
 	/**
 	 * (encrypted) The private key of this server. Used to decrypt messages by an instance
 	 */
@@ -249,7 +249,7 @@ export type EncryptedInstance = {
 export type DecryptedInstance = {
 	/**
 	 * Whether 2FA is enabled for this instance's login
-	 */
+	*/
 	twofactor_enabled: boolean;
 	/**
 	 * The public key used to encrypt data sent to this instance
@@ -258,7 +258,7 @@ export type DecryptedInstance = {
 	/**
 	 * The user ID belonging to this account
 	 */
-	user_id: StringifiedObjectId<EncryptedAccount>;
+	user_id: TypedObjectID<EncryptedAccount>;
 	/**
 	 * (encrypted) The private key of this server. Used to decrypt messages by an instance
 	 */

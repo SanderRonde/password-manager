@@ -6,7 +6,6 @@ import { API_ERRS } from '../../../../../../../../api';
 import { Webserver } from '../../../../webserver';
 import speakeasy = require('speakeasy');
 import express = require('express');
-import mongo = require('mongodb');
 
 
 export class RoutesAPIInstanceTwofactor {
@@ -59,7 +58,7 @@ export class RoutesAPIInstanceTwofactor {
 				});
 	
 				await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
-					_id: new mongo.ObjectId(this.server.database.Crypto.dbDecrypt(instance.user_id))
+					_id: instance.user_id
 				}, {
 					twofactor_secret: this.server.database.Crypto.dbEncryptWithSalt(secret.base32),
 					twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
@@ -257,7 +256,7 @@ export class RoutesAPIInstanceTwofactor {
 						success: true,
 						data: {
 							auth_token: this.server.Auth.genLoginToken(instance_id, 
-								this.server.database.Crypto.dbDecrypt(instance.user_id))
+								instance.user_id.toHexString())
 						}
 					});
 				}

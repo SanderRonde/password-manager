@@ -7,7 +7,6 @@ import { ResponseCaptured } from "../../../modules/ratelimit";
 import { API_ERRS } from "../../../../../../../api";
 import { Webserver } from "../../../webserver";
 import express = require('express');
-import mongo = require('mongodb');
 
 export class RoutesAPIAccount {
 	constructor(public server: Webserver) { }
@@ -35,7 +34,7 @@ export class RoutesAPIAccount {
 
 			const encryptedAccount = await this.server.database.Manipulation.findOne(
 				COLLECTIONS.USERS, {
-					email: this.server.database.Crypto.dbEncrypt(email)
+					email: email
 				});
 			if (encryptedAccount === null) {
 				res.status(200);
@@ -85,7 +84,7 @@ export class RoutesAPIAccount {
 			const { pw: decryptedMasterPassword } = decrypted;
 			const passwords = await this.server.database.Manipulation.findMany(
 				COLLECTIONS.PASSWORDS, {
-					user_id: this.server.database.Crypto.dbEncrypt(encryptedAccount._id.toHexString())
+					user_id: encryptedAccount._id.toHexString()
 				});
 			const newEncryptionHash = hash(pad(newmasterpassword, 'masterpwdecrypt'));
 			await Promise.all(passwords.map((encryptedPassword) => {
@@ -118,7 +117,7 @@ export class RoutesAPIAccount {
 			//Disable 2FA for all instances
 			const instances = await this.server.database.Manipulation.findMany(
 				COLLECTIONS.INSTANCES, {
-					user_id: this.server.database.Crypto.dbEncrypt(encryptedAccount._id.toHexString())
+					user_id: encryptedAccount._id
 				});
 
 			await Promise.all(instances.map((instance) => {
@@ -195,7 +194,7 @@ export class RoutesAPIAccount {
 
 			const encryptedAccount = await this.server.database.Manipulation.findOne(
 				COLLECTIONS.USERS, {
-					email: this.server.database.Crypto.dbEncrypt(email)
+					email: email
 				});
 			if (encryptedAccount === null) {
 				res.status(200);
@@ -247,7 +246,7 @@ export class RoutesAPIAccount {
 			const decryptedMasterPassword = master_password;
 			const passwords = await this.server.database.Manipulation.findMany(
 				COLLECTIONS.PASSWORDS, {
-					user_id: this.server.database.Crypto.dbEncrypt(encryptedAccount._id.toHexString())
+					user_id: encryptedAccount._id
 				});
 			const newEncryptionHash = hash(pad(newmasterpassword, 'masterpwdecrypt'));
 			await Promise.all(passwords.map((encryptedPassword) => {
@@ -279,7 +278,7 @@ export class RoutesAPIAccount {
 			//Disable 2FA for all instances
 			const instances = await this.server.database.Manipulation.findMany(
 				COLLECTIONS.INSTANCES, {
-					user_id: this.server.database.Crypto.dbEncrypt(encryptedAccount._id.toHexString())
+					user_id: encryptedAccount._id
 				});
 
 			await Promise.all(instances.map((instance) => {
@@ -349,7 +348,7 @@ export class RoutesAPIAccount {
 			//Check if the master password is correct
 			const encryptedAccount = await this.server.database.Manipulation.findOne(
 				COLLECTIONS.USERS, {
-					_id: new mongo.ObjectId(this.server.database.Crypto.dbDecrypt(instance.user_id))
+					_id: instance.user_id
 				});
 			if (encryptedAccount === null) {
 				res.status(200);
