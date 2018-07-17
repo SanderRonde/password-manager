@@ -2,6 +2,7 @@ import { Database } from "../../../../database/database";
 import { WebserverRouter } from "./modules/routing";
 import { WebserverRoutes } from "./modules/routes";
 import { WebserverAuth } from "./modules/auth";
+import cookieParser = require('cookie-parser');
 import { ServerConfig } from "../../server";
 import bodyParser = require('body-parser');
 import express = require('express');
@@ -25,6 +26,7 @@ export class Webserver {
 	}
 
 	private _initMiddleware() {
+		this.app.use(cookieParser());
 		this.app.use(bodyParser.json());
 		this.app.use(bodyParser.urlencoded({ extended: false }));
 	}
