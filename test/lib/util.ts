@@ -144,8 +144,6 @@ export function createServer({
 		listenWithoutRef(proc.stdout, (chunk) => {
 			if (chunk.trim() === `HTTP server listening on port ${http}`) {
 				resolve(proc);
-			} else {
-				console.log(chunk);
 			}
 		});
 	});
