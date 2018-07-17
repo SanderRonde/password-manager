@@ -1,5 +1,5 @@
 import { encryptWithPublicKey, Hashed, Padded, MasterPasswordVerificationPadding, genRSAKeyPair, Encrypted, decryptWithPrivateKey } from "../../../../../../../lib/crypto";
-import { EncryptedInstance, StringifiedObjectId, MasterPassword, MongoRecord, ServerPrivateKey } from "../../../../../../../database/db-types";
+import { EncryptedInstance, StringifiedObjectId, MasterPassword, MongoRecord, ServerPublicKey } from "../../../../../../../database/db-types";
 import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
@@ -70,7 +70,7 @@ export class RoutesApiInstance {
 	public login(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			challenge: Encrypted<EncodedString<string>, ServerPrivateKey, 'RSA'>;
+			challenge: Encrypted<EncodedString<string>, ServerPublicKey, 'RSA'>;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, {}, {}, {}>([
 			'instance_id', 'password_hash', 'challenge'
