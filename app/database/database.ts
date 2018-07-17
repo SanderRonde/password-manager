@@ -87,7 +87,7 @@ export class Database {
 					exitWith('Looks like you didn\'t start the mongodb service');
 					return;
 				}
-				exitWith(err.message);
+				exitWith(`Got mongodb error ${err.message}`);
 				return;
 			}
 		}) as mongo.MongoClient;
