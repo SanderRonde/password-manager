@@ -1,7 +1,7 @@
 import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, StringifiedObjectId, EncryptedPassword, TypedObjectID } from '../../app/database/db-types';
 import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, genRSAKeyPair, Encrypted, EncryptionAlgorithm } from '../../app/lib/crypto';
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../../app/lib/constants';
-import { genRandomString, getDBFromURI } from '../../app/lib/util';
+import { genRandomString, getDBFromURI, genID } from '../../app/lib/util';
 import { GenericTestContext, Context } from 'ava';
 import { getCollectionLength } from './util';
 import { DEFAULT_EMAIL } from './consts';
@@ -154,7 +154,7 @@ export async function genAccountOnly(suppliedDb: SuppliedDatabase, {
 	return _id;
 }
 
-export async function genInstancesOnly(suppliedDb: SuppliedDatabase, id: TypedObjectID<EncryptedAccount>, {
+export async function genInstancesOnly(suppliedDb: SuppliedDatabase, userId: TypedObjectID<EncryptedAccount>, {
 	dbpw
 }: {
 	dbpw: string;
@@ -170,21 +170,26 @@ export async function genInstancesOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 }) {
 	const { db, done } = await getSuppliedDatabase(suppliedDb);
 
+	const id = genID<EncryptedInstance>();
+	const firstInstance: MongoRecord<EncryptedInstance> = {
+		_id: id,
+		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		public_key: encrypt(instance_public_key, dbpw, ENCRYPTION_ALGORITHM),
+		user_id: encrypt(userId.toHexString(), dbpw, ENCRYPTION_ALGORITHM),
+		server_private_key: encrypt(server_private_key, dbpw, ENCRYPTION_ALGORITHM)
+	}
+	await db.collection('instances').insertOne(firstInstance);
+
 	//Generate some fake instances
 	const instanceRecords: EncryptedInstance[] = [{
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
-		public_key: encrypt(instance_public_key, dbpw, ENCRYPTION_ALGORITHM),
-		user_id: encrypt(id.toHexString(), dbpw, ENCRYPTION_ALGORITHM),
-		server_private_key: encrypt(server_private_key, dbpw, ENCRYPTION_ALGORITHM)
-	}, {
-		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
-		user_id: encrypt(id.toHexString(), dbpw, ENCRYPTION_ALGORITHM),
+		user_id: encrypt(userId.toHexString(), dbpw, ENCRYPTION_ALGORITHM),
 		server_private_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
-		user_id: encrypt(id.toHexString(), dbpw, ENCRYPTION_ALGORITHM),
+		user_id: encrypt(userId.toHexString(), dbpw, ENCRYPTION_ALGORITHM),
 		server_private_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
@@ -203,6 +208,7 @@ export async function genInstancesOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 	}];
 	await db.collection('instances').insertMany(instanceRecords);
 	done();
+	return id;
 }
 
 export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedObjectID<EncryptedAccount>, {
