@@ -71,7 +71,7 @@ export declare namespace APIRoutes {
 
 		export function login<C extends string>(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			challenge: Encrypted<EncodedString<C>, ServerPrivateKey>;
+			challenge: Encrypted<EncodedString<C>, ServerPrivateKey, 'RSA'>;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			twofactor_required: boolean;
