@@ -74,8 +74,12 @@ export declare namespace APIRoutes {
 			challenge: Encrypted<EncodedString<C>, ServerPrivateKey, 'RSA'>;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
-			twofactor_required: boolean;
-			twofactor_auth_token: string;	
+			twofactor_required: true;
+			twofactor_auth_token: Encrypted<EncodedString<string>, InstancePublicKey, 'RSA'>;	
+			challenge: C;
+		}|{
+			twofactor_required: false;
+			auth_token: Encrypted<EncodedString<string>, InstancePublicKey, 'RSA'>;	
 			challenge: C;
 		}>;
 
@@ -127,7 +131,7 @@ export declare namespace APIRoutes {
 				twofactor_token: string;
 				pw_verification_token: string;
 			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
-				auth_token: string;
+				auth_token: Encrypted<EncodedString<string>, InstancePublicKey, 'RSA'>;
 			}>;
 		}
 	}

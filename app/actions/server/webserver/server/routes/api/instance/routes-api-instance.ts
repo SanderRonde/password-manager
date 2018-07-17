@@ -103,6 +103,9 @@ export class RoutesApiInstance {
 				return;
 			}
 
+			const publicKey = this.server.database.Crypto.dbDecrypt(
+				instance.public_key);
+
 			const account = await this.server.database.Manipulation.findOne(
 				COLLECTIONS.USERS, {
 					_id: instance.user_id
@@ -135,8 +138,8 @@ export class RoutesApiInstance {
 					success: true,
 					data: {
 						twofactor_required: true,
-						twofactor_auth_token: this.server.Auth.genTwofactorToken(
-							instance._id.toHexString(), account._id.toHexString()),
+						twofactor_auth_token: encryptWithPublicKey(this.server.Auth.genTwofactorToken(
+							instance._id.toHexString(), account._id.toHexString()), publicKey),
 						challenge: solved
 					}
 				});
@@ -146,8 +149,8 @@ export class RoutesApiInstance {
 					success: true,
 					data: {
 						twofactor_required: false,
-						auth_token: this.server.Auth.genLoginToken(
-							instance._id.toHexString(), account._id.toHexString()),
+						auth_token: encryptWithPublicKey(this.server.Auth.genLoginToken(
+							instance._id.toHexString(), account._id.toHexString()), publicKey),
 						challenge: solved
 					}
 				});

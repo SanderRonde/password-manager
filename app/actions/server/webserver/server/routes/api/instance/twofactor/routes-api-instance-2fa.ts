@@ -1,5 +1,5 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../../../../../database/db-types';
-import { Hashed, Padded, MasterPasswordVerificationPadding } from '../../../../../../../../lib/crypto';
+import { Hashed, Padded, MasterPasswordVerificationPadding, encryptWithPublicKey } from '../../../../../../../../lib/crypto';
 import { COLLECTIONS } from '../../../../../../../../database/database';
 import { ResponseCaptured } from '../../../../modules/ratelimit';
 import { API_ERRS } from '../../../../../../../../api';
@@ -248,6 +248,7 @@ export class RoutesAPIInstanceTwofactor {
 				return;
 			}
 
+			const publicKey = this.server.database.Crypto.dbDecrypt(instance.public_key);
 			if (this.server.Router.verify2FA(twofactor_secret, twofactor_token)) {
 				//This is a login attempt
 				if (this.server.Router.verifyLoginToken(pw_verification_token, instance_id, res)) {
@@ -255,8 +256,9 @@ export class RoutesAPIInstanceTwofactor {
 					res.json({
 						success: true,
 						data: {
-							auth_token: this.server.Auth.genLoginToken(instance_id, 
-								instance.user_id.toHexString())
+							auth_token: encryptWithPublicKey(
+								this.server.Auth.genLoginToken(instance_id, 
+								instance.user_id.toHexString()), publicKey)
 						}
 					});
 				}
