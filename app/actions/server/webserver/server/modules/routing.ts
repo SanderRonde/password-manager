@@ -350,9 +350,12 @@ export class WebserverRouter {
 		this.parent.app.enable('trust proxy');
 
 		//Main entrypoint
-		this.parent.app.get('/', this.parent.Routes.Dashboard.index);
-		this.parent.app.get('/login', this.parent.Routes.Dashboard.login);
-		this.parent.app.get('/dashboard', this.parent.Routes.Dashboard.dashboard);
+		this.parent.app.get('/', 
+			this._doBind(this.parent.Routes.Dashboard, 'index'));
+		this.parent.app.get('/login', 
+			this._doBind(this.parent.Routes.Dashboard, 'login'));
+		this.parent.app.get('/dashboard', 
+			this._doBind(this.parent.Routes.Dashboard, 'dashboard'));
 
 		this.parent.app.use((_req: express.Request, res: ResponseCaptured, next) => {
 			const originalFn = res.json.bind(res);
