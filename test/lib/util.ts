@@ -6,7 +6,6 @@ import { GenericTestContext, Context, RegisterContextual } from "ava";
 import { TEST_DB_URI } from "../../app/lib/constants";
 import { genRandomString } from "../../app/lib/util";
 import { spawn, ChildProcess } from "child_process";
-import querystring = require('querystring');
 import { EventEmitter } from "events";
 import { Readable } from "stream";
 import mongo = require('mongodb');
