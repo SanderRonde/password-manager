@@ -57,10 +57,11 @@ export class WebserverRouter {
 			}
 
 			//Check if an account with that email exists
-			if (!await this.parent.database.Manipulation.findOne(
+			const record = await this.parent.database.Manipulation.findOne(
 				COLLECTIONS.USERS, {
-					email: this.parent.database.Crypto.dbEncrypt(email)
-				})) {
+					email: email
+				});
+			if (!record) {
 					res.status(400);
 					res.json({
 						success: false,
@@ -71,19 +72,6 @@ export class WebserverRouter {
 				}
 
 			//Check if the password is correct
-			const record = await this.parent.database.Manipulation.findOne(
-				COLLECTIONS.USERS, {
-					email: this.parent.database.Crypto.dbEncrypt(email)
-				});
-			if (record === null) {
-				res.status(400);
-				res.json({
-					success: false,
-					error: 'Incorrect combination',
-					ERR: API_ERRS.INVALID_CREDENTIALS
-				});
-				return false;
-			}
 			
 			if (this.parent.database.Crypto.dbDecrypt(record.pw) === 
 				hash(pad(password, 'masterpwverify'))) {
