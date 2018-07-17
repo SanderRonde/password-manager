@@ -1,7 +1,7 @@
-import { captureURIs, genUserAndDb, createServer, doAPIRequest, testParams } from '../../../lib/util';
-import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../../app/lib/crypto';
-import { DEFAULT_EMAIL } from '../../../lib/consts';
-import { getDB } from '../../../lib/db';
+import { captureURIs, genUserAndDb, createServer, doAPIRequest, testParams } from '../../../../lib/util';
+import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
+import { DEFAULT_EMAIL } from '../../../../lib/consts';
+import { getDB } from '../../../../lib/db';
 import mongo = require('mongodb');
 import { test } from 'ava';
 
