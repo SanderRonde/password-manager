@@ -31,6 +31,7 @@ export class Webserver {
 
 	private async _init() {
 		this._initMiddleware();
+		this.Router.init();
 		
 		await Promise.all([...(this.config.httpsKey && this.config.httpsCert ?
 			[new Promise(async (resolve) => {

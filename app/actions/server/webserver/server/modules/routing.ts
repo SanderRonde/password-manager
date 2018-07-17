@@ -22,11 +22,9 @@ type TypecheckConfig = {
 }
 
 export class WebserverRouter {
-	constructor(public parent: Webserver) { 
-		this._init();
-	}
+	constructor(public parent: Webserver) { }
 
-	private _init() {
+	public init() {
 		this._register();
 	}
 
