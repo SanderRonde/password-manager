@@ -51,8 +51,8 @@ export class RoutesDashboard {
 		}
 	};
 
-	public async login(_req: express.Request, _res: ResponseCaptured) {
-		//TODO:
+	public async login(_req: express.Request, res: ResponseCaptured) {
+		res.end('//TODO:');
 	}
 
 	public async dashboard(req: express.Request, res: ResponseCaptured) {
@@ -60,6 +60,6 @@ export class RoutesDashboard {
 			return;
 		}
 
-		//TODO:
+		res.end('//TODO:');
 	}
 }
