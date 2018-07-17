@@ -27,7 +27,9 @@ export interface APIFns {
 }
 
 export type APIArgs = {
-	[P in keyof APIFns]: [GetArg1<APIFns[P]>, GetArg2<APIFns[P]>];
+	[P in keyof APIFns]: [
+		GetRequired<APIFns[P]> & Partial<GetOptional<APIFns[P]>>, 
+		GetEncrypted<APIFns[P]> & Partial<GetOptionalEncrypted<APIFns[P]>>];
 }
 
 export type APIReturns = {
@@ -35,8 +37,10 @@ export type APIReturns = {
 }
 
 export type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
-export type GetArg1<T> = T extends (arg: infer R) => void ? R : any;
-export type GetArg2<T> = T extends (arg1: any, arg: infer R) => void ? R : void;
+export type GetRequired<T> = T extends (arg1: infer R, arg2: any, arg3: any, arg4: any) => void ? R : any;
+export type GetEncrypted<T> = T extends (arg1: any, arg2: infer R, arg3: any, arg4: any) => void ? R : void;
+export type GetOptional<T> = T extends (arg1: any, arg2: any, arg3: infer R, arg4: any) => void ? R : any;
+export type GetOptionalEncrypted<T> = T extends (arg1: any, arg2: any, arg3: any, arg4: infer R) => void ? R : any;
 
 export const enum API_ERRS {
 	INVALID_CREDENTIALS,
@@ -51,7 +55,7 @@ export type JSONResponse<S> = {
 	data: S;
 }|{
 	success: false;
-	error: API_ERRS;
+	ERR: API_ERRS;
 }
 
 export declare namespace APIRoutes {
@@ -60,16 +64,16 @@ export declare namespace APIRoutes {
 			email: string;
 			public_key: string;
 			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-		}): JSONResponse<{
-			id: Encrypted<EncodedString<StringifiedObjectId<EncryptedInstance>>, InstancePublicKey>
-			server_key: Encrypted<EncodedString<ServerPublicKey>, InstancePublicKey>;
+		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+			id: Encrypted<EncodedString<StringifiedObjectId<EncryptedInstance>>, InstancePublicKey, 'RSA'>
+			server_key: Encrypted<EncodedString<ServerPublicKey>, InstancePublicKey, 'RSA'>;
 		}>;
 
 		export function login<C extends string>(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			challenge: Encrypted<EncodedString<C>, ServerPrivateKey>;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-		}): JSONResponse<{
+		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			twofactor_required: boolean;
 			twofactor_auth_token: string;	
 			challenge: C;
@@ -78,12 +82,12 @@ export declare namespace APIRoutes {
 		export function logout(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: string;
-		}): JSONResponse<{}>;
+		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{}>;
 
 		export function extendKey(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			oldToken: string;
-		}): JSONResponse<{
+		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			auth_token: string;
 		}>;
 
@@ -92,7 +96,7 @@ export declare namespace APIRoutes {
 				instance_id: StringifiedObjectId<EncryptedInstance>;
 				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 				email: string;
-			}): JSONResponse<{
+			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 				message: 'state unchanged (was already set)'
 			}|{
 				enabled: false;
@@ -107,7 +111,7 @@ export declare namespace APIRoutes {
 				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 				email: string;
 				twofactor_token: string;
-			}): JSONResponse<{
+			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 				message: 'state unchanged (was already set)';
 			}|{
 				disabled: true;	
@@ -116,13 +120,13 @@ export declare namespace APIRoutes {
 			export function confirm(params: {
 				instance_id: StringifiedObjectId<EncryptedInstance>;
 				twofactor_token: string;
-			}): JSONResponse<{}>;
+			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{}>;
 
 			export function verify(params: {
 				instance_id: StringifiedObjectId<EncryptedInstance>;
 				twofactor_token: string;
 				pw_verification_token: string;
-			}): JSONResponse<{
+			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 				auth_token: string;
 			}>;
 		}
@@ -143,13 +147,25 @@ export declare namespace APIRoutes {
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 				algorithm: EncryptionAlgorithm;
 			}
-		}): JSONResponse<{}>;
+		}, optional: {}, optionalEncrypted: {}): JSONResponse<{}>;
 
 		export function update(params: {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, encrypted: {
 			token: string;
 			password_id: StringifiedObjectId<EncryptedPassword>;
+		}, optional: {}, optionalEncrypted: {
+			websites: string[];
+			twofactor_enabled: boolean;
+			twofactor_token: string;
+			encrypted: {
+				data: Encrypted<EncodedString<{
+					username: string;
+					password: string;
+					notes: string[];
+				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+				algorithm: EncryptionAlgorithm;
+			}
 		}): JSONResponse<{}>;
 
 		export function remove(params: {
@@ -157,6 +173,8 @@ export declare namespace APIRoutes {
 		}, encrypted: {
 			token: string;
 			password_id: StringifiedObjectId<EncryptedPassword>;
+		}, optional: {}, optionalEncrypted: {
+			twofactor_token: string;
 		}): JSONResponse<{}>;
 
 		export function get(params: {
@@ -164,6 +182,8 @@ export declare namespace APIRoutes {
 		}, encrypted: {
 			token: string;
 			password_id: StringifiedObjectId<EncryptedPassword>;
+		}, optional: {}, optionalEncrypted: {
+			twofactor_token: string;
 		}): JSONResponse<{
 			encrypted: Encrypted<EncodedString<EncodedString<{
 				id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
@@ -175,7 +195,7 @@ export declare namespace APIRoutes {
 					}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 					algorith: EncryptionAlgorithm;
 				}
-			}>>, InstancePublicKey>;
+			}>>, InstancePublicKey, 'RSA'>;
 		}>;
 
 		export function getmeta<P extends StringifiedObjectId<EncryptedPassword>> (params: {
@@ -183,7 +203,7 @@ export declare namespace APIRoutes {
 		}, encrypted: {
 			token: string;
 			password_id: P;
-		}): JSONResponse<{
+		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			encrypted: Encrypted<EncodedString<EncodedString<{
 				id: P;
 				websites: {
@@ -191,7 +211,7 @@ export declare namespace APIRoutes {
 					exact: string;
 				}[];
 				twofactor_enabled: boolean;
-			}>>, InstancePublicKey>;
+			}>>, InstancePublicKey, 'RSA'>;
 		}>;
 
 		export function allmeta(params: {
@@ -199,7 +219,7 @@ export declare namespace APIRoutes {
 		}, encrypted: {
 			token: string;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-		}): JSONResponse<{
+		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			encrypted: Encrypted<EncodedString<EncodedString<{
 				id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
 				websites: {
@@ -215,7 +235,7 @@ export declare namespace APIRoutes {
 		}, encrypted: {
 			token: string;
 			url: string;
-		}): JSONResponse<{
+		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			encrypted: Encrypted<EncodedString<EncodedString<{
 				id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
 				websites: {
@@ -223,7 +243,7 @@ export declare namespace APIRoutes {
 					exact: string;
 				}[];
 				twofactor_enabled: boolean;
-			}[]>>, InstancePublicKey>;
+			}[]>>, InstancePublicKey, 'RSA'>;
 		}>;
 	}
 
@@ -234,7 +254,7 @@ export declare namespace APIRoutes {
 			reset_key: string;
 			email: string;
 			newmasterpassword: MasterPassword;
-		}): JSONResponse<{
+		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			new_reset_key: ResetKey;
 		}>;
 
@@ -245,7 +265,7 @@ export declare namespace APIRoutes {
 			email: string
 			master_password: MasterPassword;
 			newmasterpassword: MasterPassword;
-		}): JSONResponse<{
+		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			new_reset_key: ResetKey;
 		}>;
 
@@ -253,7 +273,7 @@ export declare namespace APIRoutes {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, encrypted: {
 			master_password: MasterPassword;
-		}): JSONResponse<{
+		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			new_reset_key: ResetKey;
 		}>;
 	}
