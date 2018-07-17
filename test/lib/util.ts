@@ -263,7 +263,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 
 	//Missing a single unencrypted param
 	for (const missingKey in required) {
-		test(`missing unencrypted param "${missingKey}" for route "${route}"`, async t => {
+		test(`missing unencrypted param "${missingKey}"`, async t => {
 			const { config, done } = await doServerSetupAndBreakdown(t, uris);
 			const unencryptedArgs: Partial<{
 				[key in keyof GetRequired<APIFns[R]>]: any;
@@ -293,7 +293,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 
 	//Missing a single encrypted param
 	for (const missingKey in encrypted) {
-		test(`missing encrypted param "${missingKey}" for route "${route}"`, async t => {
+		test(`missing encrypted param "${missingKey}"`, async t => {
 			const { config, done } = await doServerSetupAndBreakdown(t, uris);
 			const unencryptedArgs: {
 				[key in keyof GetRequired<APIFns[R]>]: any;
@@ -323,7 +323,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 
 	//Wrong unencrypted required types
 	for (const wrongType in required) {
-		test(`wrong type for unencrypted required param "${wrongType}" for route "${route}"`, async t => {
+		test(`wrong type for unencrypted required param "${wrongType}"`, async t => {
 			const { config, done } = await doServerSetupAndBreakdown(t, uris);
 			const unencryptedArgs = {
 				[wrongType]: getWrongType(required[wrongType])
@@ -355,7 +355,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 
 	//Wrong encrypted required types
 	for (const wrongType in encrypted) {
-		test(`wrong type for encrypted required param "${wrongType}" for route "${route}"`, async t => {
+		test(`wrong type for encrypted required param "${wrongType}"`, async t => {
 			const { config, done } = await doServerSetupAndBreakdown(t, uris);
 			const unencryptedArgs: {
 				[key in keyof GetRequired<APIFns[R]>]: any;
@@ -387,7 +387,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 
 	//Wrong unencrypted optional types
 	for (const wrongType in optional) {
-		test(`wrong type for unencrypted optional param "${wrongType}" for route "${route}"`, async t => {
+		test(`wrong type for unencrypted optional param "${wrongType}"`, async t => {
 			const { config, done } = await doServerSetupAndBreakdown(t, uris);
 			const unencryptedArgs = {...mapObj(required, (_, val) => getFillerType(val)) as object, ...{
 				[wrongType]: getWrongType(optional[wrongType])
@@ -414,7 +414,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 
 	//Wrong encrypted optional types
 	for (const wrongType in optionalEncrypted) {
-		test(`wrong type for encrypted optional param "${wrongType}" for route "${route}"`, async t => {
+		test(`wrong type for encrypted optional param "${wrongType}"`, async t => {
 			const { config, done } = await doServerSetupAndBreakdown(t, uris);
 			const unencryptedArgs = mapObj(required, (_, val) => getFillerType(val)) as {
 				[key in keyof GetRequired<APIFns[R]>]: any;
