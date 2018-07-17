@@ -42,9 +42,9 @@ export class RoutesApiInstance {
 				publicKey: serverPublicKey
 			} = genRSAKeyPair();
 
-			const _id = genID();
+			const id = genID<EncryptedInstance>();
 			const record: MongoRecord<EncryptedInstance> = {
-				_id: _id,
+				_id: id,
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
 				public_key: this.server.database.Crypto.dbEncrypt(public_key),
 				user_id: this.server.database.Crypto.dbEncrypt(auth._id.toHexString()),
@@ -57,7 +57,7 @@ export class RoutesApiInstance {
 			res.json({
 				success: true,
 				data: {
-					id: encryptWithPublicKey(_id.toHexString(), public_key),
+					id: encryptWithPublicKey(id.toHexString(), public_key),
 					server_key: encryptWithPublicKey(serverPublicKey, public_key)
 				}
 			});
