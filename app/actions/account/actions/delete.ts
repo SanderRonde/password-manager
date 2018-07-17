@@ -54,7 +54,7 @@ export namespace DeleteAccount {
 		console.log('Deleting instances...');
 		//Delete all instances from the instances collection
 		await Promise.all((await database.collections.instances.find().toArray()).filter(({ user_id }) => {
-			return database.Crypto.dbDecrypt(user_id) === id.toHexString();
+			return user_id.toHexString() === id.toHexString();
 		}).map(async (record) => {
 			await database.Manipulation.deleteOne(COLLECTIONS.INSTANCES, {
 				_id: record._id
