@@ -92,6 +92,7 @@ export function getFreePort(startRange: number, endRange: number): Promise<numbe
 
 export interface UserAndDbData {
 	instance_id: TypedObjectID<EncryptedInstance>;
+	instance_public_key: string;
 	server_public_key: string;
 	userpw: string;
 	http: number;
@@ -99,32 +100,39 @@ export interface UserAndDbData {
 	uri: string;
 }
 
-export async function genUserAndDb(t: GenericTestContext<Context<any>>): Promise<UserAndDbData> {
-	const uri = await genTempDatabase(t);
-	const userpw = genRandomString(25);
-
-	const dbpw = await genDBWithPW(uri);
-	const id = await genAccountOnly(uri, {
-		dbpw,
-		userpw
-	});
-	const serverKeyPair = genRSAKeyPair();
-	const instanceKeyPair = genRSAKeyPair();
-	const instanceId = await genInstancesOnly(uri, id, {
-		dbpw
-	}, {
-		instance_public_key: instanceKeyPair.publicKey,
-		server_private_key: serverKeyPair.privateKey
-	});
-	return {
-		instance_id: instanceId,
-		server_public_key: serverKeyPair.publicKey,
-		userpw,
-		dbpw,
-		uri,
-		http: await getFreePort(30000, 50000),
-	}
+export interface MockConfig {
+	twofactor_token?: string;
+	twofactor_enabled?: boolean;
 }
+
+export async function genUserAndDb(t: GenericTestContext<Context<any>>, 
+	config: MockConfig = {}): Promise<UserAndDbData> {
+		const uri = await genTempDatabase(t);
+		const userpw = genRandomString(25);
+
+		const dbpw = await genDBWithPW(uri);
+		const id = await genAccountOnly(uri, {
+			dbpw,
+			userpw
+		}, config);
+		const serverKeyPair = genRSAKeyPair();
+		const instanceKeyPair = genRSAKeyPair();
+		const instanceId = await genInstancesOnly(uri, id, {
+			dbpw
+		}, {
+			instance_public_key: instanceKeyPair.publicKey,
+			server_private_key: serverKeyPair.privateKey
+		}, config);
+		return {
+			instance_public_key: instanceKeyPair.publicKey,
+			server_public_key: serverKeyPair.publicKey,
+			instance_id: instanceId,
+			userpw,
+			dbpw,
+			uri,
+			http: await getFreePort(30000, 50000),
+		}
+	}
 
 export function createServer({ 
 	uri, 

@@ -3,7 +3,7 @@ import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, ge
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../../app/lib/constants';
 import { genRandomString, getDBFromURI, genID } from '../../app/lib/util';
 import { GenericTestContext, Context } from 'ava';
-import { getCollectionLength } from './util';
+import { getCollectionLength, MockConfig } from './util';
 import { DEFAULT_EMAIL } from './consts';
 import mongo = require('mongodb');
 
@@ -108,15 +108,17 @@ export async function genAccountOnly(suppliedDb: SuppliedDatabase, {
 }: {
 	dbpw: string;
 	userpw: string;
-}): Promise<TypedObjectID<EncryptedAccount>> {
+}, config: MockConfig = {}): Promise<TypedObjectID<EncryptedAccount>> {
 	const { db, done } = await getSuppliedDatabase(suppliedDb);
 
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const accountRecords: EncryptedAccount[] = [{
 		email: DEFAULT_EMAIL,
 		pw: encrypt(hash(pad(userpw, 'masterpwverify')), dbpw, ENCRYPTION_ALGORITHM),
-		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
-		twofactor_secret: encryptWithSalt(null, dbpw, ENCRYPTION_ALGORITHM),
+		twofactor_enabled: encryptWithSalt(config.twofactor_enabled || false, 
+			dbpw, ENCRYPTION_ALGORITHM),
+		twofactor_secret: encryptWithSalt(config.twofactor_token || null, 
+			dbpw, ENCRYPTION_ALGORITHM),
 		reset_key: encrypt(encrypt({
 			integrity: true as true,
 			pw: userpw
@@ -167,13 +169,14 @@ export async function genInstancesOnly(suppliedDb: SuppliedDatabase, userId: Typ
 } = {
 	instance_public_key: genRSAKeyPair().publicKey,
 	server_private_key: genRSAKeyPair().privateKey
-}) {
+}, config: MockConfig = {}) {
 	const { db, done } = await getSuppliedDatabase(suppliedDb);
 
 	const id = genID<EncryptedInstance>();
 	const firstInstance: MongoRecord<EncryptedInstance> = {
 		_id: id,
-		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+		twofactor_enabled: encryptWithSalt(config.twofactor_enabled || false, 
+			dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(instance_public_key, dbpw, ENCRYPTION_ALGORITHM),
 		user_id: userId,
 		server_private_key: encrypt(server_private_key, dbpw, ENCRYPTION_ALGORITHM)
