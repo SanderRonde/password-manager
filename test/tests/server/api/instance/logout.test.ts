@@ -1,8 +1,8 @@
 import { captureURIs, genUserAndDb, createServer, doAPIRequest, testParams } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
+import { API_ERRS } from '../../../../../app/api';
 import mongo = require('mongodb');
 import { test } from 'ava';
-import { API_ERRS } from '../../../../../app/api';
 
 const uris = captureURIs(test);
 testParams(test, uris, '/api/instance/logout', {
@@ -11,7 +11,7 @@ testParams(test, uris, '/api/instance/logout', {
 }, {}, {}, {});
 test('throws an error if token is invalid', async t => {
 	const config = await genUserAndDb(t, {
-		twofactor_enabled: false
+		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
 	const { 
@@ -36,7 +36,7 @@ test('throws an error if token is invalid', async t => {
 });
 test('fails if instance id is wrong', async t => {
 	const config = await genUserAndDb(t, {
-		twofactor_enabled: false
+		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
 	const { 

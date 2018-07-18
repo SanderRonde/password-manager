@@ -15,7 +15,7 @@ testParams(test, uris, '/api/instance/login', {
 }, {}, {}, {});
 test('login token can be generated when 2FA is disabled', async t => {
 	const config = await genUserAndDb(t, {
-		twofactor_enabled: false
+		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
 	const { 
@@ -54,7 +54,7 @@ test('login token can be generated when 2FA is disabled', async t => {
 });
 test('login token can be generated when 2FA is enabled', async t => {
 	const config = await genUserAndDb(t, {
-		twofactor_enabled: true,
+		account_twofactor_enabled: true,
 		twofactor_token: speakeasy.generateSecret({
 			name: 'Password Manager'
 		}).base32
@@ -96,7 +96,7 @@ test('login token can be generated when 2FA is enabled', async t => {
 });
 test('fails if instance id is wrong', async t => {
 	const config = await genUserAndDb(t, {
-		twofactor_enabled: false
+		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
 	const { 

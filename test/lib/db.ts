@@ -107,7 +107,7 @@ export async function genAccountOnly(suppliedDb: SuppliedDatabase, {
 	const accountRecords: EncryptedAccount[] = [{
 		email: DEFAULT_EMAIL,
 		pw: encrypt(hash(pad(userpw, 'masterpwverify')), dbpw, ENCRYPTION_ALGORITHM),
-		twofactor_enabled: encryptWithSalt(config.twofactor_enabled || false, 
+		twofactor_enabled: encryptWithSalt(config.account_twofactor_enabled || false, 
 			dbpw, ENCRYPTION_ALGORITHM),
 		twofactor_secret: encryptWithSalt(config.twofactor_token || null, 
 			dbpw, ENCRYPTION_ALGORITHM),
@@ -167,7 +167,7 @@ export async function genInstancesOnly(suppliedDb: SuppliedDatabase, userId: Typ
 	const id = genID<EncryptedInstance>();
 	const firstInstance: MongoRecord<EncryptedInstance> = {
 		_id: id,
-		twofactor_enabled: encryptWithSalt(config.twofactor_enabled || false, 
+		twofactor_enabled: encryptWithSalt(config.instance_twofactor_enabled || false, 
 			dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(instance_public_key, dbpw, ENCRYPTION_ALGORITHM),
 		user_id: userId,

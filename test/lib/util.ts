@@ -102,7 +102,8 @@ export interface UserAndDbData {
 
 export interface MockConfig {
 	twofactor_token?: string;
-	twofactor_enabled?: boolean;
+	account_twofactor_enabled?: boolean;
+	instance_twofactor_enabled?: boolean;
 }
 
 export async function genUserAndDb(t: GenericTestContext<Context<any>>, 

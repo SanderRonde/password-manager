@@ -83,7 +83,7 @@ test('can log in after registering instance', async t => {
 });
 test('can log out after logging in', async t => {
 	const config = await genUserAndDb(t, {
-		twofactor_enabled: false
+		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
 	const { 
@@ -136,7 +136,7 @@ test('can log out after logging in', async t => {
 });
 test('can log in and extend key', async t => {
 	const config = await genUserAndDb(t, {
-		twofactor_enabled: false
+		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
 	const { 

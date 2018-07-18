@@ -11,7 +11,7 @@ testParams(test, uris, '/api/instance/extend_key', {
 }, {}, {}, {});
 test('throws an error if token is invalid', async t => {
 	const config = await genUserAndDb(t, {
-		twofactor_enabled: false
+		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
 	const { 
@@ -36,7 +36,7 @@ test('throws an error if token is invalid', async t => {
 });
 test('fails if instance id is wrong', async t => {
 	const config = await genUserAndDb(t, {
-		twofactor_enabled: false
+		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
 	const { 
