@@ -283,7 +283,7 @@ export class RoutesAPIInstanceTwofactor {
 			const publicKey = this.server.database.Crypto.dbDecrypt(instance.public_key);
 			if (this.server.Router.verify2FA(twofactor_secret, twofactor_token)) {
 				//This is a login attempt
-				if (this.server.Router.verifyLoginToken(pw_verification_token, instance_id, res)) {
+				if (this.server.Auth.verifyTwofactorToken(pw_verification_token, instance_id)) {
 					res.status(200);
 					res.json({
 						success: true,
@@ -292,6 +292,13 @@ export class RoutesAPIInstanceTwofactor {
 								this.server.Auth.genLoginToken(instance_id, 
 								instance.user_id.toHexString()), publicKey)
 						}
+					});
+				} else {
+					res.status(200);
+					res.json({
+						success: false,
+						error: 'invalid token',
+						ERR: API_ERRS.INVALID_CREDENTIALS
 					});
 				}
 			} else {
