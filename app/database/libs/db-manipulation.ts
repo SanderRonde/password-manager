@@ -45,7 +45,9 @@ export class DatabaseManipulation {
 			const { result: { ok } } = await collection.insertOne(record);
 			if (!ok) {
 				this._parent.err('Failed to insert record into the database');
+				return false;
 			}
+			return true;
 		}
 
 	public async findOne<R extends UnstringifyObjectIDs<EncryptedCollectionRecords[C]>, 
@@ -75,37 +77,41 @@ export class DatabaseManipulation {
 			}
 
 	public async deleteOne<R extends UnstringifyObjectIDs<EncryptedCollectionRecords[C]>, 
-		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>): Promise<void> {
+		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>): Promise<boolean> {
 			const collection = this._getCollection(collectionName);
 			if (!collection) {
-				return;
+				return false;
 			}
 
 			const {  result: { ok } } = await collection.deleteOne(filter);
 			if (!ok) {
 				this._parent.err('Failed to delete record');
+				return false;
 			}
+			return true;
 		}
 
 	public async deleteMany<R extends UnstringifyObjectIDs<EncryptedCollectionRecords[C]>, 
-		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>): Promise<void> {
+		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>): Promise<boolean> {
 			const collection = this._getCollection(collectionName);
 			if (!collection) {
-				return;
+				return false;
 			}
 
 			const { deletedCount } = await collection.deleteMany(filter);
 			if (!deletedCount) {
 				this._parent.err('Failed to delete record');
+				return false;
 			}
+			return true;
 		}
 
 	public async findAndUpdateOne<R extends UnstringifyObjectIDs<EncryptedCollectionRecords[C]>, 
 		C extends COLLECTIONS>(collectionName: C, filter: R|mongo.FilterQuery<R>,
-			update: Partial<R>): Promise<void> {
+			update: Partial<R>): Promise<boolean> {
 				const collection = this._getCollection(collectionName);
 				if (!collection) {
-					return;
+					return false;
 				}
 
 				try {
@@ -113,11 +119,14 @@ export class DatabaseManipulation {
 						"$set": update
 					});
 					if (ok) {
-						return;
+						return true;
 					}
-				} catch(e) { }
+				} catch(e) { 
+					console.log(e);
+				}
 				finally {
 					this._parent.err('Failed to update record');
 				}
+				return false;
 			}
 }

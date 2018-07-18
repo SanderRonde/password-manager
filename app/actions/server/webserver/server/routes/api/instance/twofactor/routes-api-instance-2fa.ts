@@ -57,12 +57,20 @@ export class RoutesAPIInstanceTwofactor {
 					name: 'Password Manager'
 				});
 	
-				await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
+				if (await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
 					_id: instance.user_id
 				}, {
 					twofactor_secret: this.server.database.Crypto.dbEncryptWithSalt(secret.base32),
 					twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
-				});
+				})) {
+					res.status(500);
+					res.json({
+						success: false,
+						error: 'failed to update record',
+						ERR: API_ERRS.SERVER_ERROR
+					});
+					return;
+				}
 	
 				res.status(200);
 				res.json({
@@ -75,11 +83,19 @@ export class RoutesAPIInstanceTwofactor {
 				});
 			} else {
 				//One already exists, allow this
-				await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
+				if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
 					_id: instance._id
 				}, {
 					twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(true)
-				});
+				})) {
+					res.status(500);
+					res.json({
+						success: false,
+						error: 'failed to update record',
+						ERR: API_ERRS.SERVER_ERROR
+					});
+					return;
+				}
 				res.status(200);
 				res.json({
 					success: true,
@@ -143,11 +159,19 @@ export class RoutesAPIInstanceTwofactor {
 				return;
 			}
 
-			await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
+			if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
 				_id: instance._id
 			}, {
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
-			});
+			})) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to update record',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 			res.status(200);
 			res.json({
 				success: true,
@@ -192,11 +216,19 @@ export class RoutesAPIInstanceTwofactor {
 				//This is an attempt to verify a 2FA secret after adding it
 				if (!decryptedInstance.twofactor_enabled) {
 					//Enable it
-					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
+					if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
 						_id: instance._id
 					}, {
 						twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(true)
-					});
+					})) {
+						res.status(500);
+						res.json({
+							success: false,
+							error: 'failed to update record',
+							ERR: API_ERRS.SERVER_ERROR
+						});
+						return;
+					}
 				}
 				res.status(200);
 				res.json({

@@ -50,8 +50,16 @@ export class RoutesApiInstance {
 				user_id: auth._id,
 				server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey)
 			};
-			await this.server.database.Manipulation.insertOne(
-				COLLECTIONS.INSTANCES, record);
+			if (await this.server.database.Manipulation.insertOne(
+				COLLECTIONS.INSTANCES, record)) {
+					res.status(500);
+					res.json({
+						success: false,
+						error: 'failed to create record',
+						ERR: API_ERRS.SERVER_ERROR
+					});
+					return;
+				}
 			
 			res.status(200);
 			res.json({

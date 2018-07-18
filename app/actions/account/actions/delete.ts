@@ -1,6 +1,6 @@
 import { Database, COLLECTIONS } from "../../../database/database";
 import { EncryptedAccount } from "../../../database/db-types";
-import { readPassword, readConfirm } from "../../../lib/util";
+import { readPassword, readConfirm, exitWith } from "../../../lib/util";
 import { pad, hash } from "../../../lib/crypto";
 
 export namespace DeleteAccount {
@@ -52,32 +52,83 @@ export namespace DeleteAccount {
 		const id = record._id;
 
 		console.log('Deleting instances...');
-		//Delete all instances from the instances collection
-		await Promise.all((await database.collections.instances.find().toArray()).filter(({ user_id }) => {
-			return user_id.toHexString() === id.toHexString();
-		}).map(async (record) => {
-			await database.Manipulation.deleteOne(COLLECTIONS.INSTANCES, {
-				_id: record._id
-			});
-		}));
 
-		console.log('Deleting passwords...');
-		if ((await database.Manipulation.findMany(COLLECTIONS.PASSWORDS, {
-			user_id: id
-		})).length) {
-			//Delete all passwords from the passwords collection
-			await database.Manipulation.deleteMany(COLLECTIONS.PASSWORDS, {
+		const instances = (await database.collections.instances.find().toArray()).filter(({ user_id }) => {
+			return user_id.toHexString() === id.toHexString();
+		});
+		const deletedInstances: number[] = [];
+		await Promise.all(instances.map((record, index) => {
+			return new Promise(async (resolve, reject) => {
+				if (!await database.Manipulation.deleteOne(COLLECTIONS.INSTANCES, {
+					_id: record._id
+				})) {
+					reject('Failed to delete record');
+				} else {
+					deletedInstances.push(index);
+					resolve();
+				}
+			});
+		})).catch(async () => {
+			console.log('Failed to delete an instance, undoing this operation');
+			for (const index of deletedInstances) {
+				if (!await database.Manipulation.insertOne(COLLECTIONS.INSTANCES, instances[index])) {
+					console.log('Failed to re-insert instance with id', instances[index]._id.toHexString());
+				}
+			}
+
+			await database.kill();
+			exitWith('Done salvaging');
+		}).then(async () => {
+			const passwords = await database.Manipulation.findMany(COLLECTIONS.PASSWORDS, {
 				user_id: id
 			});
-		}
 
-		console.log('Deleting user record...');
-		//Delete the record from the users collection
-		await database.Manipulation.deleteOne(COLLECTIONS.USERS, {
-			_id: id
+			console.log('Deleting passwords...');
+			if ((await database.Manipulation.findMany(COLLECTIONS.PASSWORDS, {
+				user_id: id
+			})).length) {
+				//Delete all passwords from the passwords collection
+				if (!await database.Manipulation.deleteMany(COLLECTIONS.PASSWORDS, {
+					user_id: id
+				})) {
+					console.log('Failed to delete passwords, restoring instances');
+					for (const instance of instances) {
+						if (!await database.Manipulation.insertOne(COLLECTIONS.INSTANCES, instance)) {
+							console.log('Failed to re-insert instance with id', instance._id.toHexString());
+						}
+					}
+
+					await database.kill();
+					exitWith('Done salvaging');
+					return;
+				}
+			}
+
+			console.log('Deleting user record...');
+			//Delete the record from the users collection
+			if (!await database.Manipulation.deleteOne(COLLECTIONS.USERS, {
+				_id: id
+			})) {
+				console.log('Failed to delete account, restoring instances and passwords');
+				for (const instance of instances) {
+					if (!await database.Manipulation.insertOne(COLLECTIONS.INSTANCES, instance)) {
+						console.log('Failed to re-insert instance with id', instance._id.toHexString());
+					}
+				}
+
+				for (const password of passwords) {
+					if (!await database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, password)) {
+						console.log('Failed to re-insert password with id', password._id.toHexString());
+					}
+				}
+
+				await database.kill();
+				exitWith('Done salvaging');
+				return;
+			}
+
+			console.log(`Done deleting user with email "${email}"`);
+			await database.kill();
 		});
-
-		console.log(`Done deleting user with email "${email}"`);
-		await database.kill();
 	}
 }

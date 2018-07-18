@@ -68,14 +68,14 @@ export class RoutesApiPassword {
 			token: string;
 			websites: string[];
 			twofactor_enabled: boolean;
-			encrypted: {
+			encrypted: EncodedString<{
 				data: Encrypted<EncodedString<{
 					username: string;
 					password: string;
 					notes: string[];
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 				algorithm: EncryptionAlgorithm;
-			}
+			}>;
 		}, {}>([
 			'instance_id', 'token', 'websites', 'encrypted', 'twofactor_enabled'
 		], [], async (_req, res, { instance_id, token, websites, encrypted, twofactor_enabled }) => {
@@ -135,7 +135,15 @@ export class RoutesApiPassword {
 				}),
 				encrypted: this.server.database.Crypto.dbEncrypt(encrypted)
 			};
-			await this.server.database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, record);
+			if (!await this.server.database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, record)) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to create record',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 			res.status(200);
 			res.json({
 				success: true,
@@ -154,14 +162,14 @@ export class RoutesApiPassword {
 			websites: string[];
 			twofactor_enabled: boolean;
 			twofactor_token: string;
-			encrypted: {
+			encrypted: EncodedString<{
 				data: Encrypted<EncodedString<{
 					username: string;
 					password: string;
 					notes: string[];
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 				algorithm: EncryptionAlgorithm;
-			}
+			}>;
 		}>([
 			'instance_id', 'token'
 		], [
@@ -223,7 +231,7 @@ export class RoutesApiPassword {
 			if (!this._verify2FAIfEnabled(twofactor_secret, twofactor_token,
 				password, res)) return;
 
-			await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
+			if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
 				_id: new mongo.ObjectId(password_id)
 			}, {
 				twofactor_enabled: typeof twofactor_enabled === 'boolean' ?
@@ -242,7 +250,15 @@ export class RoutesApiPassword {
 					}) : undefined,
 				encrypted: encrypted ?
 					this.server.database.Crypto.dbEncrypt(encrypted) : undefined
-			});
+			})) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to update record',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 			res.status(200);
 			res.json({
 				success: true,
@@ -292,9 +308,17 @@ export class RoutesApiPassword {
 			if (!this._verify2FAIfEnabled(twofactor_secret, twofactor_token,
 				password, res)) return;
 
-			await this.server.database.Manipulation.deleteOne(COLLECTIONS.PASSWORDS, {
+			if (!await this.server.database.Manipulation.deleteOne(COLLECTIONS.PASSWORDS, {
 				_id: password._id
-			});
+			})) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to create record',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 			res.status(200);
 			res.json({
 				success: true,

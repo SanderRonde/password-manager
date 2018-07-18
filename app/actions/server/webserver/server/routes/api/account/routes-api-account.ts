@@ -87,7 +87,9 @@ export class RoutesAPIAccount {
 					user_id: encryptedAccount._id.toHexString()
 				});
 			const newEncryptionHash = hash(pad(newmasterpassword, 'masterpwdecrypt'));
-			await Promise.all(passwords.map((encryptedPassword) => {
+
+			const updatedPasswordIndexes: number[] = [];
+			if ((await Promise.all(passwords.map((encryptedPassword, index) => {
 				return new Promise(async (resolve) => {
 					const encryptedSection = this.server.database.Crypto.dbDecrypt(
 						encryptedPassword.encrypted);
@@ -103,40 +105,89 @@ export class RoutesAPIAccount {
 					const reEncrypted = encrypt(decryptedEncrypedSection, newEncryptionHash,
 						ENCRYPTION_ALGORITHM);				
 
-					await this.server.database.Manipulation.findAndUpdateOne(
+					if (await this.server.database.Manipulation.findAndUpdateOne(
 						COLLECTIONS.PASSWORDS, {
 							_id: encryptedPassword._id
 						}, {
 							encrypted: this.server.database.Crypto.dbEncrypt(reEncrypted),
 							twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
-						});
-					resolve()
+						})) {
+							updatedPasswordIndexes.push(index);
+							resolve(true)
+						} else {
+							resolve(false);
+						}
 				});
-			}));
+			}))).filter(val => !val).length) {
+				//Some updates failed
+				for (const index of updatedPasswordIndexes) {
+					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
+						_id: passwords[index]._id
+					}, passwords[index]);
+				}
+
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to update paswords, restored to previous',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 
 			//Disable 2FA for all instances
-			const instances = await this.server.database.Manipulation.findMany(
+			const instances = (await this.server.database.Manipulation.findMany(
 				COLLECTIONS.INSTANCES, {
 					user_id: encryptedAccount._id
+				})).filter(({ twofactor_enabled }) => {
+					return this.server.database.Crypto.dbDecryptWithSalt(twofactor_enabled);
 				});
 
-			await Promise.all(instances.map((instance) => {
+			if ((await Promise.all(instances.map((instance) => {
 				return new Promise(async (resolve) => {
-					await this.server.database.Manipulation.findAndUpdateOne(
+					if (!await this.server.database.Manipulation.findAndUpdateOne(
 						COLLECTIONS.INSTANCES, {
 							_id: instance._id
 						}, {
 							twofactor_enabled: 
 								this.server.database.Crypto.dbEncryptWithSalt(false)
-						});
-					resolve();
+						})) {
+							resolve(false);
+						} else {
+							resolve(true);
+						}
 				});
-			}));
+			}))).filter(val => !val).length) {
+				//Some updates failed
+				for (const password of passwords) {
+					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
+						_id: password._id
+					}, password);
+				}
+
+				for (const instance of instances) {
+					await this.server.database.Manipulation.findAndUpdateOne(
+						COLLECTIONS.INSTANCES, {
+							_id: instance._id
+						}, {
+							twofactor_enabled: 
+								this.server.database.Crypto.dbEncryptWithSalt(true)
+						});
+				}
+
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to update instances, restored to previous',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 
 			//Change password verification key and master password
 			const newResetKey = genRandomString(RESET_KEY_LENGTH);
 
-			await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
+			if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
 				_id: encryptedAccount._id
 			}, {
 				pw: this.server.database.Crypto.dbEncrypt(
@@ -153,7 +204,32 @@ export class RoutesAPIAccount {
 						decryptedMasterPassword, ENCRYPTION_ALGORITHM)].map((key) => {
 							return this.server.database.Crypto.dbEncrypt(key);
 						})
-			});
+			})) {
+				//Some updates failed
+				for (const password of passwords) {
+					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
+						_id: password._id
+					}, password);
+				}
+
+				for (const instance of instances) {
+					await this.server.database.Manipulation.findAndUpdateOne(
+						COLLECTIONS.INSTANCES, {
+							_id: instance._id
+						}, {
+							twofactor_enabled: 
+								this.server.database.Crypto.dbEncryptWithSalt(true)
+						});
+				}
+
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to update account, restored to previous',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 
 			res.status(200);
 			res.json({

@@ -1,5 +1,5 @@
 import { RESET_KEY_LENGTH, ENCRYPTION_ALGORITHM } from "../../../lib/constants";
-import { getConfirmedPassword, genRandomString } from "../../../lib/util";
+import { getConfirmedPassword, genRandomString, exitWith } from "../../../lib/util";
 import { Database, COLLECTIONS } from "../../../database/database";
 import { EncryptedAccount } from "../../../database/db-types";
 import { hash, pad, encrypt } from "../../../lib/crypto";
@@ -25,7 +25,9 @@ export namespace CreateAccount {
 			reset_reset_keys: []
 		}
 
-		await database.Manipulation.insertOne(COLLECTIONS.USERS, record);
+		if (!await database.Manipulation.insertOne(COLLECTIONS.USERS, record)) {
+			exitWith('Failed to create user record');
+		}
 		console.log('Successfully created user!');
 		console.log('Your reset key is', resetKey);
 		console.log('Do not lose this');
