@@ -71,18 +71,17 @@ export class WebserverRouter {
 
 			//Check if the password is correct
 			
-			if (this.parent.database.Crypto.dbDecrypt(record.pw) === 
-				hash(pad(password, 'masterpwverify'))) {
-					if (!supressErr) {
-						res.status(400);
-						res.json({
-							success: false,
-							error: 'Incorrect combination',
-							ERR: API_ERRS.INVALID_CREDENTIALS
-						});
-					}
-					return false;
+			if (this.parent.database.Crypto.dbDecrypt(record.pw) !== password) {
+				if (!supressErr) {
+					res.status(400);
+					res.json({
+						success: false,
+						error: 'Incorrect combination',
+						ERR: API_ERRS.INVALID_CREDENTIALS
+					});
 				}
+				return false;
+			}
 			return record;
 		}
 
