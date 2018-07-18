@@ -1,5 +1,5 @@
 import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../database/db-types";
-import { Hashed, Padded, MasterPasswordVerificationPadding, hash, pad, decryptWithPrivateKey, ERRS } from "../../../../../lib/crypto";
+import { Hashed, Padded, MasterPasswordVerificationPadding, decryptWithPrivateKey, ERRS } from "../../../../../lib/crypto";
 import { getStores, ResponseCaptured, APIResponse } from "./ratelimit";
 import { COLLECTIONS } from "../../../../../database/database";
 import { API_ERRS } from "../../../../../api";
