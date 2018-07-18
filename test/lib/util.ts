@@ -163,7 +163,8 @@ export async function doAPIRequest<K extends keyof APIFns>({ port, publicKey }: 
 }, path: K,
 	args: APIArgs[K][0], encrypted?: APIArgs[K][1]): Promise<EncodedString<APIReturns[K]>> {
 		return new Promise<EncodedString<APIReturns[K]>>((resolve, reject) => {
-			const data = JSON.stringify({...args as Object, ...(encrypted && publicKey ? {
+			const keys = Object.getOwnPropertyNames(encrypted || {});
+			const data = JSON.stringify({...args as Object, ...(keys.length && publicKey ? {
 				encrypted: encryptWithPublicKey(encrypted, publicKey)
 			} : {})});
 			const req = http.request({
