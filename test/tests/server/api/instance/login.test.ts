@@ -101,7 +101,7 @@ test('fails if instance id is wrong', async t => {
 	uris.push(uri);
 
 	const challenge = genRandomString(25);
-	testInvalidCredentials(t, {
+	await testInvalidCredentials(t, {
 		route: '/api/instance/login',
 		port: http,
 		encrypted: {},

@@ -169,7 +169,7 @@ test('fails if password is wrong', async t => {
 	const { http, userpw, uri, instance_id } = config;
 	uris.push(uri);
 
-	testInvalidCredentials(t, {
+	await testInvalidCredentials(t, {
 		route: '/api/instance/2fa/enable',
 		port: http,
 		encrypted: {},
@@ -187,7 +187,7 @@ test('fails if instance id is wrong', async t => {
 	const { http, userpw, uri } = config;
 	uris.push(uri);
 
-	testInvalidCredentials(t, {
+	await testInvalidCredentials(t, {
 		route: '/api/instance/2fa/enable',
 		port: http,
 		encrypted: {},

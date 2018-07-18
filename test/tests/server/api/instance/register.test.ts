@@ -58,7 +58,7 @@ test('fails if password is wrong', async t => {
 	uris.push(uri);
 
 	const keyPair = genRSAKeyPair();
-	testInvalidCredentials(t, {
+	await testInvalidCredentials(t, {
 		route: '/api/instance/register',
 		port: http,
 		encrypted: {},
