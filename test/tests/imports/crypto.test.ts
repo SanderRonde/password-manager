@@ -28,11 +28,11 @@ test('encrypt throws error on invalid decrypt', t => {
 	const startValue = genRandomString(25);
 	const key = genRandomString(25);
 	
-	const { algorithm } = encrypt(startValue, key, ENCRYPTION_ALGORITHM);
-	const decrypted = decrypt({
+	const { algorithm } = JSON.parse(encrypt(startValue, key, ENCRYPTION_ALGORITHM));
+	const decrypted = decrypt(JSON.stringify({
 		algorithm,
 		data: 'baddecrypt' as Encrypted<EncodedString<string>, string>
-	}, key);
+	}), key);
 
 	t.is(decrypted, ERRS.INVALID_DECRYPT, 'is invalid decrypt');
 });
@@ -51,15 +51,15 @@ test('salt encrypt throws error on invalid decrypt', t => {
 	const startValue = genRandomString(25);
 	const key = genRandomString(25);
 	
-	const { algorithm } = encryptWithSalt(startValue, key, ENCRYPTION_ALGORITHM);
-	const decrypted = decryptWithSalt({
+	const { algorithm } = JSON.parse(encryptWithSalt(startValue, key, ENCRYPTION_ALGORITHM));
+	const decrypted = decryptWithSalt(JSON.stringify({
 		algorithm,
 		data: 'baddecrypt' as Encrypted<EncodedString<EncodedString<{
 			padded: string;
 			salt: string;
 			__data: string;
 		}>>, string>
-	}, key);
+	}), key);
 
 	t.is(decrypted, ERRS.INVALID_DECRYPT, 'is invalid decrypt');
 });
