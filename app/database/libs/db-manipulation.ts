@@ -122,11 +122,9 @@ export class DatabaseManipulation {
 						return true;
 					}
 				} catch(e) { 
-					console.log(e);
+					this._parent.err(e.message);
 				}
-				finally {
-					this._parent.err('Failed to update record');
-				}
+				this._parent.err('Failed to update record');
 				return false;
 			}
 }
