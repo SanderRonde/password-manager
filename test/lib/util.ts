@@ -92,7 +92,7 @@ export function getFreePort(startRange: number, endRange: number): Promise<numbe
 
 export interface UserAndDbData {
 	instance_id: TypedObjectID<EncryptedInstance>;
-	instance_public_key: string;
+	instance_private_key: string;
 	server_public_key: string;
 	userpw: string;
 	http: number;
@@ -124,7 +124,7 @@ export async function genUserAndDb(t: GenericTestContext<Context<any>>,
 			server_private_key: serverKeyPair.privateKey
 		}, config);
 		return {
-			instance_public_key: instanceKeyPair.publicKey,
+			instance_private_key: instanceKeyPair.privateKey,
 			server_public_key: serverKeyPair.publicKey,
 			instance_id: instanceId,
 			userpw,
@@ -447,3 +447,21 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 		});
 	}
 }
+
+export function doesNotThrowAsync<R>(t: GenericTestContext<Context<any>>, 
+	callback: () => Promise<R>, message: string): Promise<R> {
+		return new Promise<R>((resolve) => {
+			t.notThrows(async () => {
+				resolve(await callback());
+			}, message);
+		});
+	}
+
+export function doesNotThrow<R>(t: GenericTestContext<Context<any>>, callback: () => R, 
+	message: string) {
+		let result: R;
+		t.notThrows(() => {
+			result = callback();
+		}, message);
+		return result!;
+	}

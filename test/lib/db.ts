@@ -1,9 +1,9 @@
-import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, StringifiedObjectId, EncryptedPassword, TypedObjectID } from '../../app/database/db-types';
+import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, EncryptedPassword, TypedObjectID } from '../../app/database/db-types';
 import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, genRSAKeyPair, Encrypted, EncryptionAlgorithm } from '../../app/lib/crypto';
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../../app/lib/constants';
+import { getCollectionLength, MockConfig, doesNotThrowAsync } from './util';
 import { genRandomString, getDBFromURI, genID } from '../../app/lib/util';
 import { GenericTestContext, Context } from 'ava';
-import { getCollectionLength, MockConfig } from './util';
 import { DEFAULT_EMAIL } from './consts';
 import mongo = require('mongodb');
 
@@ -81,14 +81,6 @@ function doDbDecrypt<T>(data: DatabaseEncrypted<EncodedString<T>>, key: string) 
 
 function doDbDecryptWithSalt<T>(data: DatabaseEncryptedWithSalt<T>, key: string) {
 	return decryptWithSalt(data, key);
-}
-
-function doesNotThrow<R>(t: GenericTestContext<Context<any>>, callback: () => Promise<R>, message: string): Promise<R> {
-	return new Promise<R>((resolve) => {
-		t.notThrows(async () => {
-			resolve(await callback());
-		}, message);
-	});
 }
 
 type SuppliedDatabase = mongo.Db|string;
@@ -344,28 +336,28 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 
 	//Decrypt everything
 	await Promise.all([
-		doesNotThrow(t, async () => {
+		doesNotThrowAsync(t, async () => {
 			const res = await doDbDecrypt(encrypted.pw, dbpw);
 			t.not(res, ERRS.INVALID_DECRYPT,
 				'decrypting pw does not result in invalid decrypt');
 			if (res === ERRS.INVALID_DECRYPT) return;
 			decrypted.pw = res;
 		}, 'pw can be decrypted'),
-		doesNotThrow(t, async () => {
+		doesNotThrowAsync(t, async () => {
 			const res = await doDbDecryptWithSalt(encrypted.twofactor_enabled, dbpw);
 			t.not(res, ERRS.INVALID_DECRYPT,
 				'decrypting twofactor_enabled does not result in invalid decrypt');
 			if (res === ERRS.INVALID_DECRYPT) return;
 			decrypted.twofactor_enabled = res;
 		}, 'twofactor_enabled can be decrypted'),
-		doesNotThrow(t, async () => {
+		doesNotThrowAsync(t, async () => {
 			const res = await doDbDecryptWithSalt(encrypted.twofactor_secret, dbpw);
 			t.not(res, ERRS.INVALID_DECRYPT,
 				'decrypting twofactor_secret does not result in invalid decrypt');
 			if (res === ERRS.INVALID_DECRYPT) return;
 			decrypted.twofactor_secret = res;
 		}, 'twofactor_secret can be decrypted'),
-		doesNotThrow(t, async () => {
+		doesNotThrowAsync(t, async () => {
 			const res = await doDbDecrypt(encrypted.reset_key, dbpw);
 			t.not(res, ERRS.INVALID_DECRYPT,
 				'decrypting reset_key does not result in invalid decrypt');
@@ -400,7 +392,7 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 	const decryptedResetKey: {
 		integrity: true;
 		pw: string;
-	} = await doesNotThrow(t, async () => {
+	} = await doesNotThrowAsync(t, async () => {
 		const res = await decrypt(decrypted.reset_key!, resetKey);
 		t.not(res, ERRS.INVALID_DECRYPT,
 			'is not an invalid decrypt');
