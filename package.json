@@ -16,7 +16,8 @@
       "test/tests/cli/backup/*.js",
       "test/tests/server/*.js",
       "test/tests/server/api/*.js",
-      "test/tests/server/api/instance/*.js"
+      "test/tests/server/api/instance/*.js",
+      "test/tests/server/api/workflows/*.js"
     ]
   },
   "dependencies": {
