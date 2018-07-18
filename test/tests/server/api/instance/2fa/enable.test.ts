@@ -1,3 +1,207 @@
+import { captureURIs, testParams, doAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
+import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
+import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
+import { DEFAULT_EMAIL } from '../../../../../lib/consts';
+import { API_ERRS } from '../../../../../../app/api';
+import { getDB } from '../../../../../lib/db';
+import speakeasy = require('speakeasy');
+import mongo = require('mongodb');
 import { test } from 'ava';
 
-test.todo('2fa can be enabled');
+const uris = captureURIs(test);
+testParams(test, uris, '/api/instance/2fa/enable', {
+	instance_id: 'string',
+	password: 'string',
+	email: 'string'
+}, {}, {}, {});
+test('can enable 2FA when no 2FA secret is set', async t => {
+	const config = await genUserAndDb(t, {
+		account_twofactor_enabled: false,
+		instance_twofactor_enabled: false,
+		twofactor_token: null!
+	});
+	const server = await createServer(config);
+	const { 
+		http, 
+		userpw, 
+		uri, 
+		instance_id, 
+	} = config;
+	uris.push(uri);
+
+	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/enable', {
+		instance_id: instance_id.toHexString(),
+		password: hash(pad(userpw, 'masterpwverify')),
+		email: DEFAULT_EMAIL
+	}));
+
+	server.kill();
+
+	t.true(response.success, 'API call succeeded');
+	if (!response.success) return;
+	const data = response.data;
+	t.falsy((data as {
+		message: 'state unchanged (was already set)'
+	}).message, 'state is not unchanged');
+	if ((data as {
+		message: 'state unchanged (was already set)'
+	}).message) {
+		return;
+	}
+	const finalData = data as {
+		enabled: false;
+		verify_2fa_required: true;
+		auth_url: string;
+	} | {
+		enabled: true;
+	};
+	t.false(finalData.enabled, '2FA was not already enabled');
+	if (finalData.enabled) return;
+	t.true(finalData.verify_2fa_required, 
+		'further verification is needed');
+	t.is(typeof finalData.auth_url, 'auth_url is a string');
+	t.regex(finalData.auth_url, 
+		/otpauth:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/,
+		'url is an otp auth url');
+});
+test('can enable 2FA when a 2FA secret is already set', async t => {
+	const config = await genUserAndDb(t, {
+		account_twofactor_enabled: true,
+		instance_twofactor_enabled: false,
+		twofactor_token: speakeasy.generateSecret().base32
+	});
+	const server = await createServer(config);
+	const { 
+		http, 
+		userpw, 
+		uri, 
+		dbpw,
+		instance_id, 
+	} = config;
+	uris.push(uri);
+
+	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/enable', {
+		instance_id: instance_id.toHexString(),
+		password: hash(pad(userpw, 'masterpwverify')),
+		email: DEFAULT_EMAIL
+	}));
+
+	server.kill();
+
+	t.true(response.success, 'API call succeeded');
+	if (!response.success) return;
+	const data = response.data;
+	t.falsy((data as {
+		message: 'state unchanged (was already set)'
+	}).message, 'state is not unchanged');
+	if ((data as {
+		message: 'state unchanged (was already set)'
+	}).message) {
+		return;
+	}
+	const finalData = data as {
+		enabled: false;
+		verify_2fa_required: true;
+		auth_url: string;
+	} | {
+		enabled: true;
+	};
+	t.true(finalData.enabled, '2FA was already enabled');
+
+	const { db, done } = await getDB(uri);
+	const instance = await db.collection('instances').findOne({
+		_id: instance_id
+	}) as EncryptedInstance;
+	done();
+	t.truthy(instance, 'instance exists');
+	if (!instance) return;
+	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
+	t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	if (decrypt === ERRS.INVALID_DECRYPT) return;
+	t.is(decrypt, true, '2FA is now enabled');
+});
+test('does not change it if 2FA was aleady enabled in this instance', async t => {
+	const config = await genUserAndDb(t, {
+		account_twofactor_enabled: true,
+		instance_twofactor_enabled: true,
+		twofactor_token: speakeasy.generateSecret().base32
+	});
+	const server = await createServer(config);
+	const { 
+		http, 
+		userpw, 
+		uri, 
+		dbpw,
+		instance_id, 
+	} = config;
+	uris.push(uri);
+
+	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/enable', {
+		instance_id: instance_id.toHexString(),
+		password: hash(pad(userpw, 'masterpwverify')),
+		email: DEFAULT_EMAIL
+	}));
+
+	server.kill();
+
+	t.true(response.success, 'API call succeeded');
+	if (!response.success) return;
+	const data = response.data;
+	t.is((data as {
+		message: 'state unchanged (was already set)'
+	}).message, 'state unchanged (was already set)', 'state is unchanged');
+
+	const { db, done } = await getDB(uri);
+	const instance = await db.collection('instances').findOne({
+		_id: instance_id
+	}) as EncryptedInstance;
+	done();
+	t.truthy(instance, 'instance exists');
+	if (!instance) return;
+	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
+	t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	if (decrypt === ERRS.INVALID_DECRYPT) return;
+	t.is(decrypt, true, '2FA is still enabled');
+});
+test('fails if password is wrong', async t => {
+	const config = await genUserAndDb(t);
+	const server = await createServer(config);
+	const { http, userpw, uri, instance_id } = config;
+	uris.push(uri);
+
+	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/enable', {
+		instance_id: instance_id.toHexString(),
+		email: DEFAULT_EMAIL,
+		password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
+	}));
+
+	server.kill();
+
+	t.false(response.success, 'API call failed');
+	if (response.success) {
+		return;
+	}
+	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+		'got invalid credentials errors');
+});
+test('fails if instance id is wrong', async t => {
+	const config = await genUserAndDb(t);
+	const server = await createServer(config);
+	const { http, userpw, uri } = config;
+	uris.push(uri);
+
+	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/enable', {
+		instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
+		email: DEFAULT_EMAIL,
+		password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
+	}));
+
+	server.kill();
+
+	t.false(response.success, 'API call failed');
+	if (response.success) {
+		return;
+	}
+	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+		'got invalid credentials errors');
+});
