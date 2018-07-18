@@ -3,7 +3,7 @@ import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/cryp
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
 import { DEFAULT_EMAIL } from '../../../../../lib/consts';
 import { API_ERRS } from '../../../../../../app/api';
-import { getDB } from '../../../../../lib/db';
+import { doSingleQuery } from '../../../../../lib/db';
 import speakeasy = require('speakeasy');
 import mongo = require('mongodb');
 import { test } from 'ava';
@@ -108,11 +108,11 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 	};
 	t.true(finalData.enabled, '2FA was already enabled');
 
-	const { db, done } = await getDB(uri);
-	const instance = await db.collection('instances').findOne({
-		_id: instance_id
-	}) as EncryptedInstance;
-	done();
+	const instance = await doSingleQuery(uri, async (db) => {
+		return await db.collection('instances').findOne({
+			_id: new mongo.ObjectId(instance_id)
+		});
+	});
 	t.truthy(instance, 'instance exists');
 	if (!instance) return;
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
@@ -151,11 +151,11 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 		message: 'state unchanged (was already set)'
 	}).message, 'state unchanged (was already set)', 'state is unchanged');
 
-	const { db, done } = await getDB(uri);
-	const instance = await db.collection('instances').findOne({
-		_id: instance_id
-	}) as EncryptedInstance;
-	done();
+	const instance = await doSingleQuery(uri, async (db) => {
+		return await db.collection('instances').findOne({
+			_id: instance_id
+		}) as EncryptedInstance;
+	});
 	t.truthy(instance, 'instance exists');
 	if (!instance) return;
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);

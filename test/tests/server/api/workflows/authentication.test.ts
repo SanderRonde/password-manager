@@ -2,7 +2,7 @@ import { genRSAKeyPair, hash, pad, decryptWithPrivateKey, ERRS, encryptWithPubli
 import { genUserAndDb, createServer, captureURIs, doAPIRequest } from '../../../../lib/util';
 import { genRandomString } from '../../../../../app/lib/util';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
-import { getDB } from '../../../../lib/db';
+import { doSingleQuery } from '../../../../lib/db';
 import mongo = require('mongodb');
 import { test } from 'ava';
 
@@ -41,11 +41,11 @@ test('can log in after registering instance', async t => {
 			return {};
 		}
 
-		const { db, done } = await getDB(uri);
-		const instance = await db.collection('instances').findOne({
-			_id: new mongo.ObjectId(instance_id)
+		const instance = await doSingleQuery(uri, async (db) => {
+			return await db.collection('instances').findOne({
+				_id: new mongo.ObjectId(instance_id)
+			});
 		});
-		done();
 		t.truthy(instance, 'instance was created and ID is correct');
 
 		t.is(typeof server_key, 'string', 'type of serverkey is string');
@@ -224,11 +224,11 @@ test('can register an instance, log in, extend key and log out', async t => {
 			return {};
 		}
 
-		const { db, done } = await getDB(uri);
-		const instance = await db.collection('instances').findOne({
-			_id: new mongo.ObjectId(instance_id)
+		const instance = doSingleQuery(uri, async (db) => {
+			return await db.collection('instances').findOne({
+				_id: new mongo.ObjectId(instance_id)
+			});
 		});
-		done();
 		t.truthy(instance, 'instance was created and ID is correct');
 
 		t.is(typeof server_key, 'string', 'type of serverkey is string');

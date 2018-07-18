@@ -8,9 +8,9 @@ import { DEFAULT_EMAIL } from './consts';
 import mongo = require('mongodb');
 
 export async function clearDB(uri: string) {
-	const { db, done } = await getDB(uri);
-	await db.dropDatabase();
-	done();
+	await doSingleQuery(uri, async (db) => {
+		await db.dropDatabase();
+	});
 }
 
 export async function getDB(uri: string): Promise<{
@@ -29,14 +29,13 @@ export async function getDB(uri: string): Promise<{
 }
 
 export async function genDBWithPW(uri: string) {
-	const { db, done } = await getDB(uri);
-	const pw = genRandomString(25);
-	await db.collection('meta').insertOne({
-		type: 'database',
-		data: encrypt('decrypted', pw, ENCRYPTION_ALGORITHM)
+	return await doSingleQuery(uri, async (db) => {
+		const pw = genRandomString(25);
+		return await db.collection('meta').insertOne({
+			type: 'database',
+			data: encrypt('decrypted', pw, ENCRYPTION_ALGORITHM)
+		});
 	});
-	done();
-	return pw;
 }
 
 export async function isMongoConnected() {
@@ -58,11 +57,11 @@ export async function isMongoConnected() {
 }
 
 export async function hasCreatedDBWithPW(pw: string, uri: string): Promise<boolean> {
-	const { db, done } = await getDB(uri);
-	const record = await db.collection('meta').findOne({
-		type: 'database'
+	const record = await doSingleQuery(uri, async (db) => {
+		return await db.collection('meta').findOne({
+			type: 'database'
+		});
 	});
-	done();
 
 	if (!record) {
 		return false;
@@ -428,4 +427,11 @@ export async function hasDeletedAccount(t: GenericTestContext<Context<any>>, uri
 		'remaining passwords did not get deleted');
 
 	done();
+}
+
+export async function doSingleQuery<R>(uri: string, callback: (db: mongo.Db) => Promise<R>): Promise<R> {
+	const { db, done } = await getDB(uri);
+	const retVal = await callback(db);
+	done();
+	return retVal;
 }

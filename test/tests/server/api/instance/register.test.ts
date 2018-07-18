@@ -2,7 +2,7 @@ import { captureURIs, genUserAndDb, createServer, doAPIRequest, testParams } fro
 import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
 import { API_ERRS } from '../../../../../app/api';
-import { getDB } from '../../../../lib/db';
+import { doSingleQuery } from '../../../../lib/db';
 import mongo = require('mongodb');
 import { test } from 'ava';
 
@@ -41,11 +41,12 @@ test('instance can be created', async t => {
 		return;
 	}
 
-	const { db, done } = await getDB(uri);
-	const instance = await db.collection('instances').findOne({
-		_id: new mongo.ObjectId(id)
-	});
-	done();
+
+	const instance = await doSingleQuery(uri, async (db) => {
+		return await db.collection('instances').findOne({
+			_id: new mongo.ObjectId(id)
+		});
+	})
 	t.truthy(instance, 'instance was created and ID is correct');
 
 	t.is(typeof server_key, 'string', 'type of serverkey is string');
