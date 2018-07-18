@@ -1,5 +1,6 @@
-import { captureURIs, genUserAndDb, createServer, doAPIRequest, testParams } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
+import { testParams } from '../../../../lib/macros';
 import { API_ERRS } from '../../../../../app/api';
 import mongo = require('mongodb');
 import { test } from 'ava';

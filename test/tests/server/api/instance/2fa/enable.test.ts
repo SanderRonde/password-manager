@@ -1,9 +1,10 @@
-import { captureURIs, testParams, doAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
+import { captureURIs, doAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
 import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
+import { testParams } from '../../../../../lib/macros';
 import { DEFAULT_EMAIL } from '../../../../../lib/consts';
-import { API_ERRS } from '../../../../../../app/api';
 import { doSingleQuery } from '../../../../../lib/db';
+import { API_ERRS } from '../../../../../../app/api';
 import speakeasy = require('speakeasy');
 import mongo = require('mongodb');
 import { test } from 'ava';

@@ -1,11 +1,12 @@
 import { hash, pad, decryptWithPrivateKey, ERRS, encryptWithPublicKey } from '../../../../../app/lib/crypto';
-import { captureURIs, genUserAndDb, createServer, doAPIRequest, testParams } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
 import { genRandomString } from '../../../../../app/lib/util';
+import { testParams } from '../../../../lib/macros';
+import { API_ERRS } from '../../../../../app/api';
 import speakeasy = require('speakeasy');
 import mongo = require('mongodb');
 import { test } from 'ava';
-import { API_ERRS } from '../../../../../app/api';
 
 const uris = captureURIs(test);
 testParams(test, uris, '/api/instance/login', {

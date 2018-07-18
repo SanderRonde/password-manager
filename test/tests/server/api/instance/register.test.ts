@@ -1,8 +1,9 @@
-import { captureURIs, genUserAndDb, createServer, doAPIRequest, testParams } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
 import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
-import { API_ERRS } from '../../../../../app/api';
+import { testParams } from '../../../../lib/macros';
 import { doSingleQuery } from '../../../../lib/db';
+import { API_ERRS } from '../../../../../app/api';
 import mongo = require('mongodb');
 import { test } from 'ava';
 
