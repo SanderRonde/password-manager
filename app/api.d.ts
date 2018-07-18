@@ -92,7 +92,7 @@ export declare namespace APIRoutes {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			oldToken: string;
 		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
-			auth_token: string;
+			auth_token: Encrypted<EncodedString<string>, InstancePublicKey, 'RSA'>;
 		}>;
 
 		export namespace Twofactor {

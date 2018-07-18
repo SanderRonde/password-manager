@@ -211,6 +211,9 @@ export class RoutesApiInstance {
 			const { instance } = await this.server.Router.verifyAndGetInstance(instance_id, res);
 			if (!instance) return;
 
+			const publicKey = this.server.database.Crypto.dbDecrypt(
+				instance.public_key);
+
 			const newToken = this.server.Auth.extendLoginToken(oldToken, instance_id,
 				instance.user_id.toHexString());
 			if (newToken === false) {
@@ -225,7 +228,7 @@ export class RoutesApiInstance {
 				res.json({
 					success: true,
 					data: {
-						auth_token: newToken
+						auth_token: encryptWithPublicKey(newToken, publicKey)
 					}
 				});
 			}
