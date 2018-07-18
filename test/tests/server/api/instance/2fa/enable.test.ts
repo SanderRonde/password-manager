@@ -1,6 +1,6 @@
 import { captureURIs, doAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
-import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
+import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
 import { DEFAULT_EMAIL } from '../../../../../lib/consts';
 import { doSingleQuery } from '../../../../../lib/db';
