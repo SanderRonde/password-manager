@@ -182,8 +182,8 @@ export class RoutesAPIInstanceTwofactor {
 				res.status(500);
 				res.json({
 					success: false,
-					error: 'server error',
-					ERR: API_ERRS.SERVER_ERROR
+					error: 'invalid token',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return;
 			}
@@ -242,8 +242,8 @@ export class RoutesAPIInstanceTwofactor {
 				res.status(500);
 				res.json({
 					success: false,
-					error: 'server error',
-					ERR: API_ERRS.SERVER_ERROR
+					error: 'invalid token',
+					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return;
 			}
