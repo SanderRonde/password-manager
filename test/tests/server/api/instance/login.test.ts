@@ -55,6 +55,7 @@ test('login token can be generated when 2FA is disabled', async t => {
 test('login token can be generated when 2FA is enabled', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
+		instance_twofactor_enabled: true,
 		twofactor_token: speakeasy.generateSecret({
 			name: 'Password Manager'
 		}).base32
