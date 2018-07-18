@@ -31,10 +31,11 @@ export async function getDB(uri: string): Promise<{
 export async function genDBWithPW(uri: string) {
 	return await doSingleQuery(uri, async (db) => {
 		const pw = genRandomString(25);
-		return await db.collection('meta').insertOne({
+		await db.collection('meta').insertOne({
 			type: 'database',
 			data: encrypt('decrypted', pw, ENCRYPTION_ALGORITHM)
 		});
+		return pw;
 	});
 }
 
