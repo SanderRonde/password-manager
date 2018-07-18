@@ -50,7 +50,7 @@ export class RoutesApiInstance {
 				user_id: auth._id,
 				server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey)
 			};
-			if (await this.server.database.Manipulation.insertOne(
+			if (!await this.server.database.Manipulation.insertOne(
 				COLLECTIONS.INSTANCES, record)) {
 					res.status(500);
 					res.json({
