@@ -108,9 +108,16 @@ export class DatabaseManipulation {
 					return;
 				}
 
-				const { ok } = await collection.findOneAndUpdate(filter, update);
-				if (!ok) {
-					this._parent.err('Failed to delete record');
+				try {
+					const { ok } = await collection.findOneAndUpdate(filter, {
+						"$set": update
+					});
+					if (ok) {
+						return;
+					}
+				} catch(e) { }
+				finally {
+					this._parent.err('Failed to update record');
 				}
 			}
 }
