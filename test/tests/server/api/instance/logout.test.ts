@@ -41,7 +41,7 @@ test('fails if instance id is wrong', async t => {
 	const { http, uri } = config;
 	uris.push(uri);
 
-	testInvalidCredentials(t, {
+	await testInvalidCredentials(t, {
 		route: '/api/instance/logout',
 		port: http,
 		encrypted: {},
