@@ -179,7 +179,7 @@ export class RoutesAPIInstanceTwofactor {
 			const { twofactor_secret } = await accountPromise;
 
 			if (twofactor_secret === null) {
-				res.status(500);
+				res.status(200);
 				res.json({
 					success: false,
 					error: 'invalid token',
@@ -239,7 +239,7 @@ export class RoutesAPIInstanceTwofactor {
 			const { twofactor_secret } = await accountPromise;
 
 			if (twofactor_secret === null) {
-				res.status(500);
+				res.status(200);
 				res.json({
 					success: false,
 					error: 'invalid token',
