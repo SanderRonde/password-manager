@@ -17,7 +17,7 @@ test('server can be started', async t => {
 	proc.expectWrite(`HTTP server listening on port ${http}`)
 	proc.expectExit(-1);
 
-	await proc.run(10000);
+	await proc.run(60000);
 
 	proc.check();
 });
