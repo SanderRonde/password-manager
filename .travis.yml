@@ -19,7 +19,6 @@ before_script:
 script:
 - tsc
 - yarn test
-- ava test/tests/cli/account/create.test.js
 notifications:
   email:
     on_success: change
