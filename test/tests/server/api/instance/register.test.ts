@@ -1,7 +1,7 @@
 import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
 import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
+import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
-import { testParams, testWrongPw } from '../../../../lib/macros';
 import { doSingleQuery } from '../../../../lib/db';
 import mongo = require('mongodb');
 import { test } from 'ava';
@@ -58,7 +58,7 @@ test('fails if password is wrong', async t => {
 	uris.push(uri);
 
 	const keyPair = genRSAKeyPair();
-	testWrongPw(t, {
+	testInvalidCredentials(t, {
 		route: '/api/instance/register',
 		port: http,
 		encrypted: {},
@@ -67,7 +67,6 @@ test('fails if password is wrong', async t => {
 			password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
 			public_key: keyPair.publicKey
 		},
-		pwKey: 'password',
 		server: server
 	});
 });

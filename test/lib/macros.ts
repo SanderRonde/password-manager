@@ -258,18 +258,16 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 	}
 }
 
-export async function testWrongPw<R extends keyof APIFns, 
+export async function testInvalidCredentials<R extends keyof APIFns, 
 	U extends APIArgs[R][0], E extends APIArgs[R][1]>(t: GenericTestContext<Context<any>>, {
-	port, unencrypted, encrypted, route, server, pwKey
+	port, unencrypted, encrypted, route, server
 }: {
 	port: number;
 	route: R;
 	unencrypted: U;
 	encrypted?: E;
-	pwKey: keyof U;
 	server: ChildProcess;
 }) {
-	unencrypted[pwKey] = 'wrongpassword' as any;;
 	const response = JSON.parse(await doAPIRequest({ port: port }, route, 
 		unencrypted, encrypted)) as JSONResponse<any>;
 

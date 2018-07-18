@@ -1,10 +1,9 @@
 import { captureURIs, doAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
 import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
-import { testParams, testWrongPw } from '../../../../../lib/macros';
+import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
 import { DEFAULT_EMAIL } from '../../../../../lib/consts';
 import { doSingleQuery } from '../../../../../lib/db';
-import { API_ERRS } from '../../../../../../app/api';
 import speakeasy = require('speakeasy');
 import mongo = require('mongodb');
 import { test } from 'ava';
@@ -170,7 +169,7 @@ test('fails if password is wrong', async t => {
 	const { http, userpw, uri, instance_id } = config;
 	uris.push(uri);
 
-	testWrongPw(t, {
+	testInvalidCredentials(t, {
 		route: '/api/instance/2fa/enable',
 		port: http,
 		encrypted: {},
@@ -179,7 +178,6 @@ test('fails if password is wrong', async t => {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
 		},
-		pwKey: 'password',
 		server: server
 	});
 });
@@ -189,18 +187,15 @@ test('fails if instance id is wrong', async t => {
 	const { http, userpw, uri } = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/enable', {
-		instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
-		email: DEFAULT_EMAIL,
-		password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
-	}));
-
-	server.kill();
-
-	t.false(response.success, 'API call failed');
-	if (response.success) {
-		return;
-	}
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
-		'got invalid credentials errors');
+	testInvalidCredentials(t, {
+		route: '/api/instance/2fa/enable',
+		port: http,
+		encrypted: {},
+		unencrypted: {
+			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
+			email: DEFAULT_EMAIL,
+			password: hash(pad(userpw, 'masterpwverify')),
+		},
+		server: server
+	});
 });

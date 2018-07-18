@@ -2,8 +2,7 @@ import { hash, pad, decryptWithPrivateKey, ERRS, encryptWithPublicKey } from '..
 import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
 import { genRandomString } from '../../../../../app/lib/util';
-import { testParams } from '../../../../lib/macros';
-import { API_ERRS } from '../../../../../app/api';
+import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import speakeasy = require('speakeasy');
 import mongo = require('mongodb');
 import { test } from 'ava';
@@ -96,31 +95,21 @@ test('login token can be generated when 2FA is enabled', async t => {
 	t.is(data.challenge, challenge, 'challenge matches');
 });
 test('fails if instance id is wrong', async t => {
-	const config = await genUserAndDb(t, {
-		account_twofactor_enabled: false
-	});
+	const config = await genUserAndDb(t);
 	const server = await createServer(config);
-	const { 
-		http, 
-		userpw, 
-		uri, 
-		server_public_key
-	} = config;
+	const { http, uri, server_public_key, userpw } = config;
 	uris.push(uri);
 
 	const challenge = genRandomString(25);
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/login', {
-		instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
-		challenge: encryptWithPublicKey(challenge, server_public_key),
-		password_hash: hash(pad(userpw, 'masterpwverify'))
-	}));
-
-	server.kill();
-
-	t.false(response.success, 'API call failed');
-	if (response.success === true) {
-		return;
-	}
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
-		'invalid credentials error is returned');
+	testInvalidCredentials(t, {
+		route: '/api/instance/login',
+		port: http,
+		encrypted: {},
+		unencrypted: {
+			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
+			challenge: encryptWithPublicKey(challenge, server_public_key),
+			password_hash: hash(pad(userpw, 'masterpwverify'))
+		},
+		server: server
+	});
 });
