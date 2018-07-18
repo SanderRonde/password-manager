@@ -80,26 +80,26 @@ export function hash<T extends string, A extends HashingAlgorithms = 'sha512'>(d
 	}
 
 export function encryptWithSalt<T, A extends EncryptionAlgorithm, K extends string>(data: T, 
-	key: K, algorithm: A): {
+	key: K, algorithm: A): EncodedString<{
 		data: SaltEncrypted<T, K, A>
 		algorithm: A;
-	} {
+	}> {
 		const salt = genRandomString(Math.floor(Math.random() * 50));
 		const paddedData = JSON.stringify({
 			padded: JSON.stringify(data) + salt,
 			salt: salt
 		});
 
-		return encrypt(paddedData, key, algorithm) as {
+		return encrypt(paddedData, key, algorithm) as EncodedString<{
 			data: SaltEncrypted<T, K, A>
 			algorithm: A;
-		};
+		}>;
 	}
 
-export function decryptWithSalt<T, A extends EncryptionAlgorithm, K extends string>(data: {
+export function decryptWithSalt<T, A extends EncryptionAlgorithm, K extends string>(data: EncodedString<{
 	data: SaltEncrypted<T, K, A>
 	algorithm: A;
-}, key: K): T|ERRS {
+}>, key: K): T|ERRS {
 	const decrypted = decrypt(data, key);
 	if (decrypted === ERRS.INVALID_DECRYPT) {
 		return ERRS.INVALID_DECRYPT;
@@ -146,10 +146,10 @@ export function decryptBuffer<T extends string, A extends EncryptionAlgorithm, K
 	return plaintext.toString() + decipher.final() as T;
 }
 
-export function encrypt<T, A extends EncryptionAlgorithm, K extends string>(data: T, key: K, algorithm: A): {
+export function encrypt<T, A extends EncryptionAlgorithm, K extends string>(data: T, key: K, algorithm: A): EncodedString<{
 	data: Encrypted<EncodedString<T>, K, A>;
 	algorithm: A;
-} {
+}> {
 	const iv = crypto.randomBytes(16);
 	const plaintext = Buffer.from(JSON.stringify(data));
 	const enckey = hash(key).slice(0, 32);
@@ -157,20 +157,21 @@ export function encrypt<T, A extends EncryptionAlgorithm, K extends string>(data
 	const ciphertext = cipher.update(plaintext);
 	const finalText = Buffer.concat([iv, ciphertext, cipher.final()]);
 
-	return {
+	return JSON.stringify({
 		data: finalText.toString('base64'),
 		algorithm: algorithm
 	 } as {
 		data: Encrypted<EncodedString<T>, K, A>;
 		algorithm: A;
-	};
+	});
 }
 
-export function decrypt<T, A extends EncryptionAlgorithm, K extends string>({ data, algorithm }: {
+export function decrypt<T, A extends EncryptionAlgorithm, K extends string>(encrypted: EncodedString<{
 	data: Encrypted<EncodedString<T>, K, A>;
 	algorithm: A;
-}, key: K): T|ERRS {
+}>, key: K): T|ERRS {
 	try {
+		const { data, algorithm } = JSON.parse(encrypted);
 		const input = Buffer.from(data, 'base64');
 		const iv = input.slice(0, 16);
 		const ciphertext = input.slice(16);

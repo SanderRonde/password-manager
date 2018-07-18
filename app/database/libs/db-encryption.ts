@@ -27,21 +27,21 @@ export class DatabaseEncryption {
 	}
 
 	public dbEncrypt<T>(data: T, 
-		key: string = this._deObfuscateKey()): DatabaseEncrypted<EncodedString<T>> {
-			return encrypt(data, key, ENCRYPTION_ALGORITHM) as DatabaseEncrypted<EncodedString<T>>;
+		key: string = this._deObfuscateKey()): EncodedString<DatabaseEncrypted<EncodedString<T>>> {
+			return encrypt(data, key, ENCRYPTION_ALGORITHM) as EncodedString<DatabaseEncrypted<EncodedString<T>>>;
 		}
 
-	public dbDecrypt<T>(data: DatabaseEncrypted<EncodedString<T>>, 
+	public dbDecrypt<T>(data: EncodedString<DatabaseEncrypted<EncodedString<T>>>, 
 		key: string = this._deObfuscateKey()): T {
 			return decrypt(data, key) as T;
 		}
 
 	public dbEncryptWithSalt<T>(data: T,
-		key: string = this._deObfuscateKey()): DatabaseEncryptedWithSalt<T> {
-			return encryptWithSalt(data, key, ENCRYPTION_ALGORITHM) as DatabaseEncryptedWithSalt<T>;
+		key: string = this._deObfuscateKey()): EncodedString<DatabaseEncryptedWithSalt<T>> {
+			return encryptWithSalt(data, key, ENCRYPTION_ALGORITHM) as EncodedString<DatabaseEncryptedWithSalt<T>>;
 		}
 
-	public dbDecryptWithSalt<T>(data: DatabaseEncryptedWithSalt<T>,
+	public dbDecryptWithSalt<T>(data: EncodedString<DatabaseEncryptedWithSalt<T>>,
 		key: string = this._deObfuscateKey()): T {
 			return decryptWithSalt(data, key) as T;
 		}

@@ -85,21 +85,21 @@ export interface EncryptedAccount {
 	/**
 	 * (encrypted) Whether 2FA is enbled
 	 */
-	twofactor_enabled: DatabaseEncryptedWithSalt<boolean>;
+	twofactor_enabled: EncodedString<DatabaseEncryptedWithSalt<boolean>>;
 	/**
 	 * (encrypted) The 2FA secret used to generate codes
 	 */
-	twofactor_secret: DatabaseEncryptedWithSalt<string|null>;
+	twofactor_secret: EncodedString<DatabaseEncryptedWithSalt<string|null>>;
 	/**
 	 * (encrypted) The master password, padded and hashed
 	 */
-	pw: DatabaseEncrypted<EncodedString<Hashed<Padded<MasterPassword, 
-		MasterPasswordVerificationPadding>>>>;
+	pw: EncodedString<DatabaseEncrypted<EncodedString<Hashed<Padded<MasterPassword, 
+		MasterPasswordVerificationPadding>>>>>;
 	/**
 	 * (encrypted) A record that can be decrypted with the reset key
 	 * in order to reset the master password
 	 */
-	reset_key: DatabaseEncrypted<EncodedString<{
+	reset_key: EncodedString<DatabaseEncrypted<EncodedString<EncodedString<{
 		/**
 		 * The data that is encrypted
 		 */
@@ -117,12 +117,12 @@ export interface EncryptedAccount {
 		 * The algorithm used to encrypt the data
 		 */
 		algorithm: EncryptionAlgorithm;
-	}>>;
+	}>>>>;
 	/**
 	 * (encrypted) Previous reset_key-master_password combinations
 	 *  that can be used to undo a reset
 	 */
-	reset_reset_keys: DatabaseEncrypted<EncodedString<{
+	reset_reset_keys: EncodedString<DatabaseEncrypted<EncodedString<{
 		/**
 		 * The data that is encrypted
 		 */
@@ -145,7 +145,7 @@ export interface EncryptedAccount {
 		 * The algorithm used to encrypt the data
 		 */
 		algorithm: EncryptionAlgorithm;
-	}>>[];
+	}>>>[];
 }
 
 /**
@@ -172,7 +172,7 @@ export interface DecryptedAccount {
 	 * A record that can be decrypted with the reset key
 	 * in order to reset the master password
 	 */
-	reset_key: {
+	reset_key: EncodedString<{
 		/**
 		 * The data that is encrypted
 		 */
@@ -190,7 +190,7 @@ export interface DecryptedAccount {
 		 * The algorithm used to encrypt the data
 		 */
 		algorithm: EncryptionAlgorithm;
-	};
+	}>;
 	/**
 	 * Previous reset_key-master_password combinations
 	 *  that can be used to undo a reset
@@ -228,11 +228,11 @@ export type EncryptedInstance = {
 	/**
 	 * (encrypted) Whether 2FA is enabled for this instance's login
 	 */
-	twofactor_enabled: DatabaseEncryptedWithSalt<boolean>;
+	twofactor_enabled: EncodedString<DatabaseEncryptedWithSalt<boolean>>;
 	/**
 	 * (encrypted) The public key used to encrypt data sent to this instance
 	 */
-	public_key: DatabaseEncrypted<EncodedString<InstancePublicKey>>; 
+	public_key: EncodedString<DatabaseEncrypted<EncodedString<InstancePublicKey>>>;
 	/**
 	 * (encrypted) The user ID belonging to this account
 	 */
@@ -240,7 +240,7 @@ export type EncryptedInstance = {
 	/**
 	 * (encrypted) The private key of this server. Used to decrypt messages by an instance
 	 */
-	server_private_key: DatabaseEncrypted<EncodedString<ServerPrivateKey>>;
+	server_private_key: EncodedString<DatabaseEncrypted<EncodedString<ServerPrivateKey>>>;
 };
 
 /**
@@ -288,21 +288,21 @@ export interface EncryptedPassword {
 		/**
 		 * (encrypted) The hostname of the URL
 		 */
-		host: DatabaseEncrypted<EncodedString<string>>;
+		host: EncodedString<DatabaseEncrypted<EncodedString<string>>>;
 		/**
 		 * (encrypted) The full URL
 		 */
-		exact: DatabaseEncrypted<EncodedString<string>>;
+		exact: EncodedString<DatabaseEncrypted<EncodedString<string>>>;
 	}[];
 	/**
 	 * (encrypted) Whether 2FA is enabled for this password
 	 */
-	twofactor_enabled: DatabaseEncryptedWithSalt<boolean>;
+	twofactor_enabled: EncodedString<DatabaseEncryptedWithSalt<boolean>>;
 	/**
 	 * (encrypted) Data that is encrypted with the user's 
 	 * 	master password and as such is inaccessible to the server
 	 */
-	encrypted: DatabaseEncrypted<EncodedString<{
+	encrypted: EncodedString<DatabaseEncrypted<EncodedString<EncodedString<{
 		/**
 		 * The encrypted data
 		 */
@@ -324,7 +324,7 @@ export interface EncryptedPassword {
 		 * The algorithm used to encrypt the data
 		 */
 		algorithm: EncryptionAlgorithm;
-	}>>;
+	}>>>>;
 }
 
 /**
@@ -356,7 +356,7 @@ export interface DecryptedPassword {
 	 * Data that is encrypted with the user's 
 	 * 	master password and as such is inaccessible to the server
 	 */
-	encrypted: {
+	encrypted: EncodedString<{
 		/**
 		 * The encrypted data
 		 */
@@ -378,5 +378,5 @@ export interface DecryptedPassword {
 		 * The algorithm used to encrypt the data
 		 */
 		algorithm: EncryptionAlgorithm;
-	}
+	}>;
 }

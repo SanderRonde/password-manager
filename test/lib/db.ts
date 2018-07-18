@@ -74,12 +74,12 @@ export async function hasCreatedDBWithPW(pw: string, uri: string): Promise<boole
 	return false;
 }
 
-function doDbDecrypt<T>(data: DatabaseEncrypted<EncodedString<T>>, key: string) {
+function doDbDecrypt<T>(data: EncodedString<DatabaseEncrypted<EncodedString<T>>>, key: string) {
 	const res = decrypt(data, key);
 	return res;
 }
 
-function doDbDecryptWithSalt<T>(data: DatabaseEncryptedWithSalt<T>, key: string) {
+function doDbDecryptWithSalt<T>(data: EncodedString<DatabaseEncryptedWithSalt<T>>, key: string) {
 	return decryptWithSalt(data, key);
 }
 
