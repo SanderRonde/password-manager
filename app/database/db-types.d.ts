@@ -130,12 +130,12 @@ export interface EncryptedAccount {
 			/**
 			 * The data that is encrypted
 			 */
-			data: Encrypted<EncodedString<EncodedString<{
+			data: Encrypted<EncodedString<{
 				/**
 				 * An integrity verification
 				 */
 				integrity: true;
-			}>>, ResetKey>;
+			}>, ResetKey>;
 			/**
 			 * The algorithm used to encrypt the data
 			 */
@@ -199,23 +199,21 @@ export interface DecryptedAccount {
 		/**
 		 * The data that is encrypted
 		 */
-		data: Encrypted<EncodedString<
-			EncodedString<{
+		data: Encrypted<EncodedString<EncodedString<{
+			/**
+			 * The data that is encrypted
+			 */
+			data: Encrypted<EncodedString<{
 				/**
-				 * The data that is encrypted
+				 * An integrity verification
 				 */
-				data: Encrypted<EncodedString<{
-					/**
-					 * An integrity verification
-					 */
-					integrity: true;
-				}>, ResetKey>;
-				/**
-				 * The algorithm used to encrypt the data
-				 */
-				algorithm: EncryptionAlgorithm;
-			}>
-		>, MasterPassword>;
+				integrity: true;
+			}>, ResetKey>;
+			/**
+			 * The algorithm used to encrypt the data
+			 */
+			algorithm: EncryptionAlgorithm;
+		}>>, MasterPassword>;
 		/**
 		 * The algorithm used to encrypt the data
 		 */
