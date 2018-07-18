@@ -1,6 +1,7 @@
-import { GetRequired, GetOptional, GetEncrypted, GetOptionalEncrypted, APIFns, API_ERRS } from "../../app/api";
+import { GetRequired, GetOptional, GetEncrypted, GetOptionalEncrypted, APIFns, API_ERRS, APIArgs, JSONResponse } from "../../app/api";
 import { RegisterContextual, GenericTestContext, Context } from "ava";
 import { doAPIRequest, genUserAndDb, createServer } from "./util";
+import { ChildProcess } from "child_process";
 
 async function doServerSetupAndBreakdown(t: GenericTestContext<Context<any>>, uris: string[]) {
 	const config = await genUserAndDb(t);
@@ -255,4 +256,29 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 			done();
 		});
 	}
+}
+
+export async function testWrongPw<R extends keyof APIFns, 
+	U extends APIArgs[R][0], E extends APIArgs[R][1]>(t: GenericTestContext<Context<any>>, {
+	port, unencrypted, encrypted, route, server, pwKey
+}: {
+	port: number;
+	route: R;
+	unencrypted: U;
+	encrypted?: E;
+	pwKey: keyof U;
+	server: ChildProcess;
+}) {
+	unencrypted[pwKey] = 'wrongpassword' as any;;
+	const response = JSON.parse(await doAPIRequest({ port: port }, route, 
+		unencrypted, encrypted)) as JSONResponse<any>;
+
+	server.kill();
+
+	t.false(response.success, 'API call failed');
+	if (response.success) {
+		return;
+	}
+	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+		'got invalid credentials errors');
 }

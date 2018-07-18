@@ -1,7 +1,7 @@
 import { captureURIs, doAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
 import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
-import { testParams } from '../../../../../lib/macros';
+import { testParams, testWrongPw } from '../../../../../lib/macros';
 import { DEFAULT_EMAIL } from '../../../../../lib/consts';
 import { doSingleQuery } from '../../../../../lib/db';
 import { API_ERRS } from '../../../../../../app/api';
@@ -170,20 +170,18 @@ test('fails if password is wrong', async t => {
 	const { http, userpw, uri, instance_id } = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/enable', {
-		instance_id: instance_id.toHexString(),
-		email: DEFAULT_EMAIL,
-		password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
-	}));
-
-	server.kill();
-
-	t.false(response.success, 'API call failed');
-	if (response.success) {
-		return;
-	}
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
-		'got invalid credentials errors');
+	testWrongPw(t, {
+		route: '/api/instance/2fa/enable',
+		port: http,
+		encrypted: {},
+		unencrypted: {
+			instance_id: instance_id.toHexString(),
+			email: DEFAULT_EMAIL,
+			password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
+		},
+		pwKey: 'password',
+		server: server
+	});
 });
 test('fails if instance id is wrong', async t => {
 	const config = await genUserAndDb(t);

@@ -1,9 +1,8 @@
 import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
 import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
-import { testParams } from '../../../../lib/macros';
+import { testParams, testWrongPw } from '../../../../lib/macros';
 import { doSingleQuery } from '../../../../lib/db';
-import { API_ERRS } from '../../../../../app/api';
 import mongo = require('mongodb');
 import { test } from 'ava';
 
@@ -59,18 +58,16 @@ test('fails if password is wrong', async t => {
 	uris.push(uri);
 
 	const keyPair = genRSAKeyPair();
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/register', {
-		email: DEFAULT_EMAIL,
-		password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
-		public_key: keyPair.publicKey
-	}));
-
-	server.kill();
-
-	t.false(response.success, 'API call failed');
-	if (response.success) {
-		return;
-	}
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
-		'got invalid credentials errors');
+	testWrongPw(t, {
+		route: '/api/instance/register',
+		port: http,
+		encrypted: {},
+		unencrypted: {
+			email: DEFAULT_EMAIL,
+			password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
+			public_key: keyPair.publicKey
+		},
+		pwKey: 'password',
+		server: server
+	});
 });
