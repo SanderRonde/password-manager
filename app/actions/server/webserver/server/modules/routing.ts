@@ -202,7 +202,7 @@ export class WebserverRouter {
 							res.status(400);
 							res.json({
 								success: false,
-								error: 'missing parameters',
+								error: `missing parameter ${key}`,
 								ERR: API_ERRS.MISSING_PARAMS
 							});
 							return;
