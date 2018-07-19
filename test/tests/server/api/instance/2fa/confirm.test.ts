@@ -74,7 +74,7 @@ test('fails if instance id wrong', async t => {
 		twofactor_token: twofactor.base32
 	});
 	const server = await createServer(config);
-	const { http, uri } = config;
+	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
@@ -89,6 +89,7 @@ test('fails if instance id wrong', async t => {
 				time: Date.now() - (60 * 60)
 			})
 		},
-		server: server
+		server: server,
+		publicKey: server_public_key
 	});
 });

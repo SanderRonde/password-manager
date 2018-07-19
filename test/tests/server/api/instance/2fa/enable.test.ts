@@ -166,7 +166,7 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 test('fails if password is wrong', async t => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
-	const { http, userpw, uri, instance_id } = config;
+	const { http, userpw, uri, instance_id, server_public_key } = config;
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
@@ -178,13 +178,14 @@ test('fails if password is wrong', async t => {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
 		},
-		server: server
+		server: server,
+		publicKey: server_public_key
 	});
 });
 test('fails if instance id is wrong', async t => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
-	const { http, userpw, uri } = config;
+	const { http, userpw, uri, server_public_key } = config;
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
@@ -196,6 +197,7 @@ test('fails if instance id is wrong', async t => {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw, 'masterpwverify')),
 		},
-		server: server
+		server: server,
+		publicKey: server_public_key
 	});
 });

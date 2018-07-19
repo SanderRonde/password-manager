@@ -38,7 +38,7 @@ test('throws an error if token is invalid', async t => {
 test('fails if instance id is wrong', async t => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
-	const { http, uri } = config;
+	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
@@ -49,6 +49,7 @@ test('fails if instance id is wrong', async t => {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
 			token: 'someinvalidtoken'
 		},
-		server: server
+		server: server,
+		publicKey: server_public_key
 	});
 });

@@ -54,7 +54,7 @@ test('instance can be created', async t => {
 test('fails if password is wrong', async t => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
-	const { http, userpw, uri } = config;
+	const { http, userpw, uri, server_public_key } = config;
 	uris.push(uri);
 
 	const keyPair = genRSAKeyPair();
@@ -67,6 +67,7 @@ test('fails if password is wrong', async t => {
 			password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
 			public_key: keyPair.publicKey
 		},
-		server: server
+		server: server,
+		publicKey: server_public_key
 	});
 });

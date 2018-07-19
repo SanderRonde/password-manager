@@ -141,6 +141,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 
 	//Wrong unencrypted required types
 	for (const wrongType in required) {
+		if (wrongType === 'instance_id') continue;
 		test(`wrong type for unencrypted required param "${wrongType}"`, async t => {
 			const { config, done } = await doServerSetupAndBreakdown(t, uris);
 			const unencryptedArgs = {
@@ -260,16 +261,20 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 
 export async function testInvalidCredentials<R extends keyof APIFns, 
 	U extends APIArgs[R][0], E extends APIArgs[R][1]>(t: GenericTestContext<Context<any>>, {
-	port, unencrypted, encrypted, route, server
+	port, unencrypted, encrypted, route, server, publicKey
 }: {
+	publicKey: string;
 	port: number;
 	route: R;
 	unencrypted: U;
 	encrypted?: E;
 	server: ChildProcess;
 }) {
-	const response = JSON.parse(await doAPIRequest({ port: port }, route, 
-		unencrypted, encrypted)) as JSONResponse<any>;
+	const response = JSON.parse(await doAPIRequest({ 
+		port: port,
+		publicKey: publicKey
+	}, route, 
+		unencrypted, encrypted!)) as JSONResponse<any>;
 
 	server.kill();
 

@@ -111,6 +111,7 @@ test('fails if instance id is wrong', async t => {
 			challenge: encryptWithPublicKey(challenge, server_public_key),
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		},
-		server: server
+		server: server,
+		publicKey: server_public_key
 	});
 });
