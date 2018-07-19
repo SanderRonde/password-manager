@@ -4,10 +4,10 @@ import { decrypt, encrypt, hash, pad, ERRS } from "../../../../../../../lib/cryp
 import { genRandomString, sendEmail } from "../../../../../../../lib/util";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
+import { getDebug } from "../../../../../../../lib/debug";
 import { API_ERRS } from "../../../../../../../api";
 import { Webserver } from "../../../webserver";
 import express = require('express');
-import { getDebug } from "../../../../../../../lib/debug";
 
 export class RoutesAPIAccount {
 	constructor(public server: Webserver) { }
@@ -214,7 +214,6 @@ export class RoutesAPIAccount {
 			//Change password verification key and master password
 			const newResetKey = genRandomString(RESET_KEY_LENGTH);
 
-			console.log()
 			if (await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
 				_id: encryptedAccount._id
 			}, {
@@ -276,15 +275,19 @@ export class RoutesAPIAccount {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
-			master_password: MasterPassword;	
+			master_password: MasterPassword;
+			reset_key: string;
 		}>([
 			'instance_id', 'master_password'
-		], [], async (toCheck, { instance_id, master_password }) => {
+		], [], async (toCheck, { instance_id, master_password, reset_key }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
 			}, {
 				val: 'master_password',
+				type: 'string'
+			}, {
+				val: 'reset_key',
 				type: 'string'
 			}])) return;
 
@@ -306,8 +309,24 @@ export class RoutesAPIAccount {
 				});
 				return;
 			}
-			const { pw, email } = this.server.database.Crypto.dbDecryptAccountRecord(encryptedAccount);
+			const { 
+				pw, 
+				email, 
+				reset_key: accountResetKey
+			} = this.server.database.Crypto.dbDecryptAccountRecord(encryptedAccount);
 			if (pw !== hash(pad(master_password, 'masterpwverify'))) {
+				res.status(200);
+				res.json({
+					success: false,
+					//Invalid password
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
+
+			//Check if the reset key is correct
+			if (reset_key !== accountResetKey) {
 				res.status(200);
 				res.json({
 					success: false,

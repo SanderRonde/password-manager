@@ -1,9 +1,10 @@
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
-import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord } from "../../../../../../../database/db-types";
+import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord, TypedObjectID, EncryptedAccount } from "../../../../../../../database/db-types";
 import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-manipulation";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
 import { API_ERRS } from "../../../../../../../api";
+import { LoginToken } from "../../../modules/auth";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
@@ -65,7 +66,7 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
-			token: string;
+			token: LoginToken;
 			websites: string[];
 			twofactor_enabled: boolean;
 			encrypted: EncodedString<{
@@ -119,7 +120,9 @@ export class RoutesApiPassword {
 			}
 
 			//All don't exist
-			const record: EncryptedPassword = {
+			const id = new mongo.ObjectId();
+			const record: MongoRecord<EncryptedPassword> = {
+				_id: id as TypedObjectID<EncryptedAccount>,
 				user_id: account._id,
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled),
 				websites: websites.map((website) => {
@@ -147,7 +150,9 @@ export class RoutesApiPassword {
 			res.status(200);
 			res.json({
 				success: true,
-				data: {}
+				data: {
+					id: id.toHexString()
+				}
 			})
 		})(req, res, next);
 	}
@@ -156,7 +161,7 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
-			token: string;
+			token: LoginToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
 			websites: string[];
@@ -271,7 +276,7 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
-			token: string;
+			token: LoginToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
 			twofactor_token: string;
@@ -331,7 +336,7 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
-			token: string;
+			token: LoginToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;	
 		}, {
 			twofactor_token: string;	
@@ -387,7 +392,7 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
-			token: string;
+			token: LoginToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;	
 		}>([
 			'instance_id', 'token', 'password_id'
@@ -433,7 +438,7 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
-			token: string;
+			token: LoginToken;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;	
 		}>([
 			'instance_id', 'token', 'password_hash'
@@ -513,7 +518,7 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
-			token: string;
+			token: LoginToken;
 			url: string;	
 		}>([
 			'instance_id', 'token', 'url'

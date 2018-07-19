@@ -2,6 +2,7 @@ import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../..
 import { Hashed, Padded, MasterPasswordVerificationPadding, encryptWithPublicKey } from '../../../../../../../../lib/crypto';
 import { COLLECTIONS } from '../../../../../../../../database/database';
 import { ResponseCaptured } from '../../../../modules/ratelimit';
+import { TwofactorVerifyToken } from '../../../../modules/auth';
 import { API_ERRS } from '../../../../../../../../api';
 import { Webserver } from '../../../../webserver';
 import speakeasy = require('speakeasy');
@@ -250,7 +251,7 @@ export class RoutesAPIInstanceTwofactor {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			twofactor_token: string;
-			pw_verification_token: string;
+			pw_verification_token: TwofactorVerifyToken;
 		}, {}, {}, {}>([
 			'instance_id', 'twofactor_token', 'pw_verification_token'
 		], [], async (toCheck, { instance_id, twofactor_token, pw_verification_token }) => {

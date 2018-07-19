@@ -5,6 +5,7 @@ import { COLLECTIONS } from "../../../../../database/database";
 import { API_ERRS } from "../../../../../api";
 import { Webserver } from "../webserver";
 import speakeasy = require('speakeasy');
+import { LoginToken } from "./auth";
 import express = require('express');
 import mongo = require('mongodb');
 
@@ -246,7 +247,7 @@ export class WebserverRouter {
 		};
 	}
 
-	public verifyLoginToken(token: string, instanceId: StringifiedObjectId<EncryptedInstance>, res: ResponseCaptured) {
+	public verifyLoginToken(token: LoginToken, instanceId: StringifiedObjectId<EncryptedInstance>, res: ResponseCaptured) {
 		if (!this.parent.Auth.verifyLoginToken(token, instanceId)) {
 			res.status(200);
 			res.json({
