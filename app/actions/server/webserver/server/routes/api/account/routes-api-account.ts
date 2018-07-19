@@ -95,6 +95,36 @@ export class RoutesAPIAccount {
 				});
 				return;
 			}
+
+			//Disable 2FA for all instances
+			const unfilteredInstances = (await this.server.database.Manipulation.findMany(
+				COLLECTIONS.INSTANCES, {
+					user_id: encryptedAccount._id
+				}));
+			if (unfilteredInstances === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to find instances',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
+
+			const account = await this.server.database.Manipulation.findOne(
+				COLLECTIONS.USERS, {
+					_id: encryptedAccount._id
+				});
+			if (account === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to find account',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
+
 			const newEncryptionHash = hash(pad(newmasterpassword, 'masterpwdecrypt'));
 
 			const updatedPasswordIndexes: number[] = [];
@@ -144,20 +174,6 @@ export class RoutesAPIAccount {
 				return;
 			}
 
-			//Disable 2FA for all instances
-			const unfilteredInstances = (await this.server.database.Manipulation.findMany(
-				COLLECTIONS.INSTANCES, {
-					user_id: encryptedAccount._id
-				}));
-			if (unfilteredInstances === null) {
-				res.status(500);
-				res.json({
-					success: false,
-					error: 'failed to find instances',
-					ERR: API_ERRS.SERVER_ERROR
-				});
-				return;
-			}
 			const instances = unfilteredInstances.filter(({ twofactor_enabled }) => {
 					return this.server.database.Crypto.dbDecryptWithSalt(twofactor_enabled);
 				});
@@ -240,6 +256,11 @@ export class RoutesAPIAccount {
 								this.server.database.Crypto.dbEncryptWithSalt(true)
 						});
 				}
+
+				//Restore user as well to be sure
+				await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
+					_id: encryptedAccount._id
+				}, account);
 
 				res.status(500);
 				res.json({
@@ -352,32 +373,6 @@ export class RoutesAPIAccount {
 				});
 				return;
 			}
-			const newEncryptionHash = hash(pad(newmasterpassword, 'masterpwdecrypt'));
-			await Promise.all(passwords.map((encryptedPassword) => {
-				return new Promise(async (resolve) => {
-					const encryptedSection = this.server.database.Crypto.dbDecrypt(
-						encryptedPassword.encrypted);
-					const decryptedEncrypedSection = decrypt(encryptedSection, 
-						decryptedMasterPassword);
-					if (decryptedEncrypedSection === ERRS.INVALID_DECRYPT) {
-						resolve();
-						return;
-					}
-					
-					//Re-encrypt it
-					const reEncrypted = encrypt(decryptedEncrypedSection, newEncryptionHash,
-						ENCRYPTION_ALGORITHM);				
-
-					await this.server.database.Manipulation.findAndUpdateOne(
-						COLLECTIONS.PASSWORDS, {
-							_id: encryptedPassword._id
-						}, {
-							encrypted: this.server.database.Crypto.dbEncrypt(reEncrypted),
-							twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
-						});
-					resolve()
-				});
-			}));
 
 			//Disable 2FA for all instances
 			const instances = await this.server.database.Manipulation.findMany(
@@ -395,24 +390,111 @@ export class RoutesAPIAccount {
 				return;
 			}
 
-			await Promise.all(instances.map((instance) => {
+			const account = await this.server.database.Manipulation.findOne(
+				COLLECTIONS.USERS, {
+					_id: encryptedAccount._id
+				});
+
+			if (account === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to find account',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
+
+			const newEncryptionHash = hash(pad(newmasterpassword, 'masterpwdecrypt'));
+			const updatedPasswords: number[] = [];
+			if ((await Promise.all(passwords.map((encryptedPassword, index) => {
 				return new Promise(async (resolve) => {
-					await this.server.database.Manipulation.findAndUpdateOne(
+					const encryptedSection = this.server.database.Crypto.dbDecrypt(
+						encryptedPassword.encrypted);
+					const decryptedEncrypedSection = decrypt(encryptedSection, 
+						decryptedMasterPassword);
+					if (decryptedEncrypedSection === ERRS.INVALID_DECRYPT) {
+						resolve(false);
+						return;
+					}
+					
+					//Re-encrypt it
+					const reEncrypted = encrypt(decryptedEncrypedSection, newEncryptionHash,
+						ENCRYPTION_ALGORITHM);				
+
+					if (await this.server.database.Manipulation.findAndUpdateOne(
+						COLLECTIONS.PASSWORDS, {
+							_id: encryptedPassword._id
+						}, {
+							encrypted: this.server.database.Crypto.dbEncrypt(reEncrypted),
+							twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
+						}) === null) {
+							resolve(false);
+						} else {
+							updatedPasswords.push(index);
+							resolve(true);
+						}
+				});
+			}))).filter(val => !val).length) {
+				for (const index of updatedPasswords) {
+					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
+						_id: passwords[index]._id
+					}, passwords[index]);
+				}
+
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to update paswords, restored to previous',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
+
+			const updatedInstances: number[] = [];
+			if ((await Promise.all(instances.map((instance, index) => {
+				return new Promise(async (resolve) => {
+					if (await this.server.database.Manipulation.findAndUpdateOne(
 						COLLECTIONS.INSTANCES, {
 							_id: instance._id
 						}, {
 							twofactor_enabled: 
 								this.server.database.Crypto.dbEncryptWithSalt(false)
-						});
+						}) === null) {
+							resolve(false);
+						} else {
+							updatedInstances.push(index);
+							resolve(true);
+						}
 					resolve();
 				});
-			}));
+			}))).filter(val => !val).length) {
+				for (const index of updatedPasswords) {
+					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
+						_id: passwords[index]._id
+					}, passwords[index]);
+				}
+
+				for (const index of updatedInstances) {
+					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
+						_id: instances[index]._id
+					}, instances[index]);
+				}
+
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to update instances, restored to previous',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 
 			//Change password verification key and master password
 			const newResetKey = genRandomString(RESET_KEY_LENGTH);
 
 			reset_reset_keys.splice(matchIndex, 1);
-			await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
+			if (await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
 				_id: encryptedAccount._id
 			}, {
 				pw: this.server.database.Crypto.dbEncrypt(
@@ -425,7 +507,31 @@ export class RoutesAPIAccount {
 				reset_reset_keys: reset_reset_keys.map((key) => {
 					return this.server.database.Crypto.dbEncrypt(key);
 				})
-			});
+			}) === null) {
+				for (const index of updatedPasswords) {
+					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
+						_id: passwords[index]._id
+					}, passwords[index]);
+				}
+
+				for (const index of updatedInstances) {
+					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
+						_id: instances[index]._id
+					}, instances[index]);
+				}
+
+				await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
+					_id: encryptedAccount._id
+				}, account);
+
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to update account, restored to previous',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 
 			res.status(200);
 			res.json({
