@@ -77,9 +77,10 @@ export class RoutesApiPassword {
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 				algorithm: EncryptionAlgorithm;
 			}>;
-		}, {}>([
-			'instance_id', 'token', 'websites', 'encrypted', 'twofactor_enabled'
-		], [], async (toCheck, { instance_id, token, websites, encrypted, twofactor_enabled }) => {
+		}, {}>({
+			unencrypted: ['instance_id'], 
+			encrypted: ['token', 'websites', 'encrypted', 'twofactor_enabled']
+		}, {}, async (toCheck, { instance_id, token, websites, encrypted, twofactor_enabled }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -175,11 +176,12 @@ export class RoutesApiPassword {
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 				algorithm: EncryptionAlgorithm;
 			}>;
-		}>([
-			'instance_id', 'token'
-		], [
-			'encrypted', 'twofactor_enabled', 'websites', 'twofactor_token'
-		], async (toCheck, { 
+		}>({
+			unencrypted: ['instance_id'], 
+			encrypted: ['token', 'password_id']
+		}, {
+			encrypted: ['encrypted', 'twofactor_enabled', 'websites', 'twofactor_token']
+		}, async (toCheck, { 
 			token, 
 			instance_id, 
 			password_id, 
@@ -280,11 +282,12 @@ export class RoutesApiPassword {
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
 			twofactor_token: string;
-		}>([
-			'instance_id', 'token', 'password_id'
-		], [
-			'twofactor_token'
-		], async (toCheck, { token, instance_id, password_id, twofactor_token }) => {
+		}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['token', 'password_id']
+		}, {
+			encrypted: ['twofactor_token']
+		}, async (toCheck, { token, instance_id, password_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -340,11 +343,12 @@ export class RoutesApiPassword {
 			password_id: StringifiedObjectId<EncryptedPassword>;	
 		}, {
 			twofactor_token: string;	
-		}>([
-			'instance_id', 'token', 'password_id'
-		], [
-			'twofactor_token'
-		], async (toCheck, { token, instance_id, password_id, twofactor_token }) => {
+		}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['token', 'password_id']
+		}, {
+			encrypted: ['twofactor_token']
+		}, async (toCheck, { token, instance_id, password_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -394,9 +398,10 @@ export class RoutesApiPassword {
 		}, {}, {
 			token: LoginToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;	
-		}>([
-			'instance_id', 'token', 'password_id'
-		], [], async (toCheck, { token, instance_id, password_id }) => {
+		}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['token', 'password_id']
+		}, {}, async (toCheck, { token, instance_id, password_id }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -440,9 +445,10 @@ export class RoutesApiPassword {
 		}, {}, {
 			token: LoginToken;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;	
-		}>([
-			'instance_id', 'token', 'password_hash'
-		], [], async (toCheck, { token, instance_id, password_hash }) => {
+		}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['token', 'password_hash']
+		}, {}, async (toCheck, { token, instance_id, password_hash }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -520,9 +526,10 @@ export class RoutesApiPassword {
 		}, {}, {
 			token: LoginToken;
 			url: string;	
-		}>([
-			'instance_id', 'token', 'url'
-		], [], async (toCheck, { token, instance_id, url: website_url }) => {
+		}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['token', 'url']
+		}, {}, async (toCheck, { token, instance_id, url: website_url }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'

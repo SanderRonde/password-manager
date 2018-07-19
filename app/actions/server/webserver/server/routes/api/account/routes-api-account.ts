@@ -19,9 +19,10 @@ export class RoutesAPIAccount {
 			reset_key: string;
 			email: string
 			newmasterpassword: MasterPassword;	
-		}>([
-			'email', 'reset_key', 'newmasterpassword'
-		], [], async (toCheck, { email, reset_key, newmasterpassword }) => {
+		}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['email', 'reset_key', 'newmasterpassword']
+		}, {}, async (toCheck, { email, reset_key, newmasterpassword }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'email',
 				type: 'string'
@@ -277,9 +278,10 @@ export class RoutesAPIAccount {
 		}, {}, {
 			master_password: MasterPassword;
 			reset_key: string;
-		}>([
-			'instance_id', 'master_password', 'reset_key'
-		], [], async (toCheck, { instance_id, master_password, reset_key }) => {
+		}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['master_password', 'reset_key']
+		}, {}, async (toCheck, { instance_id, master_password, reset_key }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'

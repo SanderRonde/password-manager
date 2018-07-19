@@ -20,9 +20,9 @@ export class RoutesApiInstance {
 			email: string;
 			public_key: string;
 			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-		}, {}, {}, {}>([
-			'public_key', 'email', 'password'
-		], [], async (toCheck, { public_key }) => {
+		}, {}, {}, {}>({
+			unencrypted: ['public_key', 'email', 'password']
+		}, {}, async (toCheck, { public_key }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'email',
 				type: 'string'
@@ -81,9 +81,9 @@ export class RoutesApiInstance {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			challenge: RSAEncrypted<EncodedString<string>, ServerPublicKey>;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-		}, {}, {}, {}>([
-			'instance_id', 'password_hash', 'challenge'
-		], [], async (toCheck, { instance_id, password_hash, challenge }) => {
+		}, {}, {}, {}>({
+			unencrypted: ['instance_id', 'password_hash', 'challenge']
+		}, {}, async (toCheck, { instance_id, password_hash, challenge }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -171,9 +171,9 @@ export class RoutesApiInstance {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: LoginToken;
-		}, {}, {}, {}>([
-			'instance_id', 'token'
-		], [], async (toCheck, { instance_id, token }) => {
+		}, {}, {}, {}>({
+			unencrypted: ['instance_id', 'token']
+		}, {}, async (toCheck, { instance_id, token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -206,9 +206,9 @@ export class RoutesApiInstance {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			oldToken: LoginToken;
-		}, {}, {}, {}>([
-			'instance_id', 'oldToken'
-		], [], async (toCheck, { instance_id, oldToken }) => {
+		}, {}, {}, {}>({
+			unencrypted: ['instance_id', 'oldToken']
+		}, {}, async (toCheck, { instance_id, oldToken }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'

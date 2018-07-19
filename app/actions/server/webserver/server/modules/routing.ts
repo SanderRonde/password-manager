@@ -114,9 +114,13 @@ export class WebserverRouter {
 		[key: string]: any;
 	} = {}, OE extends {
 		[key: string]: any;
-	} = {}>(requiredParams: (keyof R|keyof E)[], 
-		optionalParams: (keyof O|keyof OE)[]|string[], 
-		handler: (toCheckSrc: R & E,
+	} = {}>(requiredParams: {
+		unencrypted: (keyof R)[];
+		encrypted: (keyof E)[];
+	}, optionalParams: {
+		unencrypted?: (keyof O)[];
+		encrypted?: (keyof OE)[];
+	}, handler: (toCheckSrc: R & E,
 			params: R & E & Partial<O> & Partial<OE>) => void): ResponseCapturedRequestHandler
 	public requireParams<R extends {
 		[key: string]: any;
@@ -126,9 +130,11 @@ export class WebserverRouter {
 		[key: string]: any;
 	} = {}, OE extends {
 		[key: string]: any;
-	} = {}>(requiredParams: (keyof R)[], 
-		optionalParams: (keyof O|keyof OE)[]|string[], 
-		handler: (toCheckSrc: R & E,
+	} = {}>(requiredParams: {
+		unencrypted: (keyof R)[];
+	}, optionalParams: {
+		unencrypted?: (keyof O)[];
+	}, handler: (toCheckSrc: R & E,
 			params: R & E & Partial<O> & Partial<OE>) => void): ResponseCapturedRequestHandler;
 	public requireParams<R extends {
 		[key: string]: any;
@@ -138,11 +144,17 @@ export class WebserverRouter {
 		[key: string]: any;
 	} = {}, OE extends {
 		[key: string]: any;
-	} = {}>(requiredParams: (keyof R|keyof E)[], 
-		optionalParams: (keyof O|keyof OE)[]|string[], 
-		handler: (toCheckSrc: R & E,
+	} = {}>(requiredParams: {
+		unencrypted: (keyof R)[];
+		encrypted?: (keyof E)[];
+	}, optionalParams: {
+		unencrypted?: (keyof O)[];
+		encrypted?: (keyof OE)[];
+	}, handler: (toCheckSrc: R & E,
 			params: R & E & Partial<O> & Partial<OE>) => void): ResponseCapturedRequestHandler {
 				return async (req, res) => {
+					const toCheckUnencrypted: R = req.body;
+					let toCheckEncrypted: E & OE= {} as E & OE;
 					let toCheckSrc: any & R & E = {...req.body};
 
 					if (!req.body) {
@@ -194,12 +206,14 @@ export class WebserverRouter {
 							});
 							return;
 						}
-						toCheckSrc = {...toCheckSrc, ...decrypted};
+						toCheckEncrypted = decrypted as E & OE;
 					}
 
 					const values: R & O & E & OE = {} as R & O & E & OE;
-					for (const key of requiredParams) {
-						if (toCheckSrc[key] === undefined || toCheckSrc[key] === null) {
+					console.log(requiredParams);
+					for (const key of requiredParams.unencrypted) {
+						console.log(key);
+						if (toCheckUnencrypted[key] === undefined || toCheckUnencrypted[key] === null) {
 							res.status(400);
 							res.json({
 								success: false,
@@ -208,10 +222,26 @@ export class WebserverRouter {
 							});
 							return;
 						}
-						values[key] = toCheckSrc[key];
+						values[key] = toCheckUnencrypted[key];
 					}
-					for (const key of optionalParams) {
+					for (const key of requiredParams.encrypted || []) {
+						console.log(key);
+						if (toCheckEncrypted[key] === undefined || toCheckEncrypted[key] === null) {
+							res.status(400);
+							res.json({
+								success: false,
+								error: `missing parameter ${key}`,
+								ERR: API_ERRS.MISSING_PARAMS
+							});
+							return;
+						}
+						values[key] = toCheckEncrypted[key];
+					}
+					for (const key of optionalParams.unencrypted || []) {
 						values[key] = req.body[key];
+					}
+					for (const key of optionalParams.encrypted || []) {
+						values[key] = toCheckEncrypted[key];
 					}
 
 					handler(toCheckSrc, values);
