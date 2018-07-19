@@ -1,5 +1,6 @@
 import { encrypt, encryptWithSalt, decrypt, ERRS, decryptWithSalt, pad, hash, encryptWithPublicKey, genRSAKeyPair, decryptWithPrivateKey, Encrypted } from '../../../app/lib/crypto';
 import { ENCRYPTION_ALGORITHM } from '../../../app/lib/constants';
+import { RSAEncrypted } from '../../../app/database/db-types';
 import { genRandomString } from '../../../app/lib/util';
 import { test } from 'ava';
 
@@ -123,7 +124,7 @@ test('values encrypted with a public key can be decrypted', t => {
 test('public/private key encryption returns error on invalid decrypt', t => {
 	const { privateKey } = genRSAKeyPair();
 
-	const decrypted = decryptWithPrivateKey('baddecrypt' as Encrypted<EncodedString<string>, string, 'RSA'>, 
+	const decrypted = decryptWithPrivateKey('baddecrypt' as RSAEncrypted<EncodedString<string>, string>, 
 		privateKey);
 	t.is(decrypted, ERRS.INVALID_DECRYPT, 'is invalid decrypt');
 });
