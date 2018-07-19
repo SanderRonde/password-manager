@@ -190,7 +190,9 @@ export class ProcRunner {
 			const proc = spawn('node', [
 				path.join(__dirname, './../../app/main.js'),
 				...this._args
-			]).once('exit', (code: number) => {
+			], {
+				env: this._config.env || {}
+			}).once('exit', (code: number) => {
 				if (!done) {
 					this._exitCode = code;
 					done = true;

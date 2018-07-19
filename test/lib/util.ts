@@ -151,7 +151,9 @@ export function createServer({
 			'--no-rate-limit',
 			'-p', dbpw,
 			'-d', uri
-		], ...(env ? ['--debug'] : [])]);
+		], ...(env ? ['--debug'] : [])], {
+			env: env || {}
+		});
 		proc.unref();
 		listenWithoutRef(proc.stdout, (chunk) => {
 			if (chunk.trim() === `HTTP server listening on port ${http}`) {
