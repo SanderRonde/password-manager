@@ -110,7 +110,7 @@ export async function genAccountOnly(suppliedDb: SuppliedDatabase, {
 		pw: encrypt(hash(pad(userpw, 'masterpwverify')), dbpw, ENCRYPTION_ALGORITHM),
 		twofactor_enabled: encryptWithSalt(config.account_twofactor_enabled || false, 
 			dbpw, ENCRYPTION_ALGORITHM),
-		twofactor_secret: encryptWithSalt(config.twofactor_token || null, 
+		twofactor_secret: encryptWithSalt(config.twofactor_secret || null, 
 			dbpw, ENCRYPTION_ALGORITHM),
 		reset_key: encrypt(encrypt({
 			integrity: true as true,

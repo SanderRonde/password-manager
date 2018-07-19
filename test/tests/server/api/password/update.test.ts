@@ -123,7 +123,7 @@ test('fails if it requires 2FA and no 2FA token is passed', async t => {
 	});
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
-		twofactor_token: base32
+		twofactor_secret: base32
 	});
 	const server = await createServer(config);
 	const { http, uri, server_public_key, userpw } = config;
@@ -174,7 +174,7 @@ test('password can be updated if 2FA is enabled', async t => {
 	});
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
-		twofactor_token: base32
+		twofactor_secret: base32
 	});
 	const server = await createServer(config);
 	const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;

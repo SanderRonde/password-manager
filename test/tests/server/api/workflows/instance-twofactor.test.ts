@@ -14,7 +14,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { 
@@ -108,7 +108,7 @@ test('can enable 2FA and then disable it', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: false,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { 
@@ -206,7 +206,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: false,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { 
@@ -343,7 +343,7 @@ test('can verify a login requiring 2FA', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { 
@@ -424,7 +424,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { 

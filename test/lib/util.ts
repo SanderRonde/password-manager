@@ -104,7 +104,7 @@ export interface UserAndDbData {
 
 export interface MockConfig {
 	resetKey?: string;
-	twofactor_token?: string;
+	twofactor_secret?: string;
 	account_twofactor_enabled?: boolean;
 	instance_twofactor_enabled?: boolean;
 }

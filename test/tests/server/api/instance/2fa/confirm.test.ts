@@ -15,7 +15,7 @@ test('fails if account has no 2FA setup', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false,
 		instance_twofactor_enabled: false,
-		twofactor_token: null!
+		twofactor_secret: null!
 	});
 	const server = await createServer(config);
 	const { 
@@ -41,7 +41,7 @@ test('fails if an invalid token is passed', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { 
@@ -71,7 +71,7 @@ test('fails if instance id wrong', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { http, uri, server_public_key } = config;

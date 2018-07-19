@@ -18,7 +18,7 @@ test('can enable 2FA when no 2FA secret is set', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false,
 		instance_twofactor_enabled: false,
-		twofactor_token: null!
+		twofactor_secret: null!
 	});
 	const server = await createServer(config);
 	const { 
@@ -68,7 +68,7 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: false,
-		twofactor_token: speakeasy.generateSecret().base32
+		twofactor_secret: speakeasy.generateSecret().base32
 	});
 	const server = await createServer(config);
 	const { 
@@ -124,7 +124,7 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
-		twofactor_token: speakeasy.generateSecret().base32
+		twofactor_secret: speakeasy.generateSecret().base32
 	});
 	const server = await createServer(config);
 	const { 

@@ -20,7 +20,7 @@ test('can disable 2FA when given a valid 2FA token', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { 
@@ -76,7 +76,7 @@ test('state is unchanged if already disabled', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false,
 		instance_twofactor_enabled: false,
-		twofactor_token: null!
+		twofactor_secret: null!
 	});
 	const server = await createServer(config);
 	const { 
@@ -108,7 +108,7 @@ test('fails if an invalid token is passed', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { 
@@ -141,7 +141,7 @@ test('fails if password is wrong', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { http, userpw, uri, instance_id, server_public_key } = config;
@@ -170,7 +170,7 @@ test('fails if instance id wrong', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
-		twofactor_token: twofactor.base32
+		twofactor_secret: twofactor.base32
 	});
 	const server = await createServer(config);
 	const { http, userpw, uri, server_public_key } = config;
