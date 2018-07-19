@@ -73,7 +73,7 @@ test('can get the password if 2FA is disabled', async t => {
 	t.is(decryptedEncrypted.password, password, 'password is the same');
 	for (let i = 0; i < notes.length; i++) {
 		const expectedNote = notes[i];
-		const actualNote = notes[i];
+		const actualNote = decryptedEncrypted.notes[i];
 
 		t.truthy(actualNote, 'note exists');
 		t.is(actualNote, expectedNote, 'notes are the same');
@@ -185,7 +185,7 @@ test('can get the password if 2FA is enabled', async t => {
 	t.is(decryptedEncrypted.password, password, 'password is the same');
 	for (let i = 0; i < notes.length; i++) {
 		const expectedNote = notes[i];
-		const actualNote = notes[i];
+		const actualNote = decryptedEncrypted.notes[i];
 
 		t.truthy(actualNote, 'note exists');
 		t.is(actualNote, expectedNote, 'notes are the same');
