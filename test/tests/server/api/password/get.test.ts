@@ -120,7 +120,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 		'invalid credentials error was thrown');
 });
-test('can be removed if 2FA is enabled', async t => {
+test('can get the password if 2FA is enabled', async t => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
