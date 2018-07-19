@@ -38,11 +38,14 @@ export function initCommander(handledHolder: {
 		.option('-p, --password <pw>', 'The password used to decrypt the database')
 		.option('-d, --database <location>', 'The path to the database', 
 			'mongodb://127.0.0.1:27017/pwmanager')
+		.option('--debug')
 		.action(async (action: string, { 
+			debug,
 			account: email,
 			database: databasePath,
 			password: dbPassword
 		}: { 
+			debug: boolean;
 			account: string;
 			database: string;
 			password?: string;
@@ -64,7 +67,8 @@ export function initCommander(handledHolder: {
 					if (!email) {
 						exitWith('Please supply the email of the account to edit through -a or --account');
 					} else {
-						await Account.DeleteAccount.deleteAccount(email, await getDatabase(databasePath, dbPassword, true));
+						await Account.DeleteAccount.deleteAccount(email, await getDatabase(databasePath, dbPassword, true),
+							debug);
 					}
 					break;
 				default:
@@ -137,6 +141,7 @@ export function initCommander(handledHolder: {
 		.option('-p, --password <pw>', 'The password used to decrypt the database')
 		.option('-d, --database <location>', 'The path to the database', 
 			'mongodb://127.0.0.1:27017/pwmanager')
+		.option('--debug', 'Whether to enable debug parameters to the API')
 		.action(async (settings: ServerSettings) => {
 			handledHolder.handled = true;
 			if (settings.config) {

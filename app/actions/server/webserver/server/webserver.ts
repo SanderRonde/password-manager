@@ -12,6 +12,7 @@ import http = require('http');
 
 
 export class Webserver {
+	public debug: boolean;
 	public app: express.Express;
 	public Routes: WebserverRoutes;
 	public Router: WebserverRouter;
@@ -19,6 +20,7 @@ export class Webserver {
 
 	constructor(public database: Database, public config: ServerConfig) {
 		this.app = express();
+		this.debug = !!config.debug;
 		this.Routes = new WebserverRoutes(this);
 		this.Router = new WebserverRouter(this);
 

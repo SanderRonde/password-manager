@@ -13,6 +13,7 @@ export interface ServerArgs {
 	password?: string;
 	database: string;
 	rateLimit: boolean;
+	debug: boolean;
 }
 
 export interface ServerConfig extends ServerArgs {

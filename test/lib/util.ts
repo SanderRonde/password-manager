@@ -214,3 +214,11 @@ export function doesNotThrow<R>(t: GenericTestContext<Context<any>>, callback: (
 		}, message);
 		return result!;
 	}
+
+export async function doTry<R>(fn: () => Promise<R>): Promise<R|null> {
+	try {
+		return await fn();
+	} catch(e) {
+		return null;
+	}
+}

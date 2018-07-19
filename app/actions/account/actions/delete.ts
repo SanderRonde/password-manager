@@ -66,7 +66,7 @@ export namespace DeleteAccount {
 		const account = await database.Manipulation.findOne(COLLECTIONS.USERS, {
 			_id: id
 		});
-		
+
 		if (instances === null) {
 			exitWith('Failed to find instances, exiting');
 			return;
@@ -122,6 +122,14 @@ export namespace DeleteAccount {
 					}
 				}
 
+				for (const password of passwords) {
+					if (!await database.Manipulation.findOne(COLLECTIONS.PASSWORDS, {
+						_id: password._id
+					})) {
+						await database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, password);
+					}
+				}
+
 				await database.kill();
 				exitWith('Done salvaging');
 				return;
@@ -144,6 +152,13 @@ export namespace DeleteAccount {
 				if (!await database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, password)) {
 					console.log('Failed to re-insert password with id', password._id.toHexString());
 				}
+			}
+
+			if (!await database.Manipulation.findOne(COLLECTIONS.USERS, {
+				_id: id
+			})) {
+				//Re-insert it
+				await database.Manipulation.insertOne(COLLECTIONS.USERS, account);
 			}
 
 			await database.kill();

@@ -1,5 +1,5 @@
-import { genDBWithPW, hasCreatedDBWithPW, genMockAcount, hasDeletedAccount } from '../../../lib/db';
-import { captureURIs, genTempDatabase } from '../../../lib/util';
+import { genDBWithPW, hasCreatedDBWithPW, genMockAcount, hasDeletedAccount, getDB } from '../../../lib/db';
+import { captureURIs, genTempDatabase, getCollectionLength } from '../../../lib/util';
 import { genRandomString } from '../../../../app/lib/util';
 import { ProcRunner } from '../../../lib/procrunner';
 import { DEFAULT_EMAIL } from '../../../lib/consts';
@@ -287,4 +287,151 @@ test('use the passed password to initialize the database if not set yet', async 
 	t.true(await hasCreatedDBWithPW(dbpw, uri),
 		'the database has been initialized with given password');
 	await hasDeletedAccount(t, uri);
+});
+test('cancel the deletion and restore deleted items when instance changes fail', async t => {
+	const uri = await genTempDatabase(t);
+	const userpw = genRandomString(15);
+	uris.push(uri);
+
+	const dbpw = await genDBWithPW(uri);
+	await genMockAcount({
+		userpw,
+		dbpw,
+		uri
+	});
+	const proc = new ProcRunner(t, [
+		'account', 
+		'delete',
+		'-d', uri,
+		'-a', DEFAULT_EMAIL,
+		'-p', dbpw,
+		'--debug'
+	], {
+		env: {
+			FAIL_ON_INSTANCE: true
+		}
+	});
+	proc.expectWrite('Attempt 1/3');
+	proc.expectWrite('Please enter the account\'s password');
+	proc.expectRead(userpw);
+	proc.expectWrite(`Deleting user with email "${DEFAULT_EMAIL}"`);
+	proc.expectWrite('Are you sure?');
+	proc.expectRead('');
+	proc.expectWrite('Are you very very sure?');
+	proc.expectRead('');
+	proc.expectWrite('Deleting instances...');
+	proc.expectWrite('Failed to delete an instance, undoing this operation');
+	proc.expectWrite('Done salvaging');
+	proc.expectExit(1);
+
+	await proc.run();
+	proc.check();
+
+	const { db, done } = await getDB(uri);
+	t.is(await getCollectionLength(db.collection('passwords')), 5,
+		'hasn\'t deleted any passwords');
+	t.is(await getCollectionLength(db.collection('instances')), 5,
+		'hasn\'t deleted any instances');
+	t.is(await getCollectionLength(db.collection('users')), 3,
+		'hasn\'t deleted any users');
+	done();
+});
+test('cancel the deletion and restore deleted items when password changes fail', async t => {
+	const uri = await genTempDatabase(t);
+	const userpw = genRandomString(15);
+	uris.push(uri);
+
+	const dbpw = await genDBWithPW(uri);
+	await genMockAcount({
+		userpw,
+		dbpw,
+		uri
+	});
+	const proc = new ProcRunner(t, [
+		'account', 
+		'delete',
+		'-d', uri,
+		'-a', DEFAULT_EMAIL,
+		'-p', dbpw,
+		'--debug'
+	], {
+		env: {
+			FAIL_ON_PASSWORDS: true
+		}
+	});
+	proc.expectWrite('Attempt 1/3');
+	proc.expectWrite('Please enter the account\'s password');
+	proc.expectRead(userpw);
+	proc.expectWrite(`Deleting user with email "${DEFAULT_EMAIL}"`);
+	proc.expectWrite('Are you sure?');
+	proc.expectRead('');
+	proc.expectWrite('Are you very very sure?');
+	proc.expectRead('');
+	proc.expectWrite('Deleting instances...');
+	proc.expectWrite('Deleting passwords...');
+	proc.expectWrite('Failed to delete passwords, restoring instances');
+	proc.expectWrite(`Done salvaging`);
+	proc.expectExit(1);
+
+	await proc.run();
+	proc.check();
+
+	const { db, done } = await getDB(uri);
+	t.is(await getCollectionLength(db.collection('passwords')), 5,
+		'hasn\'t deleted any passwords');
+	t.is(await getCollectionLength(db.collection('instances')), 5,
+		'hasn\'t deleted any instances');
+	t.is(await getCollectionLength(db.collection('users')), 3,
+		'hasn\'t deleted any users');
+	done();
+});
+test('cancel the deletion and restore deleted items when account changes fail', async t => {
+	const uri = await genTempDatabase(t);
+	const userpw = genRandomString(15);
+	uris.push(uri);
+
+	const dbpw = await genDBWithPW(uri);
+	await genMockAcount({
+		userpw,
+		dbpw,
+		uri
+	});
+	const proc = new ProcRunner(t, [
+		'account', 
+		'delete',
+		'-d', uri,
+		'-a', DEFAULT_EMAIL,
+		'-p', dbpw,
+		'--debug'
+	], {
+		env: {
+			FAIL_ON_ACCOUNT: true
+		}
+	});
+	proc.expectWrite('Attempt 1/3');
+	proc.expectWrite('Please enter the account\'s password');
+	proc.expectRead(userpw);
+	proc.expectWrite(`Deleting user with email "${DEFAULT_EMAIL}"`);
+	proc.expectWrite('Are you sure?');
+	proc.expectRead('');
+	proc.expectWrite('Are you very very sure?');
+	proc.expectRead('');
+	proc.expectWrite('Deleting instances...');
+	proc.expectWrite('Deleting passwords...');
+	proc.expectWrite('Deleting user record...');
+	proc.expectWrite(`Failed to delete account, restoring instances and passwords`);
+	proc.expectWrite('Done salvaging');
+	proc.expectExit(1);
+
+	await proc.run();
+	proc.check();
+
+	const { db, done } = await getDB(uri);
+	t.is(await getCollectionLength(db.collection('passwords')), 5,
+		'hasn\'t deleted any passwords');
+	t.is(await getCollectionLength(db.collection('instances')), 5,
+		'hasn\'t deleted any instances');
+	t.is(await getCollectionLength(db.collection('users')), 3,
+		'hasn\'t deleted any users');
+	done();
 });
