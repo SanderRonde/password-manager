@@ -1,4 +1,4 @@
-import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, InstancePublicKey, ResetKey, ServerPublicKey, ServerPrivateKey } from "./database/db-types";
+import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, InstancePublicKey, ResetKey, ServerPublicKey, ServerPrivateKey, RSAEncrypted } from "./database/db-types";
 import { Hashed, Padded, MasterPasswordVerificationPadding, EncryptionAlgorithm, MasterPasswordDecryptionpadding, Encrypted } from "./lib/crypto";
 import { TwofactorVerifyToken, LoginToken } from "./actions/server/webserver/server/modules/auth";
 import { UnstringifyObjectIDs } from "./database/libs/db-manipulation";
@@ -131,11 +131,11 @@ export declare namespace APIRoutes {
 			/**
 			 * The assigned ID of the instance, used to indicate its identity
 			 */
-			id: Encrypted<EncodedString<StringifiedObjectId<EncryptedInstance>>, InstancePublicKey, 'RSA'>
+			id: RSAEncrypted<EncodedString<StringifiedObjectId<EncryptedInstance>>, InstancePublicKey>
 			/**
 			 * The public key of the server, used to encrypt data sent to it
 			 */
-			server_key: Encrypted<EncodedString<ServerPublicKey>, InstancePublicKey, 'RSA'>;
+			server_key: RSAEncrypted<EncodedString<ServerPublicKey>, InstancePublicKey>;
 		}>;
 
 		/**
@@ -149,7 +149,7 @@ export declare namespace APIRoutes {
 			/**
 			 * A challenge by the instance to verify the server's identity
 			 */
-			challenge: Encrypted<EncodedString<C>, ServerPrivateKey, 'RSA'>;
+			challenge: RSAEncrypted<EncodedString<C>, ServerPrivateKey>;
 			/**
 			 * The hash of the master password
 			 */
@@ -163,7 +163,7 @@ export declare namespace APIRoutes {
 			 * The token to use when verifying 2FA code, through /api/instance/2fa/verify. 
 			 * Encrypted with instance key
 			 */
-			twofactor_auth_token: Encrypted<EncodedString<TwofactorVerifyToken>, InstancePublicKey, 'RSA'>;	
+			twofactor_auth_token: RSAEncrypted<EncodedString<TwofactorVerifyToken>, InstancePublicKey>;	
 			/**
 			 * The solved challenge
 			 */
@@ -176,7 +176,7 @@ export declare namespace APIRoutes {
 			/**
 			 * The auth token that can be used to make API requests. Encrypted with instance key
 			 */
-			auth_token: Encrypted<EncodedString<LoginToken>, InstancePublicKey, 'RSA'>;	
+			auth_token: RSAEncrypted<EncodedString<LoginToken>, InstancePublicKey>;	
 			/**
 			 * The solved challenge
 			 */
@@ -213,7 +213,7 @@ export declare namespace APIRoutes {
 			/**
 			 * The new auth token. Encrypted with instance public key
 			 */
-			auth_token: Encrypted<EncodedString<LoginToken>, InstancePublicKey, 'RSA'>;
+			auth_token: RSAEncrypted<EncodedString<LoginToken>, InstancePublicKey>;
 		}>;
 
 		export namespace Twofactor {
@@ -324,7 +324,7 @@ export declare namespace APIRoutes {
 				/**
 				 * A login token that can be used for the /api/password API
 				 */
-				auth_token: Encrypted<EncodedString<LoginToken>, InstancePublicKey, 'RSA'>;
+				auth_token: RSAEncrypted<EncodedString<LoginToken>, InstancePublicKey>;
 			}>;
 		}
 	}
@@ -489,7 +489,7 @@ export declare namespace APIRoutes {
 			/**
 			 * The password data. Encrypted with instance public key and user password
 			 */
-			encrypted: Encrypted<EncodedString<EncodedString<{
+			encrypted: RSAEncrypted<EncodedString<EncodedString<{
 				id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
 				encrypted: {
 					data: Encrypted<EncodedString<{
@@ -499,7 +499,7 @@ export declare namespace APIRoutes {
 					}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 					algorith: EncryptionAlgorithm;
 				}
-			}>>, InstancePublicKey, 'RSA'>;
+			}>>, InstancePublicKey>;
 		}>;
 
 		/**
@@ -523,7 +523,7 @@ export declare namespace APIRoutes {
 			/**
 			 * Encrypted data
 			 */
-			encrypted: Encrypted<EncodedString<EncodedString<{
+			encrypted: RSAEncrypted<EncodedString<EncodedString<{
 				/**
 				 * The ID of the password
 				 */
@@ -545,7 +545,7 @@ export declare namespace APIRoutes {
 				 * Whether 2FA is enabled for this instance
 				 */
 				twofactor_enabled: boolean;
-			}>>, InstancePublicKey, 'RSA'>;
+			}>>, InstancePublicKey>;
 		}>;
 
 		/**
@@ -615,7 +615,7 @@ export declare namespace APIRoutes {
 			/**
 			 * Data enrypted with the instance's public key
 			 */
-			encrypted: Encrypted<EncodedString<EncodedString<{
+			encrypted: RSAEncrypted<EncodedString<EncodedString<{
 				/**
 				 * The ID of the password
 				 */
@@ -637,7 +637,7 @@ export declare namespace APIRoutes {
 				 * Whether 2Fa is enabled for this password
 				 */
 				twofactor_enabled: boolean;
-			}[]>>, InstancePublicKey, 'RSA'>;
+			}[]>>, InstancePublicKey>;
 		}>;
 	}
 

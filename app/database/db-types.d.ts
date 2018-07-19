@@ -48,6 +48,20 @@ export type DatabaseEncryptedWithSalt<T> = {
 	algorithm: EncryptionAlgorithm;
 }
 
+/**
+ * Data anecrypted witha  public key
+ */
+export type RSAEncrypted<T, K extends string> = string & {
+	/**
+	 * The data that is encrypted
+	 */
+	__data: T;
+	/**
+	 * The key used to encrypt it
+	 */
+	__key: K;
+}
+
 //Keys
 /**
  * The key to decrypt the database

@@ -1,4 +1,4 @@
-import { InstancePublicKey, ServerPublicKey, ServerPrivateKey } from '../database/db-types';
+import { InstancePublicKey, ServerPublicKey, ServerPrivateKey, RSAEncrypted } from '../database/db-types';
 import { ENCRYPTION_ALGORITHM } from './constants';
 import { genRandomString } from './util';
 import NodeRSA = require('node-rsa');
@@ -30,7 +30,7 @@ export type HashingAlgorithms = 'sha256'|'sha512';
 /**
  * Encryption algorithms that can be used (among others)
  */
-export type EncryptionAlgorithm = 'aes-256-ctr'|'RSA';
+export type EncryptionAlgorithm = 'aes-256-ctr';
 
 /**
  * Data (T) that is hashed an algorithm (A)
@@ -186,16 +186,16 @@ export function decrypt<T, A extends EncryptionAlgorithm, K extends string>(encr
 }
 
 export function encryptWithPublicKey<T, K extends InstancePublicKey|ServerPublicKey>(data: T, 
-	publicKey: K): Encrypted<EncodedString<T>, K, 'RSA'> {
+	publicKey: K): RSAEncrypted<EncodedString<T>, K> {
 		const key = new NodeRSA();
 		key.importKey(publicKey, 'pkcs8-public-pem');
 
 		return key.encrypt(JSON.stringify(data), 'base64') as 
-			Encrypted<EncodedString<T>, K, 'RSA'>;
+			RSAEncrypted<EncodedString<T>, K>;
 	}
 
-export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: Encrypted<EncodedString<T>, 
-	InstancePublicKey|ServerPublicKey, 'RSA'>, 
+export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: RSAEncrypted<EncodedString<T>, 
+	InstancePublicKey|ServerPublicKey>, 
 		privateKey: K): T|ERRS {
 			const key = new NodeRSA();
 			key.importKey(privateKey, 'pkcs1-pem');
