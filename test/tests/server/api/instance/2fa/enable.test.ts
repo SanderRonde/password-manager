@@ -59,7 +59,7 @@ test('can enable 2FA when no 2FA secret is set', async t => {
 	if (finalData.enabled) return;
 	t.true(finalData.verify_2fa_required, 
 		'further verification is needed');
-	t.is(typeof finalData.auth_url, 'auth_url is a string');
+	t.is(typeof finalData.auth_url, 'string', 'auth_url is a string');
 	t.regex(finalData.auth_url, 
 		/otpauth:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/,
 		'url is an otp auth url');
