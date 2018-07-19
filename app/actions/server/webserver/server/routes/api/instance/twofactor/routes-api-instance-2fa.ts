@@ -18,7 +18,7 @@ export class RoutesAPIInstanceTwofactor {
 			email: string;
 		}, {}, {}, {}>([
 			'instance_id', 'password', 'email'
-		], [], async (req, res, toCheck, { instance_id }) => {
+		], [], async (toCheck, { instance_id }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -115,7 +115,7 @@ export class RoutesAPIInstanceTwofactor {
 			twofactor_token: string;
 		}, {}, {}, {}>([
 			'instance_id', 'password', 'email', 'twofactor_token'
-		], [], async (req, res, toCheck, { instance_id, twofactor_token }) => {
+		], [], async (toCheck, { instance_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -188,7 +188,7 @@ export class RoutesAPIInstanceTwofactor {
 			twofactor_token: string;
 		}, {}, {}, {}>([
 			'instance_id', 'twofactor_token'
-		], [], async (_req, res, toCheck, { instance_id, twofactor_token }) => {
+		], [], async (toCheck, { instance_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -253,7 +253,7 @@ export class RoutesAPIInstanceTwofactor {
 			pw_verification_token: string;
 		}, {}, {}, {}>([
 			'instance_id', 'twofactor_token', 'pw_verification_token'
-		], [], async (_req, res, toCheck, { instance_id, twofactor_token, pw_verification_token }) => {
+		], [], async (toCheck, { instance_id, twofactor_token, pw_verification_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'

@@ -21,7 +21,7 @@ export class RoutesApiInstance {
 			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, {}, {}, {}>([
 			'public_key', 'email', 'password'
-		], [], async (req, res, toCheck, { public_key }) => {
+		], [], async (toCheck, { public_key }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'email',
 				type: 'string'
@@ -82,7 +82,7 @@ export class RoutesApiInstance {
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, {}, {}, {}>([
 			'instance_id', 'password_hash', 'challenge'
-		], [], async (_req, res, toCheck, { instance_id, password_hash, challenge }) => {
+		], [], async (toCheck, { instance_id, password_hash, challenge }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -172,7 +172,7 @@ export class RoutesApiInstance {
 			token: string;
 		}, {}, {}, {}>([
 			'instance_id', 'token'
-		], [], async (_req, res, toCheck, { instance_id, token }) => {
+		], [], async (toCheck, { instance_id, token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -207,7 +207,7 @@ export class RoutesApiInstance {
 			oldToken: string;
 		}, {}, {}, {}>([
 			'instance_id', 'oldToken'
-		], [], async (_req, res, toCheck, { instance_id, oldToken }) => {
+		], [], async (toCheck, { instance_id, oldToken }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
