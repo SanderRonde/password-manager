@@ -115,7 +115,7 @@ export class WebserverRouter {
 		[key: string]: any;
 	} = {}>(requiredParams: (keyof R|keyof E)[], 
 		optionalParams: (keyof O|keyof OE)[]|string[], 
-		handler: (req: express.Request, res: ResponseCaptured, 
+		handler: (req: express.Request, res: ResponseCaptured, toCheckSrc: R & E,
 			params: R & E & Partial<O> & Partial<OE>) => void): ResponseCapturedRequestHandler
 	public requireParams<R extends {
 		[key: string]: any;
@@ -127,7 +127,7 @@ export class WebserverRouter {
 		[key: string]: any;
 	} = {}>(requiredParams: (keyof R)[], 
 		optionalParams: (keyof O|keyof OE)[]|string[], 
-		handler: (req: express.Request, res: ResponseCaptured, 
+		handler: (req: express.Request, res: ResponseCaptured, toCheckSrc: R & E,
 			params: R & E & Partial<O> & Partial<OE>) => void): ResponseCapturedRequestHandler;
 	public requireParams<R extends {
 		[key: string]: any;
@@ -139,7 +139,7 @@ export class WebserverRouter {
 		[key: string]: any;
 	} = {}>(requiredParams: (keyof R|keyof E)[], 
 		optionalParams: (keyof O|keyof OE)[]|string[], 
-		handler: (req: express.Request, res: ResponseCaptured, 
+		handler: (req: express.Request, res: ResponseCaptured, toCheckSrc: R & E,
 			params: R & E & Partial<O> & Partial<OE>) => void): ResponseCapturedRequestHandler {
 				return async (req, res) => {
 					let toCheckSrc: any & R & E = {...req.body};
@@ -213,7 +213,7 @@ export class WebserverRouter {
 						values[key] = req.body[key];
 					}
 
-					handler(req, res, values);
+					handler(req, res, toCheckSrc, values);
 				}
 			}
 
@@ -277,14 +277,13 @@ export class WebserverRouter {
 		}
 	}
 
-	public typeCheck(req: express.Request, res: ResponseCaptured, configs: TypecheckConfig[]) {
-		const body = req.body;
+	public typeCheck(src: any, res: ResponseCaptured, configs: TypecheckConfig[]) {
 		for (const config of configs) {
 			const { val, type } = config;
-			if (!(val in body)) {
+			if (!(val in src)) {
 				continue;
 			}
-			const value = body[val];
+			const value = src[val];
 			switch (config.type) {
 				case 'boolean':
 				case 'number':

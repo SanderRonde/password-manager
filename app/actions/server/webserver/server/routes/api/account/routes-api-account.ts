@@ -7,6 +7,7 @@ import { ResponseCaptured } from "../../../modules/ratelimit";
 import { API_ERRS } from "../../../../../../../api";
 import { Webserver } from "../../../webserver";
 import express = require('express');
+import { getDebug } from "../../../../../../../lib/debug";
 
 export class RoutesAPIAccount {
 	constructor(public server: Webserver) { }
@@ -20,8 +21,8 @@ export class RoutesAPIAccount {
 			newmasterpassword: MasterPassword;	
 		}>([
 			'email', 'reset_key', 'newmasterpassword'
-		], [], async (req, res, { email, reset_key, newmasterpassword }) => {
-			if (!this.server.Router.typeCheck(req, res, [{
+		], [], async (_req, res, toCheck, { email, reset_key, newmasterpassword }) => {
+			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'email',
 				type: 'string'
 			}, {
@@ -84,7 +85,7 @@ export class RoutesAPIAccount {
 			const { pw: decryptedMasterPassword } = decrypted;
 			const passwords = await this.server.database.Manipulation.findMany(
 				COLLECTIONS.PASSWORDS, {
-					user_id: encryptedAccount._id.toHexString()
+					user_id: encryptedAccount._id
 				});
 			if (passwords === null) {
 				res.status(500);
@@ -136,7 +137,7 @@ export class RoutesAPIAccount {
 						decryptedMasterPassword)
 					
 					if (decryptedEncrypedSection === ERRS.INVALID_DECRYPT) {
-						resolve();
+						resolve(false);
 						return;
 					}
 					
@@ -296,8 +297,8 @@ export class RoutesAPIAccount {
 			newmasterpassword: MasterPassword;	
 		}>([
 			'email', 'reset_key', 'newmasterpassword', 'master_password'
-		], [], async (req, res, { email, reset_key, newmasterpassword, master_password }) => {
-			if (!this.server.Router.typeCheck(req, res, [{
+		], [], async (_req, res, toCheck, { email, reset_key, newmasterpassword, master_password }) => {
+			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'email',
 				type: 'string'
 			}, {
@@ -435,7 +436,7 @@ export class RoutesAPIAccount {
 							resolve(true);
 						}
 				});
-			}))).filter(val => !val).length) {
+			}))).filter(val => !val).length || getDebug(this.server.debug).FAIL_ON_PASSWORDS) {
 				for (const index of updatedPasswords) {
 					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
 						_id: passwords[index]._id
@@ -468,7 +469,7 @@ export class RoutesAPIAccount {
 						}
 					resolve();
 				});
-			}))).filter(val => !val).length) {
+			}))).filter(val => !val).length || getDebug(this.server.debug).FAIL_ON_INSTANCE) {
 				for (const index of updatedPasswords) {
 					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
 						_id: passwords[index]._id
@@ -507,7 +508,7 @@ export class RoutesAPIAccount {
 				reset_reset_keys: reset_reset_keys.map((key) => {
 					return this.server.database.Crypto.dbEncrypt(key);
 				})
-			}) === null) {
+			}) === null || getDebug(this.server.debug).FAIL_ON_ACCOUNT) {
 				for (const index of updatedPasswords) {
 					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
 						_id: passwords[index]._id
@@ -553,8 +554,8 @@ export class RoutesAPIAccount {
 			master_password: MasterPassword;	
 		}>([
 			'instance_id', 'master_password'
-		], [], async (req, res, { instance_id, master_password }) => {
-			if (!this.server.Router.typeCheck(req, res, [{
+		], [], async (_req, res, toCheck, { instance_id, master_password }) => {
+			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
 			}, {
