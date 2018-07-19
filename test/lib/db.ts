@@ -375,7 +375,7 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 	t.is(typeof decrypted.email, 'string', 'type of email is string');
 	t.is(typeof decrypted.pw, 'string', 'type of password is string');
 	t.is(typeof decrypted.twofactor_enabled, 'boolean', 'type of 2FA_enabled is boolean');
-	t.is(typeof decrypted.reset_key, 'object', 'type of reset_key is object');
+	t.is(typeof decrypted.reset_key, 'string', 'type of reset_key is string');
 	t.true(Array.isArray(decrypted.reset_reset_keys), 'reset_reset_keys is an array');
 	t.is(decrypted.reset_reset_keys.length, 0, 'reset_reset_keys is empty');
 
