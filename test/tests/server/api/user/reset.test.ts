@@ -1,10 +1,10 @@
 import { EncryptedAccount, MongoRecord, EncryptedPassword, EncryptedInstance } from '../../../../../app/database/db-types';
 import { captureURIs, genUserAndDb, createServer, doAPIRequest, isErr } from '../../../../lib/util';
 import { decryptWithSalt, ERRS, decrypt, hash, pad } from '../../../../../app/lib/crypto';
+import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { RESET_KEY_LENGTH } from '../../../../../app/lib/constants';
 import { genRandomString } from '../../../../../app/lib/util';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
-import { testParams } from '../../../../lib/macros';
 import { API_ERRS } from '../../../../../app/api';
 import { getDB } from '../../../../lib/db';
 import { test } from 'ava';
@@ -17,7 +17,7 @@ testParams(test, uris, '/api/user/reset', {
 	email: 'string',
 	newmasterpassword: 'string'
 }, {});
-test('rejects if email is wrong', async t => {
+test('fails if email is wrong', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const config = await genUserAndDb(t, {
 		resetKey
@@ -31,22 +31,20 @@ test('rejects if email is wrong', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	await testInvalidCredentials(t, {
+		route: '/api/user/reset',
 		port: http,
-		publicKey: server_public_key
-	}, '/api/user/reset', {
-		instance_id: instance_id.toHexString()
-	}, {
-		email: 'somewrongemail',
+		unencrypted: {
+			instance_id: instance_id.toHexString()
+		},
+		encrypted: {
+			email: 'somewrongemail',
 		reset_key: resetKey,
 		newmasterpassword: 'masterpassword'
-	}));
-
-	server.kill();
-
-	t.false(response.success, 'request failed');
-	if (response.success === true) return;
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS);
+		},
+		server: server,
+		publicKey: server_public_key
+	});
 });
 test('works if params are correct', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);

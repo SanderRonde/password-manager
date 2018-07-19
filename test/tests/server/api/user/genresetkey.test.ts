@@ -1,9 +1,9 @@
 import { EncryptedAccount, MongoRecord, EncryptedInstance, StringifiedObjectId } from '../../../../../app/database/db-types';
 import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
+import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { RESET_KEY_LENGTH } from '../../../../../app/lib/constants';
 import { genRandomString } from '../../../../../app/lib/util';
 import { decrypt, ERRS } from '../../../../../app/lib/crypto';
-import { testParams } from '../../../../lib/macros';
 import { API_ERRS } from '../../../../../app/api';
 import { getDB } from '../../../../lib/db';
 import mongo = require('mongodb');
@@ -16,7 +16,7 @@ testParams(test, uris, '/api/user/genresetkey', {
 	reset_key: 'string',
 	master_password: 'string'
 }, {});
-test('rejects if instance id is wrong', async t => {
+test('fails if instance id is wrong', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const config = await genUserAndDb(t, {
 		resetKey
@@ -29,22 +29,20 @@ test('rejects if instance id is wrong', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	await testInvalidCredentials(t, {
+		route: '/api/user/genresetkey',
 		port: http,
-		publicKey: server_public_key
-	}, '/api/user/genresetkey', {
-		instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
-	}, {
-		reset_key: resetKey,
-		master_password: 'masterpassword'
-	}));
-
-	server.kill();
-
-	t.false(response.success, 'request failed');
-	if (response.success === true) return;
-	t.is(response.ERR, API_ERRS.MISSING_PARAMS, 
-		'rejects with missing params because data can\'t be decrypted');
+		unencrypted: {
+			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
+		},
+		encrypted: {
+			reset_key: resetKey,
+			master_password: 'masterpassword'
+		},
+		server: server,
+		publicKey: server_public_key,
+		err: API_ERRS.MISSING_PARAMS
+	});
 });
 test('rejects if password is wrong', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
@@ -60,21 +58,19 @@ test('rejects if password is wrong', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	await testInvalidCredentials(t, {
+		route: '/api/user/genresetkey',
 		port: http,
+		unencrypted: {
+			instance_id: instance_id.toHexString()
+		},
+		encrypted: {
+			reset_key: resetKey,
+			master_password: 'wrongpassword'
+		},
+		server: server,
 		publicKey: server_public_key
-	}, '/api/user/genresetkey', {
-		instance_id: instance_id.toHexString()
-	}, {
-		reset_key: resetKey,
-		master_password: 'wrongpassword'
-	}));
-
-	server.kill();
-
-	t.false(response.success, 'request failed');
-	if (response.success === true) return;
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS);
+	});
 });
 test('rejects if reset key is wrong', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
@@ -91,21 +87,19 @@ test('rejects if reset key is wrong', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	await testInvalidCredentials(t, {
+		route: '/api/user/genresetkey',
 		port: http,
+		unencrypted: {
+			instance_id: instance_id.toHexString()
+		},
+		encrypted: {
+			reset_key: genRandomString(RESET_KEY_LENGTH),
+			master_password: userpw
+		},
+		server: server,
 		publicKey: server_public_key
-	}, '/api/user/genresetkey', {
-		instance_id: instance_id.toHexString()
-	}, {
-		reset_key: genRandomString(RESET_KEY_LENGTH),
-		master_password: userpw
-	}));
-
-	server.kill();
-
-	t.false(response.success, 'request failed');
-	if (response.success === true) return;
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS);
+	});
 });
 test('works if params are correct', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);

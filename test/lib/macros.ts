@@ -5,7 +5,7 @@ import { ChildProcess } from "child_process";
 
 async function doServerSetupAndBreakdown(t: GenericTestContext<Context<any>>, uris: string[]) {
 	const config = await genUserAndDb(t);
-	const server = await createServer(config);
+	const server = await createServer({...config, logServerOutput: true });
 	uris.push(config.uri);
 	return {
 		done() {
@@ -261,7 +261,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 
 export async function testInvalidCredentials<R extends keyof APIFns, 
 	U extends APIArgs[R][0], E extends APIArgs[R][1]>(t: GenericTestContext<Context<any>>, {
-	port, unencrypted, encrypted, route, server, publicKey
+	port, unencrypted, encrypted, route, server, publicKey, err = API_ERRS.INVALID_CREDENTIALS
 }: {
 	publicKey: string;
 	port: number;
@@ -269,6 +269,7 @@ export async function testInvalidCredentials<R extends keyof APIFns,
 	unencrypted: U;
 	encrypted?: E;
 	server: ChildProcess;
+	err?: API_ERRS
 }) {
 	const response = JSON.parse(await doAPIRequest({ 
 		port: port,
@@ -282,6 +283,6 @@ export async function testInvalidCredentials<R extends keyof APIFns,
 	if (response.success) {
 		return;
 	}
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+	t.is(response.ERR, err,
 		'got invalid credentials errors');
 }
