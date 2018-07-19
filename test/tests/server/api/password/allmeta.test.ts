@@ -1,5 +1,5 @@
 import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doAPIRequest, genURL, doesNotThrow } from '../../../../lib/util';
-import { StringifiedObjectId, EncryptedInstance, EncryptedPassword } from '../../../../../app/database/db-types';
+import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
 import { decryptWithPrivateKey, ERRS, hash, pad } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { genRandomString } from '../../../../../app/lib/util';
@@ -110,7 +110,6 @@ test('fails if auth token is wrong', async t => {
 	const { http, uri, server_public_key, userpw } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
 	await testInvalidCredentials(t, {
 		route: '/api/password/allmeta',
 		port: http,
