@@ -10,7 +10,7 @@ stages:
   
 install:
 - yarn --ignore-engines
-- npm install -g gulp
+- npm install -g gulp ava
 - ./scripts/clone-mongo-tools.sh
 - ./scripts/alias-mongo-tools.sh
 before_script:
@@ -18,7 +18,7 @@ before_script:
   - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 script:
 - tsc
-- yarn test
+- ava
 notifications:
   email:
     on_success: change
