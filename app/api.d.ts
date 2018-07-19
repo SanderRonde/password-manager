@@ -584,7 +584,7 @@ export declare namespace APIRoutes {
 			/**
 			 * Data enrypted with the instance's public key
 			 */
-			encrypted: Encrypted<EncodedString<EncodedString<{
+			encrypted: RSAEncrypted<EncodedString<EncodedString<{
 				/**
 				 * The ID of the password
 				 */
