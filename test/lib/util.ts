@@ -1,6 +1,6 @@
+import { encryptWithPublicKey, genRSAKeyPair, ERRS, hash, pad, decryptWithPrivateKey } from "../../app/lib/crypto";
 import { getDB, clearDB, genDBWithPW, genAccountOnly, genInstancesOnly } from "./db";
 import { EncryptedInstance, TypedObjectID } from "../../app/database/db-types";
-import { encryptWithPublicKey, genRSAKeyPair, ERRS } from "../../app/lib/crypto";
 import { GenericTestContext, Context, RegisterContextual } from "ava";
 import { APIFns, APIArgs, APIReturns } from "../../app/api";
 import { TEST_DB_URI } from "../../app/lib/constants";
@@ -241,4 +241,52 @@ export async function doTry<R>(fn: () => Promise<R>): Promise<R|null> {
 export function isErr<O>(t: GenericTestContext<Context<any>>, data: ERRS|O): data is ERRS {
 	t.not(data, ERRS.INVALID_DECRYPT as ERRS, 'is not an invalid decrypt');
 	return data === ERRS.INVALID_DECRYPT;
+}
+
+export async function getLoginToken(t: GenericTestContext<Context<any>>, 
+	config: UserAndDbData) {
+		const { 
+			http, 
+			userpw, 
+			server_public_key, 
+			instance_id, 
+			instance_private_key
+		} = config;
+
+		const challenge = genRandomString(25);
+		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/login', {
+			instance_id: instance_id.toHexString(),
+			challenge: encryptWithPublicKey(challenge, server_public_key),
+			password_hash: hash(pad(userpw, 'masterpwverify'))
+		}));
+
+		t.true(response.success, 'API call succeeded');
+		if (!response.success) {
+			return;
+		}
+		const data = response.data;
+		t.false(data.twofactor_required, 'further authentication is not required');
+		if (data.twofactor_required === true) {
+			return;
+		}
+		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		if (token === ERRS.INVALID_DECRYPT) return;
+		t.is(typeof token, 'string', 'token is a string');
+
+		t.is(data.challenge, challenge, 'challenge matches');
+
+		return token;
+	}
+
+export function genURL() {
+	return `http${
+		Math.random() > 0.5 ? 's': ''
+	}://${
+		genRandomString(10)
+	}.${
+		genRandomString(3)
+	}/${
+		genRandomString(10)
+	}`;
 }
