@@ -278,7 +278,7 @@ export class RoutesAPIAccount {
 			master_password: MasterPassword;
 			reset_key: string;
 		}>([
-			'instance_id', 'master_password'
+			'instance_id', 'master_password', 'reset_key'
 		], [], async (toCheck, { instance_id, master_password, reset_key }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
@@ -325,12 +325,22 @@ export class RoutesAPIAccount {
 				return;
 			}
 
-			//Check if the reset key is correct
-			if (reset_key !== accountResetKey) {
+			const initialDecrypt = decrypt(accountResetKey, reset_key);
+			if (initialDecrypt === ERRS.INVALID_DECRYPT) {
 				res.status(200);
 				res.json({
 					success: false,
-					//Invalid password
+					//Failed to parse JSON, incorrect key
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
+			if (initialDecrypt.integrity !== true) {
+				res.status(200);
+				res.json({
+					success: false,
+					//Failed to decrypt
 					error: 'invalid credentials',
 					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
