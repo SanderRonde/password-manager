@@ -62,7 +62,7 @@ export class RoutesAPIInstanceTwofactor {
 				}, {
 					twofactor_secret: this.server.database.Crypto.dbEncryptWithSalt(secret.base32),
 					twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
-				})) {
+				}) === null) {
 					res.status(500);
 					res.json({
 						success: false,
@@ -83,11 +83,11 @@ export class RoutesAPIInstanceTwofactor {
 				});
 			} else {
 				//One already exists, allow this
-				if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
+				if (await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.INSTANCES, {
 					_id: instance._id
 				}, {
 					twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(true)
-				})) {
+				}) === null) {
 					res.status(500);
 					res.json({
 						success: false,
