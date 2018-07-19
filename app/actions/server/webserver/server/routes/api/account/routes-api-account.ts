@@ -86,6 +86,15 @@ export class RoutesAPIAccount {
 				COLLECTIONS.PASSWORDS, {
 					user_id: encryptedAccount._id.toHexString()
 				});
+			if (passwords === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to find passwords',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 			const newEncryptionHash = hash(pad(newmasterpassword, 'masterpwdecrypt'));
 
 			const updatedPasswordIndexes: number[] = [];
@@ -136,10 +145,20 @@ export class RoutesAPIAccount {
 			}
 
 			//Disable 2FA for all instances
-			const instances = (await this.server.database.Manipulation.findMany(
+			const unfilteredInstances = (await this.server.database.Manipulation.findMany(
 				COLLECTIONS.INSTANCES, {
 					user_id: encryptedAccount._id
-				})).filter(({ twofactor_enabled }) => {
+				}));
+			if (unfilteredInstances === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to find instances',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
+			const instances = unfilteredInstances.filter(({ twofactor_enabled }) => {
 					return this.server.database.Crypto.dbDecryptWithSalt(twofactor_enabled);
 				});
 
@@ -324,6 +343,15 @@ export class RoutesAPIAccount {
 				COLLECTIONS.PASSWORDS, {
 					user_id: encryptedAccount._id
 				});
+			if (passwords === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to find passwords',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 			const newEncryptionHash = hash(pad(newmasterpassword, 'masterpwdecrypt'));
 			await Promise.all(passwords.map((encryptedPassword) => {
 				return new Promise(async (resolve) => {
@@ -356,6 +384,16 @@ export class RoutesAPIAccount {
 				COLLECTIONS.INSTANCES, {
 					user_id: encryptedAccount._id
 				});
+
+			if (instances === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to find instances',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
 
 			await Promise.all(instances.map((instance) => {
 				return new Promise(async (resolve) => {

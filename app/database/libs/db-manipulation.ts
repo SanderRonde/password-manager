@@ -67,13 +67,17 @@ export class DatabaseManipulation {
 	
 	public async findMany<R extends EncryptedCollectionRecords[C], 
 		C extends COLLECTIONS>(collectionName: C, 
-			filter: Partial<R>|mongo.FilterQuery<R>): Promise<MongoRecord<R>[]> {
+			filter: Partial<R>|mongo.FilterQuery<R>): Promise<MongoRecord<R>[]|null> {
 				const collection = this._getCollection(collectionName);
 				if (!collection) {
-					return [];
+					return null;
 				}
 
-				return await (await collection.find(filter)).toArray() as MongoRecord<R>[];
+				try {
+					return await (await collection.find(filter)).toArray() as MongoRecord<R>[];
+				} catch(e) {
+					return null;
+				}
 			}
 
 	public async deleteOne<R extends UnstringifyObjectIDs<EncryptedCollectionRecords[C]>, 

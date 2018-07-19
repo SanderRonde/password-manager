@@ -481,6 +481,16 @@ export class RoutesApiPassword {
 					user_id: account._id
 				});
 
+			if (passwords === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to find passwords',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
+
 			res.status(200);
 			res.json({
 				success: true,
@@ -541,10 +551,20 @@ export class RoutesApiPassword {
 			}
 
 			const host = url.parse(website_url).hostname || url.parse(website_url).host || website_url;
-			const passwords = (await this.server.database.Manipulation.findMany(
+			const unfilteredPasswords = await this.server.database.Manipulation.findMany(
 				COLLECTIONS.PASSWORDS, {
 					user_id: account._id
-				})).filter(({ websites }) => {
+				});
+			if (unfilteredPasswords === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to create record',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
+			const passwords = unfilteredPasswords.filter(({ websites }) => {
 					for (const website of websites) {
 						if (this.server.database.Crypto.dbDecrypt(website.host) === host) {
 							return true;
