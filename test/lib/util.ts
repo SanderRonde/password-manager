@@ -116,7 +116,7 @@ export async function genUserAndDb(t: GenericTestContext<Context<any>>,
 		const id = await genAccountOnly(uri, {
 			dbpw,
 			userpw
-		}, config);
+	}, config);
 		const serverKeyPair = genRSAKeyPair();
 		const instanceKeyPair = genRSAKeyPair();
 		const instanceId = await genInstancesOnly(uri, id, {
@@ -140,17 +140,17 @@ export function createServer({
 	uri, 
 	http, 
 	dbpw 
-}: UserAndDbData, env: {} = {}): Promise<ChildProcess> {
+}: UserAndDbData, env?: {}): Promise<ChildProcess> {
 	return new Promise((resolve) => {
-		const proc = spawn('node', [
+		const proc = spawn('node', [...[
 			path.join(__dirname, './../../app/main.js'),
 			'server',
 			'--http', http + '',
 			'--no-rate-limit',
 			'-p', dbpw,
 			'-d', uri
-		], {
-			env
+		], ...(env ? ['--debug'] : [])], {
+			env: env || {}
 		});
 		proc.unref();
 		listenWithoutRef(proc.stdout, (chunk) => {

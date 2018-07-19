@@ -50,17 +50,8 @@ export class RoutesAPIAccount {
 			const { reset_key: accountResetKey, reset_reset_keys } = 
 				this.server.database.Crypto.dbDecryptAccountRecord(encryptedAccount);
 
-			let decrypted: {
-				integrity: true;
-				pw: string;
-			};
-			try {
-				const initialDecrypt = decrypt(accountResetKey, reset_key);
-				if (initialDecrypt === ERRS.INVALID_DECRYPT) {
-					throw new Error('invalid decrypt');
-				}
-				decrypted = initialDecrypt;
-			} catch(e) {
+			const initialDecrypt = decrypt(accountResetKey, reset_key);
+			if (initialDecrypt === ERRS.INVALID_DECRYPT) {
 				res.status(200);
 				res.json({
 					success: false,
@@ -70,11 +61,11 @@ export class RoutesAPIAccount {
 				});
 				return;
 			}
-			if (decrypted.integrity !== true) {
+			if (initialDecrypt.integrity !== true) {
 				res.status(200);
 				res.json({
 					success: false,
-					//Failed to parse JSON, incorrect key
+					//Failed to decrypt
 					error: 'invalid credentials',
 					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
@@ -82,7 +73,7 @@ export class RoutesAPIAccount {
 			}
 
 			//Correct key, decrypt everything
-			const { pw: decryptedMasterPassword } = decrypted;
+			const { pw: decryptedMasterPassword } = initialDecrypt;
 			const passwords = await this.server.database.Manipulation.findMany(
 				COLLECTIONS.PASSWORDS, {
 					user_id: encryptedAccount._id
@@ -158,7 +149,7 @@ export class RoutesAPIAccount {
 							resolve(false);
 						}
 				});
-			}))).filter(val => !val).length) {
+			}))).filter(val => !val).length || getDebug(this.server.debug).FAIL_ON_PASSWORDS) {
 				//Some updates failed
 				for (const index of updatedPasswordIndexes) {
 					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
@@ -193,7 +184,7 @@ export class RoutesAPIAccount {
 							resolve(true);
 						}
 				});
-			}))).filter(val => !val).length) {
+			}))).filter(val => !val).length || getDebug(this.server.debug).FAIL_ON_INSTANCE) {
 				//Some updates failed
 				for (const password of passwords) {
 					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
@@ -223,7 +214,7 @@ export class RoutesAPIAccount {
 			//Change password verification key and master password
 			const newResetKey = genRandomString(RESET_KEY_LENGTH);
 
-			if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
+			if (await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
 				_id: encryptedAccount._id
 			}, {
 				pw: this.server.database.Crypto.dbEncrypt(
@@ -240,7 +231,7 @@ export class RoutesAPIAccount {
 						decryptedMasterPassword, ENCRYPTION_ALGORITHM)].map((key) => {
 							return this.server.database.Crypto.dbEncrypt(key);
 						})
-			})) {
+			}) === null || getDebug(this.server.debug).FAIL_ON_ACCOUNT) {
 				//Some updates failed
 				for (const password of passwords) {
 					await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {

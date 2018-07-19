@@ -96,13 +96,14 @@ async function getSuppliedDatabase(db: SuppliedDatabase) {
 }
 
 export async function genAccountOnly(suppliedDb: SuppliedDatabase, {
-	dbpw, userpw, resetKey = genRandomString(RESET_KEY_LENGTH)
+	dbpw, userpw
 }: {
 	dbpw: string;
 	userpw: string;
 	resetKey?: string
 }, config: MockConfig = {}): Promise<TypedObjectID<EncryptedAccount>> {
 	const { db, done } = await getSuppliedDatabase(suppliedDb);
+	const { resetKey = genRandomString(RESET_KEY_LENGTH) } = config;
 
 	const accountRecords: EncryptedAccount[] = [{
 		email: DEFAULT_EMAIL,
