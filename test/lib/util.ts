@@ -1,9 +1,9 @@
-import { encryptWithPublicKey, genRSAKeyPair, ERRS, hash, pad, decryptWithPrivateKey } from "../../app/lib/crypto";
+import { encryptWithPublicKey, genRSAKeyPair, ERRS, hash, pad, decryptWithPrivateKey, encrypt, decryptWithSalt, decrypt } from "../../app/lib/crypto";
 import { getDB, clearDB, genDBWithPW, genAccountOnly, genInstancesOnly } from "./db";
-import { EncryptedInstance, TypedObjectID } from "../../app/database/db-types";
+import { EncryptedInstance, TypedObjectID, MongoRecord, EncryptedPassword } from "../../app/database/db-types";
 import { GenericTestContext, Context, RegisterContextual } from "ava";
 import { APIFns, APIArgs, APIReturns } from "../../app/api";
-import { TEST_DB_URI } from "../../app/lib/constants";
+import { TEST_DB_URI, ENCRYPTION_ALGORITHM } from "../../app/lib/constants";
 import { genRandomString } from "../../app/lib/util";
 import { spawn, ChildProcess } from "child_process";
 import { EventEmitter } from "events";
@@ -13,6 +13,7 @@ import fs = require('fs-extra');
 import path = require('path');
 import http = require('http');
 import net = require('net');
+import url = require('url');
 
 export function unref(...emitters: (EventEmitter|{
 	unref(): void;
@@ -289,4 +290,91 @@ export function genURL() {
 	}/${
 		genRandomString(10)
 	}`;
+}
+
+export async function setPasword(t: GenericTestContext<Context<any>>, toSet: {
+	websites: string[];
+	twofactor_enabled: boolean;
+	username: string;
+	password: string;
+	notes: string[];
+}, token: string, config: UserAndDbData) {
+	const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
+
+	const expectedWebsites = toSet.websites;
+	const expected2FAEnabled = toSet.twofactor_enabled;
+	const expectedEncrypted = encrypt({
+		username: toSet.username,
+		password: toSet.password,
+		notes: toSet.notes
+	}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
+	
+	const response = JSON.parse(await doAPIRequest({ 
+		port: http,
+		publicKey: server_public_key
+	}, '/api/password/set', {
+		instance_id: config.instance_id.toHexString()
+	}, {
+		token: token!,
+		websites: expectedWebsites,
+		twofactor_enabled: expected2FAEnabled,
+		encrypted: expectedEncrypted
+	}));
+
+	t.true(response.success, 'API call succeeded');
+	if (!response.success) {
+		return;
+	}
+	
+	const data = response.data;
+	t.is(typeof data.id, 'string', 'passed id is a string');
+
+	//Check if it was actually created
+	const { db, done } = await getDB(uri);
+	const password = await db.collection('passwords').findOne({
+		_id: new mongo.ObjectId(data.id)
+	}) as MongoRecord<EncryptedPassword>;
+	t.not(password, null, 'record was found');
+
+	const instance = await db.collection('instances').findOne({
+		_id: instance_id
+	}) as MongoRecord<EncryptedInstance>;
+	t.not(instance, null, 'instance was found');
+	done();
+
+	t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+		'user ids match');
+	const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
+		dbpw);
+	t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+
+	const actualWebsites = password.websites.map(({ exact, host }) => {
+		return {
+			host: decrypt(host, dbpw),
+			exact: decrypt(exact, dbpw)
+		}
+	});
+	for (const { host, exact } of actualWebsites) {
+		t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	}
+
+	for (let i = 0; i < expectedWebsites.length; i++) {
+		const expectedWebsite = expectedWebsites[i];
+		const actualWebsite = actualWebsites[i];
+
+		const host = url.parse(expectedWebsite).hostname ||
+			url.parse(expectedWebsite).host || expectedWebsite;
+		t.truthy(actualWebsite, 'a website exists at given index');
+		t.is(actualWebsite.host, host, 'hosts match');
+		t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+	}
+
+	const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
+	t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
+	t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+
+	return data.id;
 }
