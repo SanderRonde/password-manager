@@ -1,7 +1,7 @@
 import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doAPIRequest, genURL, doesNotThrow } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
-import { decryptWithPrivateKey, ERRS, hash, pad } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
+import { decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
 import { genRandomString } from '../../../../../app/lib/util';
 import { API_ERRS } from '../../../../../app/api';
 import speakeasy = require('speakeasy');
@@ -10,24 +10,25 @@ import { test } from 'ava';
 import url = require('url');
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/password/allmeta', {
+testParams(test, uris, '/api/password/querymeta', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
-	password_hash: 'string',
-}, { });
-test('can get the password\'s metadata', async t => {
+	url: 'string'
+}, {});
+test('can query a URL', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true
 	});
 	const server = await createServer(config);
-	const { http, uri, server_public_key, instance_private_key, userpw } = config;
+	const { http, uri, server_public_key, instance_private_key } = config;
 	uris.push(uri);
 
 	const token = await getLoginToken(t, config);
 
+	const matchingHost = `www.${genRandomString(20)}.${genRandomString(3)}`;
 	const expectedPasswords = [{
-		websites: [genURL(), genURL()],
+		websites: [genURL(matchingHost), genURL()],
 		username: genRandomString(20),
 		password: genRandomString(20),
 		notes: [genRandomString(10), genRandomString(10), genRandomString(10)],
@@ -38,32 +39,44 @@ test('can get the password\'s metadata', async t => {
 		password: genRandomString(20),
 		notes: [genRandomString(10), genRandomString(10), genRandomString(10)],
 		twofactorEnabled: true
-	}];
-	const passwordIds = [
-		await setPasword(t, {
-			websites: expectedPasswords[0].websites,
-			twofactor_enabled: expectedPasswords[0].twofactorEnabled,
-			username: expectedPasswords[0].username,
-			password: expectedPasswords[0].password,
-			notes: expectedPasswords[0].notes
-		}, token!, config), 
-		await setPasword(t, {
-			websites: expectedPasswords[1].websites,
-			twofactor_enabled: expectedPasswords[1].twofactorEnabled,
-			username: expectedPasswords[1].username,
-			password: expectedPasswords[1].password,
-			notes: expectedPasswords[1].notes
-		}, token!, config)
-	];
+	}, {
+		websites: [genURL(), genURL(matchingHost)],
+		username: genRandomString(20),
+		password: genRandomString(20),
+		notes: [genRandomString(10), genRandomString(10), genRandomString(10)],
+		twofactorEnabled: true
+	}, {
+		websites: [genURL(matchingHost), genURL(matchingHost)],
+		username: genRandomString(20),
+		password: genRandomString(20),
+		notes: [genRandomString(10), genRandomString(10), genRandomString(10)],
+		twofactorEnabled: true
+	}].map((val, index) => {
+		return {...val, index };
+	});
+	const passwordIds = [];
+	for (const pw of expectedPasswords) {
+		passwordIds.push(await setPasword(t, {
+			websites: pw.websites,
+			twofactor_enabled: pw.twofactorEnabled,
+			notes: pw.notes,
+			username: pw.username,
+			password: pw.password
+		}, token!, config));
+	}
 
 	const response = JSON.parse(await doAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/password/allmeta', {
+	}, '/api/password/querymeta', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
-		password_hash: hash(pad(userpw, 'masterpwverify'))
+		url: `http${
+			Math.random() > 0.5 ? 's' : ''
+		}://${
+			matchingHost
+		}/some/path/to/something.html`
 	}));
 
 	server.kill();
@@ -79,15 +92,32 @@ test('can get the password\'s metadata', async t => {
 
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(decryptedData);
-	}, 'data can be parsed');
-	t.is(parsed.length, expectedPasswords.length, 'exactly 2 passwords are returned');
-	for (let i = 0; i < expectedPasswords.length; i++) {
-		const parsedValue = parsed[i];
-		const expected = expectedPasswords[i];
-		t.is(parsedValue.id, passwordIds[i], 'password IDs are the same');
+	}, 'data can be parsed').sort((a, b) => {
+		if (a.id < b.id) return -1;
+		if (a.id > b.id) return 1;
+		return 0;
+	});
+	
+	const matchingExpectedPasswords = expectedPasswords.filter((password) => {
+		for (const website of password.websites) {
+			if (website.indexOf(matchingHost) > -1) {
+				return true;
+			}
+		}
+		return false;
+	});
+	t.is(parsed.length, matchingExpectedPasswords.length, 
+		'amount of matches match');
+
+	for (let i = 0; i < matchingExpectedPasswords.length; i++) {
+		const expected = matchingExpectedPasswords[i];
+		const actual = parsed[i];
+
+		t.is(actual.id, passwordIds[expected.index], 'ids match');
+		t.is(actual.twofactor_enabled, expected.twofactorEnabled);
 		for (let i = 0; i < expected.websites.length; i++) {
 			const expectedWebsite = expected.websites[i];
-			const actualWebsite = parsedValue.websites[i];
+			const actualWebsite = actual.websites[i];
 	
 			t.truthy(actualWebsite, 'note exists');
 			const hostname = url.parse(expectedWebsite).hostname || 
@@ -95,7 +125,6 @@ test('can get the password\'s metadata', async t => {
 			t.is(actualWebsite.host, hostname, 'host names match');
 			t.is(actualWebsite.exact, expectedWebsite, 'exact urls match');
 		}
-		t.is(parsedValue.twofactor_enabled, expected.twofactorEnabled, 'twofactor enabled is the same');
 	}
 });
 test('fails if auth token is wrong', async t => {
@@ -107,18 +136,18 @@ test('fails if auth token is wrong', async t => {
 		twofactor_secret: secret.base32
 	});
 	const server = await createServer(config);
-	const { http, uri, server_public_key, userpw } = config;
+	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/password/allmeta',
+		route: '/api/password/querymeta',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()
 		},
 		encrypted: {
 			token: 'wrongtoken',
-			password_hash: hash(pad(userpw, 'masterpwverify'))
+			url: genURL()
 		},
 		server: server,
 		publicKey: server_public_key
@@ -133,49 +162,22 @@ test('fails if instance id is wrong', async t => {
 		twofactor_secret: secret.base32
 	});
 	const server = await createServer(config);
-	const { http, uri, server_public_key, userpw } = config;
+	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
 	const token = await getLoginToken(t, config);
 	await testInvalidCredentials(t, {
-		route: '/api/password/allmeta',
+		route: '/api/password/querymeta',
 		port: http,
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
 		},
 		encrypted: {
 			token: token!,
-			password_hash: hash(pad(userpw, 'masterpwverify'))
+			url: genURL()
 		},
 		server: server,
 		publicKey: server_public_key,
 		err: API_ERRS.MISSING_PARAMS
-	});
-});
-test('fails if password is wrong', async t => {
-	const secret = speakeasy.generateSecret({
-		name: 'Password manager server'
-	});
-	const config = await genUserAndDb(t, {
-		account_twofactor_enabled: true,
-		twofactor_secret: secret.base32
-	});
-	const server = await createServer(config);
-	const { http, uri, server_public_key } = config;
-	uris.push(uri);
-
-	const token = await getLoginToken(t, config);
-	await testInvalidCredentials(t, {
-		route: '/api/password/allmeta',
-		port: http,
-		unencrypted: {
-			instance_id: config.instance_id.toHexString()
-		},
-		encrypted: {
-			token: token!,
-			password_hash: hash(pad('wrongpassword', 'masterpwverify'))
-		},
-		server: server,
-		publicKey: server_public_key
 	});
 });

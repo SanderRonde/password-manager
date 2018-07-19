@@ -280,14 +280,10 @@ export async function getLoginToken(t: GenericTestContext<Context<any>>,
 		return token;
 	}
 
-export function genURL() {
+export function genURL(host: string = `www.${genRandomString(20)}.${genRandomString(3)}`) {
 	return `http${
 		Math.random() > 0.5 ? 's': ''
-	}://${
-		genRandomString(10)
-	}.${
-		genRandomString(3)
-	}/${
+	}://${host}/${
 		genRandomString(10)
 	}`;
 }

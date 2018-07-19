@@ -562,7 +562,8 @@ export class RoutesApiPassword {
 				return;
 			}
 
-			const host = url.parse(website_url).hostname || url.parse(website_url).host || website_url;
+			const host = url.parse(website_url).hostname || 
+				url.parse(website_url).host || website_url;
 			const unfilteredPasswords = await this.server.database.Manipulation.findMany(
 				COLLECTIONS.PASSWORDS, {
 					user_id: account._id
@@ -571,19 +572,19 @@ export class RoutesApiPassword {
 				res.status(500);
 				res.json({
 					success: false,
-					error: 'failed to create record',
+					error: 'failed to find records',
 					ERR: API_ERRS.SERVER_ERROR
 				});
 				return;
 			}
 			const passwords = unfilteredPasswords.filter(({ websites }) => {
-					for (const website of websites) {
-						if (this.server.database.Crypto.dbDecrypt(website.host) === host) {
-							return true;
-						}
+				for (const website of websites) {
+					if (this.server.database.Crypto.dbDecrypt(website.host) === host) {
+						return true;
 					}
-					return false;
-				});
+				}
+				return false;
+			});
 
 			res.status(200);
 			res.json({
