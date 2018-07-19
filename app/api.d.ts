@@ -491,14 +491,29 @@ export declare namespace APIRoutes {
 			 */
 			encrypted: RSAEncrypted<EncodedString<EncodedString<{
 				id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
-				encrypted: {
+				encrypted: EncodedString<{
+					/**
+					 * The encrypted data
+					 */
 					data: Encrypted<EncodedString<{
+						/**
+						 * The username of the website (or group)
+						 */
 						username: string;
+						/**
+						 * The password of the website (or group)
+						 */
 						password: string;
+						/**
+						 * Any notes about this website (or group)
+						 */
 						notes: string[];
 					}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
-					algorith: EncryptionAlgorithm;
-				}
+					/**
+					 * The algorithm used to encrypt the data
+					 */
+					algorithm: EncryptionAlgorithm;
+				}>;
 			}>>, InstancePublicKey>;
 		}>;
 
