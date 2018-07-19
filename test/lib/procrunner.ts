@@ -191,7 +191,7 @@ export class ProcRunner {
 				path.join(__dirname, './../../app/main.js'),
 				...this._args
 			], {
-				env: this._config.env || {}
+				env: {...process.env, ...(this._config.env || {})}
 			}).once('exit', (code: number) => {
 				if (!done) {
 					this._exitCode = code;

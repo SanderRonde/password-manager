@@ -152,7 +152,7 @@ export function createServer({
 			'-p', dbpw,
 			'-d', uri
 		], ...(env ? ['--debug'] : [])], {
-			env: env || {}
+			env: {...process.env, ...(env || {})}
 		});
 		proc.unref();
 		listenWithoutRef(proc.stdout, (chunk) => {
