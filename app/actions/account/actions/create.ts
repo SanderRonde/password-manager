@@ -21,8 +21,7 @@ export namespace CreateAccount {
 			reset_key: database.Crypto.dbEncrypt(encrypt({
 				integrity: true as true,
 				pw: password
-			}, resetKey, ENCRYPTION_ALGORITHM)),
-			reset_reset_keys: []
+			}, resetKey, ENCRYPTION_ALGORITHM))
 		}
 
 		if (!await database.Manipulation.insertOne(COLLECTIONS.USERS, record)) {

@@ -118,34 +118,6 @@ export interface EncryptedAccount {
 		 */
 		algorithm: EncryptionAlgorithm;
 	}>>>>;
-	/**
-	 * (encrypted) Previous reset_key-master_password combinations
-	 *  that can be used to undo a reset
-	 */
-	reset_reset_keys: EncodedString<DatabaseEncrypted<EncodedString<EncodedString<{
-		/**
-		 * The data that is encrypted
-		 */
-		data: Encrypted<EncodedString<EncodedString<{
-			/**
-			 * The data that is encrypted
-			 */
-			data: Encrypted<EncodedString<{
-				/**
-				 * An integrity verification
-				 */
-				integrity: true;
-			}>, ResetKey>;
-			/**
-			 * The algorithm used to encrypt the data
-			 */
-			algorithm: EncryptionAlgorithm;
-		}>>, MasterPassword>;
-		/**
-		 * The algorithm used to encrypt the data
-		 */
-		algorithm: EncryptionAlgorithm;
-	}>>>>[];
 }
 
 /**
@@ -191,34 +163,6 @@ export interface DecryptedAccount {
 		 */
 		algorithm: EncryptionAlgorithm;
 	}>;
-	/**
-	 * Previous reset_key-master_password combinations
-	 *  that can be used to undo a reset
-	 */
-	reset_reset_keys: EncodedString<{
-		/**
-		 * The data that is encrypted
-		 */
-		data: Encrypted<EncodedString<EncodedString<{
-			/**
-			 * The data that is encrypted
-			 */
-			data: Encrypted<EncodedString<{
-				/**
-				 * An integrity verification
-				 */
-				integrity: true;
-			}>, ResetKey>;
-			/**
-			 * The algorithm used to encrypt the data
-			 */
-			algorithm: EncryptionAlgorithm;
-		}>>, MasterPassword>;
-		/**
-		 * The algorithm used to encrypt the data
-		 */
-		algorithm: EncryptionAlgorithm;
-	}>[];
 }
 
 /**

@@ -136,8 +136,6 @@ test('works if params are correct', async t => {
 	if (isErr(t, decryptedResetKey)) return;
 	t.true(decryptedResetKey.integrity, 'integrity is true');
 	t.is(decryptedResetKey.pw, newMasterPassword, 'new master password can be decrypted');
-
-	t.is(account.reset_reset_keys.length, 1, 'reset_reset_key was added');
 });
 test('cancels if failing on password changes', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
@@ -223,8 +221,6 @@ test('cancels if failing on password changes', async t => {
 	if (isErr(t, dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
 	t.not(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
-
-	t.is(account.reset_reset_keys.length, 0, 'no reset_reset_key was added');
 });
 test('cancels if failing on instance changes', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
@@ -310,8 +306,6 @@ test('cancels if failing on instance changes', async t => {
 	if (isErr(t, dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
 	t.not(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
-
-	t.is(account.reset_reset_keys.length, 0, 'no reset_reset_key was added');
 });
 test('cancels if failing on account changes', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
@@ -397,6 +391,4 @@ test('cancels if failing on account changes', async t => {
 	if (isErr(t, dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
 	t.not(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
-
-	t.is(account.reset_reset_keys.length, 0, 'no reset_reset_key was added');
 });

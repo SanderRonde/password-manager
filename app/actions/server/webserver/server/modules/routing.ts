@@ -408,9 +408,6 @@ export class WebserverRouter {
 		this.parent.app.post('/api/user/reset', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Account, 'reset')));
-		this.parent.app.post('/api/user/undoreset', bruteforceLimiter,
-			apiUseLimiter, this._wrapInErrorHandler(
-				this._doBind(this.parent.Routes.API.Account, 'undoreset')));
 		this.parent.app.post('/api/user/genresetkey', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Account, 'regenkey')));

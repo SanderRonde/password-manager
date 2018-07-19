@@ -101,17 +101,14 @@ export class DatabaseEncryption {
 	}
 
 	public dbDecryptAccountRecord({
-		email, pw, twofactor_secret, twofactor_enabled, reset_key, reset_reset_keys
+		email, pw, twofactor_secret, twofactor_enabled, reset_key
 	}: EncryptedAccount|UnstringifyObjectIDs<EncryptedAccount>): DecryptedAccount {
 		return {
 			email: email,
 			pw: this.dbDecrypt(pw),
 			twofactor_secret: this.dbDecryptWithSalt(twofactor_secret),
 			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled),
-			reset_key: this.dbDecrypt(reset_key),
-			reset_reset_keys: reset_reset_keys.map((key) => {
-				return this.dbDecrypt(key);
-			})
+			reset_key: this.dbDecrypt(reset_key)
 		}
 	}
 }

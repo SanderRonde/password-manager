@@ -115,8 +115,7 @@ export async function genAccountOnly(suppliedDb: SuppliedDatabase, {
 		reset_key: encrypt(encrypt({
 			integrity: true as true,
 			pw: userpw
-		}, resetKey, ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM),
-		reset_reset_keys: []
+		}, resetKey, ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		email: 'other@email.com',
 		pw: encrypt(hash(pad('otherpw', 'masterpwverify')), dbpw, ENCRYPTION_ALGORITHM),
@@ -126,8 +125,7 @@ export async function genAccountOnly(suppliedDb: SuppliedDatabase, {
 			integrity: true as true,
 			pw: userpw
 		}, genRandomString(RESET_KEY_LENGTH), 
-			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM),
-		reset_reset_keys: []
+			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		email: 'other@email.com',
 		pw: encrypt(hash(pad('otherpw', 'masterpwverify')), dbpw, ENCRYPTION_ALGORITHM),
@@ -137,8 +135,7 @@ export async function genAccountOnly(suppliedDb: SuppliedDatabase, {
 			integrity: true as true,
 			pw: userpw
 		}, genRandomString(RESET_KEY_LENGTH), 
-			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM),
-		reset_reset_keys: []
+			ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
 	}]
 
 	await db.collection('users').insertMany(accountRecords);
@@ -320,7 +317,6 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 	t.truthy(encrypted, 'record is truthy');
 
 	let decrypted = { 
-		reset_reset_keys: encrypted.reset_reset_keys as any[],
 		email: encrypted.email
 	} as Partial<DecryptedAccount> & {
 		email: string;

@@ -22,7 +22,6 @@ export interface APIFns {
 	'/api/password/allmeta': typeof APIRoutes.Password.allmeta;
 
 	'/api/user/reset': typeof APIRoutes.Account.reset;
-	'/api/user/undoreset': typeof APIRoutes.Account.undoreset;
 	'/api/user/genresetkey': typeof APIRoutes.Account.regenkey;
 }
 
@@ -257,17 +256,6 @@ export declare namespace APIRoutes {
 		}, encrypted: {
 			reset_key: string;
 			email: string;
-			newmasterpassword: MasterPassword;
-		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
-			new_reset_key: ResetKey;
-		}>;
-
-		export function undoreset(params: {
-			instance_id: StringifiedObjectId<EncryptedInstance>;
-		}, encrypted: {
-			reset_key: string;
-			email: string
-			master_password: MasterPassword;
 			newmasterpassword: MasterPassword;
 		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			new_reset_key: ResetKey;
