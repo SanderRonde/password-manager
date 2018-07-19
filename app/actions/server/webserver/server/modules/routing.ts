@@ -210,9 +210,7 @@ export class WebserverRouter {
 					}
 
 					const values: R & O & E & OE = {} as R & O & E & OE;
-					console.log(requiredParams);
 					for (const key of requiredParams.unencrypted) {
-						console.log(key);
 						if (toCheckUnencrypted[key] === undefined || toCheckUnencrypted[key] === null) {
 							res.status(400);
 							res.json({
@@ -225,7 +223,6 @@ export class WebserverRouter {
 						values[key] = toCheckUnencrypted[key];
 					}
 					for (const key of requiredParams.encrypted || []) {
-						console.log(key);
 						if (toCheckEncrypted[key] === undefined || toCheckEncrypted[key] === null) {
 							res.status(400);
 							res.json({
