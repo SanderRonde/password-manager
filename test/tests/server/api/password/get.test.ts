@@ -2,11 +2,11 @@ import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doA
 import { StringifiedObjectId, EncryptedInstance, EncryptedPassword } from '../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { decryptWithPrivateKey, ERRS, decrypt, hash, pad } from '../../../../../app/lib/crypto';
+import { genRandomString } from '../../../../../app/lib/util';
 import { API_ERRS } from '../../../../../app/api';
 import speakeasy = require('speakeasy');
 import mongo = require('mongodb');
 import { test } from 'ava';
-import { genRandomString } from '../../../../../app/lib/util';
 
 const uris = captureURIs(test);
 testParams(test, uris, '/api/password/get', {
