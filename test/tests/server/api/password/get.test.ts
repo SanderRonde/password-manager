@@ -2,7 +2,6 @@ import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doA
 import { StringifiedObjectId, EncryptedInstance, EncryptedPassword } from '../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { decryptWithPrivateKey, ERRS, decrypt, hash, pad } from '../../../../../app/lib/crypto';
-import { doSingleQuery } from '../../../../lib/db';
 import { API_ERRS } from '../../../../../app/api';
 import speakeasy = require('speakeasy');
 import mongo = require('mongodb');
