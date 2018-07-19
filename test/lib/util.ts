@@ -98,6 +98,7 @@ export interface UserAndDbData {
 	http: number;
 	dbpw: string;
 	uri: string;
+	logServerOutput?: boolean;
 }
 
 export interface MockConfig {
@@ -139,7 +140,8 @@ export async function genUserAndDb(t: GenericTestContext<Context<any>>,
 export function createServer({ 
 	uri, 
 	http, 
-	dbpw 
+	dbpw,
+	logServerOutput
 }: UserAndDbData, env?: {}): Promise<ChildProcess> {
 	return new Promise((resolve) => {
 		const proc = spawn('node', [...[
@@ -156,6 +158,8 @@ export function createServer({
 		listenWithoutRef(proc.stdout, (chunk) => {
 			if (chunk.trim() === `HTTP server listening on port ${http}`) {
 				resolve(proc);
+			} else if (logServerOutput) {
+				console.log(chunk.toString());
 			}
 		});
 	});
