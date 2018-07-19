@@ -207,6 +207,7 @@ export class WebserverRouter {
 							return;
 						}
 						toCheckEncrypted = decrypted as E & OE;
+						toCheckSrc = {...toCheckSrc, ...decrypted}
 					}
 
 					const values: R & O & E & OE = {} as R & O & E & OE;
