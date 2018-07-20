@@ -100,6 +100,7 @@ export interface UserAndDbData {
 	dbpw: string;
 	uri: string;
 	logServerOutput?: boolean;
+	enableRateLimit?: boolean;
 }
 
 export interface MockConfig {
@@ -142,17 +143,18 @@ export function createServer({
 	uri, 
 	http, 
 	dbpw,
-	logServerOutput
+	logServerOutput,
+	enableRateLimit
 }: UserAndDbData, env?: {}): Promise<ChildProcess> {
 	return new Promise((resolve) => {
 		const proc = spawn('node', [...[
 			path.join(__dirname, './../../app/main.js'),
 			'server',
 			'--http', http + '',
-			'--no-rate-limit',
 			'-p', dbpw,
 			'-d', uri
-		], ...(env ? ['--debug'] : [])], {
+		], ...(env ? ['--debug'] : []), 
+			...(!enableRateLimit ? ['--no-rate-limit'] : [])], {
 			env: {...process.env, ...(env || {})}
 		});
 		proc.unref();
@@ -203,6 +205,68 @@ export async function doAPIRequest<K extends keyof APIFns>({ port, publicKey }: 
 			});
 			res.once('end', () => {
 				resolve(responseText as EncodedString<APIReturns[K]>);
+			});
+			res.once('error', (err) => {
+				reject(err);
+			});
+		});
+		req.write(data);
+		req.end();
+	});
+}
+
+export async function doPostRequest<K extends keyof APIFns>({ port, publicKey }: {
+	port: number;
+	publicKey: string;
+}, path: K,args: APIArgs[K][0], encrypted: APIArgs[K][1]): Promise<{
+	response: http.IncomingMessage;
+	responseText: EncodedString<APIReturns[K]>
+}>;
+export async function doPostRequest<K extends keyof APIFns>({ port }: {
+	port: number;
+	publicKey?: string;
+}, path: K,args: APIArgs[K][0]): Promise<{
+	response: http.IncomingMessage;
+	responseText: EncodedString<APIReturns[K]>
+}>;
+export async function doPostRequest<K extends keyof APIFns>({ port, publicKey }: {
+	port: number;
+	publicKey?: string;
+}, path: K,args: APIArgs[K][0], encrypted?: APIArgs[K][1]): Promise<{
+	response: http.IncomingMessage;
+	responseText: EncodedString<APIReturns[K]>
+}> {
+	return new Promise<{
+		response: http.IncomingMessage;
+		responseText: EncodedString<APIReturns[K]>
+	}>((resolve, reject) => {
+		const keys = Object.getOwnPropertyNames(encrypted || {});
+		if (keys.length && !publicKey) {
+			throw new Error('Missing public key for encryption');
+		}
+		const data = JSON.stringify({...args as Object, ...(keys.length && publicKey ? {
+			encrypted: encryptWithPublicKey(encrypted, publicKey)
+		} : {})});
+		const req = http.request({
+			port,
+			hostname: '127.0.0.1',
+			method: 'POST',
+			path,
+			headers: {
+				'Content-Type': 'application/json',
+				'Content-Length': Buffer.byteLength(data)
+			}
+		}, (res) => {
+			let responseText: string = '';
+			res.setEncoding('utf8');
+			listenWithoutRef(res, (chunk) => {
+				responseText += chunk;
+			});
+			res.once('end', () => {
+				resolve({
+					response: res,
+					responseText: responseText as EncodedString<APIReturns[K]>
+				});
 			});
 			res.once('error', (err) => {
 				reject(err);

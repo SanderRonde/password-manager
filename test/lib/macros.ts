@@ -5,7 +5,7 @@ import { ChildProcess } from "child_process";
 
 async function doServerSetupAndBreakdown(t: GenericTestContext<Context<any>>, uris: string[]) {
 	const config = await genUserAndDb(t);
-	const server = await createServer({...config, logServerOutput: true });
+	const server = await createServer({...config });
 	uris.push(config.uri);
 	return {
 		done() {

@@ -247,3 +247,11 @@ export function genID<T>(): TypedObjectID<T> {
 export function isVoid(val: any): val is void {
 	return val === undefined || val === null;
 }
+
+export function wait(ms: number): Promise<void> {
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			resolve(undefined);
+		}, ms);
+	});
+}

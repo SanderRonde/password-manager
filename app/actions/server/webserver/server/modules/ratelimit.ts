@@ -1,4 +1,5 @@
 import { unref } from '../../../../../../test/lib/util';
+import { getDebug } from '../../../../../lib/debug';
 import RateLimit = require('express-rate-limit');
 import { ServerConfig } from '../../../server';
 import { API_ERRS } from '../../../../../api';
@@ -102,37 +103,32 @@ class RatelimitStore<K extends string> {
 }
 
 function blockHandler(_req: express.Request, res: ResponseCaptured) {
-	res.format({
-		html() {
-			res.status(429).end('too many requests');
-		},
-		json() {
-			res.status(429).json({
-				success: false,
-				error: 'too many requests'
-			});
-		}
+	res.status(429);
+	res.json({
+		success: false,
+		ERR: API_ERRS.TOO_MANY_REQUESTS,
+		error: 'too many requests'
 	});
 }
 
-function getBruteforceLimiter() {
-	const store = new RatelimitStore(60 * 1000);
+function getBruteforceLimiter(factor: number) {
+	const store = new RatelimitStore(60 * 1000 * factor);
 	return new RateLimit({
-		windowMs: 60 * 1000,
+		windowMs: 60 * 1000 * factor,
 		store: store,
 		delayAfter: 2,
 		delayMs: 1000,
 		max: 4,
-		message: 'too many requests',
 		keyGenerator(req) {
 			return (req.body && req.body.instance_id) || req.ip;
 		},
 		skipFailedRequests: true,
 		skip(req, res: ResponseCaptured) {
+			const key = (req.body && req.body.instance_id) || req.ip;
 			res.once('finish', () => {
 				if (res.__jsonResponse && res.__jsonResponse.success === false) {
 					//If API request was unsuccessful count this request 
-					store.incr((req.body && req.body.instance_id) || req.ip, () => {});
+					store.incr(key, (_, v) => { console.log(v) });
 				}
 			});
 			return true;
@@ -147,28 +143,27 @@ function noOp(_req: express.Request, _res: ResponseCaptured, next: express.NextF
 
 export function getStores(config: ServerConfig) {
 	if (config.rateLimit) {
+		const factor = getDebug(config.debug).SPEED_UP_TIME_BY_4 ? 0.25 : 1;
 		const instanceCreateLimiter = new RateLimit({
-			windowMs: 60 * 1000,
+			windowMs: 60 * 1000 * factor,
 			delayAfter: 0,
 			max: 5,
-			message: 'too many requests',
-			store: new RatelimitStore(60 * 1000),
+			store: new RatelimitStore(60 * 1000 * factor),
 			handler: blockHandler
 		});
 		const apiUseLimiter = new RateLimit({
-			windowMs: 20 * 1000,
+			windowMs: 20 * 1000 * factor,
 			delayAfter: 10,
 			delayMs: 1000,
 			max: 20,
-			message: 'too many requests',
 			keyGenerator(req) {
 				return (req.body && req.body.instance_id) || req.ip;
 			},
-			store: new RatelimitStore(20 * 1000),
+			store: new RatelimitStore(20 * 1000 * factor),
 			handler: blockHandler
 		});
 		return {
-			bruteforceLimiter: getBruteforceLimiter(),
+			bruteforceLimiter: getBruteforceLimiter(factor),
 			instanceCreateLimiter,
 			apiUseLimiter
 		}
