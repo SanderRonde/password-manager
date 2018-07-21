@@ -11,9 +11,10 @@ import { test } from 'ava';
 const uris = captureURIs(test);
 testParams(test, uris, '/api/instance/2fa/enable', {
 	instance_id: 'string',
-	password: 'string',
 	email: 'string'
-}, {}, {}, {});
+}, {}, {
+	password: 'string'
+}, {});
 test('can enable 2FA when no 2FA secret is set', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false,
@@ -26,13 +27,18 @@ test('can enable 2FA when no 2FA secret is set', async t => {
 		userpw, 
 		uri, 
 		instance_id, 
+		server_public_key
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/enable', {
+	const response = JSON.parse(await doAPIRequest({ 
+		port: http,
+		publicKey: server_public_key
+	}, '/api/instance/2fa/enable', {
 		instance_id: instance_id.toHexString(),
-		password: hash(pad(userpw, 'masterpwverify')),
 		email: DEFAULT_EMAIL
+	}, {
+		password: hash(pad(userpw, 'masterpwverify')),
 	}));
 
 	server.kill();
@@ -77,13 +83,18 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 		uri, 
 		dbpw,
 		instance_id, 
+		server_public_key
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/enable', {
+	const response = JSON.parse(await doAPIRequest({ 
+		port: http,
+		publicKey: server_public_key
+	}, '/api/instance/2fa/enable', {
 		instance_id: instance_id.toHexString(),
-		password: hash(pad(userpw, 'masterpwverify')),
 		email: DEFAULT_EMAIL
+	}, {
+		password: hash(pad(userpw, 'masterpwverify')),
 	}));
 
 	server.kill();
@@ -133,13 +144,18 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 		uri, 
 		dbpw,
 		instance_id, 
+		server_public_key
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/enable', {
+	const response = JSON.parse(await doAPIRequest({ 
+		port: http,
+		publicKey: server_public_key
+	}, '/api/instance/2fa/enable', {
 		instance_id: instance_id.toHexString(),
-		password: hash(pad(userpw, 'masterpwverify')),
 		email: DEFAULT_EMAIL
+	}, {
+		password: hash(pad(userpw, 'masterpwverify'))
 	}));
 
 	server.kill();
@@ -172,11 +188,12 @@ test('fails if password is wrong', async t => {
 	await testInvalidCredentials(t, {
 		route: '/api/instance/2fa/enable',
 		port: http,
-		encrypted: {},
+		encrypted: {
+			password: hash(pad(userpw + 'wrongpw', 'masterpwverify'))
+		},
 		unencrypted: {
 			instance_id: instance_id.toHexString(),
 			email: DEFAULT_EMAIL,
-			password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
 		},
 		server: server,
 		publicKey: server_public_key
@@ -191,11 +208,12 @@ test('fails if instance id is wrong', async t => {
 	await testInvalidCredentials(t, {
 		route: '/api/instance/2fa/enable',
 		port: http,
-		encrypted: {},
+		encrypted: {
+			password: hash(pad(userpw, 'masterpwverify'))
+		},
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
-			email: DEFAULT_EMAIL,
-			password: hash(pad(userpw, 'masterpwverify')),
+			email: DEFAULT_EMAIL
 		},
 		server: server,
 		publicKey: server_public_key

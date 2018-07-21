@@ -80,9 +80,11 @@ export class RoutesApiInstance {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			challenge: RSAEncrypted<EncodedString<string>, ServerPublicKey>;
+		}, {}, {
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-		}, {}, {}, {}>({
-			unencrypted: ['instance_id', 'password_hash', 'challenge']
+		}, {}>({
+			unencrypted: ['instance_id', 'challenge'],
+			encrypted: ['password_hash']
 		}, {}, async (toCheck, { instance_id, password_hash, challenge }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',

@@ -15,10 +15,12 @@ export class RoutesAPIInstanceTwofactor {
 	public enable(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 			email: string;
-		}, {}, {}, {}>({
-			unencrypted: ['instance_id', 'password', 'email']
+		}, {}, {
+			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+		}, {}>({
+			unencrypted: ['instance_id', 'email'],
+			encrypted: ['password']
 		}, {}, async (toCheck, { instance_id }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
@@ -111,11 +113,13 @@ export class RoutesAPIInstanceTwofactor {
 	public disable(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 			email: string;
 			twofactor_token: string;
-		}, {}, {}, {}>({
-			unencrypted: ['instance_id', 'password', 'email', 'twofactor_token']
+		}, {}, {
+			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+		}, {}>({
+			unencrypted: ['instance_id', 'email', 'twofactor_token'],
+			encrypted: ['password']
 		}, {}, async (toCheck, { instance_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',

@@ -10,9 +10,10 @@ import { test } from 'ava';
 const uris = captureURIs(test);
 testParams(test, uris, '/api/instance/login', {
 	instance_id: 'string',
-	challenge: 'string',
+	challenge: 'string'
+}, {}, {
 	password_hash: 'string'
-}, {}, {}, {});
+}, {});
 test('login token can be generated when 2FA is disabled', async t => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
@@ -29,9 +30,13 @@ test('login token can be generated when 2FA is disabled', async t => {
 	uris.push(uri);
 
 	const challenge = genRandomString(25);
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/login', {
+	const response = JSON.parse(await doAPIRequest({ 
+		port: http,
+		publicKey: server_public_key
+	}, '/api/instance/login', {
 		instance_id: instance_id.toHexString(),
-		challenge: encryptWithPublicKey(challenge, server_public_key),
+		challenge: encryptWithPublicKey(challenge, server_public_key)
+	}, {
 		password_hash: hash(pad(userpw, 'masterpwverify'))
 	}));
 
@@ -72,9 +77,13 @@ test('login token can be generated when 2FA is enabled', async t => {
 	uris.push(uri);
 
 	const challenge = genRandomString(25);
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/login', {
+	const response = JSON.parse(await doAPIRequest({ 
+		port: http,
+		publicKey: server_public_key
+	}, '/api/instance/login', {
 		instance_id: instance_id.toHexString(),
-		challenge: encryptWithPublicKey(challenge, server_public_key),
+		challenge: encryptWithPublicKey(challenge, server_public_key)
+	}, {
 		password_hash: hash(pad(userpw, 'masterpwverify'))
 	}));
 
@@ -105,11 +114,12 @@ test('fails if instance id is wrong', async t => {
 	await testInvalidCredentials(t, {
 		route: '/api/instance/login',
 		port: http,
-		encrypted: {},
+		encrypted: {
+			password_hash: hash(pad(userpw, 'masterpwverify'))
+		},
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
-			challenge: encryptWithPublicKey(challenge, server_public_key),
-			password_hash: hash(pad(userpw, 'masterpwverify'))
+			challenge: encryptWithPublicKey(challenge, server_public_key)
 		},
 		server: server,
 		publicKey: server_public_key

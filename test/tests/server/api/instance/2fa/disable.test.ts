@@ -12,9 +12,10 @@ import { test } from 'ava';
 const uris = captureURIs(test);
 testParams(test, uris, '/api/instance/2fa/enable', {
 	instance_id: 'string',
-	password: 'string',
 	email: 'string'
-}, {}, {}, {});
+}, {}, {
+	password: 'string'
+}, {});
 test('can disable 2FA when given a valid 2FA token', async t => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
@@ -28,18 +29,23 @@ test('can disable 2FA when given a valid 2FA token', async t => {
 		userpw, 
 		uri, 
 		instance_id, 
-		dbpw
+		dbpw,
+		server_public_key
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/disable', {
+	const response = JSON.parse(await doAPIRequest({ 
+		port: http,
+		publicKey: server_public_key
+	}, '/api/instance/2fa/disable', {
 		instance_id: instance_id.toHexString(),
-		password: hash(pad(userpw, 'masterpwverify')),
 		email: DEFAULT_EMAIL,
 		twofactor_token: speakeasy.totp({
 			secret: twofactor.base32,
 			encoding: 'base32'
 		})
+	}, {
+		password: hash(pad(userpw, 'masterpwverify')),
 	}));
 
 	server.kill();
@@ -84,14 +90,19 @@ test('state is unchanged if already disabled', async t => {
 		userpw, 
 		uri, 
 		instance_id, 
+		server_public_key
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/disable', {
+	const response = JSON.parse(await doAPIRequest({ 
+		port: http,
+		publicKey: server_public_key
+	}, '/api/instance/2fa/disable', {
 		instance_id: instance_id.toHexString(),
-		password: hash(pad(userpw, 'masterpwverify')),
 		email: DEFAULT_EMAIL,
 		twofactor_token: 'sometoken'
+	}, {
+		password: hash(pad(userpw, 'masterpwverify')),
 	}));
 
 	server.kill();
@@ -116,18 +127,23 @@ test('fails if an invalid token is passed', async t => {
 		userpw, 
 		uri, 
 		instance_id, 
+		server_public_key
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/disable', {
+	const response = JSON.parse(await doAPIRequest({ 
+		port: http,
+		publicKey: server_public_key
+	}, '/api/instance/2fa/disable', {
 		instance_id: instance_id.toHexString(),
-		password: hash(pad(userpw, 'masterpwverify')),
 		email: DEFAULT_EMAIL,
 		twofactor_token: speakeasy.totp({
 			secret: twofactor.base32,
 			encoding: 'base32',
 			time: Date.now() - (60 * 60)
 		})
+	}, {
+		password: hash(pad(userpw, 'masterpwverify'))
 	}));
 
 	server.kill();
@@ -150,10 +166,11 @@ test('fails if password is wrong', async t => {
 	await testInvalidCredentials(t, {
 		route: '/api/instance/2fa/disable',
 		port: http,
-		encrypted: {},
+		encrypted: {
+			password: hash(pad(userpw + 'wrongpw', 'masterpwverify'))
+		},
 		unencrypted: {
 			instance_id: instance_id.toHexString(),
-			password: hash(pad(userpw + 'wrongpw', 'masterpwverify')),
 			email: DEFAULT_EMAIL,
 			twofactor_token: speakeasy.totp({
 				secret: twofactor.base32,
@@ -179,10 +196,11 @@ test('fails if instance id wrong', async t => {
 	await testInvalidCredentials(t, {
 		route: '/api/instance/2fa/disable',
 		port: http,
-		encrypted: {},
+		encrypted: {
+			password: hash(pad(userpw, 'masterpwverify'))
+		},
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
-			password: hash(pad(userpw, 'masterpwverify')),
 			email: DEFAULT_EMAIL,
 			twofactor_token: speakeasy.totp({
 				secret: twofactor.base32,

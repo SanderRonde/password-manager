@@ -8,9 +8,13 @@ import http = require('http');
 
 async function doInstanceCreateRequest(config: UserAndDbData) {
 	const challenge = genRandomString(25);
-	return await doPostRequest({ port: config.http }, '/api/instance/login', {
+	return await doPostRequest({ 
+		port: config.http,
+		publicKey: config.server_public_key
+	}, '/api/instance/login', {
 		instance_id: config.instance_id.toHexString(),
-		challenge: encryptWithPublicKey(challenge, config.server_public_key),
+		challenge: encryptWithPublicKey(challenge, config.server_public_key)
+	}, {
 		password_hash: hash(pad(config.userpw, 'masterpwverify'))
 	});
 }
@@ -29,9 +33,13 @@ async function doAPIRequest(token: LoginToken, config: UserAndDbData) {
 
 async function doFailingInstanceCreateRequest(config: UserAndDbData) {
 	const challenge = genRandomString(25);
-	return await doPostRequest({ port: config.http }, '/api/instance/login', {
+	return await doPostRequest({ 
+		port: config.http,
+		publicKey: config.server_public_key
+	}, '/api/instance/login', {
 		instance_id: config.instance_id.toHexString(),
 		challenge: encryptWithPublicKey(challenge, config.server_public_key),
+	}, {
 		password_hash: hash(pad('wrongpassword', 'masterpwverify'))
 	});
 }

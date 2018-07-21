@@ -27,9 +27,13 @@ test('can log in, set a password, update it and then remove a password', async t
 
 	const token = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/login', {
+		const response = JSON.parse(await doAPIRequest({ 
+			port: http,
+			publicKey: server_public_key
+		}, '/api/instance/login', {
 			instance_id: instance_id.toHexString(),
-			challenge: encryptWithPublicKey(challenge, server_public_key),
+			challenge: encryptWithPublicKey(challenge, server_public_key)
+		}, {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 
@@ -258,9 +262,13 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 
 	const token = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/login', {
+		const response = JSON.parse(await doAPIRequest({ 
+			port: http,
+			publicKey: server_public_key
+		}, '/api/instance/login', {
 			instance_id: instance_id.toHexString(),
-			challenge: encryptWithPublicKey(challenge, server_public_key),
+			challenge: encryptWithPublicKey(challenge, server_public_key)
+		}, {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 
@@ -543,9 +551,13 @@ test('can log in, set a password and get all metadata', async t => {
 
 	const token = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/login', {
+		const response = JSON.parse(await doAPIRequest({ 
+			port: http,
+			publicKey: server_public_key
+		}, '/api/instance/login', {
 			instance_id: instance_id.toHexString(),
-			challenge: encryptWithPublicKey(challenge, server_public_key),
+			challenge: encryptWithPublicKey(challenge, server_public_key)
+		}, {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 
@@ -794,9 +806,13 @@ test('can log in, set and update a password, ' +
 
 		const token = await (async () => {
 			const challenge = genRandomString(25);
-			const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/login', {
+			const response = JSON.parse(await doAPIRequest({ 
+				port: http,
+				publicKey: server_public_key
+			}, '/api/instance/login', {
 				instance_id: instance_id.toHexString(),
-				challenge: encryptWithPublicKey(challenge, server_public_key),
+				challenge: encryptWithPublicKey(challenge, server_public_key)
+			}, {
 				password_hash: hash(pad(userpw, 'masterpwverify'))
 			}));
 

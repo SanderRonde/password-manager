@@ -151,11 +151,12 @@ export declare namespace APIRoutes {
 			 * A challenge by the instance to verify the server's identity
 			 */
 			challenge: RSAEncrypted<EncodedString<C>, ServerPrivateKey>;
+		}, encrypted: {
 			/**
 			 * The hash of the master password
 			 */
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			/**
 			 * Further 2FA authentication is required
 			 */
@@ -227,14 +228,15 @@ export declare namespace APIRoutes {
 				 */
 				instance_id: StringifiedObjectId<EncryptedInstance>;
 				/**
-				 * The hashed master password for the user associated with the instance
-				 */
-				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-				/**
 				 * The email address associated with the instance
 				 */
 				email: string;
-			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+			}, encrypted: {
+				/**
+				 * The hashed master password for the user associated with the instance
+				 */
+				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+			}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 				/**
 				 * A message explaining what happened
 				 */
@@ -268,10 +270,6 @@ export declare namespace APIRoutes {
 				 */
 				instance_id: StringifiedObjectId<EncryptedInstance>;
 				/**
-				 * The hashed master password for the user associated with the instance
-				 */
-				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-				/**
 				 * The email address associated with the instance
 				 */
 				email: string;
@@ -279,7 +277,12 @@ export declare namespace APIRoutes {
 				 * A 2FA token for this account
 				 */
 				twofactor_token: string;
-			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+			}, encrypted: {
+				/**
+				 * The hashed master password for the user associated with the instance
+				 */
+				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+			}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 				/**
 				 * A message explaining what happens
 				 */
