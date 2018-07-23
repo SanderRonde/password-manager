@@ -33,7 +33,7 @@ export class RoutesAPIInstanceTwofactor {
 				type: 'string'
 			},])) return;
 
-			const auth = await this.server.Router.checkPasswordFromBody(req, res);
+			const auth = await this.server.Router.checkPasswordFromBody(toCheck, res);
 			if (auth === false) return;
 
 			const { instance, decryptedInstance, accountPromise } = 
@@ -135,7 +135,7 @@ export class RoutesAPIInstanceTwofactor {
 				type: 'string'
 			}])) return;
 
-			const auth = await this.server.Router.checkPasswordFromBody(req, res);
+			const auth = await this.server.Router.checkPasswordFromBody(toCheck, res);
 			if (auth === false) return;
 
 			const { instance, decryptedInstance, accountPromise } = 

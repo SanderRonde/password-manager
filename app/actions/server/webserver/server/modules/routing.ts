@@ -44,14 +44,19 @@ export class WebserverRouter {
 				return true;
 			}
 
-	public async checkPasswordFromBody(req: express.Request, res: ResponseCaptured, 
+	public async checkPasswordFromBody(toCheck: any, res: ResponseCaptured, 
 		supressErr: boolean = false): Promise<false|MongoRecord<EncryptedAccount>> {
-			const { email, password } = req.body as {
+			const { email, password } = toCheck as {
 				email: string;
 				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 			};
 			if (!email || !password) {
 				res.status(400);
+				res.json({
+					success: false,
+					error: 'Incorrect combination',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
 				return false;
 			}
 

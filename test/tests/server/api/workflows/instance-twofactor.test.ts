@@ -21,13 +21,13 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		http, 
 		userpw, 
 		uri, 
-		dbpw,
-		server_public_key
+		dbpw
 	} = config;
 	uris.push(uri);
 
 	const {
-		instance_id
+		instance_id,
+		server_key
 	} = await (async  () => {
 		const keyPair = genRSAKeyPair();
 		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/register', {
@@ -59,13 +59,14 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 
 		t.is(typeof server_key, 'string', 'type of serverkey is string');
 		return {
-			instance_id: instance_id
+			instance_id: instance_id,
+			server_key: server_key
 		}
 	})();
 	await (async () => {
 		const response = JSON.parse(await doAPIRequest({ 
 			port: http,
-			publicKey: server_public_key
+			publicKey: server_key!
 		}, '/api/instance/2fa/enable', {
 			instance_id: instance_id!,
 			email: DEFAULT_EMAIL
