@@ -25,12 +25,17 @@
   },
   "devDependencies": {
     "ava": "^0.25.0",
+    "fs-extra": "^7.0.0",
     "gulp": "^4.0.0",
     "gulp-typescript": "^5.0.0-alpha.3",
+    "rollup": "^0.63.4",
     "typescript": "^2.9.2"
   },
   "scripts": {
-    "compile": "gulp compile",
+    "compile": "yarn compile:shared && yarn compile:server && yarn compile:dashboard",
+    "compile:shared": "tsc -p ./shared/tsconfig.json",
+    "compile:server": "tsc -p ./server/tsconfig.json",
+    "compile:dashboard": "tsc -p ./server/app/actions/server/webserver/client/src/tsconfig.json",
     "test": "ava"
   }
 }
