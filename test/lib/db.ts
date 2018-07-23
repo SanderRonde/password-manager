@@ -10,6 +10,23 @@ import mongo = require('mongodb');
 export async function clearDB(uri: string) {
 	await doSingleQuery(uri, async (db) => {
 		await db.dropDatabase();
+		const collections = await db.listCollections().toArray() as {
+			name: string;
+			type: 'collection';
+			options: Object;
+			info: {
+				readOnly: boolean;
+			}
+			idIndex: {
+				v: number;
+				key: any;
+				name: string;
+				ns: string;
+			}
+		}[];
+		for (const { name } of collections) {
+			await db.collection(name).drop();
+		}
 	});
 }
 
