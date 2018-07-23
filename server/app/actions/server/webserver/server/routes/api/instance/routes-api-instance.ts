@@ -5,7 +5,7 @@ import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
 import { sendEmail, genID } from "../../../../../../../lib/util";
 import { API_ERRS } from "../../../../../../../api";
-import { LoginToken } from "../../../modules/auth";
+import { APIToken } from "../../../modules/auth";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
@@ -173,7 +173,7 @@ export class RoutesApiInstance {
 	public logout(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			token: LoginToken;
+			token: APIToken;
 		}, {}, {}, {}>({
 			unencrypted: ['instance_id', 'token']
 		}, {}, async (toCheck, { instance_id, token }) => {
@@ -208,7 +208,7 @@ export class RoutesApiInstance {
 	public extendKey(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			oldToken: LoginToken;
+			oldToken: APIToken;
 			count: number;
 		}, {}, {}, {}>({
 			unencrypted: ['instance_id', 'oldToken', 'count']

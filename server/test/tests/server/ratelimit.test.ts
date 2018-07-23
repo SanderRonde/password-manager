@@ -1,5 +1,5 @@
 import { captureURIs, createServer, genUserAndDb, doPostRequest, UserAndDbData, doesNotThrow, genURL, getLoginToken } from '../../lib/util';
-import { LoginToken } from '../../../app/actions/server/webserver/server/modules/auth';
+import { APIToken } from '../../../app/actions/server/webserver/server/modules/auth';
 import { encryptWithPublicKey, pad, hash } from '../../../app/lib/crypto';
 import { wait, genRandomString } from '../../../app/lib/util';
 import { APIReturns, API_ERRS } from '../../../app/api';
@@ -19,7 +19,7 @@ async function doInstanceCreateRequest(config: UserAndDbData) {
 	});
 }
 
-async function doAPIRequest(token: LoginToken, config: UserAndDbData) {
+async function doAPIRequest(token: APIToken, config: UserAndDbData) {
 	return await doPostRequest({ 
 		port: config.http, 
 		publicKey: config.server_public_key

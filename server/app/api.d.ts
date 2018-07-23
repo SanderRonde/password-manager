@@ -1,6 +1,6 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, InstancePublicKey, ResetKey, ServerPublicKey, ServerPrivateKey, RSAEncrypted } from "./database/db-types";
 import { Hashed, Padded, MasterPasswordVerificationPadding, EncryptionAlgorithm, MasterPasswordDecryptionpadding, Encrypted } from "./lib/crypto";
-import { TwofactorVerifyToken, LoginToken } from "./actions/server/webserver/server/modules/auth";
+import { TwofactorVerifyToken, APIToken } from "./actions/server/webserver/server/modules/auth";
 import { UnstringifyObjectIDs } from "./database/libs/db-manipulation";
 
 export interface APIFns {
@@ -178,7 +178,7 @@ export declare namespace APIRoutes {
 			/**
 			 * The auth token that can be used to make API requests. Encrypted with instance key
 			 */
-			auth_token: RSAEncrypted<EncodedString<LoginToken>, InstancePublicKey>;	
+			auth_token: RSAEncrypted<EncodedString<APIToken>, InstancePublicKey>;	
 			/**
 			 * The solved challenge
 			 */
@@ -196,7 +196,7 @@ export declare namespace APIRoutes {
 			/**
 			 * The login token assigned at login
 			 */
-			token: LoginToken;
+			token: APIToken;
 		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{}>;
 
 		/**
@@ -210,7 +210,7 @@ export declare namespace APIRoutes {
 			/**
 			 * The login token assigned at login
 			 */
-			oldToken: LoginToken;
+			oldToken: APIToken;
 			/**
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */
@@ -219,7 +219,7 @@ export declare namespace APIRoutes {
 			/**
 			 * The new auth token. Encrypted with instance public key
 			 */
-			auth_token: RSAEncrypted<EncodedString<LoginToken>, InstancePublicKey>;
+			auth_token: RSAEncrypted<EncodedString<APIToken>, InstancePublicKey>;
 		}>;
 
 		export namespace Twofactor {
@@ -332,7 +332,7 @@ export declare namespace APIRoutes {
 				/**
 				 * A login token that can be used for the /api/password API
 				 */
-				auth_token: RSAEncrypted<EncodedString<LoginToken>, InstancePublicKey>;
+				auth_token: RSAEncrypted<EncodedString<APIToken>, InstancePublicKey>;
 			}>;
 		}
 	}
@@ -350,7 +350,7 @@ export declare namespace APIRoutes {
 			/**
 			 * An auth token
 			 */
-			token: LoginToken;
+			token: APIToken;
 			/**
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */
@@ -405,7 +405,7 @@ export declare namespace APIRoutes {
 			/**
 			 * The auth token
 			 */
-			token: LoginToken;
+			token: APIToken;
 			/**
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */
@@ -467,7 +467,7 @@ export declare namespace APIRoutes {
 			/**
 			 * An auth token
 			 */
-			token: LoginToken;
+			token: APIToken;
 			/**
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */
@@ -495,7 +495,7 @@ export declare namespace APIRoutes {
 			/**
 			 * An auth token
 			 */
-			token: LoginToken;
+			token: APIToken;
 			/**
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */
@@ -553,7 +553,7 @@ export declare namespace APIRoutes {
 			/**
 			 * An auth token
 			 */
-			token: LoginToken;
+			token: APIToken;
 			/**
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */
@@ -603,7 +603,7 @@ export declare namespace APIRoutes {
 			/**
 			 * An auth token
 			 */
-			token: LoginToken;
+			token: APIToken;
 			/**
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */
@@ -653,7 +653,7 @@ export declare namespace APIRoutes {
 			/**
 			 * An auth token
 			 */
-			token: LoginToken;
+			token: APIToken;
 			/**
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */

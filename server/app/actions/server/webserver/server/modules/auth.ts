@@ -1,10 +1,13 @@
+import { AUTH_TOKEN_EXPIRE_TIME, COOKIE_DEFAULT_EXPIRE_TIME, COOKIE_EXTEND_TIME } from "../../../../../lib/constants";
 import { StringifiedObjectId, EncryptedInstance, EncryptedAccount } from "../../../../../database/db-types";
-import { EXPIRE_TIME } from "../../../../../lib/constants";
 
-interface InstanceAuthRepresentation {
-	instance: StringifiedObjectId<EncryptedInstance>;
+interface AccountAuthRepresentation {
 	account: StringifiedObjectId<EncryptedAccount>;
 	exprires: number;
+}
+
+interface InstanceAuthRepresentation extends AccountAuthRepresentation {
+	instance: StringifiedObjectId<EncryptedInstance>;
 }
 
 interface LoginAuthRepresentation extends InstanceAuthRepresentation {
@@ -18,23 +21,24 @@ enum COUNT {
 /**
  * A token used for logging in
  */
-export type LoginToken = string;
+export type APIToken = string;
 /**
  * A token used to verify 2FA access
  */
 export type TwofactorVerifyToken = string;
 
 export class WebserverAuth {
-	private _usedTokens: Set<LoginToken> = new Set();
-	private _expiredTokens: Set<LoginToken> = new Set();
-	private _loginTokens: Map<LoginToken, LoginAuthRepresentation> = new Map();
+	private _usedTokens: Set<APIToken> = new Set();
+	private _expiredTokens: Set<APIToken> = new Set();
+	private _cookieTokens: Map<string, AccountAuthRepresentation> = new Map();
+	private _loginTokens: Map<APIToken, LoginAuthRepresentation> = new Map();
 	private _twofactorTokens: Map<TwofactorVerifyToken, InstanceAuthRepresentation> = new Map();
 	private readonly _chars = 
 		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
 
 	constructor() { }
 
-	private _genRandomToken(): LoginToken {
+	private _genRandomToken(): APIToken {
 		let str = '';
 		for (let i = 0; i < 256; i++) {
 			str += this._chars[Math.floor(Math.random() * this._chars.length)];
@@ -59,6 +63,11 @@ export class WebserverAuth {
 				this._twofactorTokens.delete(key);
 			}
 		});
+		this._cookieTokens.forEach(({ exprires }, key) => {
+			if (Date.now() > exprires) {
+				this._cookieTokens.delete(key);
+			}
+		});
 	}
 
 	public genLoginToken(instance: StringifiedObjectId<EncryptedInstance>,
@@ -67,11 +76,20 @@ export class WebserverAuth {
 			this._loginTokens.set(token, {
 				instance,
 				account,
-				exprires: Date.now() + EXPIRE_TIME,
+				exprires: Date.now() + AUTH_TOKEN_EXPIRE_TIME,
 				count: 0
 			});
 			return token;
 		}
+
+	public genCookie(account: StringifiedObjectId<EncryptedAccount>) {
+		const token = this._genRandomToken();
+		this._cookieTokens.set(token, {
+			account,
+			exprires: Date.now() + COOKIE_DEFAULT_EXPIRE_TIME
+		});
+		return token;
+	}
 
 	private _invalidateInstanceTokens(account: StringifiedObjectId<EncryptedAccount>) {
 		//Invalidate all tokens awarded to all instances of this account
@@ -84,7 +102,7 @@ export class WebserverAuth {
 
 	}
 
-	private _isTokenReused(token: LoginToken, account: StringifiedObjectId<EncryptedAccount>) {
+	private _isTokenReused(token: APIToken, account: StringifiedObjectId<EncryptedAccount>) {
 		if (this._expiredTokens.has(token)) {
 			this._invalidateInstanceTokens(account);
 			return true;
@@ -92,7 +110,7 @@ export class WebserverAuth {
 		return false;
 	}
 
-	private incrementCount(token: LoginToken) {
+	private incrementCount(token: APIToken) {
 		if (this._loginTokens.has(token)) {
 			const match = this._loginTokens.get(token);
 			match!.count += 1;
@@ -100,7 +118,7 @@ export class WebserverAuth {
 		}
 	}
 
-	public verifyLoginToken(token: LoginToken, count: number|COUNT, 
+	public verifyAPIToken(token: APIToken, count: number|COUNT, 
 		instance: StringifiedObjectId<EncryptedInstance>) {
 			this._clearExpiredTokens();
 
@@ -118,11 +136,26 @@ export class WebserverAuth {
 			return true;
 		}
 
-	public extendLoginToken(oldToken: LoginToken, count: number, 
+	public verifyCookie(cookie: string) {
+		this._clearExpiredTokens();
+
+		const match = this._cookieTokens.get(cookie);
+		if (!match) {
+			return false;
+		}
+
+		//Extend it
+		match.exprires = Math.max(match.exprires, Date.now() + COOKIE_EXTEND_TIME);
+		this._cookieTokens.set(cookie, match);
+
+		return true;
+	}
+
+	public extendLoginToken(oldToken: APIToken, count: number, 
 		instance: StringifiedObjectId<EncryptedInstance>,
 		account: StringifiedObjectId<EncryptedAccount>) {
 			const isReused = this._isTokenReused(oldToken, account);
-			if (!isReused && this.verifyLoginToken(oldToken, count, instance)) {
+			if (!isReused && this.verifyAPIToken(oldToken, count, instance)) {
 					//Delete old token
 					this._loginTokens.delete(oldToken);
 					this._expiredTokens.add(oldToken);
@@ -133,8 +166,8 @@ export class WebserverAuth {
 			return false;
 		}
 
-	public invalidateToken(token: LoginToken, instance: StringifiedObjectId<EncryptedInstance>) {
-		if (this.verifyLoginToken(token, COUNT.ANY_COUNT, instance)) {
+	public invalidateToken(token: APIToken, instance: StringifiedObjectId<EncryptedInstance>) {
+		if (this.verifyAPIToken(token, COUNT.ANY_COUNT, instance)) {
 			this._loginTokens.delete(token);
 			return true;
 		}

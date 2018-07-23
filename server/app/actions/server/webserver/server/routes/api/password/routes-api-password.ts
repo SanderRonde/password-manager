@@ -4,7 +4,7 @@ import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-mani
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
 import { API_ERRS } from "../../../../../../../api";
-import { LoginToken } from "../../../modules/auth";
+import { APIToken } from "../../../modules/auth";
 import { Webserver } from "../../../webserver";
 import express = require('express');
 import mongo = require('mongodb');
@@ -67,7 +67,7 @@ export class RoutesApiPassword {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
 			count: number;
-			token: LoginToken;
+			token: APIToken;
 			websites: string[];
 			twofactor_enabled: boolean;
 			encrypted: EncodedString<{
@@ -166,7 +166,7 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
-			token: LoginToken;
+			token: APIToken;
 			count: number;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
@@ -288,7 +288,7 @@ export class RoutesApiPassword {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
 			count: number;
-			token: LoginToken;
+			token: APIToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
 			twofactor_token: string;
@@ -353,7 +353,7 @@ export class RoutesApiPassword {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
 			count: number;
-			token: LoginToken;
+			token: APIToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;	
 		}, {
 			twofactor_token: string;	
@@ -414,7 +414,7 @@ export class RoutesApiPassword {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
 			count: number;
-			token: LoginToken;
+			token: APIToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;	
 		}>({
 			unencrypted: ['instance_id'],
@@ -465,7 +465,7 @@ export class RoutesApiPassword {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
 			count: number;
-			token: LoginToken;
+			token: APIToken;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;	
 		}>({
 			unencrypted: ['instance_id'],
@@ -550,7 +550,7 @@ export class RoutesApiPassword {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
 			count: number;
-			token: LoginToken;
+			token: APIToken;
 			url: string;	
 		}>({
 			unencrypted: ['instance_id'],
