@@ -1,7 +1,7 @@
 import { Database } from "../../../../database/database";
 import { WebserverRouter } from "./modules/routing";
 import { WebserverRoutes } from "./modules/routes";
-import serveStatic = require('express-static');
+import serveStatic = require('serve-static');
 import { WebserverAuth } from "./modules/auth";
 import cookieParser = require('cookie-parser');
 import { ServerConfig } from "../../server";
@@ -32,9 +32,15 @@ export class Webserver {
 	private _initMiddleware() {
 		this.app.use(cookieParser());
 		this.app.use(bodyParser.json());
-		const base = path.join(__dirname, '../');
+		const base = path.join(__dirname, '../client/');
 		this.app.use(serveStatic(this.config.development ? 
-			path.join(base, 'src/') : path.join(base, 'build/')));
+			path.join(base, 'src/') : path.join(base, 'build/'), {
+				maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
+				dotfiles: this.config.development ? 'allow' : 'ignore',
+				fallthrough: true,
+				index: false,
+				redirect: false
+			}));
 		this.app.use(bodyParser.urlencoded({ extended: false }));
 	}
 

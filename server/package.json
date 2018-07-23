@@ -25,6 +25,7 @@
     "node-rsa": "^1.0.0",
     "nodemailer": "^4.6.7",
     "progress": "^2.0.0",
+    "serve-static": "^1.13.2",
     "speakeasy": "^2.0.0"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "@types/node-rsa": "^0.4.3",
     "@types/nodemailer": "^4.6.2",
     "@types/progress": "^2.0.1",
+    "@types/serve-static": "^1.13.2",
     "@types/speakeasy": "^2.0.2",
     "import-fresh": "^2.0.0",
     "typescript": "^2.9.2"
