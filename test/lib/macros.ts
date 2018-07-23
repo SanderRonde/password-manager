@@ -151,7 +151,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 			}>;
 			const encryptedArgs: Partial<{
 				[key in keyof GetEncrypted<APIFns[R]>]: any;
-			}> = {};
+			}> = mapObj(encrypted, (_, val) => getFillerType(val));
 			for (const key in required) {
 				if (key !== wrongType) {
 					unencryptedArgs[key] = getFillerType(required[key]);
