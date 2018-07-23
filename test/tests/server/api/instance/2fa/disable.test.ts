@@ -209,6 +209,7 @@ test('fails if instance id wrong', async t => {
 			})
 		},
 		server: server,
-		publicKey: server_public_key
+		publicKey: server_public_key,
+		err: API_ERRS.MISSING_PARAMS
 	});
 });

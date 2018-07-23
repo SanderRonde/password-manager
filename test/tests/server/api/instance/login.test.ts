@@ -1,8 +1,9 @@
 import { hash, pad, decryptWithPrivateKey, ERRS, encryptWithPublicKey } from '../../../../../app/lib/crypto';
 import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
-import { genRandomString } from '../../../../../app/lib/util';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
+import { genRandomString } from '../../../../../app/lib/util';
+import { API_ERRS } from '../../../../../app/api';
 import speakeasy = require('speakeasy');
 import mongo = require('mongodb');
 import { test } from 'ava';
@@ -122,6 +123,7 @@ test('fails if instance id is wrong', async t => {
 			challenge: encryptWithPublicKey(challenge, server_public_key)
 		},
 		server: server,
-		publicKey: server_public_key
+		publicKey: server_public_key,
+		err: API_ERRS.MISSING_PARAMS
 	});
 });

@@ -4,6 +4,7 @@ import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/cryp
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
 import { DEFAULT_EMAIL } from '../../../../../lib/consts';
 import { doSingleQuery } from '../../../../../lib/db';
+import { API_ERRS } from '../../../../../../app/api';
 import speakeasy = require('speakeasy');
 import mongo = require('mongodb');
 import { test } from 'ava';
@@ -216,6 +217,7 @@ test('fails if instance id is wrong', async t => {
 			email: DEFAULT_EMAIL
 		},
 		server: server,
-		publicKey: server_public_key
+		publicKey: server_public_key,
+		err: API_ERRS.MISSING_PARAMS
 	});
 });
