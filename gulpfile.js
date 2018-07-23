@@ -47,4 +47,6 @@ function genTask(description, toRun) {
 			});
 		}
 	));
+
+	gulp.task('compile', gulp.parallel('compileServer', 'compileClientDashboard'))
 })();
