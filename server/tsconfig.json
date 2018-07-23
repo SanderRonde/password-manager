@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "alwaysStrict": true,
-        "baseUrl": "./typings/",
+        "baseUrl": "../typings/",
         "forceConsistentCasingInFileNames": true,
         "module": "commonjs",
         "moduleResolution": "node",
@@ -25,5 +25,8 @@
     "include": [
         "app/",
         "test/"
+    ],
+    "exclude": [
+        "app/actions/server/websever/client/"
     ]
 }
