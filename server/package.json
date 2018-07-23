@@ -15,6 +15,7 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.16.3",
     "express-rate-limit": "^2.11.0",
+    "express-static": "^1.2.5",
     "fs-extra": "^6.0.1",
     "googleapis": "^32.0.0",
     "http2": "^3.3.7",

@@ -1,6 +1,7 @@
 import { Database } from "../../../../database/database";
 import { WebserverRouter } from "./modules/routing";
 import { WebserverRoutes } from "./modules/routes";
+import serveStatic = require('express-static');
 import { WebserverAuth } from "./modules/auth";
 import cookieParser = require('cookie-parser');
 import { ServerConfig } from "../../server";
@@ -9,6 +10,7 @@ import express = require('express');
 import https = require('https');
 import fs = require('fs-extra');
 import http = require('http');
+import path = require('path');
 
 
 export class Webserver {
@@ -30,6 +32,9 @@ export class Webserver {
 	private _initMiddleware() {
 		this.app.use(cookieParser());
 		this.app.use(bodyParser.json());
+		const base = path.join(__dirname, '../');
+		this.app.use(serveStatic(this.config.development ? 
+			path.join(base, 'src/') : path.join(base, 'build/')));
 		this.app.use(bodyParser.urlencoded({ extended: false }));
 	}
 

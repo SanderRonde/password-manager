@@ -14,6 +14,7 @@ export interface ServerArgs {
 	database: string;
 	rateLimit: boolean;
 	debug: boolean;
+	development: boolean;
 }
 
 export interface ServerConfig extends ServerArgs {
