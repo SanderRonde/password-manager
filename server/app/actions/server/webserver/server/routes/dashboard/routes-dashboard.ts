@@ -1,6 +1,6 @@
+import { ResponseCaptured } from "../../modules/ratelimit";
 import { Webserver } from "../../webserver";
 import express = require('express');
-import { ResponseCaptured } from "../../modules/ratelimit";
 
 export class RoutesDashboard {
 	constructor(public server: Webserver) { }
