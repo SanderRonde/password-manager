@@ -1,4 +1,4 @@
-/// <reference path="../typings/global.d.ts" />
+/// <reference path="../../typings/global.d.ts" />
 import { Backup, BackupConfig, BackupSettings } from "./actions/backup/backup";
 import { ServerConfig, ServerSettings, Server } from "./actions/server/server";
 import { Account } from "./actions/account/account";
