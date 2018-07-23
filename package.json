@@ -36,6 +36,7 @@
     "compile:shared": "tsc -p ./shared/tsconfig.json",
     "compile:server": "tsc -p ./server/tsconfig.json",
     "compile:dashboard": "tsc -p ./server/app/actions/server/webserver/client/src/tsconfig.json",
+    "build": "compile && gulp dashboard",
     "test": "ava"
   }
 }
