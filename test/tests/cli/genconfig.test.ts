@@ -1,10 +1,11 @@
+import { genRandomString } from '../../../app/lib/util';
+import { captureCreatedFiles } from '../../lib/util';
 import { ProcRunner } from '../../lib/procrunner';
 import fs = require('fs-extra');
 import path = require('path');
 import { test } from 'ava';
-import { genRandomString } from '../../../app/lib/util';
 
-const files: string[] = [];
+const files = captureCreatedFiles(test);
 test('print an error when no command is passed', async t => {
 	const proc = new ProcRunner(t, ['genconfig']);
 	proc.expectWrite();
