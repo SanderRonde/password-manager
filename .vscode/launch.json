@@ -21,12 +21,24 @@
 			"type": "node",
 			"request": "launch",
 			"name": "Launch Server",
-			"program": "${workspaceFolder}/app/main.js",
+			"program": "${workspaceFolder}/server/app/main.js",
 			"args": [
 				"server",
 				"--http", "1256",
 				"-d", "mongodb://127.0.0.1:27017/somedb",
 				"-p", "somepw"
+			],
+		}, {
+			"type": "node",
+			"request": "launch",
+			"name": "Launch Server (development)",
+			"program": "${workspaceFolder}/server/app/main.js",
+			"args": [
+				"server",
+				"--http", "1256",
+				"-d", "mongodb://127.0.0.1:27017/somedb",
+				"-p", "somepw",
+				"--development"
 			],
 		}
 	]
