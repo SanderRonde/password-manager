@@ -18,7 +18,7 @@ before_script:
   - sleep 15
   - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 script:
-- tsc
+- cd server && tsc && cd ..
 - ava --timeout=5m
 notifications:
   email:
