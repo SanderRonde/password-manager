@@ -22,7 +22,7 @@ export class RoutesApiInstance {
 			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, {}, {}, {}>({
 			unencrypted: ['public_key', 'email', 'password']
-		}, {}, async (toCheck, { public_key }) => {
+		}, {}, async (toCheck, { email, password, public_key }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'email',
 				type: 'string'
@@ -33,7 +33,8 @@ export class RoutesApiInstance {
 				val: 'password',
 				type: 'string'
 			}])) return;
-			const auth = await this.server.Router.checkPasswordFromBody(toCheck, res);
+			const auth = await this.server.Router.checkEmailPassword(
+				email, password, res);
 			if (auth === false) {
 				return;
 			}

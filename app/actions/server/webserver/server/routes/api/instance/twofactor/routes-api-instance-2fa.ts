@@ -21,7 +21,7 @@ export class RoutesAPIInstanceTwofactor {
 		}, {}>({
 			unencrypted: ['instance_id', 'email'],
 			encrypted: ['password']
-		}, {}, async (toCheck, { instance_id }) => {
+		}, {}, async (toCheck, { email, password, instance_id }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -33,7 +33,8 @@ export class RoutesAPIInstanceTwofactor {
 				type: 'string'
 			},])) return;
 
-			const auth = await this.server.Router.checkPasswordFromBody(toCheck, res);
+			const auth = await this.server.Router.checkEmailPassword(
+				email, password, res);
 			if (auth === false) return;
 
 			const { instance, decryptedInstance, accountPromise } = 
@@ -120,7 +121,7 @@ export class RoutesAPIInstanceTwofactor {
 		}, {}>({
 			unencrypted: ['instance_id', 'email', 'twofactor_token'],
 			encrypted: ['password']
-		}, {}, async (toCheck, { instance_id, twofactor_token }) => {
+		}, {}, async (toCheck, { email, password, instance_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -135,7 +136,8 @@ export class RoutesAPIInstanceTwofactor {
 				type: 'string'
 			}])) return;
 
-			const auth = await this.server.Router.checkPasswordFromBody(toCheck, res);
+			const auth = await this.server.Router.checkEmailPassword(
+				email, password, res);
 			if (auth === false) return;
 
 			const { instance, decryptedInstance, accountPromise } = 

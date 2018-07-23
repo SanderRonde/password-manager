@@ -44,12 +44,9 @@ export class WebserverRouter {
 				return true;
 			}
 
-	public async checkPasswordFromBody(toCheck: any, res: ResponseCaptured, 
+	public async checkEmailPassword(email: string, 
+		password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>, res: ResponseCaptured, 
 		supressErr: boolean = false): Promise<false|MongoRecord<EncryptedAccount>> {
-			const { email, password } = toCheck as {
-				email: string;
-				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-			};
 			if (!email || !password) {
 				res.status(400);
 				res.json({
