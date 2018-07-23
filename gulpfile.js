@@ -1,4 +1,3 @@
-const ts = require('gulp-typescript');
 const rollup = require('rollup');
 const fs = require('fs-extra');
 const gulp = require('gulp');
@@ -59,9 +58,6 @@ function capitalize(str) {
 	const SRC_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/src/');
 	const BUILD_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/build/');
 	const ROUTES = ['dashboard', 'login'];
-	const ROOTS = ROUTES.map((route) => {
-		return path.join(SRC_DIR, 'entrypoints/', route, `${route}.js`);
-	});
 
 	/**
 	 * Combine JS files into a single bundle and output it
@@ -76,7 +72,6 @@ function capitalize(str) {
 		});
 	
 		await fs.mkdirp(path.dirname(output));
-		console.log(output);
 		await bundle.write({
 			format: 'iife',
 			file: output
