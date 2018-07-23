@@ -1,3 +1,4 @@
+const cleanCss = require('gulp-clean-css');
 const rollup = require('rollup');
 const fs = require('fs-extra');
 const gulp = require('gulp');
@@ -25,7 +26,7 @@ function genTask(description, toRun) {
  * @returns {(done: (error?: any) => void) => any} The function with the new name
  */
 function dynamicFunctionName(name, target) {
-	const fn = new Function('target', `return function ${name}(){ target() }`);
+	const fn = new Function('target', `return function ${name}(){ return target() }`);
 	return fn(target);
 }
 
@@ -38,7 +39,7 @@ function dynamicFunctionName(name, target) {
  * @returns {(done: (error?: any) => void) => any} The function with the new name
  */
 function dynamicFunctionNameAsync(name, target) {
-	const fn = new Function('target', `return async function ${name}(){ await target() }`);
+	const fn = new Function('target', `return async function ${name}(){ return await target() }`);
 	return fn(target);
 }
 
@@ -65,7 +66,7 @@ function capitalize(str) {
 	 * @param {string} input - The entrypoint
 	 * @param {string} output - The output location
 	 */
-	async function bundle(input, output) {
+	async function bundleJS(input, output) {
 		const bundle = await rollup.rollup({
 			input: input,
 			inlineDynamicImports: true
@@ -82,10 +83,21 @@ function capitalize(str) {
 		gulp.parallel(...ROUTES.map((route) => {
 			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}.js`);
 			const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}.js`);
-			return dynamicFunctionNameAsync(`bundle${capitalize(route)}`, async () => {
-				await bundle(input, output);
+			return dynamicFunctionNameAsync(`bundleJS${capitalize(route)}`, async () => {
+				await bundleJS(input, output);
 			});
 		}))));
 
-	gulp.task('dashboard', gulp.parallel('dashboard.bundle.js'));
+	gulp.task('dashboard.bundle.css', genTask('Bundles the CSS files into a single bundle',
+		gulp.parallel(...ROUTES.map((route) => {
+			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}.css`);
+			const output = path.join(BUILD_DIR, 'entrypoints/', route);
+			return dynamicFunctionName(`bundleCSS${capitalize(route)}`, () => {
+				return gulp.src(input)
+					.pipe(cleanCss({ }))
+					.pipe(gulp.dest(output));
+			});
+		}))));
+
+	gulp.task('dashboard', gulp.parallel('dashboard.bundle.js', 'dashboard.bundle.css'));
 })();

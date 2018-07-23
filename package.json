@@ -27,6 +27,7 @@
     "ava": "^0.25.0",
     "fs-extra": "^7.0.0",
     "gulp": "^4.0.0",
+    "gulp-clean-css": "^3.9.4",
     "rollup": "^0.63.4",
     "typescript": "^2.9.2"
   },
