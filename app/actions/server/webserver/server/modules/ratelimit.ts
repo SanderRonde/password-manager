@@ -128,7 +128,7 @@ function getBruteforceLimiter(factor: number) {
 			res.once('finish', () => {
 				if (res.__jsonResponse && res.__jsonResponse.success === false) {
 					//If API request was unsuccessful count this request 
-					store.incr(key, (_, v) => { console.log(v) });
+					store.incr(key, () => {});
 				}
 			});
 			return true;
