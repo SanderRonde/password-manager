@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A password manager",
   "main": "server/app/main.js",
-  "repository": "https://github.com/SanderRonde/password-manager-server",
+  "repository": "https://github.com/SanderRonde/password-manager",
   "author": "Sander Ronde <awsdfgvhbjn@gmail.com>",
   "license": "MIT",
   "private": true,
