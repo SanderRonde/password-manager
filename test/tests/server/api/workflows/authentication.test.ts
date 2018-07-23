@@ -191,6 +191,7 @@ test('can log in and extend key', async t => {
 	await (async () => {	
 		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
 			instance_id: instance_id.toHexString(),
+			count: config.count++,
 			oldToken: token!
 		}));
 	
@@ -284,6 +285,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 	const newToken = await (async () => {	
 		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
 			instance_id: instanceId!,
+			count: config.count++,
 			oldToken: token!
 		}));
 	

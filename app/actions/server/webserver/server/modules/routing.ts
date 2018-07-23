@@ -277,18 +277,19 @@ export class WebserverRouter {
 		};
 	}
 
-	public verifyLoginToken(token: LoginToken, instanceId: StringifiedObjectId<EncryptedInstance>, res: ResponseCaptured) {
-		if (!this.parent.Auth.verifyLoginToken(token, instanceId)) {
-			res.status(200);
-			res.json({
-				success: false,
-				error: 'invalid token',
-				ERR: API_ERRS.INVALID_CREDENTIALS
-			});
-			return false;
+	public verifyLoginToken(token: LoginToken, count: number, 
+		instanceId: StringifiedObjectId<EncryptedInstance>, res: ResponseCaptured) {
+			if (!this.parent.Auth.verifyLoginToken(token, count, instanceId)) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'invalid token',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return false;
+			}
+			return true;
 		}
-		return true;
-	}
 
 	private _printTypeErr(res: ResponseCaptured, val: string, type: BasicType|'array', inner?: BasicType) {
 		if (inner) {

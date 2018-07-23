@@ -14,6 +14,7 @@ testParams(test, uris, '/api/password/getmeta', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
+	count: 'number',
 	password_id: 'string',
 }, { });
 test('can get the password\'s metadata', async t => {
@@ -45,6 +46,7 @@ test('can get the password\'s metadata', async t => {
 	}, '/api/password/getmeta', {
 		instance_id: config.instance_id.toHexString()
 	}, {
+		count: config.count++,
 		token: token!,
 		password_id: passwordId!
 	}));
@@ -105,6 +107,7 @@ test('fails if auth token is wrong', async t => {
 			instance_id: config.instance_id.toHexString()
 		},
 		encrypted: {
+			count: config.count++,
 			token: 'wrongtoken',
 			password_id: passwordId!
 		},
@@ -140,6 +143,7 @@ test('fails if instance id is wrong', async t => {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
 		},
 		encrypted: {
+			count: config.count++,
 			token: token!,
 			password_id: passwordId!
 		},
@@ -176,6 +180,7 @@ test('fails if password id is wrong', async t => {
 			instance_id: config.instance_id.toHexString()
 		},
 		encrypted: {
+			count: config.count++,
 			token: token!,
 			password_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>
 		},

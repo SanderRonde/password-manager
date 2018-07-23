@@ -66,6 +66,7 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
+			count: number;
 			token: LoginToken;
 			websites: string[];
 			twofactor_enabled: boolean;
@@ -79,8 +80,8 @@ export class RoutesApiPassword {
 			}>;
 		}, {}>({
 			unencrypted: ['instance_id'], 
-			encrypted: ['token', 'websites', 'encrypted', 'twofactor_enabled']
-		}, {}, async (toCheck, { instance_id, token, websites, encrypted, twofactor_enabled }) => {
+			encrypted: ['token', 'count', 'websites', 'encrypted', 'twofactor_enabled']
+		}, {}, async (toCheck, { count, instance_id, token, websites, encrypted, twofactor_enabled }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -97,9 +98,12 @@ export class RoutesApiPassword {
 			}, {
 				val: 'encrypted',
 				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
 			}])) return;
 
-			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
 
 			const { decryptedInstance } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
@@ -163,6 +167,7 @@ export class RoutesApiPassword {
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
 			token: LoginToken;
+			count: number;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
 			websites: string[];
@@ -178,7 +183,7 @@ export class RoutesApiPassword {
 			}>;
 		}>({
 			unencrypted: ['instance_id'], 
-			encrypted: ['token', 'password_id']
+			encrypted: ['token', 'count', 'password_id']
 		}, {
 			encrypted: ['encrypted', 'twofactor_enabled', 'websites', 'twofactor_token']
 		}, async (toCheck, { 
@@ -188,7 +193,8 @@ export class RoutesApiPassword {
 			twofactor_token, 
 			encrypted, 
 			twofactor_enabled, 
-			websites 
+			websites,
+			count
 		}) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
@@ -212,9 +218,12 @@ export class RoutesApiPassword {
 			}, {
 				val: 'encrypted',
 				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
 			}])) return;
 
-			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
 
 			const { decryptedInstance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
@@ -278,16 +287,17 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
+			count: number;
 			token: LoginToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
 			twofactor_token: string;
 		}>({
 			unencrypted: ['instance_id'],
-			encrypted: ['token', 'password_id']
+			encrypted: ['token', 'count', 'token', 'password_id']
 		}, {
 			encrypted: ['twofactor_token']
-		}, async (toCheck, { token, instance_id, password_id, twofactor_token }) => {
+		}, async (toCheck, { count, token, instance_id, password_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -300,9 +310,12 @@ export class RoutesApiPassword {
 			}, {
 				val: 'twofactor_token',
 				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
 			}])) return;
 
-			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
 
 			const { decryptedInstance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
@@ -339,16 +352,17 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
+			count: number;
 			token: LoginToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;	
 		}, {
 			twofactor_token: string;	
 		}>({
 			unencrypted: ['instance_id'],
-			encrypted: ['token', 'password_id']
+			encrypted: ['token', 'count', 'password_id']
 		}, {
 			encrypted: ['twofactor_token']
-		}, async (toCheck, { token, instance_id, password_id, twofactor_token }) => {
+		}, async (toCheck, { count, token, instance_id, password_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -361,9 +375,12 @@ export class RoutesApiPassword {
 			}, {
 				val: 'twofactor_token',
 				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
 			}])) return;
 
-			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
 
 			const { decryptedInstance, accountPromise } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
@@ -396,12 +413,13 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
+			count: number;
 			token: LoginToken;
 			password_id: StringifiedObjectId<EncryptedPassword>;	
 		}>({
 			unencrypted: ['instance_id'],
-			encrypted: ['token', 'password_id']
-		}, {}, async (toCheck, { token, instance_id, password_id }) => {
+			encrypted: ['token', 'count', 'password_id']
+		}, {}, async (toCheck, { count, token, instance_id, password_id }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -411,9 +429,12 @@ export class RoutesApiPassword {
 			}, {
 				val: 'password_id',
 				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
 			}])) return;
 
-			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
 
 			const { decryptedInstance } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
@@ -443,12 +464,13 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
+			count: number;
 			token: LoginToken;
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;	
 		}>({
 			unencrypted: ['instance_id'],
-			encrypted: ['token', 'password_hash']
-		}, {}, async (toCheck, { token, instance_id, password_hash }) => {
+			encrypted: ['token', 'count', 'password_hash']
+		}, {}, async (toCheck, { count, token, instance_id, password_hash }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -458,9 +480,12 @@ export class RoutesApiPassword {
 			}, {
 				val: 'password_hash',
 				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
 			}])) return;
 
-			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
 
 			const { decryptedInstance } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
@@ -524,12 +549,13 @@ export class RoutesApiPassword {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
+			count: number;
 			token: LoginToken;
 			url: string;	
 		}>({
 			unencrypted: ['instance_id'],
-			encrypted: ['token', 'url']
-		}, {}, async (toCheck, { token, instance_id, url: website_url }) => {
+			encrypted: ['token', 'count', 'url']
+		}, {}, async (toCheck, { count, token, instance_id, url: website_url }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -539,9 +565,12 @@ export class RoutesApiPassword {
 			}, {
 				val: 'url',
 				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
 			}])) return;
 			
-			if (!this.server.Router.verifyLoginToken(token, instance_id, res)) return;
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
 
 			const { decryptedInstance } = 
 				await this.server.Router.verifyAndGetInstance(instance_id, res);

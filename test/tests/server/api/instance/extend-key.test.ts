@@ -7,6 +7,7 @@ import { test } from 'ava';
 
 const uris = captureURIs(test);
 testParams(test, uris, '/api/instance/extend_key', {
+	count: 'number',
 	instance_id: 'string',
 	oldToken: 'string'
 }, {}, {}, {});
@@ -24,6 +25,7 @@ test('throws an error if token is invalid', async t => {
 
 	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
 		instance_id: instance_id.toHexString(),
+		count: config.count++,
 		oldToken: 'someinvalidtoken'
 	}));
 
@@ -46,6 +48,7 @@ test('fails if instance id is wrong', async t => {
 		port: http,
 		encrypted: {},
 		unencrypted: {
+			count: config.count++,
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
 			oldToken: 'someinvalidtoken'
 		},

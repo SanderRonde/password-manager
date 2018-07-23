@@ -13,6 +13,7 @@ testParams(test, uris, '/api/password/get', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
+	count: 'number',
 	password_id: 'string',
 }, {
 	twofactor_token: 'string'
@@ -46,6 +47,7 @@ test('can get the password if 2FA is disabled', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
+		count: config.count++,
 		password_id: passwordId!
 	}));
 
@@ -108,6 +110,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
+		count: config.count++,
 		password_id: passwordId!
 	}));
 
@@ -153,6 +156,7 @@ test('can get the password if 2FA is enabled', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
+		count: config.count++,
 		password_id: passwordId!,
 		twofactor_token: speakeasy.totp({
 			secret: secret.base32,
@@ -219,6 +223,7 @@ test('fails if auth token is wrong', async t => {
 			instance_id: config.instance_id.toHexString()
 		},
 		encrypted: {
+			count: config.count++,
 			token: 'wrongtoken',
 			password_id: passwordId!
 		},
@@ -254,6 +259,7 @@ test('fails if instance id is wrong', async t => {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
 		},
 		encrypted: {
+			count: config.count++,
 			token: token!,
 			password_id: passwordId!
 		},
@@ -290,6 +296,7 @@ test('fails if password id is wrong', async t => {
 			instance_id: config.instance_id.toHexString()
 		},
 		encrypted: {
+			count: config.count++,
 			token: token!,
 			password_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>
 		},

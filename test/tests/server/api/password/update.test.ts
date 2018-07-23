@@ -16,6 +16,7 @@ testParams(test, uris, '/api/password/update', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
+	count: 'number',
 	password_id: 'string',
 }, {
 	websites: 'array',
@@ -57,6 +58,7 @@ test('password can be updated', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
+		count: config.count++,
 		password_id: passwordId!,
 		websites: expectedWebsites,
 		twofactor_enabled: expected2FAEnabled,
@@ -154,6 +156,7 @@ test('fails if it requires 2FA and no 2FA token is passed', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: loginToken!,
+		count: config.count++,
 		password_id: passwordId!,
 		websites: expectedWebsites,
 		twofactor_enabled: expected2FAEnabled,
@@ -205,6 +208,7 @@ test('password can be updated if 2FA is enabled', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
+		count: config.count++,
 		password_id: passwordId!,
 		websites: expectedWebsites,
 		twofactor_enabled: expected2FAEnabled,
@@ -287,6 +291,7 @@ test('fails if token is wrong', async t => {
 		encrypted: {
 			password_id: 'someid' as StringifiedObjectId<EncryptedPassword>,
 			token: 'someinvalidtoken',
+			count: config.count++,
 			websites: [],
 			twofactor_enabled: false,
 			encrypted: 'somestr' as EncodedString<{
@@ -320,6 +325,7 @@ test('fails if instance id is wrong', async t => {
 		encrypted: {
 			password_id: 'someid' as StringifiedObjectId<EncryptedPassword>,
 			token: token!,
+			count: config.count++,
 			websites: [],
 			twofactor_enabled: false,
 			encrypted: 'somestr' as EncodedString<{
@@ -354,6 +360,7 @@ test('fails if password id is wrong', async t => {
 		encrypted: {
 			password_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 			token: token!,
+			count: config.count++,
 			websites: [],
 			twofactor_enabled: false,
 			encrypted: 'somestr' as EncodedString<{

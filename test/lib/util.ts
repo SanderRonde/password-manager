@@ -101,6 +101,7 @@ export interface UserAndDbData {
 	uri: string;
 	logServerOutput?: boolean;
 	enableRateLimit?: boolean;
+	count: number;
 }
 
 export interface MockConfig {
@@ -136,6 +137,7 @@ export async function genUserAndDb(t: GenericTestContext<Context<any>>,
 			dbpw,
 			uri,
 			http: await getFreePort(30000, 50000),
+			count: 0
 		}
 	}
 
@@ -382,7 +384,8 @@ export async function setPasword(t: GenericTestContext<Context<any>>, toSet: {
 		token: token!,
 		websites: expectedWebsites,
 		twofactor_enabled: expected2FAEnabled,
-		encrypted: expectedEncrypted
+		encrypted: expectedEncrypted,
+		count: config.count++
 	}));
 
 	t.true(response.success, 'API call succeeded');

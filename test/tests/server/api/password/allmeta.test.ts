@@ -13,6 +13,7 @@ const uris = captureURIs(test);
 testParams(test, uris, '/api/password/allmeta', {
 	instance_id: 'string'
 }, {}, {
+	count: 'number',
 	token: 'string',
 	password_hash: 'string',
 }, { });
@@ -62,6 +63,7 @@ test('can get the password\'s metadata', async t => {
 	}, '/api/password/allmeta', {
 		instance_id: config.instance_id.toHexString()
 	}, {
+		count: config.count++,
 		token: token!,
 		password_hash: hash(pad(userpw, 'masterpwverify'))
 	}));
@@ -117,6 +119,7 @@ test('fails if auth token is wrong', async t => {
 			instance_id: config.instance_id.toHexString()
 		},
 		encrypted: {
+			count: config.count++,
 			token: 'wrongtoken',
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		},
@@ -144,6 +147,7 @@ test('fails if instance id is wrong', async t => {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
 		},
 		encrypted: {
+			count: config.count++,
 			token: token!,
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		},
@@ -172,6 +176,7 @@ test('fails if password is wrong', async t => {
 			instance_id: config.instance_id.toHexString()
 		},
 		encrypted: {
+			count: config.count++,
 			token: token!,
 			password_hash: hash(pad('wrongpassword', 'masterpwverify'))
 		},

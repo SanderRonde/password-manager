@@ -211,6 +211,10 @@ export declare namespace APIRoutes {
 			 * The login token assigned at login
 			 */
 			oldToken: LoginToken;
+			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: number;
 		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			/**
 			 * The new auth token. Encrypted with instance public key
@@ -348,6 +352,10 @@ export declare namespace APIRoutes {
 			 */
 			token: LoginToken;
 			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: number;
+			/**
 			 * The websites for which this password works
 			 */
 			websites: string[];
@@ -398,6 +406,10 @@ export declare namespace APIRoutes {
 			 * The auth token
 			 */
 			token: LoginToken;
+			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: number;
 			/**
 			 * The ID of the password to update
 			 */
@@ -457,6 +469,10 @@ export declare namespace APIRoutes {
 			 */
 			token: LoginToken;
 			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: number;
+			/**
 			 * The id of the password
 			 */
 			password_id: StringifiedObjectId<EncryptedPassword>;
@@ -480,6 +496,10 @@ export declare namespace APIRoutes {
 			 * An auth token
 			 */
 			token: LoginToken;
+			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: number;
 			/**
 			 * The id of the password
 			 */
@@ -535,6 +555,10 @@ export declare namespace APIRoutes {
 			 */
 			token: LoginToken;
 			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: number;
+			/**
 			 * The password ID
 			 */
 			password_id: P;
@@ -581,6 +605,10 @@ export declare namespace APIRoutes {
 			 */
 			token: LoginToken;
 			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: number;
+			/**
 			 * The master password hash
 			 */
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
@@ -626,6 +654,10 @@ export declare namespace APIRoutes {
 			 * An auth token
 			 */
 			token: LoginToken;
+			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: number;
 			/**
 			 * The URL to look for
 			 */

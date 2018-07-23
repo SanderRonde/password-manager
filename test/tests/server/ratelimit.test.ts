@@ -27,6 +27,7 @@ async function doAPIRequest(token: LoginToken, config: UserAndDbData) {
 		instance_id: config.instance_id.toHexString(),
 	}, {
 		token: token,
+		count: config.count++,
 		url: genURL()
 	});
 }

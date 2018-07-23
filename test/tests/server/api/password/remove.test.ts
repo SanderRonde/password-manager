@@ -11,6 +11,7 @@ const uris = captureURIs(test);
 testParams(test, uris, '/api/password/remove', {
 	instance_id: 'string'
 }, {}, {
+	count: 'number',
 	token: 'string',
 	password_id: 'string',
 }, {
@@ -41,6 +42,7 @@ test('can be removed if 2FA is disabled', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
+		count: config.count++,
 		password_id: passwordId!
 	}));
 
@@ -88,6 +90,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
+		count: config.count++,
 		password_id: passwordId!
 	}));
 
@@ -137,6 +140,7 @@ test('can be removed if 2FA is enabled', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
+		count: config.count++,
 		password_id: passwordId!,
 		twofactor_token: speakeasy.totp({
 			secret: secret.base32,
@@ -187,6 +191,7 @@ test('fails if auth token is wrong', async t => {
 			instance_id: config.instance_id.toHexString()
 		},
 		encrypted: {
+			count: config.count++,
 			token: 'wrongtoken',
 			password_id: passwordId!
 		},
@@ -222,6 +227,7 @@ test('fails if instance id is wrong', async t => {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
 		},
 		encrypted: {
+			count: config.count++,
 			token: token!,
 			password_id: passwordId!
 		},
@@ -258,6 +264,7 @@ test('fails if password id is wrong', async t => {
 			instance_id: config.instance_id.toHexString()
 		},
 		encrypted: {
+			count: config.count++,
 			token: token!,
 			password_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>
 		},

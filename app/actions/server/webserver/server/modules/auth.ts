@@ -7,6 +7,14 @@ interface InstanceAuthRepresentation {
 	exprires: number;
 }
 
+interface LoginAuthRepresentation extends InstanceAuthRepresentation {
+	count: number;
+}
+
+enum COUNT {
+	ANY_COUNT
+}
+
 /**
  * A token used for logging in
  */
@@ -19,7 +27,7 @@ export type TwofactorVerifyToken = string;
 export class WebserverAuth {
 	private _usedTokens: Set<LoginToken> = new Set();
 	private _expiredTokens: Set<LoginToken> = new Set();
-	private _loginTokens: Map<LoginToken, InstanceAuthRepresentation> = new Map();
+	private _loginTokens: Map<LoginToken, LoginAuthRepresentation> = new Map();
 	private _twofactorTokens: Map<TwofactorVerifyToken, InstanceAuthRepresentation> = new Map();
 	private readonly _chars = 
 		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
@@ -59,7 +67,8 @@ export class WebserverAuth {
 			this._loginTokens.set(token, {
 				instance,
 				account,
-				exprires: Date.now() + EXPIRE_TIME
+				exprires: Date.now() + EXPIRE_TIME,
+				count: 0
 			});
 			return token;
 		}
@@ -83,7 +92,16 @@ export class WebserverAuth {
 		return false;
 	}
 
-	public verifyLoginToken(token: LoginToken, instance: StringifiedObjectId<EncryptedInstance>) {
+	private incrementCount(token: LoginToken) {
+		if (this._loginTokens.has(token)) {
+			const match = this._loginTokens.get(token);
+			match!.count += 1;
+			this._loginTokens.set(token, match!);
+		}
+	}
+
+	public verifyLoginToken(token: LoginToken, count: number|COUNT, 
+		instance: StringifiedObjectId<EncryptedInstance>) {
 			this._clearExpiredTokens();
 
 			const match = this._loginTokens.get(token);
@@ -91,12 +109,19 @@ export class WebserverAuth {
 				return false;
 			}
 
-			return match.instance === instance;
+			if (match.instance !== instance ||
+				match.count !== count) {
+					this._loginTokens.delete(token);
+					return false;
+				}
+			this.incrementCount(token);
+			return true;
 		}
 
-	public extendLoginToken(oldToken: LoginToken, instance: StringifiedObjectId<EncryptedInstance>,
+	public extendLoginToken(oldToken: LoginToken, count: number, 
+		instance: StringifiedObjectId<EncryptedInstance>,
 		account: StringifiedObjectId<EncryptedAccount>) {
-			if (this.verifyLoginToken(oldToken, instance) &&
+			if (this.verifyLoginToken(oldToken, count, instance) &&
 				!this._isTokenReused(oldToken, account)) {
 					//Delete old token
 					this._loginTokens.delete(oldToken);
@@ -109,7 +134,7 @@ export class WebserverAuth {
 		}
 
 	public invalidateToken(token: LoginToken, instance: StringifiedObjectId<EncryptedInstance>) {
-		if (this.verifyLoginToken(token, instance)) {
+		if (this.verifyLoginToken(token, COUNT.ANY_COUNT, instance)) {
 			this._loginTokens.delete(token);
 			return true;
 		}

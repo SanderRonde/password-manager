@@ -445,7 +445,8 @@ test('can verify a login requiring 2FA', async t => {
 			publicKey: server_public_key
 		}, '/api/instance/extend_key', {
 			instance_id: instance_id.toHexString(),
-			oldToken: authToken!
+			oldToken: authToken!,
+			count: config.count++
 		}));
 	
 		server.kill();
@@ -617,8 +618,10 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 			publicKey: server_public_key
 		}, '/api/instance/extend_key', {
 			instance_id: instance_id!,
-			oldToken: authToken!
+			oldToken: authToken!,
+			count: config.count++
 		}));
+		config.count = 0;
 		
 		t.true(response.success, 'API call succeeded')
 		if (!response.success) {
@@ -859,8 +862,10 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 			publicKey: server_public_key
 		}, '/api/instance/extend_key', {
 			instance_id: instance_id!,
-			oldToken: authToken!
+			oldToken: authToken!,
+			count: config.count++
 		}));
+		config.count = 0;
 		
 		t.true(response.success, 'API call succeeded')
 		if (!response.success) {

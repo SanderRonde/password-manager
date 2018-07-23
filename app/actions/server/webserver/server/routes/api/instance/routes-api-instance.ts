@@ -209,15 +209,19 @@ export class RoutesApiInstance {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			oldToken: LoginToken;
+			count: number;
 		}, {}, {}, {}>({
-			unencrypted: ['instance_id', 'oldToken']
-		}, {}, async (toCheck, { instance_id, oldToken }) => {
+			unencrypted: ['instance_id', 'oldToken', 'count']
+		}, {}, async (toCheck, { count, instance_id, oldToken }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
 			}, {
 				val: 'oldToken',
 				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
 			}])) return;
 
 			const { instance } = await this.server.Router.verifyAndGetInstance(instance_id, res);
@@ -226,8 +230,8 @@ export class RoutesApiInstance {
 			const publicKey = this.server.database.Crypto.dbDecrypt(
 				instance.public_key);
 
-			const newToken = this.server.Auth.extendLoginToken(oldToken, instance_id,
-				instance.user_id.toHexString());
+			const newToken = this.server.Auth.extendLoginToken(oldToken, count,
+				instance_id, instance.user_id.toHexString());
 			if (newToken === false) {
 				res.status(200);
 				res.json({

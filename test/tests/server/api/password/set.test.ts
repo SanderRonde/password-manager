@@ -15,6 +15,7 @@ testParams(test, uris, '/api/password/set', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
+	count: 'number',
 	websites: 'array',
 	twofactor_enabled: 'boolean',
 	encrypted: 'string'
@@ -44,6 +45,7 @@ test('password can be created', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
+		count: config.count++,
 		websites: expectedWebsites,
 		twofactor_enabled: expected2FAEnabled,
 		encrypted: expectedEncrypted
@@ -123,6 +125,7 @@ test('fails if token is wrong', async t => {
 		},
 		encrypted: {
 			token: 'someinvalidtoken',
+			count: config.count++,
 			websites: [],
 			twofactor_enabled: false,
 			encrypted: 'somestr' as EncodedString<{
@@ -155,6 +158,7 @@ test('fails if instance id is wrong', async t => {
 		},
 		encrypted: {
 			token: token!,
+			count: config.count++,
 			websites: [],
 			twofactor_enabled: false,
 			encrypted: 'somestr' as EncodedString<{

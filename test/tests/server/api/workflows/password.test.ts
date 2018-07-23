@@ -76,6 +76,7 @@ test('can log in, set a password, update it and then remove a password', async t
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
+			count: config.count++,
 			websites: expectedWebsites,
 			twofactor_enabled: expected2FAEnabled,
 			encrypted: expectedEncrypted
@@ -159,6 +160,7 @@ test('can log in, set a password, update it and then remove a password', async t
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
+			count: config.count++,
 			password_id: passwordId!,
 			websites: expectedWebsites,
 			twofactor_enabled: expected2FAEnabled,
@@ -225,6 +227,7 @@ test('can log in, set a password, update it and then remove a password', async t
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
+			count: config.count++,
 			password_id: passwordId!
 		}));
 	
@@ -311,6 +314,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
+			count: config.count++,
 			websites: expectedWebsites,
 			twofactor_enabled: expected2FAEnabled,
 			encrypted: expectedEncrypted
@@ -396,6 +400,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
+			count: config.count++,
 			password_id: passwordId!,
 			websites: expectedWebsites,
 			twofactor_enabled: expected2FAEnabled,
@@ -462,6 +467,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
+			count: config.count++,
 			password_id: passwordId!
 		}));
 		
@@ -501,6 +507,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
+			count: config.count++,
 			password_id: passwordId!
 		}));
 	
@@ -600,6 +607,7 @@ test('can log in, set a password and get all metadata', async t => {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
+			count: config.count++,
 			websites: expectedWebsites,
 			twofactor_enabled: expected2FAEnabled,
 			encrypted: expectedEncrypted
@@ -683,6 +691,7 @@ test('can log in, set a password and get all metadata', async t => {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
+			count: config.count++,
 			password_id: passwordId!,
 			websites: expectedWebsites,
 			twofactor_enabled: expected2FAEnabled,
@@ -749,6 +758,7 @@ test('can log in, set a password and get all metadata', async t => {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
+			count: config.count++,
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 	
@@ -856,6 +866,7 @@ test('can log in, set and update a password, ' +
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
+				count: config.count++,
 				websites: expectedWebsites,
 				twofactor_enabled: expected2FAEnabled,
 				encrypted: expectedEncrypted
@@ -941,6 +952,7 @@ test('can log in, set and update a password, ' +
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
+				count: config.count++,
 				password_id: passwordId!,
 				websites: expectedWebsites,
 				twofactor_enabled: expected2FAEnabled,
@@ -1007,6 +1019,7 @@ test('can log in, set and update a password, ' +
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
+				count: config.count++,
 				password_hash: hash(pad(userpw, 'masterpwverify'))
 			}));
 				
@@ -1050,6 +1063,7 @@ test('can log in, set and update a password, ' +
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
+				count: config.count++,
 				url: `http${
 					Math.random() > 0.5 ? 's' : ''
 				}://${
@@ -1115,6 +1129,7 @@ test('can log in, set and update a password, ' +
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
+				count: config.count++,
 				password_id: queryResults![0].id
 			}));
 		

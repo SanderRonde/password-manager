@@ -13,6 +13,7 @@ const uris = captureURIs(test);
 testParams(test, uris, '/api/password/querymeta', {
 	instance_id: 'string'
 }, {}, {
+	count: 'number',
 	token: 'string',
 	url: 'string'
 }, {});
@@ -72,6 +73,7 @@ test('can query a URL', async t => {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
+		count: config.count++,
 		url: `http${
 			Math.random() > 0.5 ? 's' : ''
 		}://${
@@ -146,6 +148,7 @@ test('fails if auth token is wrong', async t => {
 			instance_id: config.instance_id.toHexString()
 		},
 		encrypted: {
+			count: config.count++,
 			token: 'wrongtoken',
 			url: genURL()
 		},
@@ -173,6 +176,7 @@ test('fails if instance id is wrong', async t => {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
 		},
 		encrypted: {
+			count: config.count++,
 			token: token!,
 			url: genURL()
 		},
