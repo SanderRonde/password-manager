@@ -1,0 +1,12 @@
+{
+  "name": "password-manager",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/SanderRonde/password-manager",
+  "author": "Sander Ronde <awsdfgvhbjn@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^10.5.2"
+  }
+}
