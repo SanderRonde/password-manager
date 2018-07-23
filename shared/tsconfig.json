@@ -15,7 +15,7 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "target": "es5",
+        "target": "es6",
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
