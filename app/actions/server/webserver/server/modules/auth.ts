@@ -121,8 +121,8 @@ export class WebserverAuth {
 	public extendLoginToken(oldToken: LoginToken, count: number, 
 		instance: StringifiedObjectId<EncryptedInstance>,
 		account: StringifiedObjectId<EncryptedAccount>) {
-			if (this.verifyLoginToken(oldToken, count, instance) &&
-				!this._isTokenReused(oldToken, account)) {
+			const isReused = this._isTokenReused(oldToken, account);
+			if (!isReused && this.verifyLoginToken(oldToken, count, instance)) {
 					//Delete old token
 					this._loginTokens.delete(oldToken);
 					this._expiredTokens.add(oldToken);
