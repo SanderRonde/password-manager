@@ -58,13 +58,14 @@ jspm_packages/
 .next
 
 
-app/*.js
+server/app/*.js
 
-secrets.js
+server/secrets.js
 
-app/**/*.js
-test/**/*.js
+server/app/**/*.js
+server/test/**/*.js
 
-test/temp/
-temp/
-cfg/
+server/test/temp/
+server/temp/
+server/cfg/
+server/node_modules/

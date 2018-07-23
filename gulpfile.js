@@ -17,12 +17,13 @@ function genTask(description, toRun) {
 	gulp.task('compile', genTask('Compiles the typescript',
 		function compileApp() {
 			return new Promise((resolve, reject) => {
-				const project = ts.createProject('tsconfig.json');
+				// @ts-ignore
+				const project = ts.createProject('./server/tsconfig.json');
 				const proj =  project.src().pipe(project());
 				proj.once('error', () => { 
 					reject('Error(s) thrown during compilation');
 				});
-				proj.js.pipe(gulp.dest('./')).once('end', () => {
+				proj.js.pipe(gulp.dest('./server/')).once('end', () => {
 					resolve(null);
 				});
 			});
