@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "jsx": "react",
         "alwaysStrict": true,
         "baseUrl": "../typings/",
         "forceConsistentCasingInFileNames": true,

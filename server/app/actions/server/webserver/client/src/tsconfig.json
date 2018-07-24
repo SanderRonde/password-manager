@@ -4,7 +4,7 @@
         "alwaysStrict": true,
         "baseUrl": "../../../../../../../typings/",
         "forceConsistentCasingInFileNames": true,
-        "module": "esnext",
+        "module": "commonjs",
         "moduleResolution": "node",
         "noImplicitAny": true,
         "noImplicitThis": true,

@@ -1,6 +1,5 @@
 const cleanCss = require('gulp-clean-css');
-const rollup = require('rollup');
-const fs = require('fs-extra');
+const webpack = require('webpack-stream');
 const gulp = require('gulp');
 const path = require('path');
 
@@ -66,24 +65,31 @@ function capitalize(str) {
 	 * @param {string} input - The entrypoint
 	 * @param {string} output - The output location
 	 */
-	async function bundleJS(input, output) {
-		const bundle = await rollup.rollup({
-			input: input,
-			inlineDynamicImports: true
-		});
-	
-		await fs.mkdirp(path.dirname(output));
-		await bundle.write({
-			format: 'iife',
-			file: output
-		});
+	function bundleJS(input, output) {
+		return gulp.src(input)
+			.pipe(webpack({
+				resolve: {
+					extensions: ['.ts', '.tsx.', '.js', '.jsx']
+				},
+				module: {
+					rules: [{
+						test: /\.tsx?$/,
+						loader: 'ts-loader'
+					}]
+				},
+				externals: {
+					react: 'React',
+					'react-dom': 'ReactDOM'
+				}
+			}))
+			.pipe(gulp.dest(output));
 	}
 
 	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
 		gulp.parallel(...ROUTES.map((route) => {
 			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}.js`);
 			const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}.js`);
-			return dynamicFunctionNameAsync(`bundleJS${capitalize(route)}`, async () => {
+			return dynamicFunctionName(`bundleJS${capitalize(route)}`, async () => {
 				await bundleJS(input, output);
 			});
 		}))));
@@ -99,19 +105,8 @@ function capitalize(str) {
 			});
 		}))));
 
-	gulp.task('dashboard.bundle.html', genTask('Bundles the CSS files into a single bundle',
-		gulp.parallel(...ROUTES.map((route) => {
-			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}.html`);
-			const output = path.join(BUILD_DIR, 'entrypoints/', route);
-			return dynamicFunctionName(`copyHTML${capitalize(route)}`, () => {
-				return gulp.src(input)
-					.pipe(gulp.dest(output));
-			});
-		}))));
-
 	gulp.task('dashboard', gulp.parallel(
 		'dashboard.bundle.js', 
-		'dashboard.bundle.css',
-		'dashboard.bundle.html'
+		'dashboard.bundle.css'
 	));
 })();

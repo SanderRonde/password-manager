@@ -1,3 +1,5 @@
+import path = require('path');
+
 /**
  * The encryption algorithm used by default
  */
@@ -30,3 +32,11 @@ export const COOKIE_DEFAULT_EXPIRE_TIME = 1000 * 60 * 60 * 3;
  * The time by which a cookie is extended for each use (half an hour)
  */
 export const COOKIE_EXTEND_TIME = 1000 * 60 * 30;
+/**
+ * The root of the server
+ */
+export const SERVER_ROOT = path.join(__dirname, '../../');
+/**
+ * The root of the entire project (one above server)
+ */
+export const PROJECT_ROOT = path.join(SERVER_ROOT, '../');

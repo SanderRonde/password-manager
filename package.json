@@ -28,15 +28,15 @@
     "fs-extra": "^7.0.0",
     "gulp": "^4.0.0",
     "gulp-clean-css": "^3.9.4",
-    "rollup": "^0.63.4",
-    "typescript": "^2.9.2"
+    "typescript": "^2.9.2",
+    "webpack-stream": "^5.0.0"
   },
   "scripts": {
     "compile": "yarn compile:shared && yarn compile:server && yarn compile:dashboard",
     "compile:shared": "tsc -p ./shared/tsconfig.json",
     "compile:server": "tsc -p ./server/tsconfig.json",
     "compile:dashboard": "tsc -p ./server/app/actions/server/webserver/client/src/tsconfig.json",
-    "build": "compile && gulp dashboard",
+    "build": "yarn compile && gulp dashboard",
     "test": "ava"
   }
 }
