@@ -1,5 +1,6 @@
 const cleanCss = require('gulp-clean-css');
 const webpack = require('webpack-stream');
+const rename = require('gulp-rename');
 const gulp = require('gulp');
 const path = require('path');
 
@@ -64,8 +65,9 @@ function capitalize(str) {
 	 * 
 	 * @param {string} input - The entrypoint
 	 * @param {string} output - The output location
+	 * @param {string} name - The name of the file
 	 */
-	function bundleJS(input, output) {
+	function bundleJS(input, output, name) {
 		return gulp.src(input)
 			.pipe(webpack({
 				resolve: {
@@ -78,19 +80,21 @@ function capitalize(str) {
 					}]
 				},
 				externals: {
-					react: 'React',
-					'react-dom': 'ReactDOM'
-				}
+					react: 'window.React',
+					'react-dom': 'window.ReactDOM'
+				},
+				mode: 'production'
 			}))
+			.pipe(rename(name))
 			.pipe(gulp.dest(output));
 	}
 
 	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
 		gulp.parallel(...ROUTES.map((route) => {
 			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}.js`);
-			const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}.js`);
+			const output = path.join(BUILD_DIR, 'entrypoints/', route);
 			return dynamicFunctionName(`bundleJS${capitalize(route)}`, async () => {
-				await bundleJS(input, output);
+				await bundleJS(input, output, `${route}.js`);
 			});
 		}))));
 

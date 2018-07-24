@@ -11,7 +11,7 @@ export const html = ({
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com">
+		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://unpkg.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com">
 		<!-- TODO: select color -->
 		<meta name="theme-color" content="#4285f4">
 		<meta name="description" content="Your password manager dashboard">
@@ -22,6 +22,8 @@ export const html = ({
 	<body>
 		<div id="app">`,
 	post: `</div>
+		<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+		<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
 		<script type="module" src="${script}"></script>
 	</body>
 </html>`
