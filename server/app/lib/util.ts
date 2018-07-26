@@ -1,6 +1,7 @@
 import { ServerConfig } from '../actions/server/server';
 import { TypedObjectID } from '../database/db-types';
 import commentJson = require('comment-json');
+import { SERVER_ROOT } from './constants';
 import nodemailer = require('nodemailer');
 import { EventEmitter } from 'events';
 import Mute = require('mute-stream');
@@ -254,4 +255,20 @@ export function wait(ms: number): Promise<void> {
 			resolve(undefined);
 		}, ms);
 	});
+}
+
+export function captureFileOutput() {
+	const filePath = path.join(SERVER_ROOT, 'temp/');
+	const fileName = `${genRandomString(25)}.file`;
+	return {
+		filePath,
+		fileName,
+		async check() {
+			const content = await fs.readFile(`${filePath}${fileName}`, {
+				encoding: 'utf8'
+			});
+			await fs.unlink(`${filePath}${fileName}`);
+			return content;
+		}
+	}
 }

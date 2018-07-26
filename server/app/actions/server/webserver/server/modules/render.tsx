@@ -4,17 +4,19 @@ import { html } from '../../client/src/html';
 import React = require('react');
 
 export function render(res: ResponseCaptured, {
-	App, title, script, stylesheet	
+	App, title, script, stylesheet, development
 }: {
 	App: any;
 	title: string;
 	script: string;
 	stylesheet: string;
+	development: boolean;
 }) {
 	const { pre, post } = html({
 		title,
 		script,
-		stylesheet
+		stylesheet,
+		development
 	});
 	res.write(pre);
 

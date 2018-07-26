@@ -24,11 +24,14 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^10.5.3",
+    "@types/react": "^16.4.7",
     "ava": "^0.25.0",
     "fs-extra": "^7.0.0",
     "gulp": "^4.0.0",
     "gulp-clean-css": "^3.9.4",
     "gulp-rename": "^1.4.0",
+    "ts-loader": "^4.4.2",
     "typescript": "^2.9.2",
     "webpack-stream": "^5.0.0"
   },
@@ -39,5 +42,8 @@
     "compile:dashboard": "tsc -p ./server/app/actions/server/webserver/client/src/tsconfig.json",
     "build": "yarn compile && gulp dashboard",
     "test": "ava"
+  },
+  "dependencies": {
+    "@types/react-dom": "^16.0.6"
   }
 }

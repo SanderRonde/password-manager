@@ -6,11 +6,10 @@
   "author": "Sander Ronde <awsdfgvhbjn@gmail.com>",
   "license": "MIT",
   "private": true,
-  "devDependencies": {
-    "@types/node": "^10.5.2",
-    "@types/react": "^16.4.6"
-  },
+  "devDependencies": {},
   "dependencies": {
-    "react": "^16.4.1"
+    "@material-ui/core": "^1.4.1",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1"
   }
 }

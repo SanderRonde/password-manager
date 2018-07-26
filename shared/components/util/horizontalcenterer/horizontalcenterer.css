@@ -1,0 +1,9 @@
+.centererContainer.horizontal {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+.centerer.horizontal {
+	display: block;
+}

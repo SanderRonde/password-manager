@@ -8,6 +8,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^1.4.1",
     "@types/express-rate-limit": "^2.9.3",
     "body-parser": "^1.18.3",
     "commander": "^2.16.0",
@@ -21,6 +22,7 @@
     "http2": "^3.3.7",
     "mkdirp": "^0.5.1",
     "mongodb": "^3.0.8",
+    "morgan": "^1.9.0",
     "mute-stream": "^0.0.7",
     "node-rsa": "^1.0.0",
     "nodemailer": "^4.6.7",
@@ -28,7 +30,8 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "serve-static": "^1.13.2",
-    "speakeasy": "^2.0.0"
+    "speakeasy": "^2.0.0",
+    "webpack": "^4.16.2"
   },
   "devDependencies": {
     "@types/commander": "^2.12.2",
@@ -37,14 +40,13 @@
     "@types/fs-extra": "^5.0.4",
     "@types/mkdirp": "^0.5.2",
     "@types/mongodb": "^3.0.23",
-    "@types/node": "^10.5.1",
+    "@types/morgan": "^1.7.35",
     "@types/node-rsa": "^0.4.3",
     "@types/nodemailer": "^4.6.2",
     "@types/progress": "^2.0.1",
-    "@types/react": "^16.4.6",
-    "@types/react-dom": "^16.0.6",
     "@types/serve-static": "^1.13.2",
     "@types/speakeasy": "^2.0.2",
+    "@types/webpack": "^4.4.8",
     "import-fresh": "^2.0.0",
     "typescript": "^2.9.2"
   }

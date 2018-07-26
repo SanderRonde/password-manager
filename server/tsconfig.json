@@ -25,7 +25,8 @@
     "compileOnSave": true,
     "include": [
         "app/",
-        "test/"
+        "test/",
+        "../shared/"
     ],
     "exclude": [
         "app/actions/server/websever/client/"

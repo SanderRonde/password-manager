@@ -71,13 +71,7 @@ function capitalize(str) {
 		return gulp.src(input)
 			.pipe(webpack({
 				resolve: {
-					extensions: ['.ts', '.tsx.', '.js', '.jsx']
-				},
-				module: {
-					rules: [{
-						test: /\.tsx?$/,
-						loader: 'ts-loader'
-					}]
+					extensions: ['.js', '.jsx']
 				},
 				externals: {
 					react: 'window.React',
