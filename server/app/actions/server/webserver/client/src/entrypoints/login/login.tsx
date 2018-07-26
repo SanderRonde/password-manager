@@ -1,7 +1,8 @@
 import { Login } from '../../../../../../../../../shared/components/entrypoints/login/login';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
 import blueGrey from '@material-ui/core/colors/blueGrey';
 import indigo from '@material-ui/core/colors/indigo';
+import { JssProvider } from 'react-jss';
 import { hydrate } from 'react-dom';
 import * as React from 'react';
 
@@ -29,7 +30,9 @@ const theme = createMuiTheme({
 });
   
 hydrate(
-	<MuiThemeProvider theme={theme}>
-		<Main />
-	</MuiThemeProvider>, document.getElementById('app'),
+	<JssProvider generateClassName={createGenerateClassName()}>
+		<MuiThemeProvider theme={theme}>
+			<Main />
+		</MuiThemeProvider>
+	</JssProvider>, document.getElementById('app'),
 );

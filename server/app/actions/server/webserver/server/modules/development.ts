@@ -72,6 +72,7 @@ function commonjsToEs6(file: string): string {
 		.replace(/(\w+) (\w+) = require\("@material-ui\/core\/(.+)"\)/g, 'import * as $2 from "/modules/material-ui/core/$3"')
 		.replace(/(\w+) (\w+) = require\("react-dom"\)/g, 'import $2 from "/modules/react-dom"')
 		.replace(/(\w+) (\w+) = require\("react"\)/g, 'import $2 from "/modules/react"')
+		.replace(/(\w+) (\w+) = require\("react-jss(.js)?"\)/g, 'import $2 from "/modules/react-jss"')
 		.replace(/(\w+) (\w+) = require\("(.*)"\)/g, 'import * as $2 from "$3.js"')
 		.replace(/exports.default = ([^;]+)/g, 'export default $1');
 	const lines = replaced.split('\n');
@@ -88,6 +89,19 @@ function commonjsToEs6(file: string): string {
 			}
 
 			lines[i] = `;var ${tempName} = ${expr}; export { ${tempName} as ${name} };`;
+		}
+	}
+	return lines.join('\n');
+}
+
+function prefixImports(file: string, prefix: string) {
+	const lines = file.split('\n');
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		const match = /import (\w+) from '.\/(.+)'/.exec(line);
+		if (match) {
+			const [, name, importPath] = match;
+			lines[i] = `import ${name} from '${prefix}${importPath}';`
 		}
 	}
 	return lines.join('\n');
@@ -122,6 +136,47 @@ function genCustomMaterialUI(content: string) {
 	}).join('\n');
 }
 
+async function genSingleFileWebpackRoute(res: express.Response, name: string, src: string) {
+	const { err, result } = await synchronizePromise(fs.readFile(path.join(
+		PROJECT_ROOT, 'temp/', `${name}.js`
+	)));
+	if (!err) {
+		res.contentType('.js');
+		res.write(`${result}\n\n
+		export default _${name}.default;`);
+		res.end();
+		return;
+	}
+	
+	webpack({
+		mode: "development",
+		entry: src,
+		output: {
+			library: `_${name}`,
+			path: path.join(PROJECT_ROOT, 'temp/'),
+			filename: `${name}.js`
+		}
+	}, async (err) => {
+		if (err) {
+			res.status(500);
+			res.end();
+		} else {
+			res.contentType('.js');
+			const { err, result: content } = await synchronizePromise(fs.readFile(path.join(
+				PROJECT_ROOT, 'temp/', `${name}.js`
+			)));
+			if (err) {
+				res.status(500);
+				res.end();
+				return;
+			}
+			res.write(`${content}\n\n
+			export default _${name}.default;`);
+			res.end();
+		}
+	});
+}
+
 export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 	const materialUIRoot = path.join(SERVER_ROOT, 'node_modules/@material-ui/core');
 	webserver.app.all('/modules/react', async (_req, res) => {
@@ -154,19 +209,49 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		res.end();
 	});
 	webserver.app.use(serve(path.join(materialUIRoot, 'es/colors/'), {
-		prefix: '/modules/material-ui/',
+		prefix: '/modules/material-ui/core/colors/',
 		exclude: ['index.js'],
 		extensions: ['js']
 	}));
 	webserver.app.use(serve(path.join(materialUIRoot, 'es/colors/'), {
-		prefix: '/modules/material-ui/core/colors/',
+		prefix: '/modules/es/colors/',
 		exclude: ['index.js'],
 		extensions: ['js']
 	}));
 	webserver.app.all('/modules/material-ui/colors', async (_req, res) => {
 		res.contentType('.js');
-		res.write(await fs.readFile(path.join(materialUIRoot, 'es/colors/index.js')));
+		const file = (await fs.readFile(path.join(materialUIRoot, 'es/colors/index.js')))
+			.toString();
+		res.write(prefixImports(file, '/modules/es/colors/'));
 		res.end();
+	});
+	webserver.app.all('/modules/react-jss', async (_req, res) => {
+		res.contentType('.js');
+		res.write(`
+		import theming from './theming';
+		const {
+			ThemeProvider, withTheme, createTheming
+		} = theming;
+		import JssProvider from './react-jss/JssProvider';
+		import jss from './react-jss/jss';
+		const { SheetsRegistry, createGenerateClassNameDefault } = jss;
+		import injectSheet from './react-jss/injectSheet';
+		export default {
+			ThemeProvider, withTheme, createTheming,
+			JssProvider, SheetsRegistry, jss, createGenerateClassNameDefault,
+			injectSheet
+		}
+		`);
+		res.end();
+	});
+	webserver.app.all('/modules/react-jss/:module', async (req, res) => {
+		const name = req.params.module;;
+		await genSingleFileWebpackRoute(res, name, 
+			path.join(SERVER_ROOT, `node_modules/react-jss/lib/${name}.js`));
+	});
+	webserver.app.all('/modules/theming', async (_req, res) => {
+		await genSingleFileWebpackRoute(res, 'theming', 
+			path.join(SERVER_ROOT, 'node_modules/theming/dist/esm/index.js'));
 	});
 	webserver.app.all('/modules/material-ui/core/colors', async (_req, res) => {
 		res.contentType('.js');
