@@ -85,7 +85,7 @@ function capitalize(str) {
 
 	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
 		gulp.parallel(...ROUTES.map((route) => {
-			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}.js`);
+			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-hydrate.js`);
 			const output = path.join(BUILD_DIR, 'entrypoints/', route);
 			return dynamicFunctionName(`bundleJS${capitalize(route)}`, async () => {
 				await bundleJS(input, output, `${route}.js`);
