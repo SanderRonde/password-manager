@@ -39,7 +39,7 @@ interface InputProps extends WithStyles<typeof styles> {
   	innerRef?: React.Ref<any> | React.RefObject<any>;
 }
 
-export const CustomInput = withStyles(styles)((() => {
+const _Input = (() => {
 	return class Input extends React.Component<InputProps, {}> {
 		constructor(props: InputProps) {
 			super(props);
@@ -57,4 +57,5 @@ export const CustomInput = withStyles(styles)((() => {
 			)
 		}
 	}
-})());
+})();
+export const CustomInput = withStyles(styles)(_Input);

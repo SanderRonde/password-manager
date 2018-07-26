@@ -20,7 +20,7 @@ const styles = createStyles({
 	}
 });
 
-export const VerticalCenterer = withStyles(styles)((() => {
+const _VerticalCenterer = (() => {
 	interface VerticalCentererProps extends WithStyles<typeof styles> {
 		fullscreen?: boolean;
 	}
@@ -42,4 +42,5 @@ export const VerticalCenterer = withStyles(styles)((() => {
 			)
 		}
 	}
-})());
+})();
+export const VerticalCenterer = withStyles(styles)(_VerticalCenterer);

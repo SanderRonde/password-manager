@@ -14,7 +14,7 @@ const styles = createStyles({
 	}
 });
 
-export const HorizontalCenterer = withStyles(styles)((() => {
+const _HorizontalCenterer = (() => {
 	return class HorizontalCenterer extends React.Component<WithStyles<typeof styles>, {}> {
 		constructor(props: WithStyles<typeof styles>) {
 			super(props);
@@ -30,4 +30,5 @@ export const HorizontalCenterer = withStyles(styles)((() => {
 			)
 		}
 	}
-})());
+})();
+export const HorizontalCenterer = withStyles(styles)(_HorizontalCenterer);
