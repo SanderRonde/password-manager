@@ -8,17 +8,15 @@ import { ResponseCaptured } from './ratelimit';
 import React = require('react');
 
 export function render(res: ResponseCaptured, {
-	App, title, script, stylesheet, development
+	App, title, script, development
 }: {
 	App: any;
 	title: string;
 	script: string;
-	stylesheet: string;
 	development: boolean;
 }) {
 	res.write(preAppHTML({
 		title,
-		stylesheet,
 		development
 	}));
 

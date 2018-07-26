@@ -1,8 +1,7 @@
 export function preAppHTML({
-	development, title, stylesheet	
+	development, title
 }: {
 	title: string,
-	stylesheet: string;
 	development?: boolean;
 }) {
 	return `
@@ -18,7 +17,6 @@ export function preAppHTML({
 		<meta name="description" content="Your password manager dashboard">
 		<title>${title}</title>
 		<link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
-		<link rel="stylesheet" href="${stylesheet}"/>
 	</head>
 	<body>
 		<div id="app">`
@@ -40,18 +38,17 @@ export function postAppHTML({
 }
 
 export const html = ({ 
-	title, script, stylesheet, css,
+	title, script, css,
 	development = false
 }: { 
 	css: string;
 	title: string,
 	script: string;
-	stylesheet: string;
 	development?: boolean;
 }) => {
 	return {
 		pre: preAppHTML({
-			development, title, stylesheet
+			development, title
 		}),
 		post: postAppHTML({
 			script, css

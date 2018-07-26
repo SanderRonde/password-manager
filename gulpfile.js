@@ -92,19 +92,7 @@ function capitalize(str) {
 			});
 		}))));
 
-	gulp.task('dashboard.bundle.css', genTask('Bundles the CSS files into a single bundle',
-		gulp.parallel(...ROUTES.map((route) => {
-			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}.css`);
-			const output = path.join(BUILD_DIR, 'entrypoints/', route);
-			return dynamicFunctionName(`bundleCSS${capitalize(route)}`, () => {
-				return gulp.src(input)
-					.pipe(cleanCss({ }))
-					.pipe(gulp.dest(output));
-			});
-		}))));
-
 	gulp.task('dashboard', gulp.parallel(
-		'dashboard.bundle.js', 
-		'dashboard.bundle.css'
+		'dashboard.bundle.js'
 	));
 })();

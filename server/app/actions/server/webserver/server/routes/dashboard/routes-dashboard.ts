@@ -64,7 +64,6 @@ export class RoutesDashboard {
 		render(res, {
 			App: getRouteComponent(this.server.config, ROUTES.LOGIN),
 			script: 'entrypoints/login/login.js',
-			stylesheet: 'entrypoints/login/login.css',
 			title: 'Log in to your dashboard',
 			development: this.server.config.development
 		});
@@ -78,7 +77,6 @@ export class RoutesDashboard {
 		render(res, {
 			App: getRouteComponent(this.server.config, ROUTES.DASHBOARD),
 			script: 'entrypoints/dashboard/dashboard.js',
-			stylesheet: 'entrypoints/dashboard/dashboard.css',
 			title: 'Your Dashboard',
 			development: this.server.config.development
 		});
