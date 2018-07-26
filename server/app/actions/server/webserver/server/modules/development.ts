@@ -1,10 +1,10 @@
-import { PROJECT_ROOT, SERVER_ROOT } from "../../../../../lib/constants";
+import { PROJECT_ROOT } from "../../../../../lib/constants";
+import { ResponseCaptured } from "./ratelimit";
 import { Webserver } from "../webserver";
 import express = require('express');
 import webpack = require('webpack');
 import fs = require('fs-extra');
 import path = require('path');
-import { ResponseCaptured } from "./ratelimit";
 import { parse } from "url";
 
 function synchronizePromise<T>(prom: Promise<T>): Promise<{
@@ -178,10 +178,10 @@ async function genSingleFileWebpackRoute(res: express.Response, name: string, sr
 }
 
 export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
-	const materialUIRoot = path.join(SERVER_ROOT, 'node_modules/@material-ui/core');
+	const materialUIRoot = path.join(PROJECT_ROOT, 'node_modules/@material-ui/core');
 	webserver.app.all('/modules/react', async (_req, res) => {
 		res.contentType('.js');
-		const content = (await fs.readFile(path.join(SERVER_ROOT, 'node_modules/react/umd/',
+		const content = (await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/react/umd/',
 			'react.development.js'))).toString();
 		const replaced = content.replace(/\}\((this), \(function \(\) \{ 'use strict'/,
 			'} (window, (function () { \'use strict\'');
@@ -192,7 +192,7 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 	});
 	webserver.app.all('/modules/react-dom', async (_req, res) => {
 		res.contentType('.js');
-		const content = (await fs.readFile(path.join(SERVER_ROOT, 'node_modules/react-dom/umd/',
+		const content = (await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/react-dom/umd/',
 			'react-dom.development.js'))).toString();
 		const replaced = content.replace(/\}\((this), \(function \(React\) \{ 'use strict'/g,
 			'} (window, (function (React) { \'use strict\'');
@@ -247,11 +247,11 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 	webserver.app.all('/modules/react-jss/:module', async (req, res) => {
 		const name = req.params.module;;
 		await genSingleFileWebpackRoute(res, name, 
-			path.join(SERVER_ROOT, `node_modules/react-jss/lib/${name}.js`));
+			path.join(PROJECT_ROOT, `node_modules/react-jss/lib/${name}.js`));
 	});
 	webserver.app.all('/modules/theming', async (_req, res) => {
 		await genSingleFileWebpackRoute(res, 'theming', 
-			path.join(SERVER_ROOT, 'node_modules/theming/dist/esm/index.js'));
+			path.join(PROJECT_ROOT, 'node_modules/theming/dist/esm/index.js'));
 	});
 	webserver.app.all('/modules/material-ui/core/colors', async (_req, res) => {
 		res.contentType('.js');
