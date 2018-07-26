@@ -7,7 +7,6 @@ import { EventEmitter } from 'events';
 import Mute = require('mute-stream');
 import { Readable } from 'stream';
 import mongo = require('mongodb');
-import mkdirp = require('mkdirp');
 import path = require('path');
 import fs = require('fs-extra');
 
@@ -80,7 +79,7 @@ const capturer = new StdinCapturer();
 
 export function assertDir(dirPath: string) {
 	return new Promise((resolve, reject) => {
-		mkdirp(dirPath, (err) => {
+		fs.mkdirp(dirPath, (err) => {
 			if (err) {
 				reject(err);
 			} else {
