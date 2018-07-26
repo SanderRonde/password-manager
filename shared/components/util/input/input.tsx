@@ -1,8 +1,8 @@
-import { StyleRules, withStyles, createStyles } from '@material-ui/core/styles';
+import { withStyles, createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import * as React from 'react';
 
-const styles = (): StyleRules<string> => createStyles({
+const styles = createStyles({
 	label: {
 		fontWeight: 'bold',
 		display: 'block',
@@ -38,22 +38,23 @@ interface InputProps extends WithStyles<typeof styles> {
 	name: string;
   	innerRef?: React.Ref<any> | React.RefObject<any>;
 }
-class Input extends React.Component<InputProps, {}> {
-	constructor(props: InputProps) {
-		super(props);
-	}
 
-	render() {
-		return (
-			<div className="input">
-				<label htmlFor={this.props.name} className={this.props.classes!.label}>
-					{this.props.label || ''}
-				</label>
-				<input name={this.props.name} className="inputInput" type={this.props.type || 'text'} 
-					required={this.props.required} autoFocus={this.props.autofocus}/>
-			</div>
-		)
+export const CustomInput = withStyles(styles)((() => {
+	return class Input extends React.Component<InputProps, {}> {
+		constructor(props: InputProps) {
+			super(props);
+		}
+	
+		render() {
+			return (
+				<div className="input">
+					<label htmlFor={this.props.name} className={this.props.classes!.label}>
+						{this.props.label || ''}
+					</label>
+					<input name={this.props.name} className={this.props.classes.input} type={this.props.type || 'text'} 
+						required={this.props.required} autoFocus={this.props.autofocus}/>
+				</div>
+			)
+		}
 	}
-}
-
-export const CustomInput = withStyles(styles)(Input);
+})());

@@ -1,17 +1,33 @@
+import { withStyles, createStyles } from '@material-ui/core/styles';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
 import * as React from 'react';
 
-export class HorizontalCenterer extends React.Component<{}, {}> {
-	constructor(props: {}) {
-		super(props);
-	}
+const styles = createStyles({
+	container: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'center'
+	},
 
-	render() {
-		return (
-			<div className="centererContainer horizontal">
-				<div className="centerer horizontal">
-					{this.props.children}
-				</div>
-			</div>
-		)
+	main: {
+		display: 'block'
 	}
-}
+});
+
+export const HorizontalCenterer = withStyles(styles)((() => {
+	return class HorizontalCenterer extends React.Component<WithStyles<typeof styles>, {}> {
+		constructor(props: WithStyles<typeof styles>) {
+			super(props);
+		}
+
+		render() {
+			return (
+				<div className={this.props.classes.container}>
+					<div className={this.props.classes.main}>
+						{this.props.children}
+					</div>
+				</div>
+			)
+		}
+	}
+})());

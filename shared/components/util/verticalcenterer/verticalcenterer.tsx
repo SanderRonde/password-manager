@@ -1,23 +1,45 @@
-import { optionalClassName } from '../../../lib/component-helpers';
+import { withStyles, createStyles } from '@material-ui/core/styles';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
+import classNames = require('classnames');
 import * as React from 'react';
 
-export class VerticalCenterer extends React.Component<{
-	fullscreen?: boolean;
-}, {}> {
-	constructor(props: {
-		fullscreen?: boolean;
-	}) {
-		super(props);
-	}
+const styles = createStyles({
+	container: {
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'center',
+		height: '100%'
+	},
 
-	render() {
-		return (
-			<div className={"centererContainer vertical" + optionalClassName('fullscreen', 
-					this.props.fullscreen!)}>
-				<div className="centerer vertical">
-					{this.props.children}
-				</div>
-			</div>
-		)
+	fullscreen: {
+		height: '100vh'
+	},
+
+	main: {
+		display: 'block'
 	}
-}
+});
+
+export const VerticalCenterer = withStyles(styles)((() => {
+	interface VerticalCentererProps extends WithStyles<typeof styles> {
+		fullscreen?: boolean;
+	}
+	return class VerticalCenterer extends React.Component<VerticalCentererProps> {
+		constructor(props: VerticalCentererProps) {
+			super(props);
+		}
+
+		render() {
+			return (
+				<div className={classNames(
+					this.props.classes.container, {
+						[this.props.classes.fullscreen]: this.props.fullscreen
+					})}>
+					<div className={this.props.classes.main}>
+						{this.props.children}
+					</div>
+				</div>
+			)
+		}
+	}
+})());
