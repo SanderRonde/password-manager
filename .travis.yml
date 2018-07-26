@@ -10,7 +10,6 @@ stages:
   
 install:
 - yarn --ignore-engines
-- cd server && yarn --ignore-engines && cd ..
 - npm install -g gulp ava typescript
 - ./server/scripts/clone-mongo-tools.sh
 - ./server/scripts/alias-mongo-tools.sh
