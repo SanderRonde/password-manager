@@ -8,28 +8,28 @@ import * as React from 'react';
 class Main extends React.Component {
 	// Remove the server-side injected CSS.
 	componentDidMount() {
-	  const jssStyles = document.getElementById('jss-server-side');
-	  if (jssStyles && jssStyles.parentNode) {
-		jssStyles.parentNode.removeChild(jssStyles);
-	  }
+		const jssStyles = document.getElementById('jss-server-side');
+		if (jssStyles && jssStyles.parentNode) {
+			jssStyles.parentNode.removeChild(jssStyles);
+		}
 	}
   
 	render() {
-	  return <Login />
+	  	return <Login />
 	}
-  }
+}
   
-  // Create a theme instance.
-  const theme = createMuiTheme({
+// Create a theme instance.
+const theme = createMuiTheme({
 	palette: {
-	  primary: blueGrey,
-	  secondary: indigo,
-	  type: 'light',
+		primary: blueGrey,
+		secondary: indigo,
+		type: 'light',
 	},
-  });
+});
   
-  hydrate(
+hydrate(
 	<MuiThemeProvider theme={theme}>
-	  <Main />
+		<Main />
 	</MuiThemeProvider>, document.getElementById('app'),
-  );
+);

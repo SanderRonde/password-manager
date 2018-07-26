@@ -1,8 +1,9 @@
 import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
 import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
-import { Input } from '../../util/input/input';
+import { CustomInput } from '../../util/input/input';
 import { Button } from '@material-ui/core';
 import * as React from 'react';
+
 
 export class Login extends React.Component<{}, {}> {
 	form: React.RefObject<HTMLFormElement>;
@@ -26,8 +27,8 @@ export class Login extends React.Component<{}, {}> {
 						<hr/>
 						<div className="loginContainer">
 							<form ref={this.form}>
-								<Input name="email" type="email" label="EMAIL-ADDRESS" required/>
-								<Input name="password" type="password" label="PASSWORD" required/>
+								<CustomInput name="email" type="email" label="EMAIL-ADDRESS" required/>
+								<CustomInput name="password" type="password" label="PASSWORD" required/>
 								<Button variant="contained" color="primary" onClick={this.submitForm}>dwadwa</Button>
 							</form>
 						</div>

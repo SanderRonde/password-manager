@@ -66,14 +66,31 @@ function serve(root: string, {
 }
 
 function commonjsToEs6(file: string): string {
-	return file
+	const replaced = file
 		.replace(/Object.defineProperty\(exports, .__esModule., { value: true }\);/g, '')
 		.replace(/(\w+) (\w+) = require\("@material-ui\/core"\)/g, 'import * as $2 from "/modules/material-ui/core"')
+		.replace(/(\w+) (\w+) = require\("@material-ui\/core\/(.+)"\)/g, 'import * as $2 from "/modules/material-ui/core/$3"')
 		.replace(/(\w+) (\w+) = require\("react-dom"\)/g, 'import $2 from "/modules/react-dom"')
 		.replace(/(\w+) (\w+) = require\("react"\)/g, 'import $2 from "/modules/react"')
 		.replace(/(\w+) (\w+) = require\("(.*)"\)/g, 'import * as $2 from "$3.js"')
-		.replace(/exports.default = (\w+)/g, 'export default $1')
-		.replace(/exports.(\w+) = (\w+)/g, 'export { $2 as $1 }')
+		.replace(/exports.default = ([^;]+)/g, 'export default $1');
+	const lines = replaced.split('\n');
+
+	let tempVarsIndex: number = 0;
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		let match = /exports.(\w+) = ([^;]+)/.exec(line);
+		if (match) {
+			const [, name, expr ] = match;
+			let tempName = `tempVar${++tempVarsIndex}`;
+			while (replaced.indexOf(tempName) !== -1) {
+				tempName = `tempVar${++tempVarsIndex}`;
+			}
+
+			lines[i] = `;var ${tempName} = ${expr}; export { ${tempName} as ${name} };`;
+		}
+	}
+	return lines.join('\n');
 }
 
 function getMaterialUIImportName(content: string) {
@@ -141,12 +158,27 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		exclude: ['index.js'],
 		extensions: ['js']
 	}));
+	webserver.app.use(serve(path.join(materialUIRoot, 'es/colors/'), {
+		prefix: '/modules/material-ui/core/colors/',
+		exclude: ['index.js'],
+		extensions: ['js']
+	}));
 	webserver.app.all('/modules/material-ui/colors', async (_req, res) => {
 		res.contentType('.js');
 		res.write(await fs.readFile(path.join(materialUIRoot, 'es/colors/index.js')));
 		res.end();
 	});
+	webserver.app.all('/modules/material-ui/core/colors', async (_req, res) => {
+		res.contentType('.js');
+		res.write(await fs.readFile(path.join(materialUIRoot, 'es/colors/index.js')));
+		res.end();
+	});
 	webserver.app.all('/modules/material-ui/styles', async (_req, res) => {
+		res.contentType('.js');
+		res.write(await fs.readFile(path.join(materialUIRoot, 'es/styles/index.js')));
+		res.end();
+	});
+	webserver.app.all('/modules/material-ui/core/styles', async (_req, res) => {
 		res.contentType('.js');
 		res.write(await fs.readFile(path.join(materialUIRoot, 'es/styles/index.js')));
 		res.end();
@@ -189,6 +221,56 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		webpack({
 			mode: "development",
 			entry: path.join(materialUIRoot, 'Modal/', `${component}.js`),
+			output: {
+				library: `_${component}`,
+				path: path.join(PROJECT_ROOT, 'temp/'),
+				filename: `${component}.js`
+			}
+		}, async (err) => {
+			if (err) {
+				res.status(500);
+				res.end();
+			} else {
+				res.contentType('.js');
+				const { err, result: content } = await synchronizePromise(fs.readFile(path.join(
+					PROJECT_ROOT, 'temp/', `${component}.js`
+				)));
+				if (err) {
+					res.status(500);
+					res.end();
+					return;
+				}
+				res.write(`${content}\n\n
+				export default _${component}.default;`);
+				res.end();
+			}
+		});
+	});
+	webserver.app.all('/modules/material-ui/core/:module', async (req, res, next) => {
+		const component = req.params.module;
+		const styles = [
+			'createGenerateClassName', 'createMuiTheme', 
+			'jssPreset', 'MuiThemeProvider',
+			'createStyles', 'withStyles', 'withTheme'
+		];
+		if (styles.indexOf(component) === -1) {
+			return next();
+		}
+
+		const { err, result } = await synchronizePromise(fs.readFile(path.join(
+			PROJECT_ROOT, 'temp/', `${component}.js`
+		)));
+		if (!err) {
+			res.contentType('.js');
+			res.write(`${result}\n\n
+			export default _${component}.default;`);
+			res.end();
+			return;
+		}
+	
+		webpack({
+			mode: "development",
+			entry: path.join(materialUIRoot, 'styles/', `${component}.js`),
 			output: {
 				library: `_${component}`,
 				path: path.join(PROJECT_ROOT, 'temp/'),

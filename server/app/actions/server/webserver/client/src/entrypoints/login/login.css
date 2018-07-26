@@ -1,6 +1,6 @@
 @import '../../../../../../../../../shared/components/util/horizontalcenterer/horizontalcenterer.css';
 @import '../../../../../../../../../shared/components/util/verticalcenterer/verticalcenterer.css';
-@import '../../../../../../../../../shared/components/util/input/input.css';
+/* @import '../../../../../../../../../shared/components/util/input/input.css'; */
 
 body {
 	margin: 0;
@@ -14,4 +14,8 @@ body {
 
 .loginContainer > * {
 	margin-bottom: 18px;
+}
+
+.loginHeader {
+	font-size: 120%;	
 }
