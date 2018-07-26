@@ -32,14 +32,8 @@ export function render(res: ResponseCaptured, {
 			type: 'light'
 		},
 	});
-	const gen = createGenerateClassName();
-	const generateClassName = (rule: any, sheet: any) => {
-		const retval = gen(rule, sheet);
-		console.log(retval);
-		return retval;
-	}
 	const html = renderToString(
-		<JssProvider registry={sheetsRegistry} generateClassName={generateClassName}>
+		<JssProvider registry={sheetsRegistry} generateClassName={createGenerateClassName()}>
 			<MuiThemeProvider theme={theme} sheetsManager={sheetsManager}>
 				<App/>
 			</MuiThemeProvider>
