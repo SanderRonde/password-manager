@@ -63,7 +63,7 @@ export class RoutesDashboard {
 	public async login(_req: express.Request, res: ResponseCaptured) {
 		render(res, {
 			App: getRouteComponent(this.server.config, ROUTES.LOGIN),
-			script: 'entrypoints/login/login.js',
+			script: 'entrypoints/login/login-hydrate.js',
 			title: 'Log in to your dashboard',
 			development: this.server.config.development
 		});
@@ -76,7 +76,7 @@ export class RoutesDashboard {
 
 		render(res, {
 			App: getRouteComponent(this.server.config, ROUTES.DASHBOARD),
-			script: 'entrypoints/dashboard/dashboard.js',
+			script: 'entrypoints/dashboard/dashboard-hydrate.js',
 			title: 'Your Dashboard',
 			development: this.server.config.development
 		});
