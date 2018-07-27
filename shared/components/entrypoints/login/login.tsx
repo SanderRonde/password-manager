@@ -2,8 +2,7 @@ import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcent
 import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
 import { withStyles, createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
-import { CustomInput } from '../../util/input/input';
-import { Button } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
 import * as React from 'react';
 
 const styles = createStyles({
@@ -39,8 +38,8 @@ const _Login = (() => {
 							<hr/>
 							<div className="loginContainer">
 								<form method="POST" target="/login" ref={this.form}>
-									<CustomInput name="email" type="email" label="EMAIL-ADDRESS" required/>
-									<CustomInput name="password" type="password" label="PASSWORD" required/>
+									<TextField name="email" type="email" label="EMAIL-ADDRESS" required/>
+									<TextField name="password" type="password" label="PASSWORD" required/>
 									<Button variant="contained" color="primary" onClick={this.submitForm}>dwadwa</Button>
 								</form>
 							</div>
