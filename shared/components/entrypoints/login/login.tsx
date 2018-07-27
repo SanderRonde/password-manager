@@ -5,7 +5,8 @@ import { withStyles, createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { ICON_STATE } from '../../../../server/app/lib/util';
 import { classNames } from '../../../lib/classnames';
-import { Lock, LockOpen } from '@material-ui/icons'
+import LockOpen from '@material-ui/icons/LockOpen';
+import Lock from '@material-ui/icons/Lock';
 import * as React from 'react';
 
 const styles = createStyles({
@@ -44,16 +45,9 @@ const _Login = (() => {
 			this.form = React.createRef();
 			this.emailInput = React.createRef();
 
-			if (typeof localStorage === 'undefined') {
-				this.state = {
-					emailRemembered: ICON_STATE.HIDDEN
-				};
-			} else {
-				this.state = {
-					emailRemembered: this._getRememberedEmail() !== null ?
-						ICON_STATE.ENABLED : ICON_STATE.DISABLED
-				};
-			}
+			this.state = {
+				emailRemembered: ICON_STATE.HIDDEN
+			};
 		}
 
 		private _getRememberedEmail() {
@@ -93,13 +87,21 @@ const _Login = (() => {
 
 		render() {
 			const str = this._render();
-			if (!this.didInitialRender && this.emailInput.current) {
-				this.didInitialRender = true;
-				const inputValue = this._getRememberedEmail();
-				if (inputValue !== null) {
-					this.emailInput.current.value = inputValue;
+			if (!this.didInitialRender && this.emailInput.current &&
+				typeof localStorage !== 'undefined') {
+					this.didInitialRender = true;
+					const inputValue = this._getRememberedEmail();
+					if (inputValue !== null) {
+						this.emailInput.current.value = inputValue;
+						this.setState({
+							emailRemembered: ICON_STATE.ENABLED
+						});
+					} else {
+						this.setState({
+							emailRemembered: ICON_STATE.DISABLED
+						});
+					}
 				}
-			}
 			return str;
 		}
 	
