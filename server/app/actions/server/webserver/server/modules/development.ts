@@ -65,14 +65,22 @@ function serve(root: string, {
 	}
 }
 
+function rewriteEsModuleImports(file: string): string {
+	return file	
+		.replace(/import React from 'react'/g, 'import React from "/modules/react"')
+		.replace(/import pure from 'recompose\/pure'/g, 'import pure from "/modules/recompose/pure"')
+		.replace(/import (\w+) from '@material-ui\/core\/(\w+)'/g, 'import $1 from "/modules/material-ui/$2"');
+}
+
 function commonjsToEs6(file: string): string {
 	const replaced = file
 		.replace(/Object.defineProperty\(exports, .__esModule., { value: true }\);/g, '')
-		.replace(/(\w+) (\w+) = require\("@material-ui\/core"\)/g, 'import * as $2 from "/modules/material-ui/core"')
 		.replace(/(\w+) (\w+) = require\("@material-ui\/core\/(.+)"\)/g, 'import * as $2 from "/modules/material-ui/core/$3"')
+		.replace(/(\w+) (\w+) = require\("@material-ui\/icons(\.js)?"\)/g, 'import * as $2 from "/modules/material-ui/icons"')
+		.replace(/(\w+) (\w+) = require\("@material-ui\/core"\)/g, 'import * as $2 from "/modules/material-ui/core"')
+		.replace(/(\w+) (\w+) = require\("react-jss(.js)?"\)/g, 'import $2 from "/modules/react-jss"')
 		.replace(/(\w+) (\w+) = require\("react-dom"\)/g, 'import $2 from "/modules/react-dom"')
 		.replace(/(\w+) (\w+) = require\("react"\)/g, 'import $2 from "/modules/react"')
-		.replace(/(\w+) (\w+) = require\("react-jss(.js)?"\)/g, 'import $2 from "/modules/react-jss"')
 		.replace(/(\w+) (\w+) = require\("(.*)"\)/g, 'import * as $2 from "$3.js"')
 		.replace(/exports.default = ([^;]+)/g, 'export default $1');
 	const lines = replaced.split('\n');
@@ -98,16 +106,45 @@ function prefixImports(file: string, prefix: string) {
 	const lines = file.split('\n');
 	for (let i = 0; i < lines.length; i++) {
 		const line = lines[i];
-		const match = /import (\w+) from '.\/(.+)'/.exec(line);
+		const match = /(.*) from '.\/(.+)'/.exec(line);
 		if (match) {
-			const [, name, importPath] = match;
-			lines[i] = `import ${name} from '${prefix}${importPath}';`
+			const [, expr, importPath] = match;
+			lines[i] = `${expr} from '${prefix}${importPath}';`
 		}
 	}
 	return lines.join('\n');
 }
 
-function getMaterialUIImportName(content: string) {
+function getMaterialUIIconsImportName(content: string) {
+	for (const line of content.split('\n')) {
+		const match = /\w+ (\w+) = require\("@material-ui\/icons"\)/.exec(line);
+		if (match) {
+			return match[1];
+		}
+	}
+	return 'core_1';
+}
+
+function genCustomMaterialUIIcons(content: string) {
+	const imports: string[] = [];
+	const name = getMaterialUIIconsImportName(content);
+	const lines = content.split('\n');
+	const nameRegex = new RegExp(`${name}\\.(\\w+)`);
+	for (let line of lines) {
+		while (nameRegex.exec(line)) {
+			const match = nameRegex.exec(line)!;
+			imports.push(match[1]);
+
+			line = line.replace(nameRegex, '---');
+		}
+	}
+
+	return imports.filter((val, index, arr) => arr.indexOf(val) === index).map((component) => {
+		return `export { default as ${component} } from './${component}';`
+	}).join('\n');
+}
+
+function getMaterialUICoreImportName(content: string) {
 	for (const line of content.split('\n')) {
 		const match = /\w+ (\w+) = require\("@material-ui\/core"\)/.exec(line);
 		if (match) {
@@ -117,9 +154,9 @@ function getMaterialUIImportName(content: string) {
 	return 'core_1';
 }
 
-function genCustomMaterialUI(content: string) {
+function genCustomMaterialUICore(content: string) {
 	const imports: string[] = [];
-	const name = getMaterialUIImportName(content);
+	const name = getMaterialUICoreImportName(content);
 	const lines = content.split('\n');
 	const nameRegex = new RegExp(`${name}\\.(\\w+)`);
 	for (let line of lines) {
@@ -178,7 +215,9 @@ async function genSingleFileWebpackRoute(res: express.Response, name: string, sr
 }
 
 export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
-	const materialUIRoot = path.join(PROJECT_ROOT, 'node_modules/@material-ui/core');
+	const materialUIRoot = path.join(PROJECT_ROOT, 'node_modules/@material-ui');
+	const materialUICoreRoot = path.join(materialUIRoot, 'core/');
+	const materialUIIconsRoot = path.join(materialUIRoot, 'icons/');
 	webserver.app.all('/modules/react', async (_req, res) => {
 		res.contentType('.js');
 		const content = (await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/react/umd/',
@@ -200,27 +239,48 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		export default window.ReactDOM`);
 		res.end();
 	});
+	webserver.app.all('/modules/recompose/pure', async (_req, res) => {
+		genSingleFileWebpackRoute(res, 'pure', 
+			path.join(PROJECT_ROOT, 'node_modules/recompose/pure.js'));	
+	});
+	webserver.app.all('/modules/material-ui/icons', async (req, res) => {
+		const ref = req.header('Referer')!;
+		const refFile = parse(ref).pathname!;
+		const srcFile = await fs.readFile(path.join(PROJECT_ROOT, refFile));
+		res.contentType('.js');
+		res.write(prefixImports(genCustomMaterialUIIcons(srcFile.toString()), 
+			'/modules/@material-ui/icons/es/'));
+		res.end();
+	});
 	webserver.app.all('/modules/material-ui/core', async (req, res) => {
 		const ref = req.header('Referer')!;
 		const refFile = parse(ref).pathname!;
 		const srcFile = await fs.readFile(path.join(PROJECT_ROOT, refFile));
 		res.contentType('.js');
-		res.write(genCustomMaterialUI(srcFile.toString()));
+		res.write(genCustomMaterialUICore(srcFile.toString()));
 		res.end();
 	});
-	webserver.app.use(serve(path.join(materialUIRoot, 'es/colors/'), {
+	webserver.app.use(serve(materialUIIconsRoot, {
+		prefix: '/modules/@material-ui/icons/',
+		exclude: ['index.js'],
+		rewrite(file) {
+			return rewriteEsModuleImports(file);
+		},
+		extensions: ['js']
+	}));
+	webserver.app.use(serve(path.join(materialUICoreRoot, 'es/colors/'), {
 		prefix: '/modules/material-ui/core/colors/',
 		exclude: ['index.js'],
 		extensions: ['js']
 	}));
-	webserver.app.use(serve(path.join(materialUIRoot, 'es/colors/'), {
+	webserver.app.use(serve(path.join(materialUICoreRoot, 'es/colors/'), {
 		prefix: '/modules/es/colors/',
 		exclude: ['index.js'],
 		extensions: ['js']
 	}));
 	webserver.app.all('/modules/material-ui/colors', async (_req, res) => {
 		res.contentType('.js');
-		const file = (await fs.readFile(path.join(materialUIRoot, 'es/colors/index.js')))
+		const file = (await fs.readFile(path.join(materialUICoreRoot, 'es/colors/index.js')))
 			.toString();
 		res.write(prefixImports(file, '/modules/es/colors/'));
 		res.end();
@@ -245,7 +305,7 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		res.end();
 	});
 	webserver.app.all('/modules/react-jss/:module', async (req, res) => {
-		const name = req.params.module;;
+		const name = req.params.module;
 		await genSingleFileWebpackRoute(res, name, 
 			path.join(PROJECT_ROOT, `node_modules/react-jss/lib/${name}.js`));
 	});
@@ -255,17 +315,17 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 	});
 	webserver.app.all('/modules/material-ui/core/colors', async (_req, res) => {
 		res.contentType('.js');
-		res.write(await fs.readFile(path.join(materialUIRoot, 'es/colors/index.js')));
+		res.write(await fs.readFile(path.join(materialUICoreRoot, 'es/colors/index.js')));
 		res.end();
 	});
 	webserver.app.all('/modules/material-ui/styles', async (_req, res) => {
 		res.contentType('.js');
-		res.write(await fs.readFile(path.join(materialUIRoot, 'es/styles/index.js')));
+		res.write(await fs.readFile(path.join(materialUICoreRoot, 'es/styles/index.js')));
 		res.end();
 	});
 	webserver.app.all('/modules/material-ui/core/styles', async (_req, res) => {
 		res.contentType('.js');
-		res.write(await fs.readFile(path.join(materialUIRoot, 'es/styles/index.js')));
+		res.write(await fs.readFile(path.join(materialUICoreRoot, 'es/styles/index.js')));
 		res.end();
 	});
 	webserver.app.all('/modules/classnames', async (_req, res) => {
@@ -275,7 +335,7 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 	});
 	webserver.app.all('/modules/material-ui/Modal', async (_req, res) => {
 		res.contentType('.js');
-		const file = await fs.readFile(path.join(materialUIRoot, 'es/Modal/index.js'));
+		const file = await fs.readFile(path.join(materialUICoreRoot, 'es/Modal/index.js'));
 		const replaced = file.toString()
 			.replace(/export { default } from '.\/Modal';/g, 
 				'export { default } from \'./Modal2\';');
@@ -310,7 +370,7 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 	
 		webpack({
 			mode: "development",
-			entry: path.join(materialUIRoot, 'Modal/', `${component}.js`),
+			entry: path.join(materialUICoreRoot, 'Modal/', `${component}.js`),
 			output: {
 				library: `_${component}`,
 				path: path.join(PROJECT_ROOT, 'temp/'),
@@ -360,7 +420,7 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 	
 		webpack({
 			mode: "development",
-			entry: path.join(materialUIRoot, 'styles/', `${component}.js`),
+			entry: path.join(materialUICoreRoot, 'styles/', `${component}.js`),
 			output: {
 				library: `_${component}`,
 				path: path.join(PROJECT_ROOT, 'temp/'),
@@ -410,7 +470,7 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 	
 		webpack({
 			mode: "development",
-			entry: path.join(materialUIRoot, 'styles/', `${component}.js`),
+			entry: path.join(materialUICoreRoot, 'styles/', `${component}.js`),
 			output: {
 				library: `_${component}`,
 				path: path.join(PROJECT_ROOT, 'temp/'),
@@ -451,7 +511,7 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 
 		webpack({
 			mode: "development",
-			entry: path.join(materialUIRoot, component, 'index.js'),
+			entry: path.join(materialUICoreRoot, component, 'index.js'),
 			output: {
 				library: `_${component}`,
 				path: path.join(PROJECT_ROOT, 'temp/'),
