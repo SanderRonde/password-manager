@@ -35,6 +35,13 @@ export class Webserver {
 		this.app.use(cookieParser());
 		this.app.use(bodyParser.json());
 		const base = path.join(__dirname, '../client/');
+		this.app.use(serveStatic(path.join(base, 'static/'), {
+			maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
+			dotfiles: this.config.development ? 'allow' : 'ignore',
+			fallthrough: true,
+			index: false,
+			redirect: false
+		}));
 		if (this.config.development) {
 			initDevelopmentMiddleware(this, base);
 		} else {

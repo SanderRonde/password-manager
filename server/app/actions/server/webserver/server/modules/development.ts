@@ -485,6 +485,9 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 			return content;
 		}
 	}));
+	webserver.app.use(serve(path.join(base, 'build/static/'), {
+		prefix: '/static/'
+	}));
 	webserver.app.use(serve(path.join(PROJECT_ROOT, 'shared/components/'), {
 		rewrite(content, filePath) {
 			if (filePath.endsWith('.js')) {
