@@ -44,7 +44,6 @@ const _Login = (() => {
 			this.form = React.createRef();
 			this.emailInput = React.createRef();
 
-			console.log('Setting state');
 			if (typeof localStorage === 'undefined') {
 				this.state = {
 					emailRemembered: ICON_STATE.HIDDEN
