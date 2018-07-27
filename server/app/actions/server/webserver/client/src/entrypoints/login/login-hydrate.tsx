@@ -25,8 +25,8 @@ const theme = createMuiTheme({
 	palette: {
 		primary: blueGrey,
 		secondary: indigo,
-		type: 'light',
-	},
+		type: 'light'
+	}
 });
   
 hydrate(
