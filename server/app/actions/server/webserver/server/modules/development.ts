@@ -131,7 +131,7 @@ function genCustomMaterialUI(content: string) {
 		}
 	}
 
-	return imports.map((component) => {
+	return imports.filter((val, index, arr) => arr.indexOf(val) === index).map((component) => {
 		return `export { default as ${component} } from './${component}';`
 	}).join('\n');
 }
