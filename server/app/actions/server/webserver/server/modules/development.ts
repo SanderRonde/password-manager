@@ -72,6 +72,7 @@ function commonjsToEs6(file: string): string {
 		.replace(/(\w+) (\w+) = require\("@material-ui\/core\/(.+)"\)/g, 'import * as $2 from "/modules/material-ui/core/$3"')
 		.replace(/(\w+) (\w+) = require\("react-dom"\)/g, 'import $2 from "/modules/react-dom"')
 		.replace(/(\w+) (\w+) = require\("react"\)/g, 'import $2 from "/modules/react"')
+		.replace(/(\w+) (\w+) = require\("classnames(.js)?"\)/g, 'import $2 from "/modules/classnames"')
 		.replace(/(\w+) (\w+) = require\("react-jss(.js)?"\)/g, 'import $2 from "/modules/react-jss"')
 		.replace(/(\w+) (\w+) = require\("(.*)"\)/g, 'import * as $2 from "$3.js"')
 		.replace(/exports.default = ([^;]+)/g, 'export default $1');
@@ -266,6 +267,11 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 	webserver.app.all('/modules/material-ui/core/styles', async (_req, res) => {
 		res.contentType('.js');
 		res.write(await fs.readFile(path.join(materialUIRoot, 'es/styles/index.js')));
+		res.end();
+	});
+	webserver.app.all('/modules/classnames', async (_req, res) => {
+		res.contentType('.js');
+		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/classnames/index.js')));
 		res.end();
 	});
 	webserver.app.all('/modules/material-ui/Modal', async (_req, res) => {

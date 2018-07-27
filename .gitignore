@@ -70,6 +70,5 @@ server/temp/
 server/cfg/
 server/node_modules/
 server/app/actions/server/webserver/client/build/entrypoints
-# !server/app/actions/server/webserver/client/build/static/
 shared/**/*.js
 temp/
