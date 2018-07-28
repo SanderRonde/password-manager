@@ -71,7 +71,7 @@ const _Login = (() => {
 			const wasEnabled = this.state.emailRemembered === ICON_STATE.ENABLED;
 			this.setState({
 				emailRemembered: wasEnabled ?
-					ICON_STATE.ENABLED : ICON_STATE.DISABLED
+					ICON_STATE.DISABLED : ICON_STATE.ENABLED
 			});
 			if (wasEnabled) {
 				//Now disabled
@@ -85,8 +85,7 @@ const _Login = (() => {
 			event.preventDefault();
 		}
 
-		render() {
-			const str = this._render();
+		componentDidMount() {
 			if (!this.didInitialRender && this.emailInput.current &&
 				typeof localStorage !== 'undefined') {
 					this.didInitialRender = true;
@@ -102,22 +101,22 @@ const _Login = (() => {
 						});
 					}
 				}
-			return str;
 		}
-	
-		_render() {
+		
+		render() {
 			return (
 				<VerticalCenterer fullscreen>
 					<HorizontalCenterer>
 						<div className={this.props.classes.filling}>
 							<div className="loginContainer">
-								<form method="POST" target="/login" ref={this.form}>
+								<form method="POST" ref={this.form}>
 									<FormControl className={this.props.classes.filling}>
 										<InputLabel htmlFor="adornment-email">EMAIL</InputLabel>
 										<Input id="adornment-email" name="email" type="email"
 											innerRef={this.emailInput} endAdornment={
 												<InputAdornment position="end">
 													<IconButton aria-label="Remember email"
+														title="Remember email"
 														onClick={this.handleEmailRememberToggle}
 														onMouseDown={this.preventDefault}
 													>
@@ -139,7 +138,8 @@ const _Login = (() => {
 										this.props.classes.buttonStyles
 									)}>
 										<Button variant="raised" size="large" color="primary" 
-												onClick={this.submitForm}>
+											onClick={this.submitForm}
+										>
 											Submit
 										</Button>
 									</div>
