@@ -23,6 +23,13 @@
       "server/test/tests/server/api/instance/2fa/*.js"
     ]
   },
+  "nodemonConfig": {
+    "ext": "js",
+    "exec": "node server/app/main.js server --http 1256 -d mongodb://127.0.0.1:27017/somedb -p somepw --development",
+    "watch": [
+      "server/app/actions/server/webserver/server/"
+    ]
+  },
   "dependencies": {
     "@material-ui/core": "^1.4.1",
     "@material-ui/icons": "^2.0.0",
