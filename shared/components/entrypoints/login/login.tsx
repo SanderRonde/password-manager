@@ -77,6 +77,13 @@ const _Login = (() => {
 			event.preventDefault();
 		}
 
+		private _getRememberedEmail() {
+			if (typeof localStorage === 'undefined') {
+				return null;
+			}
+			return localStorage.getItem('rememberedEmail');
+		}
+
 		componentDidMount() {
 			if (this.emailInput.current && typeof localStorage !== 'undefined') {
 				const inputValue = this._getRememberedEmail();
