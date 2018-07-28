@@ -36,7 +36,6 @@ const _Login = (() => {
 	}> {
 		form: React.RefObject<HTMLFormElement>;
 		emailInput: React.RefObject<HTMLInputElement>;
-		didInitialRender: boolean = false;
 	
 		constructor(props: WithStyles<typeof styles>) {
 			super(props);
@@ -86,21 +85,19 @@ const _Login = (() => {
 		}
 
 		componentDidMount() {
-			if (!this.didInitialRender && this.emailInput.current &&
-				typeof localStorage !== 'undefined') {
-					this.didInitialRender = true;
-					const inputValue = this._getRememberedEmail();
-					if (inputValue !== null) {
-						this.emailInput.current.value = inputValue;
-						this.setState({
-							emailRemembered: ICON_STATE.ENABLED
-						});
-					} else {
-						this.setState({
-							emailRemembered: ICON_STATE.DISABLED
-						});
-					}
+			if (this.emailInput.current && typeof localStorage !== 'undefined') {
+				const inputValue = this._getRememberedEmail();
+				if (inputValue !== null) {
+					this.emailInput.current.value = inputValue;
+					this.setState({
+						emailRemembered: ICON_STATE.ENABLED
+					});
+				} else {
+					this.setState({
+						emailRemembered: ICON_STATE.DISABLED
+					});
 				}
+			}
 		}
 		
 		render() {
