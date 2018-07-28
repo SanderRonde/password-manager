@@ -48,13 +48,6 @@ const _Login = (() => {
 				emailRemembered: ICON_STATE.HIDDEN
 			};
 		}
-
-		private _getRememberedEmail() {
-			if (typeof localStorage === 'undefined') {
-				return null;
-			}
-			return localStorage.getItem('rememberedEmail');
-		}
 	
 		submitForm() {
 			if (this.state.emailRemembered === ICON_STATE.ENABLED) {
