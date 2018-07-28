@@ -32,7 +32,7 @@ function serve(root: string, {
 	exclude = [],
 	extensions = []
 }: {
-	rewrite?: (content: string, filename: string) => string;
+	rewrite?: (content: string, filename: string) => Promise<string>|string;
 	prefix?: string;
 	exclude?: string[];
 	extensions?: string[]
@@ -57,7 +57,7 @@ function serve(root: string, {
 			}
 			res.contentType(filePath);
 			res.status(200);
-			res.send(rewrite(result!.toString(), filePath));
+			res.send(await rewrite(result!.toString(), filePath));
 			res.end();
 			return;
 		}
@@ -76,7 +76,7 @@ function commonjsToEs6(file: string): string {
 	const replaced = file
 		.replace(/Object.defineProperty\(exports, .__esModule., { value: true }\);/g, '')
 		.replace(/(\w+) (\w+) = require\("@material-ui\/core\/(.+)"\)/g, 'import * as $2 from "/modules/material-ui/core/$3"')
-		.replace(/(\w+) (\w+) = require\("@material-ui\/icons(\.js)?"\)/g, 'import * as $2 from "/modules/material-ui/icons"')
+		.replace(/(\w+) (\w+) = require\("@material-ui\/icons\/(\w+)(\.js)?"\)/g, 'import * as $2 from "/modules/material-ui/icons/$3"')
 		.replace(/(\w+) (\w+) = require\("@material-ui\/core"\)/g, 'import * as $2 from "/modules/material-ui/core"')
 		.replace(/(\w+) (\w+) = require\("react-jss(.js)?"\)/g, 'import $2 from "/modules/react-jss"')
 		.replace(/(\w+) (\w+) = require\("react-dom"\)/g, 'import $2 from "/modules/react-dom"')
@@ -113,35 +113,6 @@ function prefixImports(file: string, prefix: string) {
 		}
 	}
 	return lines.join('\n');
-}
-
-function getMaterialUIIconsImportName(content: string) {
-	for (const line of content.split('\n')) {
-		const match = /\w+ (\w+) = require\("@material-ui\/icons"\)/.exec(line);
-		if (match) {
-			return match[1];
-		}
-	}
-	return 'core_1';
-}
-
-function genCustomMaterialUIIcons(content: string) {
-	const imports: string[] = [];
-	const name = getMaterialUIIconsImportName(content);
-	const lines = content.split('\n');
-	const nameRegex = new RegExp(`${name}\\.(\\w+)`);
-	for (let line of lines) {
-		while (nameRegex.exec(line)) {
-			const match = nameRegex.exec(line)!;
-			imports.push(match[1]);
-
-			line = line.replace(nameRegex, '---');
-		}
-	}
-
-	return imports.filter((val, index, arr) => arr.indexOf(val) === index).map((component) => {
-		return `export { default as ${component} } from './${component}';`
-	}).join('\n');
 }
 
 function getMaterialUICoreImportName(content: string) {
@@ -243,14 +214,10 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		genSingleFileWebpackRoute(res, 'pure', 
 			path.join(PROJECT_ROOT, 'node_modules/recompose/pure.js'));	
 	});
-	webserver.app.all('/modules/material-ui/icons', async (req, res) => {
-		const ref = req.header('Referer')!;
-		const refFile = parse(ref).pathname!;
-		const srcFile = await fs.readFile(path.join(PROJECT_ROOT, refFile));
-		res.contentType('.js');
-		res.write(prefixImports(genCustomMaterialUIIcons(srcFile.toString()), 
-			'/modules/@material-ui/icons/es/'));
-		res.end();
+	webserver.app.all('/modules/material-ui/icons/:icon', async (req, res) => {
+		const name = req.params.icon;
+		await genSingleFileWebpackRoute(res, name, 
+			path.join(materialUIIconsRoot, `${name}.js`));
 	});
 	webserver.app.all('/modules/material-ui/core', async (req, res) => {
 		const ref = req.header('Referer')!;
@@ -261,7 +228,7 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		res.end();
 	});
 	webserver.app.use(serve(materialUIIconsRoot, {
-		prefix: '/modules/@material-ui/icons/',
+		prefix: '/modules/material-ui/icons/',
 		exclude: ['index.js'],
 		rewrite(file) {
 			return rewriteEsModuleImports(file);
