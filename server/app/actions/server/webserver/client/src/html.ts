@@ -17,7 +17,7 @@ export function preAppHTML({
 		<meta name="description" content="Your password manager dashboard">
 		<title>${title}</title>
 		<link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
-		<link href="/css/default.css" rel="stylesheet" 
+		<link href="/css/default.css" rel="stylesheet">
 	</head>
 	<body>
 		<div id="app">`
