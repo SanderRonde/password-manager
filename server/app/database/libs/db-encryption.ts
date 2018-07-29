@@ -90,13 +90,14 @@ export class DatabaseEncryption {
 	}
 
 	public dbDecryptInstanceRecord({
-		public_key, twofactor_enabled, user_id, server_private_key
+		public_key, twofactor_enabled, user_id, server_private_key, expires
 	}: EncryptedInstance|UnstringifyObjectIDs<EncryptedInstance>): DecryptedInstance {
 		return {
 			user_id: user_id,
 			public_key: this.dbDecrypt(public_key),
 			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled),
-			server_private_key: this.dbDecrypt(server_private_key)
+			server_private_key: this.dbDecrypt(server_private_key),
+			expires
 		}
 	}
 

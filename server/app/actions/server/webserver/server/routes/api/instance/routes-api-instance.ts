@@ -8,7 +8,6 @@ import { API_ERRS } from "../../../../../../../api";
 import { APIToken } from "../../../modules/auth";
 import { Webserver } from "../../../webserver";
 import express = require('express');
-import mongo = require('mongodb');
 
 export class RoutesApiInstance {
 	public Twofactor = new RoutesAPIInstanceTwofactor(this.server);
@@ -50,7 +49,8 @@ export class RoutesApiInstance {
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
 				public_key: this.server.database.Crypto.dbEncrypt(public_key),
 				user_id: auth._id,
-				server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey)
+				server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey),
+				expires: Infinity
 			};
 			if (!await this.server.database.Manipulation.insertOne(
 				COLLECTIONS.INSTANCES, record)) {
@@ -99,10 +99,7 @@ export class RoutesApiInstance {
 			}])) return;
 
 			//Get user from instance ID
-			const instance = await this.server.database.Manipulation.findOne(
-				COLLECTIONS.INSTANCES, {
-					_id: new mongo.ObjectId(instance_id)
-				});
+			const instance = await this.server.Router.getInstance(instance_id);
 			
 			if (!instance) {
 				res.status(200);

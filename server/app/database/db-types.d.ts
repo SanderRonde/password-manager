@@ -199,6 +199,10 @@ export type EncryptedInstance = {
 	 * (encrypted) The private key of this server. Used to decrypt messages by an instance
 	 */
 	server_private_key: EncodedString<DatabaseEncrypted<EncodedString<ServerPrivateKey>>>;
+	/**
+	 * When this instance expires (will be infinity for non-dashboard instances)
+	 */
+	expires: number;
 };
 
 /**
@@ -221,6 +225,10 @@ export type DecryptedInstance = {
 	 * (encrypted) The private key of this server. Used to decrypt messages by an instance
 	 */
 	server_private_key: ServerPrivateKey;
+	/**
+	 * When this instance expires (will be infinity for non-dashboard instances)
+	 */
+	expires: number;
 }
 
 /**

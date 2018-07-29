@@ -1,5 +1,6 @@
 import { initDevelopmentMiddleware } from "./modules/development";
 import { Database } from "../../../../database/database";
+import { initPeriodicals } from "./modules/periodicals";
 import { WebserverRouter } from "./modules/routing";
 import { WebserverRoutes } from "./modules/routes";
 import { WebserverAuth } from "./modules/auth";
@@ -59,6 +60,7 @@ export class Webserver {
 	private async _init() {
 		this._initMiddleware();
 		this.Router.init();
+		initPeriodicals(this);
 		
 		await Promise.all([...(this.config.httpsKey && this.config.httpsCert ?
 			[new Promise(async (resolve) => {

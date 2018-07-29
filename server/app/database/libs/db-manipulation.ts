@@ -131,4 +131,19 @@ export class DatabaseManipulation {
 				this._parent.err('Failed to update record');
 				return false;
 			}
+		
+	public async getAll<R extends EncryptedCollectionRecords[C], 
+		C extends COLLECTIONS>(collectionName: C): Promise<MongoRecord<R>[]|null> {
+			const collection = this._getCollection(collectionName);
+			if (!collection) {
+				return null;
+			}
+
+			try {
+				return await collection.find().toArray() as MongoRecord<R>[];
+			} catch(e) {
+				this._parent.err(e.message);
+			}
+			return null;
+		}
 }

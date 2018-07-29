@@ -88,11 +88,21 @@ export class WebserverRouter {
 			return record;
 		}
 
-	private async _getInstance(id: StringifiedObjectId<EncryptedInstance>) {
+	async getInstance(id: StringifiedObjectId<EncryptedInstance>) {
 		const objectId = new mongo.ObjectId(id);
-		return await this.parent.database.Manipulation.findOne(COLLECTIONS.INSTANCES, {
+		const instance = await this.parent.database.Manipulation.findOne(COLLECTIONS.INSTANCES, {
 			_id: objectId
 		});
+		if (instance === null) {
+			return null;
+		}
+		if (Date.now() > instance.expires) {
+			await this.parent.database.Manipulation.deleteOne(COLLECTIONS.INSTANCES, {
+				_id: instance._id
+			});
+			return null;
+		}
+		return instance;
 	}
 
 	public verify2FA(secret: string, key: string) {
@@ -181,10 +191,7 @@ export class WebserverRouter {
 							return;
 						}
 
-						const instance = await this.parent.database.Manipulation.findOne(
-							COLLECTIONS.INSTANCES, {
-								_id: new mongo.ObjectId(req.body.instance_id)
-							});
+						const instance = await this.getInstance(req.body.instance_id);
 						if (!instance) {
 							res.status(400);
 							res.json({
@@ -249,7 +256,7 @@ export class WebserverRouter {
 			}
 
 	public async verifyAndGetInstance(instanceId: StringifiedObjectId<EncryptedInstance>, res: ResponseCaptured) {
-		const instance = await this._getInstance(instanceId);
+		const instance = await this.getInstance(instanceId);
 		if (!instance) {
 			res.status(400);
 			res.json({
