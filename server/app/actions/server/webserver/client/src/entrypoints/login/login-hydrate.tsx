@@ -28,9 +28,11 @@ const theme = createMuiTheme({
 		type: 'light'
 	}
 });
-  
+
 hydrate(
-	<JssProvider generateClassName={createGenerateClassName()}>
+	<JssProvider generateClassName={createGenerateClassName({
+		dangerouslyUseGlobalCSS: true
+	})}>
 		<MuiThemeProvider theme={theme}>
 			<Main />
 		</MuiThemeProvider>

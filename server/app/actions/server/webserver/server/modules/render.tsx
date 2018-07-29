@@ -31,7 +31,9 @@ export function render(res: ResponseCaptured, {
 		},
 	});
 	const html = renderToString(
-		<JssProvider registry={sheetsRegistry} generateClassName={createGenerateClassName()}>
+		<JssProvider registry={sheetsRegistry} generateClassName={createGenerateClassName({
+			dangerouslyUseGlobalCSS: true
+		})}>
 			<MuiThemeProvider theme={theme} sheetsManager={sheetsManager}>
 				<App/>
 			</MuiThemeProvider>
