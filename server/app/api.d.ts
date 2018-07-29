@@ -777,6 +777,10 @@ export declare namespace APIRoutes {
 				 * The padded and hashed master password
 				 */
 				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+				/**
+				 * The 2FA token if required for the user
+				 */
+				twofactor_token?: string;
 			}>, ServerPublicKey>;
 		}, encrypted: {}, optional: {}, optionalEncrypted: {}): ReturnType<typeof APIRoutes.Instance.register>;
 	}

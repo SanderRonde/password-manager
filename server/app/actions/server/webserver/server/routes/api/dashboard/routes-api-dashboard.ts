@@ -3,6 +3,7 @@ import { ServerPublicKey, RSAEncrypted, MasterPassword } from "../../../../../..
 import { ResponseCaptured } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
 import { API_ERRS } from "../../../../../../../api";
+import { COLLECTIONS } from "../../../../../../../database/database";
 
 export class RoutesAPIDashboard {
 	constructor(public server: Webserver) { }
@@ -13,6 +14,7 @@ export class RoutesAPIDashboard {
 			public_key: string;
 			encrypted: RSAEncrypted<EncodedString<{
 				email: string;
+				twofactor_token?: string;
 				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 			}>, ServerPublicKey>;
 		}, {}, {}, {}>({
@@ -50,6 +52,47 @@ export class RoutesAPIDashboard {
 					error: 'invalid comm token'
 				});
 				return;
+			}
+
+			//Check the 2FA token
+			const account = await this.server.database.Manipulation.findOne(
+				COLLECTIONS.USERS, {
+					email: decrypted.email
+				});
+			if (!account) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'Incorrect combination',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
+
+			const decryptedAccount = this.server.database.Crypto.dbDecryptAccountRecord(
+				account);
+			if (decryptedAccount.twofactor_enabled) {
+				const secret = decryptedAccount.twofactor_secret;
+				if (secret === null) {
+					res.status(500);
+					res.json({
+						success: false,
+						error: 'Server error',
+						ERR: API_ERRS.SERVER_ERROR
+					});
+					return;
+				}
+
+				if (!decrypted.twofactor_token || 
+					!this.server.Router.verify2FA(secret, decrypted.twofactor_token)) {
+						res.status(200);
+						res.json({
+							success: false,
+							error: 'Incorrect combination',
+							ERR: API_ERRS.INVALID_CREDENTIALS
+						});
+						return;
+					}
 			}
 
 			await this.server.Routes.API.Instance.doRegister({ 
