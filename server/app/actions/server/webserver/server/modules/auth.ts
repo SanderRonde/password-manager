@@ -18,7 +18,6 @@ interface LoginAuthRepresentation extends InstanceAuthRepresentation {
 interface DashboardComm {
 	server_public_key: ServerPublicKey;
 	server_private_key: ServerPrivateKey;
-	instance_public_key?: InstancePublicKey
 	expires: number;
 }
 
