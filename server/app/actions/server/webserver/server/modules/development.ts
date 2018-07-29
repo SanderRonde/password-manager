@@ -271,6 +271,14 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		`);
 		res.end();
 	});
+	webserver.app.all('/shared/lib/shared-crypto.js', async (_req, res) => {
+		await genSingleFileWebpackRoute(res, 'sharedCrypto', 
+			path.join(PROJECT_ROOT, `shared/lib/shared-crypto.js`));
+	});
+	webserver.app.all('/shared/lib/browser-crypto.js', async (_req, res) => {
+		await genSingleFileWebpackRoute(res, 'browserCrypto', 
+			path.join(PROJECT_ROOT, `shared/lib/browser-crypto.js`));
+	});
 	webserver.app.all('/modules/react-jss/:module', async (req, res) => {
 		const name = req.params.module;
 		await genSingleFileWebpackRoute(res, name, 
