@@ -1,9 +1,10 @@
-import { AUTH_TOKEN_EXPIRE_TIME, COOKIE_DEFAULT_EXPIRE_TIME, COOKIE_EXTEND_TIME } from "../../../../../lib/constants";
-import { StringifiedObjectId, EncryptedInstance, EncryptedAccount } from "../../../../../database/db-types";
+import { StringifiedObjectId, EncryptedInstance, EncryptedAccount, ServerPublicKey, InstancePublicKey, ServerPrivateKey } from "../../../../../database/db-types";
+import { AUTH_TOKEN_EXPIRE_TIME, COMM_TOKEN_DEFAULT_EXPIRE_TIME } from "../../../../../lib/constants";
+import { genRSAKeyPair } from "../../../../../lib/crypto";
 
 interface AccountAuthRepresentation {
 	account: StringifiedObjectId<EncryptedAccount>;
-	exprires: number;
+	expires: number;
 }
 
 interface InstanceAuthRepresentation extends AccountAuthRepresentation {
@@ -14,7 +15,14 @@ interface LoginAuthRepresentation extends InstanceAuthRepresentation {
 	count: number;
 }
 
-enum COUNT {
+interface DashboardComm {
+	server_public_key: ServerPublicKey;
+	server_private_key: ServerPrivateKey;
+	instance_public_key?: InstancePublicKey
+	expires: number;
+}
+
+export enum COUNT {
 	ANY_COUNT
 }
 
@@ -30,7 +38,7 @@ export type TwofactorVerifyToken = string;
 export class WebserverAuth {
 	private _usedTokens: Set<APIToken> = new Set();
 	private _expiredTokens: Set<APIToken> = new Set();
-	private _cookieTokens: Map<string, AccountAuthRepresentation> = new Map();
+	private _dashboardCommToken: Map<string, DashboardComm> = new Map();
 	private _loginTokens: Map<APIToken, LoginAuthRepresentation> = new Map();
 	private _twofactorTokens: Map<TwofactorVerifyToken, InstanceAuthRepresentation> = new Map();
 	private readonly _chars = 
@@ -51,23 +59,38 @@ export class WebserverAuth {
 		return str;
 	}
 
+	private _clearExpiredForMap<K>(container: Map<K, {
+		expires: number;
+	}>) {
+		container.forEach(({ expires }, key) => {
+			if (Date.now() > expires) {
+				container.delete(key);
+			}
+		});
+	}
+
 	private _clearExpiredTokens() {
-		this._loginTokens.forEach(({ exprires }, key) => {
-			if (Date.now() > exprires) {
+		this._loginTokens.forEach(({ expires }, key) => {
+			if (Date.now() > expires) {
 				this._expiredTokens.add(key);
 				this._loginTokens.delete(key);
 			}
 		});
-		this._twofactorTokens.forEach(({ exprires }, key) => {
-			if (Date.now() > exprires) {
-				this._twofactorTokens.delete(key);
-			}
+		this._clearExpiredForMap(this._twofactorTokens);
+		this._clearExpiredForMap(this._dashboardCommToken);
+	}
+
+	public genDashboardCommToken() {
+		const token = this._genRandomToken();
+		const { privateKey, publicKey } = genRSAKeyPair()
+		this._dashboardCommToken.set(token, {
+			server_public_key: publicKey,
+			server_private_key: privateKey,
+			expires: Date.now() + COMM_TOKEN_DEFAULT_EXPIRE_TIME
 		});
-		this._cookieTokens.forEach(({ exprires }, key) => {
-			if (Date.now() > exprires) {
-				this._cookieTokens.delete(key);
-			}
-		});
+		return {
+			token, privateKey, publicKey
+		};
 	}
 
 	public genLoginToken(instance: StringifiedObjectId<EncryptedInstance>,
@@ -76,20 +99,11 @@ export class WebserverAuth {
 			this._loginTokens.set(token, {
 				instance,
 				account,
-				exprires: Date.now() + AUTH_TOKEN_EXPIRE_TIME,
+				expires: Date.now() + AUTH_TOKEN_EXPIRE_TIME,
 				count: 0
 			});
 			return token;
 		}
-
-	public genCookie(account: StringifiedObjectId<EncryptedAccount>) {
-		const token = this._genRandomToken();
-		this._cookieTokens.set(token, {
-			account,
-			exprires: Date.now() + COOKIE_DEFAULT_EXPIRE_TIME
-		});
-		return token;
-	}
 
 	private _invalidateInstanceTokens(account: StringifiedObjectId<EncryptedAccount>) {
 		//Invalidate all tokens awarded to all instances of this account
@@ -128,27 +142,25 @@ export class WebserverAuth {
 			}
 
 			if (match.instance !== instance ||
-				match.count !== count) {
+				(match.count !== COUNT.ANY_COUNT && match.count !== count)) {
 					this._loginTokens.delete(token);
 					return false;
 				}
-			this.incrementCount(token);
+			if (match.count !== COUNT.ANY_COUNT) {
+				this.incrementCount(token);
+			}
 			return true;
 		}
 
-	public verifyCookie(cookie: string) {
+	public verifyDashboardCommToken(token: string) {
 		this._clearExpiredTokens();
 
-		const match = this._cookieTokens.get(cookie);
+		const match = this._dashboardCommToken.get(token);
 		if (!match) {
-			return false;
+			return null;
 		}
 
-		//Extend it
-		match.exprires = Math.max(match.exprires, Date.now() + COOKIE_EXTEND_TIME);
-		this._cookieTokens.set(cookie, match);
-
-		return true;
+		return match;
 	}
 
 	public extendLoginToken(oldToken: APIToken, count: number, 
@@ -180,7 +192,7 @@ export class WebserverAuth {
 			this._twofactorTokens.set(token, {
 				instance,
 				account,
-				exprires: Date.now() + (1000 * 60 * 5)
+				expires: Date.now() + (1000 * 60 * 5)
 			});
 			return token;
 		}

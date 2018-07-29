@@ -1,6 +1,8 @@
 import { Button, TextField, FormControl, InputLabel, InputAdornment, IconButton, Input } from '@material-ui/core';
 import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
 import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
+import { ServerPublicKey } from '../../../../server/app/database/db-types';
+import { DataContainer } from '../../util/datacontainer/datacontainer';
 import { withStyles, createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { ICON_STATE } from '../../../../server/app/lib/util';
@@ -34,23 +36,34 @@ const styles = createStyles({
 	}
 });
 
-const _Login = (() => {
+export interface LoginData {
+	server_public_key: ServerPublicKey;
+	comm_token: string;
+}
+
+function getLogin<D extends LoginData>(data: D|null = null) {
 	return class Login extends React.Component<WithStyles<typeof styles>, {
 		emailRemembered: ICON_STATE;
 	}> {
 		emailInput: React.RefObject<HTMLInputElement>;
-	
+		dataContainer: React.RefObject<DataContainer<D>>;
+
 		constructor(props: WithStyles<typeof styles>) {
 			super(props);
 			this.attemptLogin = this.attemptLogin.bind(this);
 			this.handleEmailRememberToggle = this.handleEmailRememberToggle.bind(this);
 			this.emailInput = React.createRef();
+			this.dataContainer = React.createRef();
 
 			this.state = {
 				emailRemembered: ICON_STATE.HIDDEN
 			};
 		}
-	
+
+		getData(): D|null {
+			return this.dataContainer.current && this.dataContainer.current.getData();
+		}
+
 		attemptLogin() {
 			if (this.state.emailRemembered === ICON_STATE.ENABLED) {
 				const email = this.emailInput.current && 
@@ -58,7 +71,7 @@ const _Login = (() => {
 				localStorage.setItem('rememberedEmail', email || '');
 			}
 			
-			
+			// const data = this.getData();
 		}
 
 		handleEmailRememberToggle() {
@@ -146,10 +159,14 @@ const _Login = (() => {
 								</form>
 							</div>
 						</div>
+						<DataContainer ref={this.dataContainer} 
+							data={data} suppressHydrationWarning={true} />
 					</HorizontalCenterer>
 				</VerticalCenterer>
 			)
 		}
 	}
-})();
-export const Login = withStyles(styles)(_Login);
+}
+export function GetLoginStyled(data?: LoginData) {
+	return withStyles(styles)(getLogin(data));
+}

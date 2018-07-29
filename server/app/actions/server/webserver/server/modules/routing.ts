@@ -388,7 +388,11 @@ export class WebserverRouter {
 			bruteforceLimiter 
 		} = getStores(this.parent.config);
 
-		//API
+		//Interal API
+		this.parent.app.post('/api/dashboard/login', bruteforceLimiter,
+			instanceCreateLimiter, )
+
+		//External API
 		this.parent.app.post('/api/instance/register', bruteforceLimiter,
 			instanceCreateLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance, 'register')));

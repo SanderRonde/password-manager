@@ -25,13 +25,9 @@ export const TEST_DB_URI = 'mongodb://127.0.0.1:27017/__pwmanager_test_db';
  */
 export const AUTH_TOKEN_EXPIRE_TIME = 1000 * 60 * 18;
 /**
- * The time in which a dashboard auth cookie expires (6 hours)
+ * The time in which a dashboard comm token expires (6 hours)
  */
-export const COOKIE_DEFAULT_EXPIRE_TIME = 1000 * 60 * 60 * 3;
-/**
- * The time by which a cookie is extended for each use (half an hour)
- */
-export const COOKIE_EXTEND_TIME = 1000 * 60 * 30;
+export const COMM_TOKEN_DEFAULT_EXPIRE_TIME = 1000 * 60 * 60 * 3;
 /**
  * The root of the server
  */

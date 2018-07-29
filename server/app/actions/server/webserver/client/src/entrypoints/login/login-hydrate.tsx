@@ -1,4 +1,4 @@
-import { Login } from '../../../../../../../../../shared/components/entrypoints/login/login';
+import { GetLoginStyled } from '../../../../../../../../../shared/components/entrypoints/login/login';
 import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
 import blueGrey from '@material-ui/core/colors/blueGrey';
 import indigo from '@material-ui/core/colors/indigo';
@@ -6,6 +6,7 @@ import { JssProvider } from 'react-jss';
 import { hydrate } from 'react-dom';
 import * as React from 'react';
 
+const Login = GetLoginStyled();
 class Main extends React.Component {
 	// Remove the server-side injected CSS.
 	componentDidMount() {

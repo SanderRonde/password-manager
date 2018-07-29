@@ -1,4 +1,4 @@
-import { Dashboard } from '../../../../../../../../../shared/components/entrypoints/dashboard/dashboard';
+import { GetDashboard } from '../../../../../../../../../shared/components/entrypoints/dashboard/dashboard';
 import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
 import blueGrey from '@material-ui/core/colors/blueGrey';
 import indigo from '@material-ui/core/colors/indigo';
@@ -6,6 +6,7 @@ import { JssProvider } from 'react-jss';
 import { hydrate } from 'react-dom';
 import * as React from 'react';
 
+const Dashboard = GetDashboard();
 class Main extends React.Component {
 	// Remove the server-side injected CSS.
 	componentDidMount() {
