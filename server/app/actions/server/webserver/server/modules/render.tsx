@@ -10,7 +10,7 @@ import React = require('react');
 export function render(res: ResponseCaptured, {
 	App, title, script, development
 }: {
-	App: any;
+	App: React.ComponentType;
 	title: string;
 	script: string;
 	development: boolean;
