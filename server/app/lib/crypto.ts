@@ -62,8 +62,8 @@ export type Padded<T extends string, P extends Paddings> = string & {
 	__padding: P;
 }
 
-export enum ERRS {
-	INVALID_DECRYPT
+export const enum ERRS {
+	INVALID_DECRYPT = 'ERR_INVALID_DECRYPT'
 }
 
 export function hash<T extends string, A extends HashingAlgorithms = 'sha512'>(data: T, 
