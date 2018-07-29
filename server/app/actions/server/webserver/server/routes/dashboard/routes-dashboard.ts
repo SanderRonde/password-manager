@@ -29,10 +29,10 @@ function getRouteComponent(config: ServerConfig, route: ROUTES): ((...args: any[
 		switch (route) {
 			case ROUTES.LOGIN:
 				return fresh(`${sharedComponentsBase}/entrypoints/login/login.js`)
-					.Login;
+					.GetLoginStyled;
 			case ROUTES.DASHBOARD:
 				return fresh(`${sharedComponentsBase}/entrypoints/dashboard/dashboard.js`)
-					.Dashboard;
+					.GetDashboard;
 		}
 	}
 	return null;
