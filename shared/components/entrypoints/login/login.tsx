@@ -38,14 +38,12 @@ const _Login = (() => {
 	return class Login extends React.Component<WithStyles<typeof styles>, {
 		emailRemembered: ICON_STATE;
 	}> {
-		form: React.RefObject<HTMLFormElement>;
 		emailInput: React.RefObject<HTMLInputElement>;
 	
 		constructor(props: WithStyles<typeof styles>) {
 			super(props);
 			this.attemptLogin = this.attemptLogin.bind(this);
 			this.handleEmailRememberToggle = this.handleEmailRememberToggle.bind(this);
-			this.form = React.createRef();
 			this.emailInput = React.createRef();
 
 			this.state = {
@@ -110,7 +108,7 @@ const _Login = (() => {
 					<HorizontalCenterer>
 						<div className={this.props.classes.filling}>
 							<div className="loginContainer">
-								<form method="POST" ref={this.form}>
+								<form method="POST">
 									<FormControl className={this.props.classes.filling}>
 										<InputLabel htmlFor="adornment-email">EMAIL</InputLabel>
 										<Input id="adornment-email" name="email" type="email"
