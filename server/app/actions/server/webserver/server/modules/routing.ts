@@ -48,7 +48,7 @@ export class WebserverRouter {
 		password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>, res: ResponseCaptured, 
 		supressErr: boolean = false): Promise<false|MongoRecord<EncryptedAccount>> {
 			if (!email || !password) {
-				res.status(400);
+				res.status(200);
 				res.json({
 					success: false,
 					error: 'Incorrect combination',
@@ -63,20 +63,20 @@ export class WebserverRouter {
 					email: email
 				});
 			if (!record) {
-					res.status(400);
-					res.json({
-						success: false,
-						error: 'Incorrect combination',
-						ERR: API_ERRS.INVALID_CREDENTIALS
-					});
-					return false;
-				}
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'Incorrect combination',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return false;
+			}
 
 			//Check if the password is correct
 			
 			if (this.parent.database.Crypto.dbDecrypt(record.pw) !== password) {
 				if (!supressErr) {
-					res.status(400);
+					res.status(200);
 					res.json({
 						success: false,
 						error: 'Incorrect combination',
@@ -170,7 +170,7 @@ export class WebserverRouter {
 					let toCheckSrc: any & R & E = {...req.body};
 
 					if (!req.body) {
-						res.status(400);
+						res.status(200);
 						res.json({
 							success: false,
 							error: 'no request body',
@@ -182,7 +182,7 @@ export class WebserverRouter {
 					//Decrypt encrypted params
 					if (req.body.encrypted) {
 						if (!req.body.instance_id) {
-							res.status(400);
+							res.status(200);
 							res.json({
 								success: false,
 								error: 'missing parameters',
@@ -193,7 +193,7 @@ export class WebserverRouter {
 
 						const instance = await this.getInstance(req.body.instance_id);
 						if (!instance) {
-							res.status(400);
+							res.status(200);
 							res.json({
 								success: false,
 								error: 'missing parameters',
@@ -207,7 +207,7 @@ export class WebserverRouter {
 						const decrypted = decryptWithPrivateKey(req.body.encrypted,
 							privateKey);
 						if (decrypted === ERRS.INVALID_DECRYPT) {
-							res.status(400);
+							res.status(200);
 							res.json({
 								success: false,
 								error: 'missing parameters',
@@ -222,7 +222,7 @@ export class WebserverRouter {
 					const values: R & O & E & OE = {} as R & O & E & OE;
 					for (const key of requiredParams.unencrypted) {
 						if (toCheckUnencrypted[key] === undefined || toCheckUnencrypted[key] === null) {
-							res.status(400);
+							res.status(200);
 							res.json({
 								success: false,
 								error: `missing parameter ${key}`,
@@ -234,7 +234,7 @@ export class WebserverRouter {
 					}
 					for (const key of requiredParams.encrypted || []) {
 						if (toCheckEncrypted[key] === undefined || toCheckEncrypted[key] === null) {
-							res.status(400);
+							res.status(200);
 							res.json({
 								success: false,
 								error: `missing parameter ${key}`,
@@ -258,7 +258,7 @@ export class WebserverRouter {
 	public async verifyAndGetInstance(instanceId: StringifiedObjectId<EncryptedInstance>, res: ResponseCaptured) {
 		const instance = await this.getInstance(instanceId);
 		if (!instance) {
-			res.status(400);
+			res.status(200);
 			res.json({
 				success: false,
 				error: 'invalid instance ID',
@@ -300,14 +300,14 @@ export class WebserverRouter {
 
 	private _printTypeErr(res: ResponseCaptured, val: string, type: BasicType|'array', inner?: BasicType) {
 		if (inner) {
-			res.status(400);
+			res.status(200);
 			res.json({
 				success: false,
 				error: `param "${val}" not of type ${type}[]`,
 				ERR: API_ERRS.INVALID_PARAM_TYPES
 			});
 		} else {
-			res.status(400);
+			res.status(200);
 			res.json({
 				success: false,
 				error: `param "${val}" not of type ${type}`,

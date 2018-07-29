@@ -41,7 +41,7 @@ export class RoutesApiPassword {
 			if (decryptedPassword.twofactor_enabled && twofactorSecret !== null) {
 				//Password is secured with 2FA
 				if (!twofactorToken) {
-					res.status(400);
+					res.status(200);
 					res.json({
 						success: false,
 						error: 'no 2FA token supplied',
