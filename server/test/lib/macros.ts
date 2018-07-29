@@ -1,6 +1,6 @@
 import { GetRequired, GetOptional, GetEncrypted, GetOptionalEncrypted, APIFns, API_ERRS, APIArgs, JSONResponse } from "../../app/api";
 import { RegisterContextual, GenericTestContext, Context } from "ava";
-import { doAPIRequest, genUserAndDb, createServer } from "./util";
+import { doServerAPIRequest, genUserAndDb, createServer } from "./util";
 import { ChildProcess } from "child_process";
 
 async function doServerSetupAndBreakdown(t: GenericTestContext<Context<any>>, uris: string[]) {
@@ -67,7 +67,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 	// Test missing params
 	test(`no params for route "${route}"`, async t => {
 		const { config, done } = await doServerSetupAndBreakdown(t, uris);
-		const response = JSON.parse(await doAPIRequest({
+		const response = JSON.parse(await doServerAPIRequest({
 			port: config.http,
 			publicKey: config.server_public_key
 		}, route, {} as any)) as {
@@ -94,7 +94,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 					unencryptedArgs[key] = getFillerType(required[key]);
 				}
 			}
-			const response = JSON.parse(await doAPIRequest({
+			const response = JSON.parse(await doServerAPIRequest({
 				port: config.http,
 				publicKey: config.server_public_key
 			}, route, {...unencryptedArgs as any, ...(missingKey === 'instance_id' ? {} : {
@@ -124,7 +124,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 					encryptedArgs[key] = getFillerType(encrypted[key]);
 				}
 			}
-			const response = JSON.parse(await doAPIRequest({
+			const response = JSON.parse(await doServerAPIRequest({
 				port: config.http,
 				publicKey: config.server_public_key
 			}, route, {...unencryptedArgs as any, ...{
@@ -157,7 +157,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 					unencryptedArgs[key] = getFillerType(required[key]);
 				}
 			}
-			const response = JSON.parse(await doAPIRequest({
+			const response = JSON.parse(await doServerAPIRequest({
 				port: config.http,
 				publicKey: config.server_public_key
 			}, route, {...unencryptedArgs as any, ...(wrongType === 'instance_id' ? {} : {
@@ -189,7 +189,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 					encryptedArgs[key] = getFillerType(encrypted[key]);
 				}
 			}
-			const response = JSON.parse(await doAPIRequest({
+			const response = JSON.parse(await doServerAPIRequest({
 				port: config.http,
 				publicKey: config.server_public_key
 			}, route, {...unencryptedArgs as any, ...{
@@ -216,7 +216,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 			const encryptedArgs: {
 				[key in keyof GetEncrypted<APIFns[R]>]: any;
 			} = mapObj(encrypted, (_, val) => getFillerType(val));
-			const response = JSON.parse(await doAPIRequest({
+			const response = JSON.parse(await doServerAPIRequest({
 				port: config.http,
 				publicKey: config.server_public_key
 			}, route, {...unencryptedArgs as any, ...{
@@ -243,7 +243,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 			}} as {
 				[key in keyof GetEncrypted<APIFns[R]>]: any;
 			};
-			const response = JSON.parse(await doAPIRequest({
+			const response = JSON.parse(await doServerAPIRequest({
 				port: config.http,
 				publicKey: config.server_public_key
 			}, route, {...unencryptedArgs as any, ...{
@@ -271,7 +271,7 @@ export async function testInvalidCredentials<R extends keyof APIFns,
 	server: ChildProcess;
 	err?: API_ERRS
 }) {
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: port,
 		publicKey: publicKey
 	}, route, 

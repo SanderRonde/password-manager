@@ -1,4 +1,4 @@
-import { captureURIs, doAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
+import { captureURIs, doServerAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
 import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
@@ -34,7 +34,7 @@ test('can disable 2FA when given a valid 2FA token', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/instance/2fa/disable', {
@@ -94,7 +94,7 @@ test('state is unchanged if already disabled', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/instance/2fa/disable', {
@@ -131,7 +131,7 @@ test('fails if an invalid token is passed', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/instance/2fa/disable', {

@@ -1,5 +1,5 @@
 import { encryptWithPublicKey, hash, pad, decryptWithPrivateKey, ERRS, encrypt, decryptWithSalt, decrypt } from '../../../../../app/lib/crypto';
-import { genUserAndDb, createServer, doAPIRequest, captureURIs, genURL, doesNotThrow, isErr } from '../../../../lib/util';
+import { genUserAndDb, createServer, doServerAPIRequest, captureURIs, genURL, doesNotThrow, isErr } from '../../../../lib/util';
 import { genRandomString } from '../../../../../app/lib/util';
 import url = require('url');
 import mongo = require('mongodb');
@@ -27,7 +27,7 @@ test('can log in, set a password, update it and then remove a password', async t
 
 	const token = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/login', {
@@ -69,7 +69,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		const expected2FAEnabled = initialPassword.twofactorEnabled;
 		const expectedEncrypted = initialPassword.encrypted;
 		
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/password/set', {
@@ -153,7 +153,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		const expected2FAEnabled = updatedPassword.twofactorEnabled;
 		const expectedEncrypted = updatedPassword.encrypted;
 		
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/password/update', {
@@ -220,7 +220,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/password/remove', {
@@ -265,7 +265,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 
 	const token = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/login', {
@@ -307,7 +307,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const expected2FAEnabled = initialPassword.twofactorEnabled;
 		const expectedEncrypted = initialPassword.encrypted;
 		
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/password/set', {
@@ -393,7 +393,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			notes: updatedPassword.notes
 		}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
 		
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/password/update', {
@@ -460,7 +460,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/password/get', {
@@ -500,7 +500,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		}
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/password/getmeta', {
@@ -558,7 +558,7 @@ test('can log in, set a password and get all metadata', async t => {
 
 	const token = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/login', {
@@ -600,7 +600,7 @@ test('can log in, set a password and get all metadata', async t => {
 		const expected2FAEnabled = initialPassword.twofactorEnabled;
 		const expectedEncrypted = initialPassword.encrypted;
 		
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/password/set', {
@@ -684,7 +684,7 @@ test('can log in, set a password and get all metadata', async t => {
 		const expected2FAEnabled = updatedPassword.twofactorEnabled;
 		const expectedEncrypted = updatedPassword.encrypted;
 		
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/password/update', {
@@ -751,7 +751,7 @@ test('can log in, set a password and get all metadata', async t => {
 		t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/password/allmeta', {
@@ -816,7 +816,7 @@ test('can log in, set and update a password, ' +
 
 		const token = await (async () => {
 			const challenge = genRandomString(25);
-			const response = JSON.parse(await doAPIRequest({ 
+			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
 			}, '/api/instance/login', {
@@ -859,7 +859,7 @@ test('can log in, set and update a password, ' +
 			const expected2FAEnabled = initialPassword.twofactorEnabled;
 			const expectedEncrypted = initialPassword.encrypted;
 			
-			const response = JSON.parse(await doAPIRequest({ 
+			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
 			}, '/api/password/set', {
@@ -945,7 +945,7 @@ test('can log in, set and update a password, ' +
 				notes: updatedPassword.notes
 			}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
 			
-			const response = JSON.parse(await doAPIRequest({ 
+			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
 			}, '/api/password/update', {
@@ -1012,7 +1012,7 @@ test('can log in, set and update a password, ' +
 			t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 		})();
 		await (async () => {
-			const response = JSON.parse(await doAPIRequest({ 
+			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
 			}, '/api/password/allmeta', {
@@ -1056,7 +1056,7 @@ test('can log in, set and update a password, ' +
 			}
 		})();
 		const queryResults = await (async () => {
-			const response = JSON.parse(await doAPIRequest({ 
+			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
 			}, '/api/password/querymeta', {
@@ -1122,7 +1122,7 @@ test('can log in, set and update a password, ' +
 			return parsed;
 		})();
 		await (async () => {
-			const response = JSON.parse(await doAPIRequest({ 
+			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
 			}, '/api/password/get', {

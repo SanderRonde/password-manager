@@ -1,5 +1,5 @@
 import { EncryptedInstance, MongoRecord, EncryptedAccount, EncryptedPassword } from '../../../../../app/database/db-types';
-import { captureURIs, genUserAndDb, createServer, doAPIRequest, isErr } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, isErr } from '../../../../lib/util';
 import { ERRS, decrypt, decryptWithSalt, hash, pad } from '../../../../../app/lib/crypto';
 import { RESET_KEY_LENGTH } from '../../../../../app/lib/constants';
 import { genRandomString } from '../../../../../app/lib/util';
@@ -25,7 +25,7 @@ test('can generate a new key and then reset with it', async t => {
 	uris.push(uri);
 	
 	const newResetKey = await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/user/genresetkey', {
@@ -66,7 +66,7 @@ test('can generate a new key and then reset with it', async t => {
 
 	await (async () => {
 		const newMasterPassword = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http, 
 			publicKey: server_public_key 
 		}, '/api/user/reset', {

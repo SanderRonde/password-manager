@@ -1,4 +1,4 @@
-import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
@@ -19,7 +19,7 @@ test('instance can be created', async t => {
 	uris.push(uri);
 
 	const keyPair = genRSAKeyPair();
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/register', {
+	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
 		email: DEFAULT_EMAIL,
 		password: hash(pad(userpw, 'masterpwverify')),
 		public_key: keyPair.publicKey

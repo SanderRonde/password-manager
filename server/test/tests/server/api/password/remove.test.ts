@@ -1,4 +1,4 @@
-import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doAPIRequest } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doServerAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance, EncryptedPassword } from '../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { doSingleQuery } from '../../../../lib/db';
@@ -35,7 +35,7 @@ test('can be removed if 2FA is disabled', async t => {
 		notes: []		
 	}, token!, config);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/remove', {
@@ -83,7 +83,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 		notes: []		
 	}, token!, config);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/remove', {
@@ -133,7 +133,7 @@ test('can be removed if 2FA is enabled', async t => {
 		notes: []		
 	}, token!, config);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/remove', {

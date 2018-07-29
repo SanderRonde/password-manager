@@ -1,4 +1,4 @@
-import { captureURIs, doAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
+import { captureURIs, doServerAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
 import { API_ERRS } from '../../../../../../app/api';
@@ -26,7 +26,7 @@ test('fails if account has no 2FA setup', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/verify', {
+	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/2fa/verify', {
 		instance_id: instance_id.toHexString(),
 		twofactor_token: 'sometoken',
 		pw_verification_token: 'sometoken'
@@ -53,7 +53,7 @@ test('fails if an invalid 2FA token is passed', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/verify', {
+	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/2fa/verify', {
 		instance_id: instance_id.toHexString(),
 		twofactor_token: speakeasy.totp({
 			secret: twofactor.base32,
@@ -84,7 +84,7 @@ test('fails if an invalid password verification token is passed', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/2fa/verify', {
+	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/2fa/verify', {
 		instance_id: instance_id.toHexString(),
 		twofactor_token: speakeasy.totp({
 			secret: twofactor.base32,

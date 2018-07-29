@@ -1,4 +1,4 @@
-import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doAPIRequest, genURL, doesNotThrow } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doServerAPIRequest, genURL, doesNotThrow } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
 import { decryptWithPrivateKey, ERRS, hash, pad } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
@@ -57,7 +57,7 @@ test('can get the password\'s metadata', async t => {
 		}, token!, config)
 	];
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/allmeta', {

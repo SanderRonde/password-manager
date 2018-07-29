@@ -1,5 +1,5 @@
 import { EncryptedAccount, MongoRecord, EncryptedPassword, EncryptedInstance } from '../../../../../app/database/db-types';
-import { captureURIs, genUserAndDb, createServer, doAPIRequest, isErr } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, isErr } from '../../../../lib/util';
 import { decryptWithSalt, ERRS, decrypt, hash, pad } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { RESET_KEY_LENGTH } from '../../../../../app/lib/constants';
@@ -62,7 +62,7 @@ test('works if params are correct', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http, 
 		publicKey: server_public_key 
 	}, '/api/user/reset', {
@@ -154,7 +154,7 @@ test('cancels if failing on password changes', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http, 
 		publicKey: server_public_key
 	}, '/api/user/reset', {
@@ -239,7 +239,7 @@ test('cancels if failing on instance changes', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/user/reset', {
@@ -324,7 +324,7 @@ test('cancels if failing on account changes', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/user/reset', {

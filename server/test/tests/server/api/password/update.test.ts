@@ -1,4 +1,4 @@
-import { captureURIs, genUserAndDb, createServer, doAPIRequest, getLoginToken, genURL, setPasword } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, getLoginToken, genURL, setPasword } from '../../../../lib/util';
 import { MongoRecord, EncryptedPassword, EncryptedInstance, StringifiedObjectId } from '../../../../../app/database/db-types';
 import { encrypt, hash, pad, decryptWithSalt, ERRS, decrypt, Encrypted, Hashed, Padded } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
@@ -51,7 +51,7 @@ test('password can be updated', async t => {
 		notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 	}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
 	
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/update', {
@@ -149,7 +149,7 @@ test('fails if it requires 2FA and no 2FA token is passed', async t => {
 		notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 	}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
 	
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/update', {
@@ -201,7 +201,7 @@ test('password can be updated if 2FA is enabled', async t => {
 		notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 	}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
 	
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/update', {

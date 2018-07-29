@@ -170,15 +170,15 @@ export function createServer({
 	});
 }
 
-export async function doAPIRequest<K extends keyof APIFns>({ port, publicKey }: {
+export async function doServerAPIRequest<K extends keyof APIFns>({ port, publicKey }: {
 	port: number;
 	publicKey: string;
 }, path: K,args: APIArgs[K][0], encrypted: APIArgs[K][1]): Promise<EncodedString<APIReturns[K]>>;
-export async function doAPIRequest<K extends keyof APIFns>({ port }: {
+export async function doServerAPIRequest<K extends keyof APIFns>({ port }: {
 	port: number;
 	publicKey?: string;
 }, path: K,args: APIArgs[K][0]): Promise<EncodedString<APIReturns[K]>>;
-export async function doAPIRequest<K extends keyof APIFns>({ port, publicKey }: {
+export async function doServerAPIRequest<K extends keyof APIFns>({ port, publicKey }: {
 	port: number;
 	publicKey?: string;
 }, path: K,args: APIArgs[K][0], encrypted?: APIArgs[K][1]): Promise<EncodedString<APIReturns[K]>> {
@@ -217,21 +217,21 @@ export async function doAPIRequest<K extends keyof APIFns>({ port, publicKey }: 
 	});
 }
 
-export async function doPostRequest<K extends keyof APIFns>({ port, publicKey }: {
+export async function doServerPostRequest<K extends keyof APIFns>({ port, publicKey }: {
 	port: number;
 	publicKey: string;
 }, path: K,args: APIArgs[K][0], encrypted: APIArgs[K][1]): Promise<{
 	response: http.IncomingMessage;
 	responseText: EncodedString<APIReturns[K]>
 }>;
-export async function doPostRequest<K extends keyof APIFns>({ port }: {
+export async function doServerPostRequest<K extends keyof APIFns>({ port }: {
 	port: number;
 	publicKey?: string;
 }, path: K,args: APIArgs[K][0]): Promise<{
 	response: http.IncomingMessage;
 	responseText: EncodedString<APIReturns[K]>
 }>;
-export async function doPostRequest<K extends keyof APIFns>({ port, publicKey }: {
+export async function doServerPostRequest<K extends keyof APIFns>({ port, publicKey }: {
 	port: number;
 	publicKey?: string;
 }, path: K,args: APIArgs[K][0], encrypted?: APIArgs[K][1]): Promise<{
@@ -321,7 +321,7 @@ export async function getLoginToken(t: GenericTestContext<Context<any>>,
 		} = config;
 
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/login', {
@@ -375,7 +375,7 @@ export async function setPasword(t: GenericTestContext<Context<any>>, toSet: {
 		notes: toSet.notes
 	}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
 	
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/set', {

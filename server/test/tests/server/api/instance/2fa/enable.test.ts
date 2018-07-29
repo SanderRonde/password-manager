@@ -1,4 +1,4 @@
-import { captureURIs, doAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
+import { captureURIs, doServerAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
 import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
@@ -32,7 +32,7 @@ test('can enable 2FA when no 2FA secret is set', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/instance/2fa/enable', {
@@ -88,7 +88,7 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/instance/2fa/enable', {
@@ -149,7 +149,7 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/instance/2fa/enable', {

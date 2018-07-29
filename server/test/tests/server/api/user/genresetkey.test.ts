@@ -1,5 +1,5 @@
 import { EncryptedAccount, MongoRecord, EncryptedInstance, StringifiedObjectId } from '../../../../../app/database/db-types';
-import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { RESET_KEY_LENGTH } from '../../../../../app/lib/constants';
 import { genRandomString } from '../../../../../app/lib/util';
@@ -117,7 +117,7 @@ test('works if params are correct', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/user/genresetkey', {

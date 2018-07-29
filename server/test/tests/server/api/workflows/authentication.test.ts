@@ -1,5 +1,5 @@
 import { genRSAKeyPair, hash, pad, decryptWithPrivateKey, ERRS, encryptWithPublicKey } from '../../../../../app/lib/crypto';
-import { genUserAndDb, createServer, captureURIs, doAPIRequest } from '../../../../lib/util';
+import { genUserAndDb, createServer, captureURIs, doServerAPIRequest } from '../../../../lib/util';
 import { genRandomString } from '../../../../../app/lib/util';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
 import { doSingleQuery } from '../../../../lib/db';
@@ -21,7 +21,7 @@ test('can log in after registering instance', async t => {
 		instance_id, clientPrivateKey, serverPublicKey
 	} = await (async  () => {
 		const keyPair = genRSAKeyPair();
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/register', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw, 'masterpwverify')),
 			public_key: keyPair.publicKey
@@ -57,7 +57,7 @@ test('can log in after registering instance', async t => {
 	})();
 	await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: serverPublicKey!
 		}, '/api/instance/login', {
@@ -102,7 +102,7 @@ test('can log out after logging in', async t => {
 
 	const token = await (async () => {	
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/login', {
@@ -132,7 +132,7 @@ test('can log out after logging in', async t => {
 		return token;
 	})();
 	await (async () => {	
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/logout', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/logout', {
 			instance_id: instance_id.toHexString(),
 			token: token!
 		}));
@@ -159,7 +159,7 @@ test('can log in and extend key', async t => {
 
 	const token = await (async () => {	
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/login', {
@@ -189,7 +189,7 @@ test('can log in and extend key', async t => {
 		return token;
 	})();
 	await (async () => {	
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 			instance_id: instance_id.toHexString(),
 			count: config.count++,
 			oldToken: token!
@@ -217,7 +217,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 
 	const { instanceId, clientPrivateKey, serverPublicKey } = await (async  () => {
 		const keyPair = genRSAKeyPair();
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/register', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw, 'masterpwverify')),
 			public_key: keyPair.publicKey
@@ -253,7 +253,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 	})();
 	const token = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: serverPublicKey!
 		}, '/api/instance/login', {
@@ -283,7 +283,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 		return token;
 	})();
 	const newToken = await (async () => {	
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 			instance_id: instanceId!,
 			count: config.count++,
 			oldToken: token!
@@ -302,7 +302,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 		return decrypted;
 	})();
 	await (async () => {	
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/logout', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/logout', {
 			instance_id: instanceId!,
 			token: newToken!
 		}));

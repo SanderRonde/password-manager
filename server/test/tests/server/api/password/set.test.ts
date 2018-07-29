@@ -1,4 +1,4 @@
-import { captureURIs, genUserAndDb, createServer, doAPIRequest, getLoginToken, genURL } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, getLoginToken, genURL } from '../../../../lib/util';
 import { MongoRecord, EncryptedPassword, EncryptedInstance, StringifiedObjectId } from '../../../../../app/database/db-types';
 import { encrypt, hash, pad, decryptWithSalt, ERRS, decrypt, Encrypted, Hashed, Padded } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
@@ -38,7 +38,7 @@ test('password can be created', async t => {
 		notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 	}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
 	
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/set', {

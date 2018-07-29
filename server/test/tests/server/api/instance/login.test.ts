@@ -1,5 +1,5 @@
 import { hash, pad, decryptWithPrivateKey, ERRS, encryptWithPublicKey } from '../../../../../app/lib/crypto';
-import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { genRandomString } from '../../../../../app/lib/util';
@@ -31,7 +31,7 @@ test('login token can be generated when 2FA is disabled', async t => {
 	uris.push(uri);
 
 	const challenge = genRandomString(25);
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/instance/login', {
@@ -78,7 +78,7 @@ test('login token can be generated when 2FA is enabled', async t => {
 	uris.push(uri);
 
 	const challenge = genRandomString(25);
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/instance/login', {

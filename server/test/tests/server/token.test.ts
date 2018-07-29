@@ -1,5 +1,5 @@
 import { encryptWithPublicKey, hash, pad, decryptWithPrivateKey, ERRS, genRSAKeyPair } from '../../../app/lib/crypto';
-import { genUserAndDb, createServer, captureURIs, doAPIRequest } from '../../lib/util';
+import { genUserAndDb, createServer, captureURIs, doServerAPIRequest } from '../../lib/util';
 import { genRandomString } from '../../../app/lib/util';
 import { DEFAULT_EMAIL } from '../../lib/consts';
 import { doSingleQuery } from '../../lib/db';
@@ -26,7 +26,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 	//Log in
 	const initialToken = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/login', {
@@ -56,7 +56,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 
 	//Extend token
 	const extendedToken = await (async () => {
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 			instance_id: instance_id.toHexString(),
 			count: 0,
 			oldToken: initialToken!
@@ -76,7 +76,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 
 	//Extend token again
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 			instance_id: instance_id.toHexString(),
 			count: 1,
 			oldToken: initialToken!
@@ -92,7 +92,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 
 	//Try to use the extended token
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/logout', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/logout', {
 			instance_id: instance_id.toHexString(),
 			token: extendedToken!
 		}));
@@ -123,7 +123,7 @@ test('invalidates a token if its count is wrong', async t => {
 	//Log in
 	const initialToken = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/login', {
@@ -153,7 +153,7 @@ test('invalidates a token if its count is wrong', async t => {
 
 	//Extend token
 	const extendedToken = await (async () => {
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 			instance_id: instance_id.toHexString(),
 			count: 0,
 			oldToken: initialToken!
@@ -173,7 +173,7 @@ test('invalidates a token if its count is wrong', async t => {
 
 	//Use wrong count
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 			instance_id: instance_id.toHexString(),
 			count: 0,
 			oldToken: initialToken!
@@ -189,7 +189,7 @@ test('invalidates a token if its count is wrong', async t => {
 
 	//Try to use the token
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/logout', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/logout', {
 			instance_id: instance_id.toHexString(),
 			token: extendedToken!
 		}));
@@ -219,7 +219,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 
 	const { instanceId: secondInstance } = await (async  () => {
 		const keyPair = genRSAKeyPair();
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/register', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw, 'masterpwverify')),
 			public_key: keyPair.publicKey
@@ -257,7 +257,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 	//Log in
 	const initialToken = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/login', {
@@ -287,7 +287,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 
 	//Extend token
 	const extendedToken = await (async () => {
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 			instance_id: instance_id.toHexString(),
 			count: 0,
 			oldToken: initialToken!
@@ -307,7 +307,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 
 	//Use wrong instance id
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/extend_key', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 			instance_id: secondInstance!,
 			count: 1,
 			oldToken: initialToken!
@@ -323,7 +323,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 
 	//Try to use the token
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/logout', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/logout', {
 			instance_id: instance_id.toHexString(),
 			token: extendedToken!
 		}));

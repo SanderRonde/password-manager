@@ -1,4 +1,4 @@
-import { captureURIs, createServer, genUserAndDb, doPostRequest, UserAndDbData, doesNotThrow, genURL, getLoginToken } from '../../lib/util';
+import { captureURIs, createServer, genUserAndDb, doServerPostRequest, UserAndDbData, doesNotThrow, genURL, getLoginToken } from '../../lib/util';
 import { APIToken } from '../../../app/actions/server/webserver/server/modules/auth';
 import { encryptWithPublicKey, pad, hash } from '../../../app/lib/crypto';
 import { wait, genRandomString } from '../../../app/lib/util';
@@ -8,7 +8,7 @@ import http = require('http');
 
 async function doInstanceCreateRequest(config: UserAndDbData) {
 	const challenge = genRandomString(25);
-	return await doPostRequest({ 
+	return await doServerPostRequest({ 
 		port: config.http,
 		publicKey: config.server_public_key
 	}, '/api/instance/login', {
@@ -20,7 +20,7 @@ async function doInstanceCreateRequest(config: UserAndDbData) {
 }
 
 async function doAPIRequest(token: APIToken, config: UserAndDbData) {
-	return await doPostRequest({ 
+	return await doServerPostRequest({ 
 		port: config.http, 
 		publicKey: config.server_public_key
 	}, '/api/password/querymeta', {
@@ -34,7 +34,7 @@ async function doAPIRequest(token: APIToken, config: UserAndDbData) {
 
 async function doFailingInstanceCreateRequest(config: UserAndDbData) {
 	const challenge = genRandomString(25);
-	return await doPostRequest({ 
+	return await doServerPostRequest({ 
 		port: config.http,
 		publicKey: config.server_public_key
 	}, '/api/instance/login', {

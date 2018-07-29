@@ -1,4 +1,4 @@
-import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doAPIRequest, genURL, doesNotThrow, isErr } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doServerAPIRequest, genURL, doesNotThrow, isErr } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance, EncryptedPassword } from '../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { decryptWithPrivateKey, ERRS, decrypt, hash, pad } from '../../../../../app/lib/crypto';
@@ -40,7 +40,7 @@ test('can get the password if 2FA is disabled', async t => {
 		notes,
 	}, token!, config);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/get', {
@@ -103,7 +103,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 		notes: []		
 	}, token!, config);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/get', {
@@ -149,7 +149,7 @@ test('can get the password if 2FA is enabled', async t => {
 		notes,
 	}, token!, config);
 
-	const response = JSON.parse(await doAPIRequest({ 
+	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
 	}, '/api/password/get', {

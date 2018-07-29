@@ -1,4 +1,4 @@
-import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { API_ERRS } from '../../../../../app/api';
@@ -22,7 +22,7 @@ test('throws an error if token is invalid', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/logout', {
+	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/logout', {
 		instance_id: instance_id.toHexString(),
 		token: 'someinvalidtoken'
 	}));

@@ -1,5 +1,5 @@
 import { genRSAKeyPair, hash, pad, decryptWithPrivateKey, ERRS, decryptWithSalt, encryptWithPublicKey } from '../../../../../app/lib/crypto';
-import { captureURIs, genUserAndDb, createServer, doAPIRequest } from '../../../../lib/util';
+import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { genRandomString } from '../../../../../app/lib/util';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
 import { doSingleQuery } from '../../../../lib/db';
@@ -30,7 +30,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		server_key
 	} = await (async  () => {
 		const keyPair = genRSAKeyPair();
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/register', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw, 'masterpwverify')),
 			public_key: keyPair.publicKey
@@ -64,7 +64,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		}
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_key!
 		}, '/api/instance/2fa/enable', {
@@ -128,7 +128,7 @@ test('can enable 2FA and then disable it', async t => {
 	uris.push(uri);
 
 	await (async () => {	
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/2fa/enable', {
@@ -171,7 +171,7 @@ test('can enable 2FA and then disable it', async t => {
 		t.is(decrypt, true, '2FA is now enabled');
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/2fa/disable', {
@@ -235,7 +235,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 	uris.push(uri);
 
 	await (async () => {	
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/2fa/enable', {
@@ -278,7 +278,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		t.is(decrypt, true, '2FA is now enabled');
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/2fa/disable', {
@@ -321,7 +321,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		t.is(decrypt, false, '2FA is now disabled');
 	})();
 	await (async () => {	
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/2fa/enable', {
@@ -386,7 +386,7 @@ test('can verify a login requiring 2FA', async t => {
 
 	const pw_verification_token = await (async () => {	
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/login', {
@@ -416,7 +416,7 @@ test('can verify a login requiring 2FA', async t => {
 		return token;
 	})();
 	const authToken = await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/2fa/verify', {
@@ -440,7 +440,7 @@ test('can verify a login requiring 2FA', async t => {
 	})();
 	//Check if it's valid by extending the key
 	await (async () => {	
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/extend_key', {
@@ -480,7 +480,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		instance_private_key
 	} = await (async  () => {
 		const keyPair = genRSAKeyPair();
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/register', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw, 'masterpwverify')),
 			public_key: keyPair.publicKey
@@ -515,7 +515,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		}
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
 		}, '/api/instance/2fa/enable', {
@@ -559,7 +559,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 	})();
 	const pw_verification_token = await (async () => {	
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
 		}, '/api/instance/login', {
@@ -589,7 +589,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		return token;
 	})();
 	const authToken = await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
 		}, '/api/instance/2fa/verify', {
@@ -613,7 +613,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 	})();
 	//Check if it's valid by extending the key
 	await (async () => {	
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/extend_key', {
@@ -631,7 +631,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		t.is(typeof data.auth_token, 'string', 'new auth token was passed');
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
 		}, '/api/instance/2fa/disable', {
@@ -696,7 +696,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		instance_private_key
 	} = await (async  () => {
 		const keyPair = genRSAKeyPair();
-		const response = JSON.parse(await doAPIRequest({ port: http }, '/api/instance/register', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw, 'masterpwverify')),
 			public_key: keyPair.publicKey
@@ -731,7 +731,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		}
 	})();
 	const secret = await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
 		}, '/api/instance/2fa/enable', {
@@ -779,7 +779,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		return secret as string;
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ port: http}, '/api/instance/2fa/confirm', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http}, '/api/instance/2fa/confirm', {
 			instance_id: instance_id!,
 			twofactor_token: speakeasy.totp({
 				secret: secret!,
@@ -803,7 +803,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 	})();
 	const pw_verification_token = await (async () => {
 		const challenge = genRandomString(25);
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
 		}, '/api/instance/login', {
@@ -833,7 +833,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		return token;
 	})();
 	const authToken = await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/2fa/verify', {
@@ -857,7 +857,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 	})();
 	//Check if it's valid by extending the key
 	await (async () => {	
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
 		}, '/api/instance/extend_key', {
@@ -875,7 +875,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		t.is(typeof data.auth_token, 'string', 'new auth token was passed');
 	})();
 	await (async () => {
-		const response = JSON.parse(await doAPIRequest({ 
+		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
 		}, '/api/instance/2fa/disable', {
