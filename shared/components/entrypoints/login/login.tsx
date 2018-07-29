@@ -43,7 +43,7 @@ const _Login = (() => {
 	
 		constructor(props: WithStyles<typeof styles>) {
 			super(props);
-			this.submitForm = this.submitForm.bind(this);
+			this.attemptLogin = this.attemptLogin.bind(this);
 			this.handleEmailRememberToggle = this.handleEmailRememberToggle.bind(this);
 			this.form = React.createRef();
 			this.emailInput = React.createRef();
@@ -53,14 +53,14 @@ const _Login = (() => {
 			};
 		}
 	
-		submitForm() {
+		attemptLogin() {
 			if (this.state.emailRemembered === ICON_STATE.ENABLED) {
 				const email = this.emailInput.current && 
 					this.emailInput.current.value;
 				localStorage.setItem('rememberedEmail', email || '');
 			}
 			
-			this.form.current && this.form.current.submit();
+			
 		}
 
 		handleEmailRememberToggle() {
@@ -140,7 +140,7 @@ const _Login = (() => {
 										this.props.classes.buttonStyles
 									)}>
 										<Button variant="raised" size="large" color="primary" 
-											onClick={this.submitForm}
+											onClick={this.attemptLogin}
 										>
 											Submit
 										</Button>
