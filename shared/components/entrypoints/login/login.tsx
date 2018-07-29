@@ -1,13 +1,17 @@
 import { Button, TextField, FormControl, InputLabel, InputAdornment, IconButton, Input } from '@material-ui/core';
+import { genRSAKeyPair, encryptWithPublicKey, pad } from '../../../lib/shared-crypto';
 import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
 import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
 import { ServerPublicKey } from '../../../../server/app/database/db-types';
 import { DataContainer } from '../../util/datacontainer/datacontainer';
 import { withStyles, createStyles } from '@material-ui/core/styles';
+import { APIReturns, API_ERRS } from '../../../../server/app/api';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
+import { doClientAPIRequest } from '../../../lib/apirequests';
 import { ICON_STATE } from '../../../../server/app/lib/util';
 import { classNames } from '../../../lib/classnames';
 import LockOpen from '@material-ui/icons/LockOpen';
+import { hash } from '../../../lib/browser-crypto';
 import Lock from '@material-ui/icons/Lock';
 import * as React from 'react';
 
@@ -41,18 +45,22 @@ export interface LoginData {
 	comm_token: string;
 }
 
+type ServerLoginResponse = APIReturns['/api/dashboard/login'];
+
 function getLogin<D extends LoginData>(data: D|null = null) {
 	return class Login extends React.Component<WithStyles<typeof styles>, {
 		emailRemembered: ICON_STATE;
 	}> {
 		emailInput: React.RefObject<HTMLInputElement>;
+		passwordInput: React.RefObject<HTMLInputElement>;
 		dataContainer: React.RefObject<DataContainer<D>>;
 
 		constructor(props: WithStyles<typeof styles>) {
 			super(props);
-			this.attemptLogin = this.attemptLogin.bind(this);
+			this.login = this.login.bind(this);
 			this.handleEmailRememberToggle = this.handleEmailRememberToggle.bind(this);
 			this.emailInput = React.createRef();
+			this.passwordInput = React.createRef();
 			this.dataContainer = React.createRef();
 
 			this.state = {
@@ -64,14 +72,81 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 			return this.dataContainer.current && this.dataContainer.current.getData();
 		}
 
-		attemptLogin() {
+		private async _doLoginRequest({
+			email, password, twofactor_token
+		}: {
+			valid: boolean;
+			email: string;
+			password: string;
+			twofactor_token: string;
+		}): Promise<ServerLoginResponse> {
+			const serverData = this.getData();
+			if (serverData === null) {
+				return {
+					success: false,
+					ERR: API_ERRS.NO_REQUEST_BODY,
+					error: 'no data provided by server on page load'
+				}
+			}
+
+			const keyPair = genRSAKeyPair();
+			localStorage.setItem('instance_private_key', keyPair.privateKey);
+			localStorage.setItem('instance_public_key', keyPair.publicKey);
+
+			const { comm_token, server_public_key } = serverData;
+			return await doClientAPIRequest({},
+				'/api/dashboard/login', {
+					comm_token,
+					public_key: keyPair.publicKey,
+					encrypted: encryptWithPublicKey({
+						email: email,
+						twofactor_token: twofactor_token,
+						password: hash(pad(password, 'masterpwverify')),
+					}, server_public_key)
+				});
+		}
+
+		private async _proceedToDashboard(_serverResponse: ServerLoginResponse) {
+
+		}
+
+		private _failLogin(_serverResponse: ServerLoginResponse) {
+
+		}
+
+		private _showSpinner() {}
+
+		private _hideSpinner() {
+
+		}
+
+		private _getInputData() {
+			const email = this.emailInput.current && 
+				this.emailInput.current.value;
+			const password = this.passwordInput.current &&
+				this.passwordInput.current.value;
+		}
+
+		async login() {
+			const inputData = this._getInputData();
+
 			if (this.state.emailRemembered === ICON_STATE.ENABLED) {
 				const email = this.emailInput.current && 
 					this.emailInput.current.value;
 				localStorage.setItem('rememberedEmail', email || '');
 			}
 			
-			// const data = this.getData();
+			if (typeof localStorage === 'undefined') return;
+
+			this._showSpinner();
+			const result = await this._doLoginRequest(inputData);
+			this._hideSpinner()
+
+			if (result.success) {
+				await this._proceedToDashboard(result);
+			} else {
+				this._failLogin(result);
+			}
 		}
 
 		handleEmailRememberToggle() {
@@ -125,7 +200,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 									<FormControl className={this.props.classes.filling}>
 										<InputLabel htmlFor="adornment-email">EMAIL</InputLabel>
 										<Input id="adornment-email" name="email" type="email"
-											innerRef={this.emailInput} endAdornment={
+											required innerRef={this.emailInput} endAdornment={
 												<InputAdornment position="end">
 													<IconButton aria-label="Remember email"
 														title="Remember email"
@@ -141,17 +216,24 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 											}/>
 									</FormControl>
 									<div className={this.props.classes.marginTopSmall}>
-										<TextField className={classNames(
+										<TextField innerRef={this.passwordInput} className={classNames(
 											this.props.classes.filling
-										)} name="password" type="password"
+										)} name="password" type="password" required
 											label="PASSWORD"/>
+									</div>
+									<div className={this.props.classes.marginTopSmall}>
+										<TextField innerRef={this.passwordInput} className={classNames(
+											this.props.classes.filling
+										)} name="twofactor_token" type="tel"
+											autoComplete="off"
+											label="2FA TOKEN (IF ENABLED)"/>
 									</div>
 									<div className={classNames(
 										this.props.classes.floatChildRight,
 										this.props.classes.buttonStyles
 									)}>
 										<Button variant="raised" size="large" color="primary" 
-											onClick={this.attemptLogin}
+											onClick={this.login}
 										>
 											Submit
 										</Button>
