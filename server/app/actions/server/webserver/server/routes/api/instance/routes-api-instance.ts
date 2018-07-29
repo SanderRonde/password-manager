@@ -14,6 +14,57 @@ export class RoutesApiInstance {
 
 	constructor(public server: Webserver) { }
 
+	public async doRegister({
+		email, password, public_key
+	}: {
+		email: string;
+		public_key: string;
+		password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+	}, res: ResponseCaptured) {
+		const auth = await this.server.Router.checkEmailPassword(
+			email, password, res);
+		if (auth === false) {
+			return;
+		}
+
+		const { 
+			privateKey: serverPrivateKey,
+			publicKey: serverPublicKey
+		} = genRSAKeyPair();
+
+		const id = genID<EncryptedInstance>();
+		const record: MongoRecord<EncryptedInstance> = {
+			_id: id,
+			twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
+			public_key: this.server.database.Crypto.dbEncrypt(public_key),
+			user_id: auth._id,
+			server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey),
+			expires: Infinity
+		};
+		if (!await this.server.database.Manipulation.insertOne(
+			COLLECTIONS.INSTANCES, record)) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'failed to create record',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
+			}
+		
+		res.status(200);
+		res.json({
+			success: true,
+			data: {
+				id: encryptWithPublicKey(id.toHexString(), public_key),
+				server_key: encryptWithPublicKey(serverPublicKey, public_key)
+			}
+		});
+
+		sendEmail(this.server.config, auth.email,
+			'New instance registered', 'A new instance was registered to your email');
+	}
+
 	public register(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			email: string;
@@ -32,48 +83,8 @@ export class RoutesApiInstance {
 				val: 'password',
 				type: 'string'
 			}])) return;
-			const auth = await this.server.Router.checkEmailPassword(
-				email, password, res);
-			if (auth === false) {
-				return;
-			}
 
-			const { 
-				privateKey: serverPrivateKey,
-				publicKey: serverPublicKey
-			} = genRSAKeyPair();
-
-			const id = genID<EncryptedInstance>();
-			const record: MongoRecord<EncryptedInstance> = {
-				_id: id,
-				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
-				public_key: this.server.database.Crypto.dbEncrypt(public_key),
-				user_id: auth._id,
-				server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey),
-				expires: Infinity
-			};
-			if (!await this.server.database.Manipulation.insertOne(
-				COLLECTIONS.INSTANCES, record)) {
-					res.status(500);
-					res.json({
-						success: false,
-						error: 'failed to create record',
-						ERR: API_ERRS.SERVER_ERROR
-					});
-					return;
-				}
-			
-			res.status(200);
-			res.json({
-				success: true,
-				data: {
-					id: encryptWithPublicKey(id.toHexString(), public_key),
-					server_key: encryptWithPublicKey(serverPublicKey, public_key)
-				}
-			});
-
-			sendEmail(this.server.config, auth.email,
-				'New instance registered', 'A new instance was registered to your email');
+			await this.doRegister({ email, password, public_key }, res);
 		})(req, res, next);
 	}
 
