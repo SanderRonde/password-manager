@@ -1,7 +1,5 @@
-import { InstancePublicKey, ServerPublicKey, ServerPrivateKey, RSAEncrypted } from '../database/db-types';
 import { ENCRYPTION_ALGORITHM } from './constants';
 import { genRandomString } from './util';
-import NodeRSA = require('node-rsa');
 import crypto = require('crypto');
 
 /**
@@ -66,10 +64,6 @@ export type Padded<T extends string, P extends Paddings> = string & {
 
 export enum ERRS {
 	INVALID_DECRYPT
-}
-
-export function pad<T extends string, P extends Paddings>(data: T, padding: P): Padded<T, P> {
-	return `${data}${padding}` as Padded<T, P>;
 }
 
 export function hash<T extends string, A extends HashingAlgorithms = 'sha512'>(data: T, 
@@ -185,34 +179,6 @@ export function decrypt<T, A extends EncryptionAlgorithm, K extends string>(encr
 	}
 }
 
-export function encryptWithPublicKey<T, K extends InstancePublicKey|ServerPublicKey>(data: T, 
-	publicKey: K): RSAEncrypted<EncodedString<T>, K> {
-		const key = new NodeRSA();
-		key.importKey(publicKey, 'pkcs8-public-pem');
-
-		return key.encrypt(JSON.stringify(data), 'base64') as 
-			RSAEncrypted<EncodedString<T>, K>;
-	}
-
-export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: RSAEncrypted<EncodedString<T>, 
-	InstancePublicKey|ServerPublicKey>, 
-		privateKey: K): T|ERRS {
-			const key = new NodeRSA();
-			key.importKey(privateKey, 'pkcs1-pem');
-
-			try {
-				return JSON.parse(key.decrypt(data, 'utf8'));
-			} catch(e) {
-				return ERRS.INVALID_DECRYPT;
-			}
-		}
-
-export function genRSAKeyPair() {
-	const key = new NodeRSA({
-		b: 512
-	});
-	return {
-		publicKey: key.exportKey('pkcs8-public-pem'),
-		privateKey: key.exportKey('pkcs1-pem')
-	}
-}
+export { 
+	encryptWithPublicKey, decryptWithPrivateKey, genRSAKeyPair, pad
+} from '../../../shared/lib/shared-crypto';
