@@ -27,6 +27,10 @@ const styles = createStyles({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'flex-end'
+	},
+
+	circle: {
+		borderRadius: '50%!important'
 	}
 });
 
@@ -116,10 +120,11 @@ const _Login = (() => {
 														title="Remember email"
 														onClick={this.handleEmailRememberToggle}
 														onMouseDown={this.preventDefault}
+														className={this.props.classes.circle}
 													>
 														{this.state.emailRemembered !== ICON_STATE.HIDDEN &&
-															this.state.emailRemembered === ICON_STATE.ENABLED ? 
-																<Lock /> : <LockOpen />}
+															(this.state.emailRemembered === ICON_STATE.ENABLED ? 
+																<Lock /> : <LockOpen />)}
 													</IconButton>
 												</InputAdornment>	
 											}/>
