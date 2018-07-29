@@ -113,6 +113,7 @@ export type JSONResponse<S> = {
 }|{
 	success: false;
 	ERR: API_ERRS;
+	error: string;
 }
 
 export declare namespace APIRoutes {
