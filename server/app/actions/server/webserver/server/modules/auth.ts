@@ -1,4 +1,4 @@
-import { StringifiedObjectId, EncryptedInstance, EncryptedAccount, ServerPublicKey, InstancePublicKey, ServerPrivateKey } from "../../../../../database/db-types";
+import { StringifiedObjectId, EncryptedInstance, EncryptedAccount, ServerPublicKey, ServerPrivateKey } from "../../../../../database/db-types";
 import { AUTH_TOKEN_EXPIRE_TIME, COMM_TOKEN_DEFAULT_EXPIRE_TIME } from "../../../../../lib/constants";
 import { genRSAKeyPair } from "../../../../../lib/crypto";
 
