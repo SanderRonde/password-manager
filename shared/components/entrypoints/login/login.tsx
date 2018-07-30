@@ -1,4 +1,4 @@
-import { Button, TextField, FormControl, InputLabel, InputAdornment, IconButton, Input } from '@material-ui/core';
+import { Button, FormHelperText, FormControl, InputLabel, InputAdornment, IconButton, Input } from '@material-ui/core';
 import { genRSAKeyPair, encryptWithPublicKey, pad } from '../../../lib/shared-crypto';
 import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
 import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
@@ -47,24 +47,53 @@ export interface LoginData {
 
 type ServerLoginResponse = APIReturns['/api/dashboard/login'];
 
+export interface InputValidation {
+	dirty: boolean;
+	valid: boolean;
+	errorString: string;
+}
+
 function getLogin<D extends LoginData>(data: D|null = null) {
 	return class Login extends React.Component<WithStyles<typeof styles>, {
 		emailRemembered: ICON_STATE;
+		emailValidation: InputValidation;
+		passwordValidation: InputValidation;
+		twofactorValidation: InputValidation;
+		buttonState: 'normal'|'loading'|'invalid'|'valid';
 	}> {
 		emailInput: React.RefObject<HTMLInputElement>;
 		passwordInput: React.RefObject<HTMLInputElement>;
+		twofactorInput: React.RefObject<HTMLInputElement>;
 		dataContainer: React.RefObject<DataContainer<D>>;
 
 		constructor(props: WithStyles<typeof styles>) {
 			super(props);
 			this.login = this.login.bind(this);
+			this.onEmailBlur = this.onEmailBlur.bind(this);
+			this.onPasswordBlur = this.onPasswordBlur.bind(this);
+			this.onTwofactorBlur = this.onTwofactorBlur.bind(this);
 			this.handleEmailRememberToggle = this.handleEmailRememberToggle.bind(this);
 			this.emailInput = React.createRef();
 			this.passwordInput = React.createRef();
+			this.twofactorInput = React.createRef();
 			this.dataContainer = React.createRef();
 
 			this.state = {
-				emailRemembered: ICON_STATE.HIDDEN
+				emailRemembered: ICON_STATE.HIDDEN,
+				emailValidation: { 
+					valid: true, 
+					errorString: '',
+					dirty: false
+				},
+				passwordValidation: { valid: true, 
+					errorString: '',
+					dirty: false
+				},
+				twofactorValidation: { valid: true, 
+					errorString: '',
+					dirty: false
+				},
+				buttonState: 'normal'
 			};
 		}
 
@@ -78,7 +107,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 			valid: boolean;
 			email: string;
 			password: string;
-			twofactor_token: string;
+			twofactor_token: string|null;
 		}): Promise<ServerLoginResponse> {
 			const serverData = this.getData();
 			if (serverData === null) {
@@ -100,7 +129,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 					public_key: keyPair.publicKey,
 					encrypted: encryptWithPublicKey({
 						email: email,
-						twofactor_token: twofactor_token,
+						twofactor_token: twofactor_token || undefined,
 						password: hash(pad(password, 'masterpwverify')),
 					}, server_public_key)
 				});
@@ -114,10 +143,121 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 
 		}
 
-		private _showSpinner() {}
+		private readonly EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		private readonly NUMBERS_REGEX = /(\d+)/;
+		checkInputData() {
+			const email = this.emailInput.current && 
+				this.emailInput.current.value;
+			const password = this.passwordInput.current &&
+				this.passwordInput.current.value;
+			const twofactor = this.twofactorInput.current &&
+				this.twofactorInput.current.value;
 
-		private _hideSpinner() {
+			let err: boolean = false;
+			if (this.state.emailValidation.dirty && !email) {
+				this.setState({
+					emailValidation: {
+						valid: false,
+						dirty: true,
+						errorString: 'Please enter an email address'
+					}
+				});
+				err = true;
+			} else if (this.state.emailValidation.dirty && email && !this.EMAIL_REGEX.exec(email)) {
+				this.setState({
+					emailValidation: {
+						valid: false,
+						dirty: true,
+						errorString: 'Invalid email address'
+					}
+				});
+				err = true;
+			} else {
+				this.setState({
+					emailValidation: {
+						valid: true,
+						dirty: this.state.emailValidation.dirty,
+						errorString: ''
+					}
+				});
+			}
+			if (this.state.passwordValidation.dirty && !password) {
+				this.setState({
+					passwordValidation: {
+						valid: false,
+						dirty: true,
+						errorString: 'Please enter a password'
+					}
+				});
+				err = true;
+			} else {
+				this.setState({
+					passwordValidation: {
+						valid: true,
+						dirty: this.state.passwordValidation.dirty,
+						errorString: ''
+					}
+				});
+			}
+			if (twofactor && this.state.twofactorValidation.dirty && !this.NUMBERS_REGEX.exec(twofactor)) {
+				this.setState({
+					twofactorValidation: {
+						valid: false,
+						dirty: true,
+						errorString: `Token contains letters`
+					}
+				});
+				err = true;
+			} else if (twofactor && this.state.twofactorValidation.dirty && twofactor.length !== 6) {
+				this.setState({
+					twofactorValidation: {
+						valid: false,
+						dirty: true,
+						errorString: `Token is too ${twofactor.length > 6 ? 
+							'long' : 'short'}`
+					}
+				});
+				err = true;
+			} else {
+				this.setState({
+					twofactorValidation: {
+						valid: true,
+						dirty: this.state.twofactorValidation.dirty,
+						errorString: ''
+					}
+				});
+			}
+			return !err;
+		}
 
+		onEmailBlur() {
+			this.setState({
+				emailValidation: {
+					valid: this.state.emailValidation.valid,
+					dirty: true,
+					errorString: this.state.emailValidation.errorString
+				}
+			});
+		}
+
+		onPasswordBlur() {
+			this.setState({
+				passwordValidation: {
+					valid: this.state.passwordValidation.valid,
+					dirty: true,
+					errorString: this.state.passwordValidation.errorString
+				}
+			});
+		}
+
+		onTwofactorBlur() {
+			this.setState({
+				twofactorValidation: {
+					valid: this.state.twofactorValidation.valid,
+					dirty: true,
+					errorString: this.state.twofactorValidation.errorString
+				}
+			});
 		}
 
 		private _getInputData() {
@@ -125,10 +265,45 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 				this.emailInput.current.value;
 			const password = this.passwordInput.current &&
 				this.passwordInput.current.value;
+			const twofactor = this.twofactorInput.current &&
+				this.twofactorInput.current.value;
+			
+			if (!this.checkInputData()) {
+				return {
+					valid: false,
+					email: '', password: '', twofactor_token: ''
+				}
+			} else {	
+				return {
+					valid: true,
+					email: email!, 
+					password: password!,
+					twofactor_token: twofactor
+				}
+			}
+		}
+
+		private _inputChangeTimeout: number|NodeJS.Timer|null = null;
+
+		private _resetButton(timeout: number) {
+			if (this._inputChangeTimeout) {
+				clearTimeout(this._inputChangeTimeout as number);
+			}
+			this._inputChangeTimeout = setTimeout(() => {
+				this.setState({
+					buttonState: 'normal'
+				});
+			}, timeout);
 		}
 
 		async login() {
 			const inputData = this._getInputData();
+			if (inputData.valid === false) {
+				this.setState({
+					buttonState: 'invalid'
+				});
+				this._resetButton(5000);
+			}
 
 			if (this.state.emailRemembered === ICON_STATE.ENABLED) {
 				const email = this.emailInput.current && 
@@ -138,14 +313,22 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 			
 			if (typeof localStorage === 'undefined') return;
 
-			this._showSpinner();
-			const result = await this._doLoginRequest(inputData);
-			this._hideSpinner()
+			this.setState({
+				buttonState: 'loading'
+			});
+			const result = await this._doLoginRequest(inputData);	
 
 			if (result.success) {
+				this.setState({
+					buttonState: 'valid'
+				});
 				await this._proceedToDashboard(result);
 			} else {
 				this._failLogin(result);
+				this.setState({
+					buttonState: 'invalid'
+				});
+				this._resetButton(5000);
 			}
 		}
 
@@ -189,6 +372,31 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 				}
 			}
 		}
+
+		private _getButtonData() {
+			switch (this.state.buttonState) {
+				case 'normal':
+					return {
+						color: 'primary',
+						iconName: null
+					};
+				case 'loading':
+					return {
+						color: 'primary',
+						iconName: 'spinner'
+					};
+				case 'invalid':
+					return {
+						color: 'red',
+						iconName: 'cross'
+					}
+				case 'valid': 
+					return {
+						color: 'green',
+						iconName: 'checkmark'
+					}
+			}
+		}
 		
 		render() {
 			return (
@@ -197,10 +405,14 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 						<div className={this.props.classes.filling}>
 							<div className="loginContainer">
 								<form method="POST">
-									<FormControl className={this.props.classes.filling}>
-										<InputLabel htmlFor="adornment-email">EMAIL</InputLabel>
-										<Input id="adornment-email" name="email" type="email"
-											required innerRef={this.emailInput} endAdornment={
+									<FormControl className={this.props.classes.filling} 
+										aria-describedby="email-descr"
+									>
+										<InputLabel htmlFor="email-input">EMAIL</InputLabel>
+										<Input id="email-input" name="email" type="email"
+											title="Account's email" onBlur={this.onEmailBlur}
+											error={this.state.emailValidation.valid}
+											innerRef={this.emailInput} endAdornment={
 												<InputAdornment position="end">
 													<IconButton aria-label="Remember email"
 														title="Remember email"
@@ -214,25 +426,44 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 													</IconButton>
 												</InputAdornment>	
 											}/>
+											<FormHelperText id="email-descr">{
+												this.state.emailValidation.errorString
+											}</FormHelperText>
 									</FormControl>
 									<div className={this.props.classes.marginTopSmall}>
-										<TextField innerRef={this.passwordInput} className={classNames(
-											this.props.classes.filling
-										)} name="password" type="password" required
-											label="PASSWORD"/>
+										<FormControl className={this.props.classes.filling}>
+											<InputLabel htmlFor="password-input">PASSWORD</InputLabel>
+											<Input innerRef={this.passwordInput} className={classNames(
+												this.props.classes.filling
+											)} name="password" type="password" 
+												error={this.state.passwordValidation.valid}
+												title="Account password" id="password-input" 
+												onBlur={this.onPasswordBlur} />
+											<FormHelperText id="password-descr">{
+												this.state.passwordValidation.errorString
+											}</FormHelperText>
+										</FormControl>
 									</div>
 									<div className={this.props.classes.marginTopSmall}>
-										<TextField innerRef={this.passwordInput} className={classNames(
-											this.props.classes.filling
-										)} name="twofactor_token" type="tel"
-											autoComplete="off"
-											label="2FA TOKEN (IF ENABLED)"/>
+										<FormControl className={this.props.classes.filling}>
+											<InputLabel htmlFor="twofactor-input">2FA TOKEN (IF ENABLED)</InputLabel>
+											<Input innerRef={this.twofactorInput} className={classNames(
+												this.props.classes.filling
+											)} name="twofactor_token" type="tel"
+												error={this.state.twofactorValidation.valid}
+												title="Twofactor authentication token (if enabled for the account)"
+												autoComplete="off" id="twofactor-input" 
+												onBlur={this.onTwofactorBlur} />
+											<FormHelperText id="twofactor-descr">{
+												this.state.twofactorValidation.errorString
+											}</FormHelperText>
+										</FormControl>
 									</div>
 									<div className={classNames(
 										this.props.classes.floatChildRight,
 										this.props.classes.buttonStyles
 									)}>
-										<Button variant="raised" size="large" color="primary" 
+										<Button variant="raised" size="large" color={this._getButtonData().color} 
 											onClick={this.login}
 										>
 											Submit
