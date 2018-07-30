@@ -143,6 +143,7 @@ export function initCommander(handledHolder: {
 			'mongodb://127.0.0.1:27017/pwmanager')
 		.option('--debug', 'Whether to enable debug parameters to the API')
 		.option('--development', 'Whether to enable development mode')
+		.option('--databaseless', 'Don\'t use any database (for development)')
 		.action(async (settings: ServerSettings) => {
 			handledHolder.handled = true;
 			if (settings.config) {

@@ -3,6 +3,7 @@ import { encrypt, decrypt, encryptWithSalt, decryptWithSalt } from "../../lib/cr
 import { ENCRYPTION_ALGORITHM } from "../../lib/constants";
 import { UnstringifyObjectIDs } from "./db-manipulation";
 import { Database } from "../database";
+import { MockMongoDb } from "../mocks";
 
 export class DatabaseEncryption {
 	protected _obfuscatedKey: string | undefined;
@@ -47,20 +48,20 @@ export class DatabaseEncryption {
 		}
 
 	public async hasEncryptionPassword() {
-		const record = await this._parent.mongoInstance.collection('meta').findOne({
+		const record = await (this._parent.mongoInstance as MockMongoDb).collection('meta').findOne({
 			type: 'database'
 		});
 		return !!record;
 	}
 
 	public async canDecrypt(key: string) {
-		const record = await this._parent.mongoInstance.collection('meta').findOne({
+		const record = await (this._parent.mongoInstance as MockMongoDb).collection('meta').findOne({
 			type: 'database'
 		});
 		if (!record) {
 			//Uninitialized database, initialize now
 			console.log('Empty database, creating with this key');
-			await this._parent.mongoInstance.collection('meta').insertOne({
+			await (this._parent.mongoInstance as MockMongoDb).collection('meta').insertOne({
 				type: 'database',
 				data: this.dbEncrypt('decrypted', key)
 			});

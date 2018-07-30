@@ -38,7 +38,8 @@
 				"--http", "1256",
 				"-d", "mongodb://127.0.0.1:27017/somedb",
 				"-p", "somepw",
-				"--development"
+				"--development",
+				"--databaseless"
 			],
 		}
 	]

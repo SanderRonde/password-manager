@@ -1,7 +1,9 @@
-import { TypedObjectID, EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from './db-types';
+
+import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from './db-types';
+import { exitWith, readPassword, getDBFromURI } from '../lib/util';
 import { DatabaseManipulation } from './libs/db-manipulation';
 import { DatabaseEncryption } from './libs/db-encryption';
-import { exitWith, readPassword, getDBFromURI } from '../lib/util';
+import { MockMongoDb, TypedCollection } from './mocks';
 import mongo = require('mongodb');
 
 export async function getDatabase(dbPath: string, key: string|undefined, 
@@ -28,21 +30,6 @@ export async function getDatabase(dbPath: string, key: string|undefined,
 		return exitWith('Database can\'t be decrypted with that key; password invalid');
 	}
 
-export interface TypedCollection<C = any> extends mongo.Collection<MongoRecord<C>> {
-	findOne<T = C>(filter: {
-		_id: TypedObjectID<T>;
-	}, callback: mongo.MongoCallback<T | null>): void;
-	findOne<T = C>(filter: {
-		_id: TypedObjectID<T>;
-	}, options?: mongo.FindOneOptions): Promise<T | null>;
-    findOne<T = C>(filter: {
-		_id: TypedObjectID<T>;
-	}, options: mongo.FindOneOptions, callback: mongo.MongoCallback<T | null>): void;
-	findOne<T = C>(filter: mongo.FilterQuery<C>, callback: mongo.MongoCallback<T | null>): void;
-    findOne<T = C>(filter: mongo.FilterQuery<C>, options?: mongo.FindOneOptions): Promise<T | null>;
-    findOne<T = C>(filter: mongo.FilterQuery<C>, options: mongo.FindOneOptions, callback: mongo.MongoCallback<T | null>): void;
-}
-
 export enum COLLECTIONS {
 	USERS,
 	INSTANCES,
@@ -52,7 +39,7 @@ export enum COLLECTIONS {
 export class Database {
 	private _initialized: boolean = false;
 	
-	public mongoInstance!: mongo.Db;
+	public mongoInstance!: mongo.Db|MockMongoDb;
 	public mongoClient!: mongo.MongoClient;
 	public collections!: {
 		users: TypedCollection<MongoRecord<EncryptedAccount>>;
@@ -94,11 +81,16 @@ export class Database {
 		return this.mongoClient.db(getDBFromURI(this._dbPath)) as mongo.Db;
 	}
 
-	private _getCollections() {
+	private _getCollections(): {
+		users: TypedCollection<MongoRecord<EncryptedAccount>>;
+		instances: TypedCollection<MongoRecord<EncryptedInstance>>;
+		passwords: TypedCollection<MongoRecord<EncryptedPassword>>;
+	} {
+		const db = this.mongoInstance as MockMongoDb;
 		return {
-			users: this.mongoInstance.collection('users'),
-			instances: this.mongoInstance.collection('instances'),
-			passwords: this.mongoInstance.collection('passwords')
+			users: db.collection('users'),
+			instances: db.collection('instances'),
+			passwords: db.collection('passwords')
 		}
 	}
 

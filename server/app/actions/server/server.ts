@@ -15,6 +15,7 @@ export interface ServerArgs {
 	rateLimit: boolean;
 	debug: boolean;
 	development: boolean;
+	databaseless: boolean;
 }
 
 export interface ServerConfig extends ServerArgs {
