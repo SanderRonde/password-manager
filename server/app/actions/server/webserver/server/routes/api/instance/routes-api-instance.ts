@@ -1,9 +1,9 @@
 import { encryptWithPublicKey, Hashed, Padded, MasterPasswordVerificationPadding, genRSAKeyPair, decryptWithPrivateKey } from "../../../../../../../lib/crypto";
-import { EncryptedInstance, StringifiedObjectId, MasterPassword, MongoRecord, ServerPublicKey, RSAEncrypted } from "../../../../../../../database/db-types";
+import { EncryptedInstance, StringifiedObjectId, MasterPassword, ServerPublicKey, RSAEncrypted } from "../../../../../../../database/db-types";
 import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
-import { sendEmail, genID } from "../../../../../../../lib/util";
+import { sendEmail } from "../../../../../../../lib/util";
 import { API_ERRS } from "../../../../../../../api";
 import { APIToken } from "../../../modules/auth";
 import { Webserver } from "../../../webserver";
@@ -32,17 +32,16 @@ export class RoutesApiInstance {
 			publicKey: serverPublicKey
 		} = genRSAKeyPair();
 
-		const id = genID<EncryptedInstance>();
-		const record: MongoRecord<EncryptedInstance> = {
-			_id: id,
+		const record: EncryptedInstance = {
 			twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
 			public_key: this.server.database.Crypto.dbEncrypt(public_key),
 			user_id: auth._id,
 			server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey),
 			expires: Infinity
 		};
-		if (!await this.server.database.Manipulation.insertOne(
-			COLLECTIONS.INSTANCES, record)) {
+		const result = await this.server.database.Manipulation.insertOne(
+			COLLECTIONS.INSTANCES, record);
+		if (result === false) {
 				res.status(500);
 				res.json({
 					success: false,
@@ -56,7 +55,7 @@ export class RoutesApiInstance {
 		res.json({
 			success: true,
 			data: {
-				id: encryptWithPublicKey(id.toHexString(), public_key),
+				id: encryptWithPublicKey(result.toHexString(), public_key),
 				server_key: encryptWithPublicKey(serverPublicKey, public_key)
 			}
 		});

@@ -1,5 +1,5 @@
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
-import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord, TypedObjectID, EncryptedAccount } from "../../../../../../../database/db-types";
+import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord } from "../../../../../../../database/db-types";
 import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-manipulation";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
@@ -125,9 +125,7 @@ export class RoutesApiPassword {
 			}
 
 			//All don't exist
-			const id = new mongo.ObjectId();
-			const record: MongoRecord<EncryptedPassword> = {
-				_id: id as TypedObjectID<EncryptedAccount>,
+			const record: EncryptedPassword = {
 				user_id: account._id,
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled),
 				websites: websites.map((website) => {
@@ -143,7 +141,8 @@ export class RoutesApiPassword {
 				}),
 				encrypted: this.server.database.Crypto.dbEncrypt(encrypted)
 			};
-			if (!await this.server.database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, record)) {
+			const result = await this.server.database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, record);
+			if (result === false) {
 				res.status(500);
 				res.json({
 					success: false,
@@ -156,7 +155,7 @@ export class RoutesApiPassword {
 			res.json({
 				success: true,
 				data: {
-					id: id.toHexString()
+					id: result.toHexString()
 				}
 			})
 		})(req, res, next);

@@ -37,18 +37,18 @@ export class DatabaseManipulation {
 	}
 
 	public async insertOne<R extends EncryptedCollectionRecords[C], 
-		C extends COLLECTIONS>(collectionName: C, record: UnstringifyObjectIDs<R>) {
+		C extends COLLECTIONS>(collectionName: C, record: UnstringifyObjectIDs<R>): Promise<false|mongo.ObjectId> {
 			const collection = this._getCollection(collectionName);
 			if (!collection) {
-				return;
+				return false;
 			}
 
-			const { result: { ok } } = await collection.insertOne(record);
+			const { result: { ok }, insertedId } = await collection.insertOne(record);
 			if (!ok) {
 				this._parent.err('Failed to insert record into the database');
 				return false;
 			}
-			return true;
+			return insertedId;
 		}
 
 	public async findOne<R extends UnstringifyObjectIDs<EncryptedCollectionRecords[C]>, 
