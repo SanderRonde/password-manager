@@ -57,14 +57,14 @@ export function initCommander(handledHolder: {
 					if (!email) {
 						exitWith('Please supply the email of the account to edit through -a or --account');
 					} else {
-						await Account.CreateAccount.createAccount(email, await getDatabase(databasePath, dbPassword, true));
+						await Account.CreateAccount.createAccount(email, await getDatabase(databasePath, dbPassword, true, false));
 					}
 					break;
 				case 'delete':
 					if (!email) {
 						exitWith('Please supply the email of the account to edit through -a or --account');
 					} else {
-						await Account.DeleteAccount.deleteAccount(email, await getDatabase(databasePath, dbPassword, true),
+						await Account.DeleteAccount.deleteAccount(email, await getDatabase(databasePath, dbPassword, true, false),
 							debug);
 					}
 					break;
@@ -150,8 +150,8 @@ export function initCommander(handledHolder: {
 					isConfig: true
 				}
 			}
-			Server.run(await getDatabase(settings.database, settings.password, false),
-				settings as  ServerConfig);
+			Server.run(await getDatabase(settings.database, settings.password, false, 
+				settings.databaseless), settings as  ServerConfig);
 		});
 
 	commander

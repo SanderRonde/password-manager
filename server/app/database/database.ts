@@ -7,8 +7,8 @@ import { MockMongoDb, TypedCollection } from './mocks';
 import * as mongo from 'mongodb'
 
 export async function getDatabase(dbPath: string, password: string|undefined, 
-	quitOnError: boolean): Promise<Database> {
-		const instance = await new Database(dbPath, quitOnError).init();
+	quitOnError: boolean, useMockDb: boolean): Promise<Database> {
+		const instance = await new Database(dbPath, quitOnError, useMockDb).init();
 
 		if (password !== undefined) {
 			if (await instance.Crypto.canDecrypt(password)) {
@@ -50,7 +50,7 @@ export class Database {
 	public Crypto: DatabaseEncryption;
 	public Manipulation: DatabaseManipulation;
 
-	constructor(private _dbPath: string, private _quitOnError: boolean) { 
+	constructor(private _dbPath: string, private _quitOnError: boolean, private _mockDb: boolean) { 
 		this.Crypto = new DatabaseEncryption(this);
 		this.Manipulation = new DatabaseManipulation(this);
 	}
@@ -59,7 +59,7 @@ export class Database {
 		if (this._initialized) {
 			return this;
 		}
-		this.mongoInstance = await this._connectToMongo();
+		this.mongoInstance = this._mockDb ? new MockMongoDb() : await this._connectToMongo();
 		this.collections = await this._getCollections();
 		this._initialized = true;
 		return this;
