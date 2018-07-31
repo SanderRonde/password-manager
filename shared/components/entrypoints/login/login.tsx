@@ -9,6 +9,7 @@ import { APIReturns, API_ERRS } from '../../../../server/app/api';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { doClientAPIRequest } from '../../../lib/apirequests';
 import { ICON_STATE } from '../../../../server/app/lib/util';
+import { bindToClass } from '../../../lib/decorators';
 import { classNames } from '../../../lib/classnames';
 import LockOpen from '@material-ui/icons/LockOpen';
 import { hash } from '../../../lib/browser-crypto';
@@ -18,10 +19,6 @@ import * as React from 'react';
 const styles = createStyles({
 	filling: {
 		width: '420px'
-	},
-
-	marginTopSmall: {
-		marginTop: '15px'
 	},
 
 	buttonStyles: {
@@ -54,29 +51,20 @@ export interface InputValidation {
 }
 
 function getLogin<D extends LoginData>(data: D|null = null) {
-	return class Login extends React.Component<WithStyles<typeof styles>, {
+	class Login extends React.Component<WithStyles<typeof styles>, {
 		emailRemembered: ICON_STATE;
 		emailValidation: InputValidation;
 		passwordValidation: InputValidation;
 		twofactorValidation: InputValidation;
 		buttonState: 'normal'|'loading'|'invalid'|'valid';
 	}> {
-		emailInput: React.RefObject<HTMLInputElement>;
-		passwordInput: React.RefObject<HTMLInputElement>;
-		twofactorInput: React.RefObject<HTMLInputElement>;
-		dataContainer: React.RefObject<DataContainer<D>>;
+		emailInput: React.RefObject<HTMLInputElement> = React.createRef();
+		passwordInput: React.RefObject<HTMLInputElement> = React.createRef();
+		twofactorInput: React.RefObject<HTMLInputElement> = React.createRef();
+		dataContainer: React.RefObject<DataContainer<D>> = React.createRef();
 
 		constructor(props: WithStyles<typeof styles>) {
 			super(props);
-			this.login = this.login.bind(this);
-			this.onEmailBlur = this.onEmailBlur.bind(this);
-			this.onPasswordBlur = this.onPasswordBlur.bind(this);
-			this.onTwofactorBlur = this.onTwofactorBlur.bind(this);
-			this.handleEmailRememberToggle = this.handleEmailRememberToggle.bind(this);
-			this.emailInput = React.createRef();
-			this.passwordInput = React.createRef();
-			this.twofactorInput = React.createRef();
-			this.dataContainer = React.createRef();
 
 			this.state = {
 				emailRemembered: ICON_STATE.HIDDEN,
@@ -145,7 +133,10 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 
 		private readonly EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		private readonly NUMBERS_REGEX = /(\d+)/;
+
+		@bindToClass
 		checkInputData() {
+			console.log('Checking input data');
 			const email = this.emailInput.current && 
 				this.emailInput.current.value;
 			const password = this.passwordInput.current &&
@@ -230,6 +221,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 			return !err;
 		}
 
+		@bindToClass
 		onEmailBlur() {
 			this.setState({
 				emailValidation: {
@@ -240,6 +232,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 			});
 		}
 
+		@bindToClass
 		onPasswordBlur() {
 			this.setState({
 				passwordValidation: {
@@ -250,6 +243,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 			});
 		}
 
+		@bindToClass
 		onTwofactorBlur() {
 			this.setState({
 				twofactorValidation: {
@@ -296,6 +290,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 			}, timeout);
 		}
 
+		@bindToClass
 		async login() {
 			const inputData = this._getInputData();
 			if (inputData.valid === false) {
@@ -332,6 +327,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 			}
 		}
 
+		@bindToClass
 		handleEmailRememberToggle() {
 			const wasEnabled = this.state.emailRemembered === ICON_STATE.ENABLED;
 			this.setState({
@@ -411,7 +407,8 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 										<InputLabel htmlFor="email-input">EMAIL</InputLabel>
 										<Input id="email-input" name="email" type="email"
 											title="Account's email" onBlur={this.onEmailBlur}
-											error={this.state.emailValidation.valid}
+											onChange={this.checkInputData}
+											error={!this.state.emailValidation.valid}
 											innerRef={this.emailInput} endAdornment={
 												<InputAdornment position="end">
 													<IconButton aria-label="Remember email"
@@ -430,35 +427,33 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 												this.state.emailValidation.errorString
 											}</FormHelperText>
 									</FormControl>
-									<div className={this.props.classes.marginTopSmall}>
-										<FormControl className={this.props.classes.filling}>
-											<InputLabel htmlFor="password-input">PASSWORD</InputLabel>
-											<Input innerRef={this.passwordInput} className={classNames(
-												this.props.classes.filling
-											)} name="password" type="password" 
-												error={this.state.passwordValidation.valid}
-												title="Account password" id="password-input" 
-												onBlur={this.onPasswordBlur} />
-											<FormHelperText id="password-descr">{
-												this.state.passwordValidation.errorString
-											}</FormHelperText>
-										</FormControl>
-									</div>
-									<div className={this.props.classes.marginTopSmall}>
-										<FormControl className={this.props.classes.filling}>
-											<InputLabel htmlFor="twofactor-input">2FA TOKEN (IF ENABLED)</InputLabel>
-											<Input innerRef={this.twofactorInput} className={classNames(
-												this.props.classes.filling
-											)} name="twofactor_token" type="tel"
-												error={this.state.twofactorValidation.valid}
-												title="Twofactor authentication token (if enabled for the account)"
-												autoComplete="off" id="twofactor-input" 
-												onBlur={this.onTwofactorBlur} />
-											<FormHelperText id="twofactor-descr">{
-												this.state.twofactorValidation.errorString
-											}</FormHelperText>
-										</FormControl>
-									</div>
+									<FormControl className={this.props.classes.filling}>
+										<InputLabel htmlFor="password-input">PASSWORD</InputLabel>
+										<Input innerRef={this.passwordInput} className={classNames(
+											this.props.classes.filling
+										)} name="password" type="password" 
+											error={!this.state.passwordValidation.valid}
+											title="Account password" id="password-input" 
+											onBlur={this.onPasswordBlur} 
+											onChange={this.checkInputData} />
+										<FormHelperText id="password-descr">{
+											this.state.passwordValidation.errorString
+										}</FormHelperText>
+									</FormControl>
+									<FormControl className={this.props.classes.filling}>
+										<InputLabel htmlFor="twofactor-input">2FA TOKEN (IF ENABLED)</InputLabel>
+										<Input innerRef={this.twofactorInput} className={classNames(
+											this.props.classes.filling
+										)} name="twofactor_token" type="tel"
+											error={!this.state.twofactorValidation.valid}
+											title="Twofactor authentication token (if enabled for the account)"
+											autoComplete="off" id="twofactor-input" 
+											onBlur={this.onTwofactorBlur} 
+											onChange={this.checkInputData} />
+										<FormHelperText id="twofactor-descr">{
+											this.state.twofactorValidation.errorString
+										}</FormHelperText>
+									</FormControl>
 									<div className={classNames(
 										this.props.classes.floatChildRight,
 										this.props.classes.buttonStyles
@@ -479,6 +474,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 			)
 		}
 	}
+	return Login;
 }
 export function GetLoginStyled(data?: LoginData) {
 	return withStyles(styles)(getLogin(data));
