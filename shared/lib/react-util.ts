@@ -43,3 +43,9 @@ export function multiFunctions(...fns: Function[]) {
 		});
 	}
 }
+
+export const enum ICON_STATE {
+	ENABLED,
+	DISABLED,
+	HIDDEN
+}

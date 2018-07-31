@@ -1,7 +1,6 @@
-import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, InstancePublicKey, ResetKey, ServerPublicKey, ServerPrivateKey, RSAEncrypted } from "./database/db-types";
-import { Hashed, Padded, MasterPasswordVerificationPadding, EncryptionAlgorithm, MasterPasswordDecryptionpadding, Encrypted } from "./lib/crypto";
-import { TwofactorVerifyToken, APIToken } from "./actions/server/webserver/server/modules/auth";
-import { UnstringifyObjectIDs } from "./database/libs/db-manipulation";
+import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, InstancePublicKey, ResetKey, ServerPublicKey, ServerPrivateKey, RSAEncrypted } from "./db-types";
+import { Hashed, Padded, MasterPasswordVerificationPadding, EncryptionAlgorithm, MasterPasswordDecryptionpadding, Encrypted } from "./crypto";
+import { UnstringifyObjectIDs, APIToken, TwofactorVerifyToken } from "./crypto";
 
 export interface APIFns {
 	/**

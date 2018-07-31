@@ -1,5 +1,6 @@
-import { StringifiedObjectId, EncryptedInstance, EncryptedAccount, ServerPublicKey, ServerPrivateKey } from "../../../../../database/db-types";
+import { StringifiedObjectId, EncryptedInstance, EncryptedAccount, ServerPublicKey, ServerPrivateKey } from '../../../../../../../shared/types/db-types';
 import { AUTH_TOKEN_EXPIRE_TIME, COMM_TOKEN_DEFAULT_EXPIRE_TIME } from "../../../../../lib/constants";
+import { APIToken, TwofactorVerifyToken } from '../../../../../../../shared/types/crypto';
 import { genRSAKeyPair } from "../../../../../lib/crypto";
 
 interface AccountAuthRepresentation {
@@ -24,15 +25,6 @@ interface DashboardComm {
 export enum COUNT {
 	ANY_COUNT
 }
-
-/**
- * A token used for logging in
- */
-export type APIToken = string;
-/**
- * A token used to verify 2FA access
- */
-export type TwofactorVerifyToken = string;
 
 export class WebserverAuth {
 	private _usedTokens: Set<APIToken> = new Set();

@@ -1,5 +1,5 @@
-import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey } from "../../server/app/database/db-types";
-import { ERRS, Padded, Paddings } from "../../server/app/lib/crypto";
+import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey } from "../types/db-types";
+import { ERRS, Padded, Paddings } from "../types/crypto";
 import * as NodeRSA from 'node-rsa';
 
 export function encryptWithPublicKey<T, K extends InstancePublicKey|ServerPublicKey>(data: T, 

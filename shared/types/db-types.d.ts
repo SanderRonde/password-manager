@@ -1,4 +1,5 @@
-import { Encrypted, Hashed, Padded, MasterPasswordVerificationPadding, MasterPasswordDecryptionpadding, SaltEncrypted, EncryptionAlgorithm } from "../lib/crypto";
+/// <reference path="../../typings/global.d.ts" />
+import { Encrypted, EncryptionAlgorithm, SaltEncrypted, Hashed, MasterPasswordVerificationPadding, Padded, MasterPasswordDecryptionpadding } from './crypto';
 import * as mongo from 'mongodb'
 
 /**

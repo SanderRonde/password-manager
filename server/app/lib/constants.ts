@@ -3,10 +3,6 @@ import * as path from 'path'
 /**
  * The encryption algorithm used by default
  */
-export type ENCRYPTION_ALGORITHM = typeof ENCRYPTION_ALGORITHM;
-/**
- * The encryption algorithm used by default
- */
 export const ENCRYPTION_ALGORITHM: 'aes-256-ctr' = 'aes-256-ctr';
 /**
  * The length of the key used to reset an account

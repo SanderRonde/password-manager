@@ -1,4 +1,4 @@
-import { APIFns, APIArgs, APIReturns } from "../../server/app/api";
+import { APIFns, APIArgs, APIReturns } from "../types/api";
 import { encryptWithPublicKey } from "./shared-crypto";
 
 export function doHTTPRequest<R>(url: string, method: 'GET'|'POST', data: any): Promise<R> {

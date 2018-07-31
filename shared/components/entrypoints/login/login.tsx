@@ -2,15 +2,15 @@ import { Button, FormHelperText, FormControl, InputLabel, InputAdornment, IconBu
 import { genRSAKeyPair, encryptWithPublicKey, pad } from '../../../lib/shared-crypto';
 import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
 import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
-import { ServerPublicKey } from '../../../../server/app/database/db-types';
 import { DataContainer } from '../../util/datacontainer/datacontainer';
+import { classNames, multiFunctions } from '../../../lib/react-util';
 import { withStyles, createStyles } from '@material-ui/core/styles';
-import { APIReturns, API_ERRS } from '../../../../server/app/api';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { doClientAPIRequest } from '../../../lib/apirequests';
-import { ICON_STATE } from '../../../../server/app/lib/util';
+import { APIReturns, API_ERRS } from '../../../types/api';
+import { ServerPublicKey } from '../../../types/db-types';
 import { bindToClass } from '../../../lib/decorators';
-import { classNames } from '../../../lib/classnames';
+import { ICON_STATE } from '../../../lib/react-util';
 import LockOpen from '@material-ui/icons/LockOpen';
 import { hash } from '../../../lib/browser-crypto';
 import Lock from '@material-ui/icons/Lock';
@@ -58,6 +58,10 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 		passwordValidation: InputValidation;
 		twofactorValidation: InputValidation;
 		buttonState: 'normal'|'loading'|'invalid'|'valid';
+
+		emailValue: string;
+		passwordValue: string;
+		twofactorValue: string;
 	}> {
 		emailInput: React.RefObject<HTMLInputElement> = React.createRef();
 		passwordInput: React.RefObject<HTMLInputElement> = React.createRef();
@@ -85,15 +89,20 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 					errorString: '',
 					dirty: false
 				},
-				passwordValidation: { valid: true, 
+				passwordValidation: { 
+					valid: true, 
 					errorString: '',
 					dirty: false
 				},
-				twofactorValidation: { valid: true, 
+				twofactorValidation: { 
+					valid: true, 
 					errorString: '',
 					dirty: false
 				},
-				buttonState: 'normal'
+				buttonState: 'normal',
+				emailValue: '',
+				passwordValue: '',
+				twofactorValue: ''
 			};
 		}
 
@@ -148,12 +157,15 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 
 		@bindToClass
 		checkInputData() {
+			console.log('checking');
 			const email = this.emailInput.current && 
 				this.emailInput.current.value;
 			const password = this.passwordInput.current &&
 				this.passwordInput.current.value;
 			const twofactor = this.twofactorInput.current &&
 				this.twofactorInput.current.value;
+			console.log(email, password, twofactor);
+			console.log(this.emailInput.current);
 
 			let err: boolean = false;
 			if (this.state.emailValidation.dirty && !email) {
@@ -263,6 +275,10 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 					errorString: this.state.twofactorValidation.errorString
 				}
 			});
+		}
+
+		handleChange(...args: any[]) {
+			console.log(args);
 		}
 
 		private _getInputData() {
@@ -418,7 +434,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 										<InputLabel htmlFor="email-input">EMAIL</InputLabel>
 										<Input id="email-input" name="email" type="email"
 											title="Account's email" onBlur={this.onEmailBlur}
-											onChange={this.checkInputData}
+											onChange={multiFunctions(this.checkInputData, this.handleChange)}
 											error={!this.state.emailValidation.valid}
 											innerRef={this.emailInput} endAdornment={
 												<InputAdornment position="end">
@@ -446,7 +462,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 											error={!this.state.passwordValidation.valid}
 											title="Account password" id="password-input" 
 											onBlur={this.onPasswordBlur} 
-											onChange={this.checkInputData} />
+											onChange={multiFunctions(this.checkInputData, this.handleChange)} />
 										<FormHelperText id="password-descr">{
 											this.state.passwordValidation.errorString
 										}</FormHelperText>
@@ -460,7 +476,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 											title="Twofactor authentication token (if enabled for the account)"
 											autoComplete="off" id="twofactor-input" 
 											onBlur={this.onTwofactorBlur} 
-											onChange={this.checkInputData} />
+											onChange={multiFunctions(this.checkInputData, this.handleChange)} />
 										<FormHelperText id="twofactor-descr">{
 											this.state.twofactorValidation.errorString
 										}</FormHelperText>

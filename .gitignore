@@ -74,3 +74,4 @@ shared/**/*.js
 temp/
 server/**/*.d.ts
 shared/**/*.d.ts
+!shared/types/**/*.d.ts

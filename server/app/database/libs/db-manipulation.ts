@@ -1,21 +1,13 @@
-import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord, TypedObjectID, StringifiedObjectId } from "../db-types";
+import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from '../../../../shared/types/db-types';
+import { UnstringifyObjectIDs } from '../../../../shared/types/crypto';
 import { Database, COLLECTIONS } from "../database";
 import { TypedCollection } from "../mocks";
 import * as mongo from 'mongodb'
-
 
 interface EncryptedCollectionRecords {
 	[COLLECTIONS.USERS]: EncryptedAccount;
 	[COLLECTIONS.INSTANCES]: EncryptedInstance;
 	[COLLECTIONS.PASSWORDS]: EncryptedPassword;
-}
-
-type ToTypedObjectID<T> = T extends StringifiedObjectId<infer V> ?
-	TypedObjectID<V> : TypedObjectID<void>;
-
-export type UnstringifyObjectIDs<T> = {
-	[P in keyof T]: T[P] extends StringifiedObjectId<any> ? 
-		ToTypedObjectID<T[P]> : T[P];
 }
 
 export class DatabaseManipulation {

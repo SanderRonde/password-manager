@@ -418,9 +418,3 @@ export function captureFileOutput() {
 		}
 	}
 }
-
-export const enum ICON_STATE {
-	ENABLED,
-	DISABLED,
-	HIDDEN
-}

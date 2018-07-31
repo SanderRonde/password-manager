@@ -1,4 +1,4 @@
-import { HashingAlgorithms, Hashed } from "../../server/app/lib/crypto";
+import { HashingAlgorithms, Hashed } from "../types/crypto";
 import { sha512, sha512_256 } from 'js-sha512';
 
 function getHashingFunction(algorithm: HashingAlgorithms) {
