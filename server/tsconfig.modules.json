@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "alwaysStrict": true,
+        "baseUrl": "../typings/",
+        "forceConsistentCasingInFileNames": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "removeComments": true,
+        "preserveConstEnums": false,
+        "listFiles": false,
+        "pretty": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "target": "es2015",
+        "noUnusedParameters": true,
+        "experimentalDecorators": true,
+        "strictPropertyInitialization": true,
+        "strictNullChecks": true
+	}, 
+    "allowJs": true,
+    "compileOnSave": true,
+    "include": [
+        "app/",
+        "test/",
+        "../shared/"
+    ],
+    "exclude": [
+        "app/actions/server/websever/client/"
+    ]
+}

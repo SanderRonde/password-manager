@@ -87,11 +87,12 @@
     "webpack-stream": "^5.0.0"
   },
   "scripts": {
-    "compile": "yarn compile:shared && yarn compile:server && yarn compile:dashboard",
+    "compile": "yarn compile:shared && yarn compile:server:no-modules && yarn compile:dashboard",
     "compile:shared": "tsc -p ./shared/tsconfig.json",
-    "compile:server": "tsc -p ./server/tsconfig.json",
+    "compile:server:no-modules": "tsc -p ./server/tsconfig.json",
+    "compile:server:modules": "tsc -p ./server/tsconfig.modules.json",
     "compile:dashboard": "tsc -p ./server/app/actions/server/webserver/client/src/tsconfig.json",
-    "build": "yarn compile && gulp dashboard",
+    "build": "yarn compile && yarn compile:server:modules && gulp dashboard",
     "test": "ava"
   }
 }
