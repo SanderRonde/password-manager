@@ -1,7 +1,7 @@
 import { exitWith, genRandomString } from '../../lib/util';
 import { exec } from 'child_process';
-import fs = require('fs-extra');
-import path = require('path');
+import * as fs from 'fs-extra'
+import * as path from 'path'
 
 export namespace Export {
 	function assertDumpExists() {

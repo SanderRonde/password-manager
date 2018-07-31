@@ -4,7 +4,7 @@ import { exitWith, readPassword, getDBFromURI } from '../lib/util';
 import { DatabaseManipulation } from './libs/db-manipulation';
 import { DatabaseEncryption } from './libs/db-encryption';
 import { MockMongoDb, TypedCollection } from './mocks';
-import mongo = require('mongodb');
+import * as mongo from 'mongodb'
 
 export async function getDatabase(dbPath: string, key: string|undefined, 
 	quitOnError: boolean): Promise<Database> {

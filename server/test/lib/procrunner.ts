@@ -1,7 +1,7 @@
 import { GenericTestContext, Context } from "ava";
 import { listenWithoutRef } from "./util";
 import { spawn } from "child_process";
-import path = require('path');
+import * as path from 'path'
 
 export enum LOG_VALS {
 	ANY_STRING = 0

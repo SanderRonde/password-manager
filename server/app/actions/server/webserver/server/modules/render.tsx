@@ -5,7 +5,7 @@ import indigo from '@material-ui/core/colors/indigo';
 import { SheetsRegistry, JssProvider } from 'react-jss';
 import { renderToString } from 'react-dom/server';
 import { ResponseCaptured } from './ratelimit';
-import React = require('react');
+import * as React from 'react'
 
 export function render(res: ResponseCaptured, {
 	App, title, script, development

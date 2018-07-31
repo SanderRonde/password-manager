@@ -6,7 +6,7 @@ import { genRandomString } from '../../../../../app/lib/util';
 import { decrypt, ERRS } from '../../../../../app/lib/crypto';
 import { API_ERRS } from '../../../../../app/api';
 import { getDB } from '../../../../lib/db';
-import mongo = require('mongodb');
+import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);

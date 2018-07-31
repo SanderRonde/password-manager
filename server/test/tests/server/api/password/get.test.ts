@@ -4,8 +4,8 @@ import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { decryptWithPrivateKey, ERRS, decrypt, hash, pad } from '../../../../../app/lib/crypto';
 import { genRandomString } from '../../../../../app/lib/util';
 import { API_ERRS } from '../../../../../app/api';
-import speakeasy = require('speakeasy');
-import mongo = require('mongodb');
+import * as speakeasy from 'speakeasy'
+import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);

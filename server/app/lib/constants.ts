@@ -1,4 +1,4 @@
-import path = require('path');
+import * as path from 'path'
 
 /**
  * The encryption algorithm used by default

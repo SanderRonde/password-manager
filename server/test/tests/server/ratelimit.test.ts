@@ -4,7 +4,7 @@ import { encryptWithPublicKey, pad, hash } from '../../../app/lib/crypto';
 import { wait, genRandomString } from '../../../app/lib/util';
 import { APIReturns, API_ERRS } from '../../../app/api';
 import { test, GenericTestContext, Context } from 'ava';
-import http = require('http');
+import * as http from 'http'
 
 async function doInstanceCreateRequest(config: UserAndDbData) {
 	const challenge = genRandomString(25);

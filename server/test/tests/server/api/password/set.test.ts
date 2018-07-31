@@ -6,8 +6,8 @@ import { ENCRYPTION_ALGORITHM } from '../../../../../app/lib/constants';
 import { genRandomString } from '../../../../../app/lib/util';
 import { API_ERRS } from '../../../../../app/api';
 import { getDB } from '../../../../lib/db';
-import mongo = require('mongodb');
-import url = require('url');
+import * as mongo from 'mongodb'
+import * as url from 'url'
 import { test } from 'ava';
 
 const uris = captureURIs(test);

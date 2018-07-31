@@ -2,8 +2,8 @@ import { captureURIs, doServerAPIRequest, createServer, genUserAndDb } from '../
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
 import { API_ERRS } from '../../../../../../app/api';
-import speakeasy = require('speakeasy');
-import mongo = require('mongodb');
+import * as speakeasy from 'speakeasy'
+import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);

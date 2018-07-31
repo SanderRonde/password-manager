@@ -1,5 +1,5 @@
 import { Encrypted, Hashed, Padded, MasterPasswordVerificationPadding, MasterPasswordDecryptionpadding, SaltEncrypted, EncryptionAlgorithm } from "../lib/crypto";
-import mongo = require('mongodb');
+import * as mongo from 'mongodb'
 
 /**
  * A mongo record, has a _id property

@@ -8,12 +8,12 @@ import { genRandomString } from "../../app/lib/util";
 import { spawn, ChildProcess } from "child_process";
 import { EventEmitter } from "events";
 import { Readable } from "stream";
-import mongo = require('mongodb');
-import fs = require('fs-extra');
-import path = require('path');
-import http = require('http');
-import net = require('net');
-import url = require('url');
+import * as mongo from 'mongodb'
+import * as fs from 'fs-extra'
+import * as path from 'path'
+import * as http from 'http'
+import * as net from 'net'
+import * as url from 'url'
 
 export function unref(...emitters: (EventEmitter|{
 	unref(): void;

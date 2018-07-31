@@ -3,7 +3,7 @@ import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
 import { doSingleQuery } from '../../../../lib/db';
-import mongo = require('mongodb');
+import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);

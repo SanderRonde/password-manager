@@ -5,7 +5,7 @@ import { getCollectionLength, MockConfig, doesNotThrowAsync } from './util';
 import { genRandomString, getDBFromURI, genID } from '../../app/lib/util';
 import { GenericTestContext, Context } from 'ava';
 import { DEFAULT_EMAIL } from './consts';
-import mongo = require('mongodb');
+import * as mongo from 'mongodb'
 
 export async function clearDB(uri: string) {
 	await doSingleQuery(uri, async (db) => {

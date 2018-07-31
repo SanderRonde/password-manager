@@ -1,7 +1,7 @@
 import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord, TypedObjectID, StringifiedObjectId } from "../db-types";
 import { Database, COLLECTIONS } from "../database";
 import { TypedCollection } from "../mocks";
-import mongo = require('mongodb');
+import * as mongo from 'mongodb'
 
 
 interface EncryptedCollectionRecords {

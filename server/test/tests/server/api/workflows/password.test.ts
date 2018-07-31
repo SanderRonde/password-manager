@@ -1,8 +1,8 @@
 import { encryptWithPublicKey, hash, pad, decryptWithPrivateKey, ERRS, encrypt, decryptWithSalt, decrypt } from '../../../../../app/lib/crypto';
 import { genUserAndDb, createServer, doServerAPIRequest, captureURIs, genURL, doesNotThrow, isErr } from '../../../../lib/util';
 import { genRandomString } from '../../../../../app/lib/util';
-import url = require('url');
-import mongo = require('mongodb');
+import * as url from 'url'
+import * as mongo from 'mongodb'
 import { test } from 'ava';
 import { ENCRYPTION_ALGORITHM } from '../../../../../app/lib/constants';
 import { EncryptedPassword, MongoRecord, EncryptedInstance } from '../../../../../app/database/db-types';

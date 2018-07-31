@@ -4,16 +4,16 @@ import { initPeriodicals } from "./modules/periodicals";
 import { WebserverRouter } from "./modules/routing";
 import { WebserverRoutes } from "./modules/routes";
 import { WebserverAuth } from "./modules/auth";
-import cookieParser = require('cookie-parser');
-import serveStatic = require('serve-static');
+import * as cookieParser from 'cookie-parser'
+import * as serveStatic from 'serve-static'
 import { ServerConfig } from "../../server";
-import bodyParser = require('body-parser');
-import express = require('express');
-import morgan = require('morgan');
-import https = require('https');
-import fs = require('fs-extra');
-import http = require('http');
-import path = require('path');
+import * as bodyParser from 'body-parser'
+import * as express from 'express'
+import * as morgan from 'morgan'
+import * as https from 'https'
+import * as fs from 'fs-extra'
+import * as http from 'http'
+import * as path from 'path'
 
 export class Webserver {
 	public debug: boolean;

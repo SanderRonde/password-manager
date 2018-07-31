@@ -5,8 +5,8 @@ import { ResponseCaptured } from '../../../../modules/ratelimit';
 import { TwofactorVerifyToken } from '../../../../modules/auth';
 import { API_ERRS } from '../../../../../../../../api';
 import { Webserver } from '../../../../webserver';
-import speakeasy = require('speakeasy');
-import express = require('express');
+import * as speakeasy from 'speakeasy'
+import * as express from 'express'
 
 
 export class RoutesAPIInstanceTwofactor {

@@ -1,14 +1,14 @@
 import { getSecrets, createTempFile } from "../../../lib/util";
 import { OAuth2Client } from "google-auth-library";
 import { google, drive_v3 } from 'googleapis';
-import querystring = require('querystring');
+import * as querystring from 'querystring'
 import { BackupSettings } from "../backup";
-import progress = require('progress');
+import * as progress from 'progress'
 import { Export } from "../export";
-import path = require('path');
-import http = require('http');
-import url = require('url');
-import fs = require('fs');
+import * as path from 'path'
+import * as http from 'http'
+import * as url from 'url'
+import * as fs from 'fs'
 
 export namespace GoogleDrive {
 	function authenticate(client: OAuth2Client) {

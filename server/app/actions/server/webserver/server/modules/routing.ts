@@ -4,10 +4,10 @@ import { getStores, ResponseCaptured, APIResponse } from "./ratelimit";
 import { COLLECTIONS } from "../../../../../database/database";
 import { API_ERRS } from "../../../../../api";
 import { Webserver } from "../webserver";
-import speakeasy = require('speakeasy');
+import * as speakeasy from 'speakeasy'
 import { APIToken } from "./auth";
-import express = require('express');
-import mongo = require('mongodb');
+import * as express from 'express'
+import * as mongo from 'mongodb'
 
 type ResponseCapturedRequestHandler = (req: express.Request,
 	res: ResponseCaptured, next: express.NextFunction) => any;

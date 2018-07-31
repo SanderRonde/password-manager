@@ -1,6 +1,6 @@
 import { ENCRYPTION_ALGORITHM } from './constants';
 import { genRandomString } from './util';
-import crypto = require('crypto');
+import * as crypto from 'crypto'
 
 /**
  * Data (T) that is encrypted with key (K) using algorithm (A)

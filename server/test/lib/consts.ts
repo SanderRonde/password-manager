@@ -1,5 +1,5 @@
 import { MainExports } from "../../app/main";
-import importFresh = require('import-fresh');
+import * as importFresh from 'import-fresh'
 
 function getFreshMain(): MainExports {
 	return importFresh('../../app/main');

@@ -1,8 +1,8 @@
 import { genRandomString } from '../../../app/lib/util';
 import { captureCreatedFiles } from '../../lib/util';
 import { ProcRunner } from '../../lib/procrunner';
-import fs = require('fs-extra');
-import path = require('path');
+import * as fs from 'fs-extra'
+import * as path from 'path'
 import { test } from 'ava';
 
 const files = captureCreatedFiles(test);

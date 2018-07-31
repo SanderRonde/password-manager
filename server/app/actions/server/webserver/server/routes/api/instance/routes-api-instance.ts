@@ -7,7 +7,7 @@ import { sendEmail } from "../../../../../../../lib/util";
 import { API_ERRS } from "../../../../../../../api";
 import { APIToken } from "../../../modules/auth";
 import { Webserver } from "../../../webserver";
-import express = require('express');
+import * as express from 'express'
 
 export class RoutesApiInstance {
 	public Twofactor = new RoutesAPIInstanceTwofactor(this.server);

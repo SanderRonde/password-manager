@@ -3,9 +3,9 @@ import { genRandomString, writeBuffer } from '../../../../app/lib/util';
 import { genTempDatabase, captureURIs } from '../../../lib/util';
 import { Export } from '../../../../app/actions/backup/export';
 import { ProcRunner } from '../../../lib/procrunner';
-import path = require('path');
+import * as path from 'path'
 import { test } from 'ava';
-import fs = require('fs');
+import * as fs from 'fs'
 
 const dumps: string[] = [];
 async function createDummyDump(uri: string) {

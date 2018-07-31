@@ -4,7 +4,7 @@ import { ServerConfig, ServerSettings, Server } from "./actions/server/server";
 import { Account } from "./actions/account/account";
 import { getDatabase } from "./database/database";
 import { readJSON, exitWith } from "./lib/util";
-import importFresh = require('import-fresh');
+import * as importFresh from 'import-fresh'
 import { CommanderStatic } from "commander";
 import { VERSION } from "./lib/constants";
 

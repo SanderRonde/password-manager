@@ -5,9 +5,9 @@ import { ServerConfig } from "../../../../server";
 import { render } from "../../modules/render";
 import { Webserver } from "../../webserver";
 import { COUNT } from "../../modules/auth";
-import fresh = require('import-fresh');
-import express = require('express');
-import path = require('path');
+import * as fresh from 'import-fresh'
+import * as express from 'express'
+import * as path from 'path'
 
 export const enum ROUTES {
 	LOGIN,

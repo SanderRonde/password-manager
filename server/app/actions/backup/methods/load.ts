@@ -2,7 +2,7 @@ import { listenWithoutRef } from "../../../../test/lib/util";
 import { exitWith } from "../../../lib/util";
 import { BackupSettings } from "../backup";
 import { exec } from "child_process";
-import fs = require('fs-extra');
+import * as fs from 'fs-extra'
 
 export namespace Load {
 	function assertRestoreExists() {

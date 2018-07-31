@@ -1,9 +1,9 @@
 import { unref } from '../../../../../../test/lib/util';
 import { getDebug } from '../../../../../lib/debug';
-import RateLimit = require('express-rate-limit');
+import * as RateLimit from 'express-rate-limit'
 import { ServerConfig } from '../../../server';
 import { API_ERRS } from '../../../../../api';
-import express = require('express');
+import * as express from 'express'
 
 export type APIResponse = {
 	success: true;

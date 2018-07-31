@@ -1,6 +1,6 @@
 import { MongoCallback, FilterQuery, CommonOptions, DeleteWriteOpResultObject, FindAndModifyWriteOpResultObject, FindOneAndReplaceOption, InsertOneWriteOpResult, CollectionInsertOneOptions, FindOneOptions } from 'mongodb';
 import { TypedObjectID } from './db-types';
-import mongo = require('mongodb');
+import * as mongo from 'mongodb'
 
 interface TypedCursor<C> {
 	toArray(): Promise<C[]>;

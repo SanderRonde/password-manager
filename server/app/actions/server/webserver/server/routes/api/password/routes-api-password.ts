@@ -6,9 +6,9 @@ import { ResponseCaptured } from "../../../modules/ratelimit";
 import { API_ERRS } from "../../../../../../../api";
 import { APIToken } from "../../../modules/auth";
 import { Webserver } from "../../../webserver";
-import express = require('express');
-import mongo = require('mongodb');
-import url = require('url');
+import * as express from 'express'
+import * as mongo from 'mongodb'
+import * as url from 'url'
 
 export class RoutesApiPassword {
 	constructor(public server: Webserver) { }

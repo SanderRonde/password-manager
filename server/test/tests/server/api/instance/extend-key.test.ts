@@ -2,7 +2,7 @@ import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { API_ERRS } from '../../../../../app/api';
-import mongo = require('mongodb');
+import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);

@@ -1,8 +1,8 @@
 import { GoogleDrive as _GoogleDrive } from "./methods/googledrive";
 import { Local as _Local } from "./methods/local";
 import { Load as _Load } from "./methods/load";
-import fs = require('fs-extra');
-import path = require('path');
+import * as fs from 'fs-extra'
+import * as path from 'path'
 
 export interface BackupArgs {
 	config?: string;

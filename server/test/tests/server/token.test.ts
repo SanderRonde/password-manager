@@ -4,7 +4,7 @@ import { genRandomString } from '../../../app/lib/util';
 import { DEFAULT_EMAIL } from '../../lib/consts';
 import { doSingleQuery } from '../../lib/db';
 import { API_ERRS } from '../../../app/api';
-import mongo = require('mongodb');
+import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);

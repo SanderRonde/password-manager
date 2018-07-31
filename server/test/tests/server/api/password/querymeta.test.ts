@@ -4,10 +4,10 @@ import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
 import { genRandomString } from '../../../../../app/lib/util';
 import { API_ERRS } from '../../../../../app/api';
-import speakeasy = require('speakeasy');
-import mongo = require('mongodb');
+import * as speakeasy from 'speakeasy'
+import * as mongo from 'mongodb'
 import { test } from 'ava';
-import url = require('url');
+import * as url from 'url'
 
 const uris = captureURIs(test);
 testParams(test, uris, '/api/password/querymeta', {

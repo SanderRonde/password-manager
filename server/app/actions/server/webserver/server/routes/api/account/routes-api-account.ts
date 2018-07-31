@@ -7,7 +7,7 @@ import { ResponseCaptured } from "../../../modules/ratelimit";
 import { getDebug } from "../../../../../../../lib/debug";
 import { API_ERRS } from "../../../../../../../api";
 import { Webserver } from "../../../webserver";
-import express = require('express');
+import * as express from 'express'
 
 export class RoutesAPIAccount {
 	constructor(public server: Webserver) { }

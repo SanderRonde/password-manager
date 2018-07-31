@@ -2,9 +2,9 @@ import { genTempDatabase, captureURIs, captureCreatedFiles } from '../../lib/uti
 import { genRandomString } from '../../../app/lib/util';
 import { ProcRunner } from '../../lib/procrunner';
 import { genDBWithPW, clearDB, getDB, hasCreatedDBWithPW } from '../../lib/db';
-import path = require('path');
+import * as path from 'path'
 import { test } from 'ava';
-import fs = require('fs');
+import * as fs from 'fs'
 
 const uris = captureURIs(test);
 const files = captureCreatedFiles(test);

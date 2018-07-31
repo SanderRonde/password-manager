@@ -3,10 +3,10 @@ import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../
 import { genRandomString } from '../../../../../app/lib/util';
 import { DEFAULT_EMAIL } from '../../../../lib/consts';
 import { doSingleQuery } from '../../../../lib/db';
-import querystring = require('querystring');
-import speakeasy = require('speakeasy');
-import mongo = require('mongodb');
-import url = require('url');
+import * as querystring from 'querystring'
+import * as speakeasy from 'speakeasy'
+import * as mongo from 'mongodb'
+import * as url from 'url'
 import { test } from 'ava';
 
 const uris = captureURIs(test);

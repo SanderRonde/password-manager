@@ -1,14 +1,14 @@
 import { ServerConfig } from '../actions/server/server';
 import { TypedObjectID } from '../database/db-types';
-import commentJson = require('comment-json');
+import * as commentJson from 'comment-json'
 import { SERVER_ROOT } from './constants';
-import nodemailer = require('nodemailer');
+import * as nodemailer from 'nodemailer'
 import { EventEmitter } from 'events';
-import Mute = require('mute-stream');
 import { Readable } from 'stream';
-import mongo = require('mongodb');
-import path = require('path');
-import fs = require('fs-extra');
+import { Stream } from 'stream';
+import * as mongo from 'mongodb'
+import * as fs from 'fs-extra'
+import * as path from 'path'
 
 //Prevent circular import
 function unref(...emitters: (EventEmitter|{

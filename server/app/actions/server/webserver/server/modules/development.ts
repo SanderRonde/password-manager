@@ -1,10 +1,10 @@
 import { PROJECT_ROOT } from "../../../../../lib/constants";
 import { ResponseCaptured } from "./ratelimit";
 import { Webserver } from "../webserver";
-import express = require('express');
-import webpack = require('webpack');
-import fs = require('fs-extra');
-import path = require('path');
+import * as express from 'express'
+import * as webpack from 'webpack'
+import * as fs from 'fs-extra'
+import * as path from 'path'
 import { parse } from "url";
 
 function synchronizePromise<T>(prom: Promise<T>): Promise<{
