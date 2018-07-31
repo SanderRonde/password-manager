@@ -7,6 +7,7 @@
   "author": "Sander Ronde <awsdfgvhbjn@gmail.com>",
   "license": "MIT",
   "private": true,
+  "sideEffects": ["react", "react-dom"],
   "ava": {
     "files": [
       "server/test/tests/*.js",
