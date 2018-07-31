@@ -1,6 +1,6 @@
 import { withStyles, createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
-import { classNames } from '../../../lib/classnames';
+import { classNames } from '../../../lib/react-util';
 import * as React from 'react';
 
 const styles = createStyles({
@@ -20,10 +20,10 @@ const styles = createStyles({
 	}
 });
 
+export interface VerticalCentererProps extends WithStyles<typeof styles> {
+	fullscreen?: boolean;
+}
 const _VerticalCenterer = (() => {
-	interface VerticalCentererProps extends WithStyles<typeof styles> {
-		fullscreen?: boolean;
-	}
 	return class VerticalCenterer extends React.Component<VerticalCentererProps> {
 		constructor(props: VerticalCentererProps) {
 			super(props);
