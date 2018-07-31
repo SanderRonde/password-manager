@@ -1,4 +1,4 @@
-import { EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../../../database/db-types";
+import { EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../../../../../shared/types/db-types";
 import { ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from "../../../../../../../lib/constants";
 import { decrypt, encrypt, hash, pad, ERRS } from "../../../../../../../lib/crypto";
 import { genRandomString, sendEmail } from "../../../../../../../lib/util";

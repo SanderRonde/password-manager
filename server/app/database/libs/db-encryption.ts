@@ -1,7 +1,7 @@
-import { DatabaseEncrypted, EncryptedPassword, DecryptedPassword, EncryptedInstance, DecryptedInstance, EncryptedAccount, DecryptedAccount, DatabaseEncryptedWithSalt } from "../db-types";
+import { DatabaseEncrypted, EncryptedPassword, DecryptedPassword, EncryptedInstance, DecryptedInstance, EncryptedAccount, DecryptedAccount, DatabaseEncryptedWithSalt } from "../../../../shared/types/db-types";
 import { encrypt, decrypt, encryptWithSalt, decryptWithSalt } from "../../lib/crypto";
+import { UnstringifyObjectIDs } from "../../../../shared/types/crypto";
 import { ENCRYPTION_ALGORITHM } from "../../lib/constants";
-import { UnstringifyObjectIDs } from "./db-manipulation";
 import { Database } from "../database";
 import { MockMongoDb } from "../mocks";
 

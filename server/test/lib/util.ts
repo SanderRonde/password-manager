@@ -1,6 +1,6 @@
 import { encryptWithPublicKey, genRSAKeyPair, ERRS, hash, pad, decryptWithPrivateKey, encrypt, decryptWithSalt, decrypt } from "../../app/lib/crypto";
 import { getDB, clearDB, genDBWithPW, genAccountOnly, genInstancesOnly } from "./db";
-import { EncryptedInstance, TypedObjectID, MongoRecord, EncryptedPassword } from "../../app/database/db-types";
+import { EncryptedInstance, TypedObjectID, MongoRecord, EncryptedPassword } from "../../app/../../shared/types/db-types";
 import { GenericTestContext, Context, RegisterContextual } from "ava";
 import { APIFns, APIArgs, APIReturns } from "../../app/../../shared/types/api";
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM } from "../../app/lib/constants";
@@ -324,7 +324,7 @@ export async function getLoginToken(t: GenericTestContext<Context<any>>,
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/instance/login', {
+		}, '/api/instance/login', {
 			instance_id: instance_id.toHexString(),
 			challenge: encryptWithPublicKey(challenge, server_public_key)
 		}, {
@@ -378,7 +378,7 @@ export async function setPasword(t: GenericTestContext<Context<any>>, toSet: {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/set', {
+	}, '/api/password/set', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,

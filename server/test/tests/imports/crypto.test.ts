@@ -1,6 +1,6 @@
 import { encrypt, encryptWithSalt, decrypt, ERRS, decryptWithSalt, pad, hash, encryptWithPublicKey, genRSAKeyPair, decryptWithPrivateKey, Encrypted } from '../../../app/lib/crypto';
 import { ENCRYPTION_ALGORITHM } from '../../../app/lib/constants';
-import { RSAEncrypted } from '../../../app/database/db-types';
+import { RSAEncrypted } from '../../../app/../../shared/types/db-types';
 import { genRandomString } from '../../../app/lib/util';
 import { test } from 'ava';
 

@@ -1,5 +1,5 @@
 import { decryptWithPrivateKey, ERRS, Hashed, Padded, MasterPasswordVerificationPadding } from "../../../../../../../lib/crypto";
-import { ServerPublicKey, RSAEncrypted, MasterPassword } from "../../../../../../../database/db-types";
+import { ServerPublicKey, RSAEncrypted, MasterPassword } from "../../../../../../../../../shared/types/db-types";
 import { ResponseCaptured } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
 import { API_ERRS } from "../../../../../../../../../shared/types/api";

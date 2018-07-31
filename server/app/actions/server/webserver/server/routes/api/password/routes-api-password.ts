@@ -1,10 +1,9 @@
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
-import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord } from "../../../../../../../database/db-types";
-import { UnstringifyObjectIDs } from "../../../../../../../database/libs/db-manipulation";
+import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord } from "../../../../../../../../../shared/types/db-types";
+import { UnstringifyObjectIDs, APIToken } from "../../../../../../../../../shared/types/crypto";
+import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
-import { API_ERRS } from "../../../../../../../../../shared/types/api";
-import { APIToken } from "../../../modules/auth";
 import { Webserver } from "../../../webserver";
 import * as express from 'express'
 import * as mongo from 'mongodb'

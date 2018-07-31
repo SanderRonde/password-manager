@@ -1,9 +1,9 @@
-import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../../../../../database/db-types';
+import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../../../../../../../shared/types/db-types';
 import { Hashed, Padded, MasterPasswordVerificationPadding, encryptWithPublicKey } from '../../../../../../../../lib/crypto';
+import { TwofactorVerifyToken } from "../../../../../../../../../../shared/types/crypto";
+import { API_ERRS } from '../../../../../../../../../../shared/types/api';
 import { COLLECTIONS } from '../../../../../../../../database/database';
 import { ResponseCaptured } from '../../../../modules/ratelimit';
-import { TwofactorVerifyToken } from '../../../../modules/auth';
-import { API_ERRS } from '../../../../../../../../../../shared/types/api';
 import { Webserver } from '../../../../webserver';
 import * as speakeasy from 'speakeasy'
 import * as express from 'express'

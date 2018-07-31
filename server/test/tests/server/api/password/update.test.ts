@@ -1,5 +1,5 @@
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, getLoginToken, genURL, setPasword } from '../../../../lib/util';
-import { MongoRecord, EncryptedPassword, EncryptedInstance, StringifiedObjectId } from '../../../../../app/database/db-types';
+import { MongoRecord, EncryptedPassword, EncryptedInstance, StringifiedObjectId } from '../../../../../app/../../shared/types/db-types';
 import { encrypt, hash, pad, decryptWithSalt, ERRS, decrypt, Encrypted, Hashed, Padded } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { ENCRYPTION_ALGORITHM } from '../../../../../app/lib/constants';
@@ -12,7 +12,7 @@ import * as url from 'url'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/../../shared/types/api/password/update', {
+testParams(test, uris, '/api/password/update', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
@@ -54,7 +54,7 @@ test('password can be updated', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/update', {
+	}, '/api/password/update', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
@@ -152,7 +152,7 @@ test('fails if it requires 2FA and no 2FA token is passed', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/update', {
+	}, '/api/password/update', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: loginToken!,
@@ -204,7 +204,7 @@ test('password can be updated if 2FA is enabled', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/update', {
+	}, '/api/password/update', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
@@ -283,7 +283,7 @@ test('fails if token is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/update',
+		route: '/api/password/update',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()
@@ -317,7 +317,7 @@ test('fails if instance id is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/update',
+		route: '/api/password/update',
 		port: http,
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
@@ -352,7 +352,7 @@ test('fails if password id is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/update',
+		route: '/api/password/update',
 		port: http,
 		unencrypted: {
 			instance_id: instance_id.toHexString()

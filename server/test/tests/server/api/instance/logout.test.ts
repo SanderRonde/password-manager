@@ -1,12 +1,12 @@
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
-import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
+import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/../../shared/types/api/instance/logout', {
+testParams(test, uris, '/api/instance/logout', {
 	instance_id: 'string',
 	token: 'string'
 }, {}, {}, {});
@@ -22,7 +22,7 @@ test('throws an error if token is invalid', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/../../shared/types/api/instance/logout', {
+	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/logout', {
 		instance_id: instance_id.toHexString(),
 		token: 'someinvalidtoken'
 	}));
@@ -42,7 +42,7 @@ test('fails if instance id is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/instance/logout',
+		route: '/api/instance/logout',
 		port: http,
 		encrypted: {},
 		unencrypted: {

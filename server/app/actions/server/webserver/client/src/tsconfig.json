@@ -27,5 +27,8 @@
     "compileOnSave": true,
     "include": [
         "./",
-    ]
+    ],
+    "references": [{
+        "path": "../../../../../../../shared"
+    }]
 }

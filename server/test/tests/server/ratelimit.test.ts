@@ -1,8 +1,8 @@
 import { captureURIs, createServer, genUserAndDb, doServerPostRequest, UserAndDbData, doesNotThrow, genURL, getLoginToken } from '../../lib/util';
-import { APIToken } from '../../../app/actions/server/webserver/server/modules/auth';
+import { APIReturns, API_ERRS } from '../../../app/../../shared/types/api';
 import { encryptWithPublicKey, pad, hash } from '../../../app/lib/crypto';
 import { wait, genRandomString } from '../../../app/lib/util';
-import { APIReturns, API_ERRS } from '../../../app/../../shared/types/api';
+import { APIToken } from '../../../../shared/types/crypto';
 import { test, GenericTestContext, Context } from 'ava';
 import * as http from 'http'
 
@@ -11,7 +11,7 @@ async function doInstanceCreateRequest(config: UserAndDbData) {
 	return await doServerPostRequest({ 
 		port: config.http,
 		publicKey: config.server_public_key
-	}, '/../../shared/types/api/instance/login', {
+	}, '/api/instance/login', {
 		instance_id: config.instance_id.toHexString(),
 		challenge: encryptWithPublicKey(challenge, config.server_public_key)
 	}, {
@@ -23,7 +23,7 @@ async function doAPIRequest(token: APIToken, config: UserAndDbData) {
 	return await doServerPostRequest({ 
 		port: config.http, 
 		publicKey: config.server_public_key
-	}, '/../../shared/types/api/password/querymeta', {
+	}, '/api/password/querymeta', {
 		instance_id: config.instance_id.toHexString(),
 	}, {
 		token: token,
@@ -37,7 +37,7 @@ async function doFailingInstanceCreateRequest(config: UserAndDbData) {
 	return await doServerPostRequest({ 
 		port: config.http,
 		publicKey: config.server_public_key
-	}, '/../../shared/types/api/instance/login', {
+	}, '/api/instance/login', {
 		instance_id: config.instance_id.toHexString(),
 		challenge: encryptWithPublicKey(challenge, config.server_public_key),
 	}, {

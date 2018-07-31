@@ -1,4 +1,4 @@
-export { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms, MasterPasswordDecryptionpadding, MasterPasswordVerificationPadding } from '../../../shared/types/crypto'
+export { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms, MasterPasswordDecryptionpadding, MasterPasswordVerificationPadding, Padded } from '../../../shared/types/crypto'
 import { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms } from '../../../shared/types/crypto'
 import { genRandomString } from './util';
 import * as crypto from 'crypto'

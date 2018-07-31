@@ -1,5 +1,5 @@
 import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doServerAPIRequest, genURL, doesNotThrow } from '../../../../lib/util';
-import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
+import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
 import { genRandomString } from '../../../../../app/lib/util';
@@ -10,7 +10,7 @@ import { test } from 'ava';
 import * as url from 'url'
 
 const uris = captureURIs(test);
-testParams(test, uris, '/../../shared/types/api/password/querymeta', {
+testParams(test, uris, '/api/password/querymeta', {
 	instance_id: 'string'
 }, {}, {
 	count: 'number',
@@ -69,7 +69,7 @@ test('can query a URL', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/querymeta', {
+	}, '/api/password/querymeta', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
@@ -142,7 +142,7 @@ test('fails if auth token is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/querymeta',
+		route: '/api/password/querymeta',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()
@@ -170,7 +170,7 @@ test('fails if instance id is wrong', async t => {
 
 	const token = await getLoginToken(t, config);
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/querymeta',
+		route: '/api/password/querymeta',
 		port: http,
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>

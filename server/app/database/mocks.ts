@@ -1,5 +1,5 @@
 import { MongoCallback, FilterQuery, CommonOptions, DeleteWriteOpResultObject, FindAndModifyWriteOpResultObject, FindOneAndReplaceOption, InsertOneWriteOpResult, CollectionInsertOneOptions, FindOneOptions } from 'mongodb';
-import { TypedObjectID } from './db-types';
+import { TypedObjectID } from './../../../shared/types/db-types';
 import * as mongo from 'mongodb'
 
 interface TypedCursor<C> {

@@ -1,5 +1,5 @@
 import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doServerAPIRequest, genURL, doesNotThrow } from '../../../../lib/util';
-import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
+import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
 import { decryptWithPrivateKey, ERRS, hash, pad } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { genRandomString } from '../../../../../app/lib/util';
@@ -10,7 +10,7 @@ import { test } from 'ava';
 import * as url from 'url'
 
 const uris = captureURIs(test);
-testParams(test, uris, '/../../shared/types/api/password/allmeta', {
+testParams(test, uris, '/api/password/allmeta', {
 	instance_id: 'string'
 }, {}, {
 	count: 'number',
@@ -60,7 +60,7 @@ test('can get the password\'s metadata', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/allmeta', {
+	}, '/api/password/allmeta', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		count: config.count++,
@@ -113,7 +113,7 @@ test('fails if auth token is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/allmeta',
+		route: '/api/password/allmeta',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()
@@ -141,7 +141,7 @@ test('fails if instance id is wrong', async t => {
 
 	const token = await getLoginToken(t, config);
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/allmeta',
+		route: '/api/password/allmeta',
 		port: http,
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
@@ -170,7 +170,7 @@ test('fails if password is wrong', async t => {
 
 	const token = await getLoginToken(t, config);
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/allmeta',
+		route: '/api/password/allmeta',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()

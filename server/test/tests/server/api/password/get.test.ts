@@ -1,5 +1,5 @@
 import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doServerAPIRequest, genURL, doesNotThrow, isErr } from '../../../../lib/util';
-import { StringifiedObjectId, EncryptedInstance, EncryptedPassword } from '../../../../../app/database/db-types';
+import { StringifiedObjectId, EncryptedInstance, EncryptedPassword } from '../../../../../app/../../shared/types/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { decryptWithPrivateKey, ERRS, decrypt, hash, pad } from '../../../../../app/lib/crypto';
 import { genRandomString } from '../../../../../app/lib/util';
@@ -9,7 +9,7 @@ import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/../../shared/types/api/password/get', {
+testParams(test, uris, '/api/password/get', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
@@ -43,7 +43,7 @@ test('can get the password if 2FA is disabled', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/get', {
+	}, '/api/password/get', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
@@ -106,7 +106,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/get', {
+	}, '/api/password/get', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
@@ -152,7 +152,7 @@ test('can get the password if 2FA is enabled', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/get', {
+	}, '/api/password/get', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
@@ -217,7 +217,7 @@ test('fails if auth token is wrong', async t => {
 	}, token!, config);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/get',
+		route: '/api/password/get',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()
@@ -253,7 +253,7 @@ test('fails if instance id is wrong', async t => {
 	}, token!, config);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/get',
+		route: '/api/password/get',
 		port: http,
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
@@ -290,7 +290,7 @@ test('fails if password id is wrong', async t => {
 	}, token!, config);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/get',
+		route: '/api/password/get',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()

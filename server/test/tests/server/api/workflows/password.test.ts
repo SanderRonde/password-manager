@@ -5,7 +5,7 @@ import * as url from 'url'
 import * as mongo from 'mongodb'
 import { test } from 'ava';
 import { ENCRYPTION_ALGORITHM } from '../../../../../app/lib/constants';
-import { EncryptedPassword, MongoRecord, EncryptedInstance } from '../../../../../app/database/db-types';
+import { EncryptedPassword, MongoRecord, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
 import { getDB, doSingleQuery } from '../../../../lib/db';
 
 const uris = captureURIs(test);
@@ -30,7 +30,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/instance/login', {
+		}, '/api/instance/login', {
 			instance_id: instance_id.toHexString(),
 			challenge: encryptWithPublicKey(challenge, server_public_key)
 		}, {
@@ -72,7 +72,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/password/set', {
+		}, '/api/password/set', {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
@@ -156,7 +156,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/password/update', {
+		}, '/api/password/update', {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
@@ -223,7 +223,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/password/remove', {
+		}, '/api/password/remove', {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
@@ -268,7 +268,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/instance/login', {
+		}, '/api/instance/login', {
 			instance_id: instance_id.toHexString(),
 			challenge: encryptWithPublicKey(challenge, server_public_key)
 		}, {
@@ -310,7 +310,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/password/set', {
+		}, '/api/password/set', {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
@@ -396,7 +396,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/password/update', {
+		}, '/api/password/update', {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
@@ -463,7 +463,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/password/get', {
+		}, '/api/password/get', {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
@@ -503,7 +503,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/password/getmeta', {
+		}, '/api/password/getmeta', {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
@@ -561,7 +561,7 @@ test('can log in, set a password and get all metadata', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/instance/login', {
+		}, '/api/instance/login', {
 			instance_id: instance_id.toHexString(),
 			challenge: encryptWithPublicKey(challenge, server_public_key)
 		}, {
@@ -603,7 +603,7 @@ test('can log in, set a password and get all metadata', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/password/set', {
+		}, '/api/password/set', {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
@@ -687,7 +687,7 @@ test('can log in, set a password and get all metadata', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/password/update', {
+		}, '/api/password/update', {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
@@ -754,7 +754,7 @@ test('can log in, set a password and get all metadata', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/password/allmeta', {
+		}, '/api/password/allmeta', {
 			instance_id: config.instance_id.toHexString()
 		}, {
 			token: token!,
@@ -819,7 +819,7 @@ test('can log in, set and update a password, ' +
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
-			}, '/../../shared/types/api/instance/login', {
+			}, '/api/instance/login', {
 				instance_id: instance_id.toHexString(),
 				challenge: encryptWithPublicKey(challenge, server_public_key)
 			}, {
@@ -862,7 +862,7 @@ test('can log in, set and update a password, ' +
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
-			}, '/../../shared/types/api/password/set', {
+			}, '/api/password/set', {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
@@ -948,7 +948,7 @@ test('can log in, set and update a password, ' +
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
-			}, '/../../shared/types/api/password/update', {
+			}, '/api/password/update', {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
@@ -1015,7 +1015,7 @@ test('can log in, set and update a password, ' +
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
-			}, '/../../shared/types/api/password/allmeta', {
+			}, '/api/password/allmeta', {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
@@ -1059,7 +1059,7 @@ test('can log in, set and update a password, ' +
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
-			}, '/../../shared/types/api/password/querymeta', {
+			}, '/api/password/querymeta', {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
@@ -1125,7 +1125,7 @@ test('can log in, set and update a password, ' +
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
 				publicKey: server_public_key
-			}, '/../../shared/types/api/password/get', {
+			}, '/api/password/get', {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,

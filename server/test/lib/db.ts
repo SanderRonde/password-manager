@@ -1,4 +1,4 @@
-import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, EncryptedPassword, TypedObjectID } from '../../app/database/db-types';
+import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, EncryptedPassword, TypedObjectID } from '../../app/../../shared/types/db-types';
 import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, genRSAKeyPair } from '../../app/lib/crypto';
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../app/lib/constants';
 import { getCollectionLength, MockConfig, doesNotThrowAsync } from './util';

@@ -1,5 +1,5 @@
 import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doServerAPIRequest } from '../../../../lib/util';
-import { StringifiedObjectId, EncryptedInstance, EncryptedPassword } from '../../../../../app/database/db-types';
+import { StringifiedObjectId, EncryptedInstance, EncryptedPassword } from '../../../../../app/../../shared/types/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { doSingleQuery } from '../../../../lib/db';
 import { API_ERRS } from '../../../../../app/../../shared/types/api';
@@ -8,7 +8,7 @@ import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/../../shared/types/api/password/remove', {
+testParams(test, uris, '/api/password/remove', {
 	instance_id: 'string'
 }, {}, {
 	count: 'number',
@@ -38,7 +38,7 @@ test('can be removed if 2FA is disabled', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/remove', {
+	}, '/api/password/remove', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
@@ -86,7 +86,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/remove', {
+	}, '/api/password/remove', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
@@ -136,7 +136,7 @@ test('can be removed if 2FA is enabled', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/../../shared/types/api/password/remove', {
+	}, '/api/password/remove', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
@@ -185,7 +185,7 @@ test('fails if auth token is wrong', async t => {
 	}, token!, config);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/remove',
+		route: '/api/password/remove',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()
@@ -221,7 +221,7 @@ test('fails if instance id is wrong', async t => {
 	}, token!, config);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/remove',
+		route: '/api/password/remove',
 		port: http,
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
@@ -258,7 +258,7 @@ test('fails if password id is wrong', async t => {
 	}, token!, config);
 
 	await testInvalidCredentials(t, {
-		route: '/../../shared/types/api/password/remove',
+		route: '/api/password/remove',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()

@@ -1,4 +1,4 @@
-import { EncryptedInstance, MongoRecord, EncryptedAccount, EncryptedPassword } from '../../../../../app/database/db-types';
+import { EncryptedInstance, MongoRecord, EncryptedAccount, EncryptedPassword } from '../../../../../app/../../shared/types/db-types';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, isErr } from '../../../../lib/util';
 import { ERRS, decrypt, decryptWithSalt, hash, pad } from '../../../../../app/lib/crypto';
 import { RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../../../../app/lib/constants';
@@ -27,7 +27,7 @@ test('can generate a new key and then reset with it', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/../../shared/types/api/user/genresetkey', {
+		}, '/api/user/genresetkey', {
 			instance_id: instance_id.toHexString()
 		}, {
 			reset_key: initialResetKey,
@@ -68,7 +68,7 @@ test('can generate a new key and then reset with it', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http, 
 			publicKey: server_public_key 
-		}, '/../../shared/types/api/user/reset', {
+		}, '/api/user/reset', {
 			instance_id: instance_id.toHexString()
 		}, {
 			email: DEFAULT_EMAIL,

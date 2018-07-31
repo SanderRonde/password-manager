@@ -1,11 +1,11 @@
 import { encryptWithPublicKey, Hashed, Padded, MasterPasswordVerificationPadding, genRSAKeyPair, decryptWithPrivateKey } from "../../../../../../../lib/crypto";
-import { EncryptedInstance, StringifiedObjectId, MasterPassword, ServerPublicKey, RSAEncrypted } from "../../../../../../../database/db-types";
+import { EncryptedInstance, StringifiedObjectId, MasterPassword, ServerPublicKey, RSAEncrypted } from "../../../../../../../../../shared/types/db-types";
 import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa";
+import { APIToken } from "../../../../../../../../../shared/types/crypto";
+import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
 import { sendEmail } from "../../../../../../../lib/util";
-import { API_ERRS } from "../../../../../../../../../shared/types/api";
-import { APIToken } from "../../../modules/auth";
 import { Webserver } from "../../../webserver";
 import * as express from 'express'
 

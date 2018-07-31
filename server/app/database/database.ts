@@ -1,5 +1,5 @@
 
-import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from './db-types';
+import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from './../../../shared/types/db-types';
 import { exitWith, readPassword, getDBFromURI } from '../lib/util';
 import { DatabaseManipulation } from './libs/db-manipulation';
 import { DatabaseEncryption } from './libs/db-encryption';

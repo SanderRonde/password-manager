@@ -1,5 +1,5 @@
 import { ServerConfig } from '../actions/server/server';
-import { TypedObjectID } from '../database/db-types';
+import { TypedObjectID } from '../../../shared/types/db-types';
 import * as commentJson from 'comment-json'
 import { SERVER_ROOT } from './constants';
 import * as nodemailer from 'nodemailer'

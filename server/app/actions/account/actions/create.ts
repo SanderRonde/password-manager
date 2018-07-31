@@ -1,7 +1,7 @@
 import { RESET_KEY_LENGTH, ENCRYPTION_ALGORITHM } from "../../../lib/constants";
 import { getConfirmedPassword, genRandomString, exitWith } from "../../../lib/util";
 import { Database, COLLECTIONS } from "../../../database/database";
-import { EncryptedAccount } from "../../../database/db-types";
+import { EncryptedAccount } from "../../../../../shared/types/db-types";
 import { hash, pad, encrypt } from "../../../lib/crypto";
 
 export namespace CreateAccount {
