@@ -72,3 +72,5 @@ server/node_modules/
 server/app/actions/server/webserver/client/build/
 shared/**/*.js
 temp/
+server/**/*.d.ts
+shared/**/*.d.ts
