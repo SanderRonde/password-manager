@@ -155,17 +155,21 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 		private readonly EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		private readonly NUMBERS_REGEX = /(\d+)/;
 
+		private _getInputValue(input: React.RefObject<HTMLInputElement>) {
+			if (input.current) {
+				const ref = (input.current as any).inputRef as HTMLInputElement;
+				if (ref) {
+					return ref.value;
+				}
+			}
+			return null;
+		}
+
 		@bindToClass
 		checkInputData() {
-			console.log('checking');
-			const email = this.emailInput.current && 
-				this.emailInput.current.value;
-			const password = this.passwordInput.current &&
-				this.passwordInput.current.value;
-			const twofactor = this.twofactorInput.current &&
-				this.twofactorInput.current.value;
-			console.log(email, password, twofactor);
-			console.log(this.emailInput.current);
+			const email = this._getInputValue(this.emailInput);
+			const password = this._getInputValue(this.passwordInput);
+			const twofactor = this._getInputValue(this.twofactorInput);
 
 			let err: boolean = false;
 			if (this.state.emailValidation.dirty && !email) {
@@ -275,10 +279,6 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 					errorString: this.state.twofactorValidation.errorString
 				}
 			});
-		}
-
-		handleChange(...args: any[]) {
-			console.log(args);
 		}
 
 		private _getInputData() {
@@ -434,7 +434,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 										<InputLabel htmlFor="email-input">EMAIL</InputLabel>
 										<Input id="email-input" name="email" type="email"
 											title="Account's email" onBlur={this.onEmailBlur}
-											onChange={multiFunctions(this.checkInputData, this.handleChange)}
+											onChange={multiFunctions(this.checkInputData)}
 											error={!this.state.emailValidation.valid}
 											innerRef={this.emailInput} endAdornment={
 												<InputAdornment position="end">
@@ -462,7 +462,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 											error={!this.state.passwordValidation.valid}
 											title="Account password" id="password-input" 
 											onBlur={this.onPasswordBlur} 
-											onChange={multiFunctions(this.checkInputData, this.handleChange)} />
+											onChange={multiFunctions(this.checkInputData)} />
 										<FormHelperText id="password-descr">{
 											this.state.passwordValidation.errorString
 										}</FormHelperText>
@@ -476,7 +476,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 											title="Twofactor authentication token (if enabled for the account)"
 											autoComplete="off" id="twofactor-input" 
 											onBlur={this.onTwofactorBlur} 
-											onChange={multiFunctions(this.checkInputData, this.handleChange)} />
+											onChange={multiFunctions(this.checkInputData)} />
 										<FormHelperText id="twofactor-descr">{
 											this.state.twofactorValidation.errorString
 										}</FormHelperText>
