@@ -6,13 +6,13 @@ import { DatabaseEncryption } from './libs/db-encryption';
 import { MockMongoDb, TypedCollection } from './mocks';
 import * as mongo from 'mongodb'
 
-export async function getDatabase(dbPath: string, key: string|undefined, 
+export async function getDatabase(dbPath: string, password: string|undefined, 
 	quitOnError: boolean): Promise<Database> {
 		const instance = await new Database(dbPath, quitOnError).init();
 
-		if (key !== undefined) {
-			if (await instance.Crypto.canDecrypt(key)) {
-				instance.Crypto.setKey(key);
+		if (password !== undefined) {
+			if (await instance.Crypto.canDecrypt(password)) {
+				instance.Crypto.setKey(password);
 				return instance;
 			}
 			exitWith('Database can\'t be decrypted with that key; password invalid');		
