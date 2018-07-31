@@ -91,7 +91,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 			} = mapObj(encrypted, (_, val) => getFillerType(val));
 			for (const key in required) {
 				if (key !== missingKey) {
-					unencryptedArgs[key] = getFillerType(required[key]);
+					unencryptedArgs[key] = getFillerType(required[key]) as any;
 				}
 			}
 			const response = JSON.parse(await doServerAPIRequest({
@@ -121,7 +121,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 			}> = {};
 			for (const key in encrypted) {
 				if (key !== missingKey) {
-					encryptedArgs[key] = getFillerType(encrypted[key]);
+					encryptedArgs[key] = getFillerType(encrypted[key]) as any;
 				}
 			}
 			const response = JSON.parse(await doServerAPIRequest({
@@ -151,10 +151,10 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 			}>;
 			const encryptedArgs: Partial<{
 				[key in keyof GetEncrypted<APIFns[R]>]: any;
-			}> = mapObj(encrypted, (_, val) => getFillerType(val));
+			}> = mapObj(encrypted, (_, val) => getFillerType(val) as any);
 			for (const key in required) {
 				if (key !== wrongType) {
-					unencryptedArgs[key] = getFillerType(required[key]);
+					unencryptedArgs[key] = getFillerType(required[key]) as any;
 				}
 			}
 			const response = JSON.parse(await doServerAPIRequest({
@@ -186,7 +186,7 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 			}>;
 			for (const key in encrypted) {
 				if (key !== wrongType) {
-					encryptedArgs[key] = getFillerType(encrypted[key]);
+					encryptedArgs[key] = getFillerType(encrypted[key]) as any;
 				}
 			}
 			const response = JSON.parse(await doServerAPIRequest({
