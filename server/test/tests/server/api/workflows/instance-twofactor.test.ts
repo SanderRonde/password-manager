@@ -1,7 +1,7 @@
 import { genRSAKeyPair, hash, pad, decryptWithPrivateKey, ERRS, decryptWithSalt, encryptWithPublicKey } from '../../../../../app/lib/crypto';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { genRandomString } from '../../../../../app/lib/util';
-import { DEFAULT_EMAIL } from '../../../../lib/consts';
+import { DEFAULT_EMAIL } from '../../../../../app/lib/constants';
 import { doSingleQuery } from '../../../../lib/db';
 import * as querystring from 'querystring'
 import * as speakeasy from 'speakeasy'

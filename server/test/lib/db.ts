@@ -1,10 +1,10 @@
 import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, EncryptedPassword, TypedObjectID } from '../../app/database/db-types';
 import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, genRSAKeyPair } from '../../app/lib/crypto';
-import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../../app/lib/constants';
+import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../app/lib/constants';
 import { getCollectionLength, MockConfig, doesNotThrowAsync } from './util';
 import { genRandomString, getDBFromURI, genID } from '../../app/lib/util';
 import { GenericTestContext, Context } from 'ava';
-import { DEFAULT_EMAIL } from './consts';
+
 import * as mongo from 'mongodb'
 
 export async function clearDB(uri: string) {

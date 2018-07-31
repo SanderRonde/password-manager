@@ -1,7 +1,7 @@
 import { encryptWithPublicKey, hash, pad, decryptWithPrivateKey, ERRS, genRSAKeyPair } from '../../../app/lib/crypto';
 import { genUserAndDb, createServer, captureURIs, doServerAPIRequest } from '../../lib/util';
+import { DEFAULT_EMAIL } from '../../../app/lib/constants';
 import { genRandomString } from '../../../app/lib/util';
-import { DEFAULT_EMAIL } from '../../lib/consts';
 import { doSingleQuery } from '../../lib/db';
 import { API_ERRS } from '../../../app/api';
 import * as mongo from 'mongodb'

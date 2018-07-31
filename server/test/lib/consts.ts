@@ -15,5 +15,3 @@ export const EXECUTABLE_SPECIFIC_HELP = DEFAULT_HELP
 	.replace(/ \[options\]/, 'main [options]');
 
 export const DEFAULT_ARGS = ['/usr/bin/node', './app/main.js'];
-
-export const DEFAULT_EMAIL = 'some@email.com';

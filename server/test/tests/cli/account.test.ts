@@ -1,8 +1,8 @@
 import { genTempDatabase, captureURIs, getCollectionLength } from '../../lib/util';
 import { hasCreatedDBWithPW, hasCreatedAccount, getDB } from '../../lib/db';
+import { DEFAULT_EMAIL } from '../../../app/lib/constants';
 import { genRandomString } from '../../../app/lib/util';
 import { ProcRunner } from '../../lib/procrunner';
-import { DEFAULT_EMAIL } from '../../lib/consts';
 import { test } from 'ava';
 
 const uris = captureURIs(test);

@@ -1,9 +1,8 @@
 import { EncryptedInstance, MongoRecord, EncryptedAccount, EncryptedPassword } from '../../../../../app/database/db-types';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, isErr } from '../../../../lib/util';
 import { ERRS, decrypt, decryptWithSalt, hash, pad } from '../../../../../app/lib/crypto';
-import { RESET_KEY_LENGTH } from '../../../../../app/lib/constants';
+import { RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../../../../app/lib/constants';
 import { genRandomString } from '../../../../../app/lib/util';
-import { DEFAULT_EMAIL } from '../../../../lib/consts';
 import { getDB } from '../../../../lib/db';
 import { test } from 'ava';
 

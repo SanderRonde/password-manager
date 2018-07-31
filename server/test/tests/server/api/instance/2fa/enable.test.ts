@@ -2,7 +2,7 @@ import { captureURIs, doServerAPIRequest, createServer, genUserAndDb } from '../
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
 import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
-import { DEFAULT_EMAIL } from '../../../../../lib/consts';
+import { DEFAULT_EMAIL } from '../../../../../../app/lib/constants';
 import { doSingleQuery } from '../../../../../lib/db';
 import { API_ERRS } from '../../../../../../app/api';
 import * as speakeasy from 'speakeasy'

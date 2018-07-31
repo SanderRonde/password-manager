@@ -36,3 +36,7 @@ export const SERVER_ROOT = path.join(__dirname, '../../');
  * The root of the entire project (one above server)
  */
 export const PROJECT_ROOT = path.join(SERVER_ROOT, '../');
+/**
+ * The email that is used by default
+ */
+export const DEFAULT_EMAIL = 'some@email.com';
