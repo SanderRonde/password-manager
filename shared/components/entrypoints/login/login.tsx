@@ -373,30 +373,30 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 			}
 		}
 
-		private _getButtonData() {
-			switch (this.state.buttonState) {
-				case 'normal':
-					return {
-						color: 'primary',
-						iconName: null
-					};
-				case 'loading':
-					return {
-						color: 'primary',
-						iconName: 'spinner'
-					};
-				case 'invalid':
-					return {
-						color: 'red',
-						iconName: 'cross'
-					}
-				case 'valid': 
-					return {
-						color: 'green',
-						iconName: 'checkmark'
-					}
-			}
-		}
+		// private _getButtonData() {
+		// 	switch (this.state.buttonState) {
+		// 		case 'normal':
+		// 			return {
+		// 				color: 'primary',
+		// 				iconName: null
+		// 			};
+		// 		case 'loading':
+		// 			return {
+		// 				color: 'primary',
+		// 				iconName: 'spinner'
+		// 			};
+		// 		case 'invalid':
+		// 			return {
+		// 				color: 'red',
+		// 				iconName: 'cross'
+		// 			}
+		// 		case 'valid': 
+		// 			return {
+		// 				color: 'green',
+		// 				iconName: 'checkmark'
+		// 			}
+		// 	}
+		// }
 		
 		render() {
 			return (
