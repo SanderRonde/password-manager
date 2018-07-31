@@ -51,6 +51,7 @@ export interface InputValidation {
 }
 
 function getLogin<D extends LoginData>(data: D|null = null) {
+	// @bindable
 	class Login extends React.Component<WithStyles<typeof styles>, {
 		emailRemembered: ICON_STATE;
 		emailValidation: InputValidation;
@@ -63,9 +64,20 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 		twofactorInput: React.RefObject<HTMLInputElement> = React.createRef();
 		dataContainer: React.RefObject<DataContainer<D>> = React.createRef();
 
+		__toBind!: ((__this: any) => void)[];
+		__doBinds(__this: this) {
+			if (!this.__toBind) {
+				return;
+			}
+			this.__toBind.forEach((fn) => {
+				fn(__this);
+			});
+		}
+
 		constructor(props: WithStyles<typeof styles>) {
 			super(props);
 
+			this.__doBinds(this);
 			this.state = {
 				emailRemembered: ICON_STATE.HIDDEN,
 				emailValidation: { 
