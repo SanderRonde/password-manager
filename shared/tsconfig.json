@@ -15,23 +15,16 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "target": "es2015",
+        "target": "es6",
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
         "strictNullChecks": true,
         "composite": true,
         "declaration": true
-	}, 
+	},
     "compileOnSave": true,
     "include": [
-        "app/**/*",
-        "test/**/*"
-    ],
-    "exclude": [
-        "app/actions/server/websever/client/"
-    ],
-    "references": [{
-        "path": "../shared"   
-    }]
+        "./**/*"
+    ]
 }

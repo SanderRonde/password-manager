@@ -2,7 +2,7 @@
     "compilerOptions": {
         "jsx": "react",
         "alwaysStrict": true,
-        "baseUrl": "../typings/",
+        "baseUrl": "typings/",
         "forceConsistentCasingInFileNames": true,
         "module": "commonjs",
         "moduleResolution": "node",
@@ -19,19 +19,13 @@
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
-        "strictNullChecks": true,
-        "composite": true,
-        "declaration": true
+        "strictNullChecks": true
 	}, 
     "compileOnSave": true,
-    "include": [
-        "app/**/*",
-        "test/**/*"
-    ],
-    "exclude": [
-        "app/actions/server/websever/client/"
-    ],
-    "references": [{
-        "path": "../shared"   
-    }]
+	"include": [],
+	"references": [{
+		"path": "./server"
+	}, {
+		"path": "./server/app/actions/server/webserver/client/src"
+	}]
 }
