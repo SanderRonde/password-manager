@@ -136,7 +136,6 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 
 		@bindToClass
 		checkInputData() {
-			console.log('Checking input data');
 			const email = this.emailInput.current && 
 				this.emailInput.current.value;
 			const password = this.passwordInput.current &&
