@@ -3,13 +3,13 @@ import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { genRandomString } from '../../../../../app/lib/util';
-import { API_ERRS } from '../../../../../app/api';
+import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/login', {
+testParams(test, uris, '/../../shared/types/api/instance/login', {
 	instance_id: 'string',
 	challenge: 'string'
 }, {}, {
@@ -34,7 +34,7 @@ test('login token can be generated when 2FA is disabled', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/instance/login', {
+	}, '/../../shared/types/api/instance/login', {
 		instance_id: instance_id.toHexString(),
 		challenge: encryptWithPublicKey(challenge, server_public_key)
 	}, {
@@ -81,7 +81,7 @@ test('login token can be generated when 2FA is enabled', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/instance/login', {
+	}, '/../../shared/types/api/instance/login', {
 		instance_id: instance_id.toHexString(),
 		challenge: encryptWithPublicKey(challenge, server_public_key)
 	}, {
@@ -113,7 +113,7 @@ test('fails if instance id is wrong', async t => {
 
 	const challenge = genRandomString(25);
 	await testInvalidCredentials(t, {
-		route: '/api/instance/login',
+		route: '/../../shared/types/api/instance/login',
 		port: http,
 		encrypted: {
 			password_hash: hash(pad(userpw, 'masterpwverify'))

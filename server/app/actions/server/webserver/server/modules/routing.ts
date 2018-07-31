@@ -2,7 +2,7 @@ import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, 
 import { Hashed, Padded, MasterPasswordVerificationPadding, decryptWithPrivateKey, ERRS } from "../../../../../lib/crypto";
 import { getStores, ResponseCaptured, APIResponse } from "./ratelimit";
 import { COLLECTIONS } from "../../../../../database/database";
-import { API_ERRS } from "../../../../../api";
+import { API_ERRS } from "../../../../../../../shared/types/api";
 import { Webserver } from "../webserver";
 import * as speakeasy from 'speakeasy'
 import { APIToken } from "./auth";
@@ -396,63 +396,63 @@ export class WebserverRouter {
 		} = getStores(this.parent.config);
 
 		//Interal API
-		this.parent.app.post('/api/dashboard/login', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/dashboard/login', bruteforceLimiter,
 			instanceCreateLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Dashboard, 'login')));
 
 		//External API
-		this.parent.app.post('/api/instance/register', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/instance/register', bruteforceLimiter,
 			instanceCreateLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance, 'register')));
-		this.parent.app.post('/api/instance/login', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/instance/login', bruteforceLimiter,
 			instanceCreateLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance, 'login')));
-		this.parent.app.post('/api/instance/logout', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/instance/logout', bruteforceLimiter,
 			instanceCreateLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance, 'logout')));
-		this.parent.app.post('/api/instance/extend_key', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/instance/extend_key', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance, 'extendKey')));
 
-		this.parent.app.post('/api/instance/2fa/enable', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/instance/2fa/enable', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.Twofactor, 'enable')));
-		this.parent.app.post('/api/instance/2fa/disable', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/instance/2fa/disable', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.Twofactor, 'disable')));
-		this.parent.app.post('/api/instance/2fa/confirm', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/instance/2fa/confirm', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.Twofactor, 'confirm')));
-		this.parent.app.post('/api/instance/2fa/verify', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/instance/2fa/verify', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.Twofactor, 'verify')));
 
-		this.parent.app.post('/api/password/set', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/password/set', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Password, 'set')));
-		this.parent.app.post('/api/password/update', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/password/update', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Password, 'update')));
-		this.parent.app.post('/api/password/remove', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/password/remove', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Password, 'remove')));
-		this.parent.app.post('/api/password/get', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/password/get', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Password, 'get')));
-		this.parent.app.post('/api/password/getmeta', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/password/getmeta', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Password, 'getmeta')));
-		this.parent.app.post('/api/password/querymeta', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/password/querymeta', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Password, 'querymeta')));
-		this.parent.app.post('/api/password/allmeta', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/password/allmeta', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Password, 'allmeta')));
 
-		this.parent.app.post('/api/user/reset', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/user/reset', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Account, 'reset')));
-		this.parent.app.post('/api/user/genresetkey', bruteforceLimiter,
+		this.parent.app.post('/../../shared/types/api/user/genresetkey', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Account, 'regenkey')));
 	}

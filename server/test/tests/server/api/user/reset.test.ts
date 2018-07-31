@@ -4,12 +4,12 @@ import { decryptWithSalt, ERRS, decrypt, hash, pad } from '../../../../../app/li
 import { RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../../../../app/lib/constants';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { genRandomString } from '../../../../../app/lib/util';
-import { API_ERRS } from '../../../../../app/api';
+import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import { getDB } from '../../../../lib/db';
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/user/reset', {
+testParams(test, uris, '/../../shared/types/api/user/reset', {
 	instance_id: 'string',
 }, {}, {
 	reset_key: 'string',
@@ -31,7 +31,7 @@ test('fails if email is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/user/reset',
+		route: '/../../shared/types/api/user/reset',
 		port: http,
 		unencrypted: {
 			instance_id: instance_id.toHexString()
@@ -64,7 +64,7 @@ test('works if params are correct', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http, 
 		publicKey: server_public_key 
-	}, '/api/user/reset', {
+	}, '/../../shared/types/api/user/reset', {
 		instance_id: instance_id.toHexString()
 	}, {
 		email: DEFAULT_EMAIL,
@@ -156,7 +156,7 @@ test('cancels if failing on password changes', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http, 
 		publicKey: server_public_key
-	}, '/api/user/reset', {
+	}, '/../../shared/types/api/user/reset', {
 		instance_id: instance_id.toHexString()
 	}, {
 		email: DEFAULT_EMAIL,
@@ -241,7 +241,7 @@ test('cancels if failing on instance changes', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/user/reset', {
+	}, '/../../shared/types/api/user/reset', {
 		instance_id: instance_id.toHexString()
 	}, {
 		email: DEFAULT_EMAIL,
@@ -326,7 +326,7 @@ test('cancels if failing on account changes', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/user/reset', {
+	}, '/../../shared/types/api/user/reset', {
 		instance_id: instance_id.toHexString()
 	}, {
 		email: DEFAULT_EMAIL,

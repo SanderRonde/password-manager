@@ -7,7 +7,7 @@ import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/register', {
+testParams(test, uris, '/../../shared/types/api/instance/register', {
 	email: 'string',
 	password: 'string',
 	public_key: 'string'
@@ -19,7 +19,7 @@ test('instance can be created', async t => {
 	uris.push(uri);
 
 	const keyPair = genRSAKeyPair();
-	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
+	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/../../shared/types/api/instance/register', {
 		email: DEFAULT_EMAIL,
 		password: hash(pad(userpw, 'masterpwverify')),
 		public_key: keyPair.publicKey
@@ -59,7 +59,7 @@ test('fails if password is wrong', async t => {
 
 	const keyPair = genRSAKeyPair();
 	await testInvalidCredentials(t, {
-		route: '/api/instance/register',
+		route: '/../../shared/types/api/instance/register',
 		port: http,
 		encrypted: {},
 		unencrypted: {

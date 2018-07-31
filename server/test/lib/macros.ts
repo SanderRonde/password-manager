@@ -1,4 +1,4 @@
-import { GetRequired, GetOptional, GetEncrypted, GetOptionalEncrypted, APIFns, API_ERRS, APIArgs, JSONResponse } from "../../../shared/types/api";
+import { GetRequired, GetOptional, GetEncrypted, GetOptionalEncrypted, APIFns, API_ERRS, APIArgs, JSONResponse } from "../../../shared/types/../../shared/types/api";
 import { RegisterContextual, GenericTestContext, Context } from "ava";
 import { doServerAPIRequest, genUserAndDb, createServer } from "./util";
 import { ChildProcess } from "child_process";

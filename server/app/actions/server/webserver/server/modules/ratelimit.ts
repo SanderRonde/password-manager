@@ -2,7 +2,7 @@ import { unref } from '../../../../../../test/lib/util';
 import { getDebug } from '../../../../../lib/debug';
 import * as RateLimit from 'express-rate-limit'
 import { ServerConfig } from '../../../server';
-import { API_ERRS } from '../../../../../api';
+import { API_ERRS } from '../../../../../../../shared/types/api';
 import * as express from 'express'
 
 export type APIResponse = {

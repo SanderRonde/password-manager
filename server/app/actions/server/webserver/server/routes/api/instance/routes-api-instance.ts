@@ -4,7 +4,7 @@ import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa"
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
 import { sendEmail } from "../../../../../../../lib/util";
-import { API_ERRS } from "../../../../../../../api";
+import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { APIToken } from "../../../modules/auth";
 import { Webserver } from "../../../webserver";
 import * as express from 'express'

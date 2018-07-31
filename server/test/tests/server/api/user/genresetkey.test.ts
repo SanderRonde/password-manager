@@ -4,13 +4,13 @@ import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { RESET_KEY_LENGTH } from '../../../../../app/lib/constants';
 import { genRandomString } from '../../../../../app/lib/util';
 import { decrypt, ERRS } from '../../../../../app/lib/crypto';
-import { API_ERRS } from '../../../../../app/api';
+import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import { getDB } from '../../../../lib/db';
 import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/user/genresetkey', {
+testParams(test, uris, '/../../shared/types/api/user/genresetkey', {
 	instance_id: 'string',
 }, {}, {
 	reset_key: 'string',
@@ -30,7 +30,7 @@ test('fails if instance id is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/user/genresetkey',
+		route: '/../../shared/types/api/user/genresetkey',
 		port: http,
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
@@ -59,7 +59,7 @@ test('rejects if password is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/user/genresetkey',
+		route: '/../../shared/types/api/user/genresetkey',
 		port: http,
 		unencrypted: {
 			instance_id: instance_id.toHexString()
@@ -88,7 +88,7 @@ test('rejects if reset key is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/user/genresetkey',
+		route: '/../../shared/types/api/user/genresetkey',
 		port: http,
 		unencrypted: {
 			instance_id: instance_id.toHexString()
@@ -120,7 +120,7 @@ test('works if params are correct', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/user/genresetkey', {
+	}, '/../../shared/types/api/user/genresetkey', {
 		instance_id: instance_id.toHexString()
 	}, {
 		reset_key: resetKey,

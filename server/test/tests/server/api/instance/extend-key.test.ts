@@ -1,12 +1,12 @@
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
-import { API_ERRS } from '../../../../../app/api';
+import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/extend_key', {
+testParams(test, uris, '/../../shared/types/api/instance/extend_key', {
 	count: 'number',
 	instance_id: 'string',
 	oldToken: 'string'
@@ -23,7 +23,7 @@ test('throws an error if token is invalid', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
+	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/../../shared/types/api/instance/extend_key', {
 		instance_id: instance_id.toHexString(),
 		count: config.count++,
 		oldToken: 'someinvalidtoken'
@@ -44,7 +44,7 @@ test('fails if instance id is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/instance/extend_key',
+		route: '/../../shared/types/api/instance/extend_key',
 		port: http,
 		encrypted: {},
 		unencrypted: {

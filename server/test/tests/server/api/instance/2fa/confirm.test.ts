@@ -1,13 +1,13 @@
 import { captureURIs, doServerAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/database/db-types';
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
-import { API_ERRS } from '../../../../../../app/api';
+import { API_ERRS } from '../../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/2fa/confirm', {
+testParams(test, uris, '/../../shared/types/api/instance/2fa/confirm', {
 	instance_id: 'string',
 	twofactor_token: 'string'
 }, {}, {}, {});
@@ -25,7 +25,7 @@ test('fails if account has no 2FA setup', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/2fa/confirm', {
+	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/../../shared/types/api/instance/2fa/confirm', {
 		instance_id: instance_id.toHexString(),
 		twofactor_token: 'sometoken'
 	}));
@@ -51,7 +51,7 @@ test('fails if an invalid token is passed', async t => {
 	} = config;
 	uris.push(uri);
 
-	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/2fa/confirm', {
+	const response = JSON.parse(await doServerAPIRequest({ port: http }, '/../../shared/types/api/instance/2fa/confirm', {
 		instance_id: instance_id.toHexString(),
 		twofactor_token: speakeasy.totp({
 			secret: twofactor.base32,
@@ -78,7 +78,7 @@ test('fails if instance id wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/instance/2fa/confirm',
+		route: '/../../shared/types/api/instance/2fa/confirm',
 		port: http,
 		encrypted: {},
 		unencrypted: {

@@ -30,7 +30,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		server_key
 	} = await (async  () => {
 		const keyPair = genRSAKeyPair();
-		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/../../shared/types/api/instance/register', {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw, 'masterpwverify')),
 			public_key: keyPair.publicKey
@@ -67,7 +67,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_key!
-		}, '/api/instance/2fa/enable', {
+		}, '/../../shared/types/api/instance/2fa/enable', {
 			instance_id: instance_id!,
 			email: DEFAULT_EMAIL
 		}, {
@@ -131,7 +131,7 @@ test('can enable 2FA and then disable it', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/2fa/enable', {
+		}, '/../../shared/types/api/instance/2fa/enable', {
 			instance_id: instance_id.toHexString(),
 			email: DEFAULT_EMAIL
 		}, {
@@ -174,7 +174,7 @@ test('can enable 2FA and then disable it', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/2fa/disable', {
+		}, '/../../shared/types/api/instance/2fa/disable', {
 			instance_id: instance_id.toHexString(),
 			email: DEFAULT_EMAIL,
 			twofactor_token: speakeasy.totp({
@@ -238,7 +238,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/2fa/enable', {
+		}, '/../../shared/types/api/instance/2fa/enable', {
 			instance_id: instance_id.toHexString(),
 			email: DEFAULT_EMAIL
 		}, {
@@ -281,7 +281,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/2fa/disable', {
+		}, '/../../shared/types/api/instance/2fa/disable', {
 			instance_id: instance_id.toHexString(),
 			email: DEFAULT_EMAIL,
 			twofactor_token: speakeasy.totp({
@@ -324,7 +324,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/2fa/enable', {
+		}, '/../../shared/types/api/instance/2fa/enable', {
 			instance_id: instance_id.toHexString(),
 			email: DEFAULT_EMAIL
 		}, {
@@ -389,7 +389,7 @@ test('can verify a login requiring 2FA', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/login', {
+		}, '/../../shared/types/api/instance/login', {
 			instance_id: instance_id.toHexString(),
 			challenge: encryptWithPublicKey(challenge, server_public_key)
 		}, {
@@ -419,7 +419,7 @@ test('can verify a login requiring 2FA', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/2fa/verify', {
+		}, '/../../shared/types/api/instance/2fa/verify', {
 			instance_id: instance_id.toHexString(),
 			pw_verification_token: pw_verification_token!,
 			twofactor_token: speakeasy.totp({
@@ -443,7 +443,7 @@ test('can verify a login requiring 2FA', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/extend_key', {
+		}, '/../../shared/types/api/instance/extend_key', {
 			instance_id: instance_id.toHexString(),
 			oldToken: authToken!,
 			count: config.count++
@@ -480,7 +480,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		instance_private_key
 	} = await (async  () => {
 		const keyPair = genRSAKeyPair();
-		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/../../shared/types/api/instance/register', {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw, 'masterpwverify')),
 			public_key: keyPair.publicKey
@@ -518,7 +518,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
-		}, '/api/instance/2fa/enable', {
+		}, '/../../shared/types/api/instance/2fa/enable', {
 			instance_id: instance_id!,
 			email: DEFAULT_EMAIL
 		}, {
@@ -562,7 +562,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
-		}, '/api/instance/login', {
+		}, '/../../shared/types/api/instance/login', {
 			instance_id: instance_id!,
 			challenge: encryptWithPublicKey(challenge, server_public_key!)
 		}, {
@@ -592,7 +592,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
-		}, '/api/instance/2fa/verify', {
+		}, '/../../shared/types/api/instance/2fa/verify', {
 			instance_id: instance_id!,
 			pw_verification_token: pw_verification_token!,
 			twofactor_token: speakeasy.totp({
@@ -616,7 +616,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/extend_key', {
+		}, '/../../shared/types/api/instance/extend_key', {
 			instance_id: instance_id!,
 			oldToken: authToken!,
 			count: config.count++
@@ -634,7 +634,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
-		}, '/api/instance/2fa/disable', {
+		}, '/../../shared/types/api/instance/2fa/disable', {
 			instance_id: instance_id!,
 			email: DEFAULT_EMAIL,
 			twofactor_token: speakeasy.totp({
@@ -696,7 +696,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		instance_private_key
 	} = await (async  () => {
 		const keyPair = genRSAKeyPair();
-		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http }, '/../../shared/types/api/instance/register', {
 			email: DEFAULT_EMAIL,
 			password: hash(pad(userpw, 'masterpwverify')),
 			public_key: keyPair.publicKey
@@ -734,7 +734,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
-		}, '/api/instance/2fa/enable', {
+		}, '/../../shared/types/api/instance/2fa/enable', {
 			instance_id: instance_id!,
 			email: DEFAULT_EMAIL
 		}, {
@@ -779,7 +779,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		return secret as string;
 	})();
 	await (async () => {
-		const response = JSON.parse(await doServerAPIRequest({ port: http}, '/api/instance/2fa/confirm', {
+		const response = JSON.parse(await doServerAPIRequest({ port: http}, '/../../shared/types/api/instance/2fa/confirm', {
 			instance_id: instance_id!,
 			twofactor_token: speakeasy.totp({
 				secret: secret!,
@@ -806,7 +806,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
-		}, '/api/instance/login', {
+		}, '/../../shared/types/api/instance/login', {
 			instance_id: instance_id!,
 			challenge: encryptWithPublicKey(challenge, server_public_key!)
 		}, {
@@ -836,7 +836,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/2fa/verify', {
+		}, '/../../shared/types/api/instance/2fa/verify', {
 			instance_id: instance_id!,
 			pw_verification_token: pw_verification_token!,
 			twofactor_token: speakeasy.totp({
@@ -860,7 +860,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/instance/extend_key', {
+		}, '/../../shared/types/api/instance/extend_key', {
 			instance_id: instance_id!,
 			oldToken: authToken!,
 			count: config.count++
@@ -878,7 +878,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key!
-		}, '/api/instance/2fa/disable', {
+		}, '/../../shared/types/api/instance/2fa/disable', {
 			instance_id: instance_id!,
 			email: DEFAULT_EMAIL,
 			twofactor_token: speakeasy.totp({

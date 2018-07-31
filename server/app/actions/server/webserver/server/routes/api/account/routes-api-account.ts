@@ -5,7 +5,7 @@ import { genRandomString, sendEmail } from "../../../../../../../lib/util";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ResponseCaptured } from "../../../modules/ratelimit";
 import { getDebug } from "../../../../../../../lib/debug";
-import { API_ERRS } from "../../../../../../../api";
+import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { Webserver } from "../../../webserver";
 import * as express from 'express'
 

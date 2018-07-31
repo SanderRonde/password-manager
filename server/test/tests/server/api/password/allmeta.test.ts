@@ -3,14 +3,14 @@ import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/datab
 import { decryptWithPrivateKey, ERRS, hash, pad } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { genRandomString } from '../../../../../app/lib/util';
-import { API_ERRS } from '../../../../../app/api';
+import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { test } from 'ava';
 import * as url from 'url'
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/password/allmeta', {
+testParams(test, uris, '/../../shared/types/api/password/allmeta', {
 	instance_id: 'string'
 }, {}, {
 	count: 'number',
@@ -60,7 +60,7 @@ test('can get the password\'s metadata', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/password/allmeta', {
+	}, '/../../shared/types/api/password/allmeta', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		count: config.count++,
@@ -113,7 +113,7 @@ test('fails if auth token is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/password/allmeta',
+		route: '/../../shared/types/api/password/allmeta',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()
@@ -141,7 +141,7 @@ test('fails if instance id is wrong', async t => {
 
 	const token = await getLoginToken(t, config);
 	await testInvalidCredentials(t, {
-		route: '/api/password/allmeta',
+		route: '/../../shared/types/api/password/allmeta',
 		port: http,
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
@@ -170,7 +170,7 @@ test('fails if password is wrong', async t => {
 
 	const token = await getLoginToken(t, config);
 	await testInvalidCredentials(t, {
-		route: '/api/password/allmeta',
+		route: '/../../shared/types/api/password/allmeta',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()

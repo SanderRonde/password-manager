@@ -3,7 +3,7 @@ import { Hashed, Padded, MasterPasswordVerificationPadding, encryptWithPublicKey
 import { COLLECTIONS } from '../../../../../../../../database/database';
 import { ResponseCaptured } from '../../../../modules/ratelimit';
 import { TwofactorVerifyToken } from '../../../../modules/auth';
-import { API_ERRS } from '../../../../../../../../api';
+import { API_ERRS } from '../../../../../../../../../../shared/types/api';
 import { Webserver } from '../../../../webserver';
 import * as speakeasy from 'speakeasy'
 import * as express from 'express'

@@ -4,13 +4,13 @@ import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/cryp
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
 import { DEFAULT_EMAIL } from '../../../../../../app/lib/constants';
 import { doSingleQuery } from '../../../../../lib/db';
-import { API_ERRS } from '../../../../../../app/api';
+import { API_ERRS } from '../../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/2fa/enable', {
+testParams(test, uris, '/../../shared/types/api/instance/2fa/enable', {
 	instance_id: 'string',
 	email: 'string'
 }, {}, {
@@ -35,7 +35,7 @@ test('can enable 2FA when no 2FA secret is set', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/instance/2fa/enable', {
+	}, '/../../shared/types/api/instance/2fa/enable', {
 		instance_id: instance_id.toHexString(),
 		email: DEFAULT_EMAIL
 	}, {
@@ -91,7 +91,7 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/instance/2fa/enable', {
+	}, '/../../shared/types/api/instance/2fa/enable', {
 		instance_id: instance_id.toHexString(),
 		email: DEFAULT_EMAIL
 	}, {
@@ -152,7 +152,7 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/instance/2fa/enable', {
+	}, '/../../shared/types/api/instance/2fa/enable', {
 		instance_id: instance_id.toHexString(),
 		email: DEFAULT_EMAIL
 	}, {
@@ -187,7 +187,7 @@ test('fails if password is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/instance/2fa/enable',
+		route: '/../../shared/types/api/instance/2fa/enable',
 		port: http,
 		encrypted: {
 			password: hash(pad(userpw + 'wrongpw', 'masterpwverify'))
@@ -207,7 +207,7 @@ test('fails if instance id is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/instance/2fa/enable',
+		route: '/../../shared/types/api/instance/2fa/enable',
 		port: http,
 		encrypted: {
 			password: hash(pad(userpw, 'masterpwverify'))

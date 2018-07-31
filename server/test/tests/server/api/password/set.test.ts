@@ -4,14 +4,14 @@ import { encrypt, hash, pad, decryptWithSalt, ERRS, decrypt, Encrypted, Hashed, 
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { ENCRYPTION_ALGORITHM } from '../../../../../app/lib/constants';
 import { genRandomString } from '../../../../../app/lib/util';
-import { API_ERRS } from '../../../../../app/api';
+import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import { getDB } from '../../../../lib/db';
 import * as mongo from 'mongodb'
 import * as url from 'url'
 import { test } from 'ava';
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/password/set', {
+testParams(test, uris, '/../../shared/types/api/password/set', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
@@ -41,7 +41,7 @@ test('password can be created', async t => {
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
 		publicKey: server_public_key
-	}, '/api/password/set', {
+	}, '/../../shared/types/api/password/set', {
 		instance_id: config.instance_id.toHexString()
 	}, {
 		token: token!,
@@ -118,7 +118,7 @@ test('fails if token is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/password/set',
+		route: '/../../shared/types/api/password/set',
 		port: http,
 		unencrypted: {
 			instance_id: config.instance_id.toHexString()
@@ -151,7 +151,7 @@ test('fails if instance id is wrong', async t => {
 	uris.push(uri);
 
 	await testInvalidCredentials(t, {
-		route: '/api/password/set',
+		route: '/../../shared/types/api/password/set',
 		port: http,
 		unencrypted: {
 			instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>

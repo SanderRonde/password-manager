@@ -27,7 +27,7 @@ test('can generate a new key and then reset with it', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http,
 			publicKey: server_public_key
-		}, '/api/user/genresetkey', {
+		}, '/../../shared/types/api/user/genresetkey', {
 			instance_id: instance_id.toHexString()
 		}, {
 			reset_key: initialResetKey,
@@ -68,7 +68,7 @@ test('can generate a new key and then reset with it', async t => {
 		const response = JSON.parse(await doServerAPIRequest({ 
 			port: http, 
 			publicKey: server_public_key 
-		}, '/api/user/reset', {
+		}, '/../../shared/types/api/user/reset', {
 			instance_id: instance_id.toHexString()
 		}, {
 			email: DEFAULT_EMAIL,
