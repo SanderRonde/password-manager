@@ -5,9 +5,13 @@ import { ServerConfig } from "../../../../server";
 import { render } from "../../modules/render";
 import { Webserver } from "../../webserver";
 import { COUNT } from "../../modules/auth";
-import * as fresh from 'import-fresh'
 import * as express from 'express'
 import * as path from 'path'
+
+function importFresh(moduleId: string) {
+	delete require.cache[require.resolve(moduleId)];
+	return require(moduleId);
+}
 
 export const enum ROUTES {
 	LOGIN,
@@ -28,10 +32,10 @@ function getRouteComponent(config: ServerConfig, route: ROUTES): ((...args: any[
 		const sharedComponentsBase = '../../../../../../../../shared/components';
 		switch (route) {
 			case ROUTES.LOGIN:
-				return fresh(`${sharedComponentsBase}/entrypoints/login/login.js`)
+				return importFresh(`${sharedComponentsBase}/entrypoints/login/login.js`)
 					.GetLoginStyled;
 			case ROUTES.DASHBOARD:
-				return fresh(`${sharedComponentsBase}/entrypoints/dashboard/dashboard.js`)
+				return importFresh(`${sharedComponentsBase}/entrypoints/dashboard/dashboard.js`)
 					.GetDashboard;
 		}
 	}

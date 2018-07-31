@@ -4,11 +4,8 @@ import { ServerConfig, ServerSettings, Server } from "./actions/server/server";
 import { Account } from "./actions/account/account";
 import { getDatabase } from "./database/database";
 import { readJSON, exitWith } from "./lib/util";
-import * as importFresh from 'import-fresh'
-import { CommanderStatic } from "commander";
 import { VERSION } from "./lib/constants";
-
-const commander: CommanderStatic = importFresh('commander');
+import * as commander from 'commander';
 
 export interface Log {
 	write(...args: any[]): void;
@@ -198,9 +195,4 @@ if (require.main === module) {
 	  	console.error(error.stack || error.message || error);
 	  	process.exit(1);
 	});
-}
-
-export type MainExports = {
-	main: typeof main;
-	initCommander: typeof initCommander;
 }

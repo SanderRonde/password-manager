@@ -1,13 +1,8 @@
-import { MainExports } from "../../app/main";
-import * as importFresh from 'import-fresh'
-
-function getFreshMain(): MainExports {
-	return importFresh('../../app/main');
-}
+import { initCommander } from '../../app/main';
 
 function getDefaultHelp() {
 	let helpText: string = '';
-	getFreshMain().initCommander({ handled: true }).outputHelp((text: string) => {
+	initCommander({ handled: true }).outputHelp((text: string) => {
 		helpText = text;
 		return '';
 	});
