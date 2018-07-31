@@ -27,6 +27,153 @@ function listenWithoutRef(src: Readable, handler: (chunk: string) => void) {
 	unref(src);
 }
 
+class Mute extends Stream {
+	writable: boolean = true;
+	readable: boolean = true;
+	muted: boolean = false;
+	replace: string;
+	
+	private _src!: NodeJS.ReadableStream;
+	private _dest!: NodeJS.WritableStream;
+	private _prompt: string|null;
+	private _hadControl: boolean = false;
+
+	private _setISTTY: boolean|null = null;
+
+	constructor({
+		replace, prompt
+	}: {
+		replace: string;
+		prompt: string;
+	}) {
+		super();
+
+		this.replace = replace;
+		this._prompt = prompt || null;
+	}
+
+	private _getStreamProps(prop: string) {
+		if (this._dest) {
+			return (this._dest as any)[prop];
+		} else if (this._src) {
+			return (this._src as any)[prop];
+		} else {
+			return undefined;
+		}
+	}
+
+	mute() {
+		this.muted = true;
+	}
+	unmute() {
+		this.muted = false;
+	}
+	//@ts-ignore
+	private _onpipe(src: any) {
+		this._src = src;
+	}
+	get isTTY() {
+		if (this._setISTTY !== null) {
+			return this._setISTTY;
+		}
+
+		if (this._dest) {
+			return (this._dest as any).isTTY();
+		} else if (this._src) {
+			return (this._src as any).isTTY();
+		}
+		return false;
+	}
+	set isTTY(isTTY: boolean) {
+		this._setISTTY = isTTY;
+	}
+
+	get rows() {
+		return this._getStreamProps('rows');
+	}
+
+	get columns() {
+		return this._getStreamProps('columns');
+	}
+
+	pipe<T extends NodeJS.WritableStream>(destination: T, options?: { end?: boolean; }): T {
+		this._dest = destination;
+		return Stream.prototype.pipe.call(this, destination, options);
+	}
+
+	pause() {
+		if (this._src) {
+			return this._src.pause();
+		}
+		return undefined;
+	}
+
+	resume() {
+		if (this._src) {
+			return this._src.resume();
+		}
+		return undefined;
+	}
+
+	write(data: any) {
+		if (this.muted) {
+			if (!this.replace) return;
+			if (data.match(/^\u001b/)) {
+				if(this._prompt && data.indexOf(this._prompt) === 0) {
+					data = data.substr(this._prompt.length);
+					data = data.replace(/./g, this.replace);
+					data = this._prompt + data;
+				}
+				this._hadControl = true
+				this.emit('data', data);
+				return;
+			} else {
+				if (this._prompt && this._hadControl &&
+					data.indexOf(this._prompt) === 0) {
+					this._hadControl = false
+					this.emit('data', this._prompt)
+					data = data.substr(this._prompt.length)
+				}
+				data = data.toString().replace(/./g, this.replace)
+			}
+		}
+		this.emit('data', data)
+	}
+
+	end(data: any) {
+		if (this.muted) {
+			if (data && this.replace) {
+				data = data.toString().replace(/./g, this.replace)
+			} else {
+				data = null
+			}
+		}
+		if (data) this.emit('data', data);
+		this.emit('end');
+	}
+
+	destroy(...args: any[]) {
+		const src = this._src as any;
+		const dest = this._dest as any;
+		src && src.destroy && src.destroy(...args);
+		dest && dest.destroy && dest.destroy(...args);
+	}
+
+	destroySoon(...args: any[]) {
+		const src = this._src as any;
+		const dest = this._dest as any;
+		src && src.destroySoon && src.destroySoon(...args);
+		dest && dest.destroySoon && dest.destroySoon(...args);
+	}
+
+	close(...args: any[]) {
+		const src = this._src as any;
+		const dest = this._dest as any;
+		src && src.close && src.close(...args);
+		dest && dest.close && dest.close(...args);
+	}
+}
+
 class StdinCapturer {
 	private _read: string = '';
 	private _listeners: ((text: string) => void)[] = [];

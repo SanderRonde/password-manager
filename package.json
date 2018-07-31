@@ -7,7 +7,10 @@
   "author": "Sander Ronde <awsdfgvhbjn@gmail.com>",
   "license": "MIT",
   "private": true,
-  "sideEffects": ["react", "react-dom"],
+  "sideEffects": [
+    "react",
+    "react-dom"
+  ],
   "ava": {
     "files": [
       "server/test/tests/*.js",
@@ -49,7 +52,6 @@
     "mkdirp": "^0.5.1",
     "mongodb": "^3.0.8",
     "morgan": "^1.9.0",
-    "mute-stream": "^0.0.7",
     "node-rsa": "^1.0.0",
     "nodemailer": "^4.6.7",
     "progress": "^2.0.0",
