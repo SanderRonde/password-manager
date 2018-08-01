@@ -1,7 +1,7 @@
-import { WebComponent, genIs, css } from '../../../lib/webcomponent-util';
+import { WebComponent, genIs } from '../../../lib/webcomponent-util';
 import { html } from 'lit-html';
 
-const styles = css(`<style>
+const styles = html`<style>
 	#container {
 		display: flex;
 		flex-direction: row;
@@ -11,7 +11,7 @@ const styles = css(`<style>
 	#content {
 		display: block;
 	}
-</style>`);
+</style>`;
 
 export class HorizontalCenterer extends WebComponent {
 	static is = genIs('horizontal-centerer', HorizontalCenterer);

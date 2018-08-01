@@ -315,7 +315,3 @@ export class WebComponent extends HTMLElement {
 export function genIs(name: string, component: typeof WebComponent): [string, typeof WebComponent] {
 	return [name, component];
 }
-
-export function css(styles: string) {
-	return styles;
-}
