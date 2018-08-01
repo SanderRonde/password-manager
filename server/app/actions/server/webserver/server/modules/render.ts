@@ -16,7 +16,7 @@ export function render(res: ResponseCaptured, {
 	}));
 
 	res.write(`<${rootName}></${rootName}/>`);
-	res.write(`<textarea hidden>${escape(JSON.stringify(data))}</textarea>`)
+	res.write(`<textarea hidden>${JSON.stringify(data)}</textarea>`)
 
 	res.write(postAppHTML({
 		script
