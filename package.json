@@ -36,8 +36,6 @@
     ]
   },
   "dependencies": {
-    "@material-ui/core": "^1.4.1",
-    "@material-ui/icons": "^2.0.0",
     "@types/express-rate-limit": "^2.9.3",
     "body-parser": "^1.18.3",
     "commander": "^2.16.0",
@@ -56,9 +54,6 @@
     "node-rsa": "^1.0.0",
     "nodemailer": "^4.6.7",
     "progress": "^2.0.0",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-jss": "^8.6.1",
     "serve-static": "^1.13.2",
     "speakeasy": "^2.0.0",
     "webpack": "^4.16.2"
@@ -76,7 +71,6 @@
     "@types/node-rsa": "^0.4.3",
     "@types/nodemailer": "^4.6.2",
     "@types/progress": "^2.0.1",
-    "@types/react-dom": "^16.0.6",
     "@types/serve-static": "^1.13.2",
     "@types/speakeasy": "^2.0.2",
     "@types/webpack": "^4.4.8",
