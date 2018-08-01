@@ -1,3 +1,5 @@
+import { TemplateResult, render } from "lit-html";
+
 // From https://github.com/JedWatson/classnames
 
 const hasOwn = {}.hasOwnProperty;
@@ -130,7 +132,7 @@ export function defineProps<P extends {
 	[key: string]: PROP_TYPE|JSONType<any>;
 }, R extends {
 	[K in keyof P]: GetTSType<P[K]>;
-}>(element: HTMLElement, map: P): R {
+}>(element: WebComponent, map: P, doRender: () => void): R {
 	const propValues: Partial<R> = {};
 	const props: Partial<R> = {};
 
@@ -144,6 +146,7 @@ export function defineProps<P extends {
 			set(value) {
 				setter(element, mapKey, value, map[mapKey]);
 				props[mapKey] = value;
+				doRender();
 			}
 		});
 		Object.defineProperty(props, mapKey, {
@@ -153,6 +156,7 @@ export function defineProps<P extends {
 			set(value) {
 				propValues[mapKey] = value;
 				setter(element, mapKey, value, map[mapKey]);
+				doRender();
 			}
 		});
 		propValues[mapKey] = getter(element, mapKey, map[mapKey]) as any;
@@ -161,20 +165,23 @@ export function defineProps<P extends {
 }
 
 export class WebComponent extends HTMLElement {
-	constructor() {
-		super();
-
-		this.render(this.attachShadow({
-			mode: 'closed'
-		}));
-	}
-
-	render(_root: ShadowRoot) {
-		throw new Error('No render method implemented');
-	}
-
 	protected static dependencies: typeof WebComponent[] = [];
 	protected static is: [string, typeof WebComponent];
+	private _root = this.attachShadow({
+		mode: 'closed'
+	});
+
+	constructor() {
+		super();
+		this.__render();
+	}
+
+	render(): TemplateResult {
+		throw new Error('No render method implemented');
+	}
+	protected __render() {
+		this.render(), this._root
+	}
 
 	static define() {
 		for (const dependency of this.dependencies) {

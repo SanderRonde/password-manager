@@ -45,18 +45,18 @@
 // })();
 // export const VerticalCenterer = withStyles(styles)(_VerticalCenterer);
 
-import { WebComponent, defineProps, PROP_TYPE, genIs } from '../../../lib/webcomponent-util';
-import { html, render } from 'lit-html';
+import { WebComponent, defineProps, PROP_TYPE, genIs, classNames } from '../../../lib/webcomponent-util';
+import { html } from 'lit-html';
 
 export class VerticalCenterer extends WebComponent {
 	static is = genIs('vertical-centerer', VerticalCenterer);
 
 	public props = defineProps(this, {
 		fullscreen: PROP_TYPE.BOOL
-	});
+	}, this.__render);
 
-	render(root: ShadowRoot) {
-		render(html`
+	render() {
+		return html`
 			<style>
 				#container {
 					display: flex;
@@ -65,14 +65,20 @@ export class VerticalCenterer extends WebComponent {
 					height: 100%;
 				}
 
+				.fullscreen {
+					height: 100vh;
+				}
+
 				#content {
 					display: block;
 				}
 			</style>
-			<div id="container">
+			<div id="container" class="${classNames({
+				fullscreen: this.props.fullscreen
+			})}">
 				<div id="content">
 					<slot></slot>
 				</div>
-			</div>`, root)
+			</div>`;
 	}
 }

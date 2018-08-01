@@ -518,14 +518,14 @@ export class Login extends WebComponent {
 	static dependencies = [VerticalCenterer, HorizontalCenterer];
 	static is = genIs('login-page', Login);
 	
-	render(root: ShadowRoot) {
-		render(html`
+	render() {
+		return html`
 			<div>
 				<horizontal-centerer>
 					<vertical-centerer fullscreen>
 						<div>hi login</div>
 					</vertical-centerer>
 				</horizontal-centerer>
-			</div>`, root);
+			</div>`;
 	}
 }

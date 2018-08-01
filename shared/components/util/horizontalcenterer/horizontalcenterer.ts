@@ -4,8 +4,8 @@ import { html, render } from 'lit-html';
 export class HorizontalCenterer extends WebComponent {
 	static is = genIs('horizontal-centerer', HorizontalCenterer);
 
-	render(root: ShadowRoot) {
-		render(html`
+	render() {
+		return html`
 			<style>
 				#container {
 					display: flex;
@@ -21,6 +21,6 @@ export class HorizontalCenterer extends WebComponent {
 				<div id="content">
 					<slot></slot>
 				</div>
-			</div>`, root)
+			</div>`
 	}
 }
