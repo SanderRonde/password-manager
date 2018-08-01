@@ -150,8 +150,6 @@ function flattenImportMap(current: ImportMap, arr: string[]) {
 function genCustomMaterialUICore(route: keyof typeof IMPORT_MAP) {
 	const imports = flattenImportMap(IMPORT_MAP[route], []);
 
-	console.log(imports);
-
 	return imports.filter((val, index, arr) => arr.indexOf(val) === index).map((component) => {
 		return `export { default as ${component} } from './${component}';`
 	}).join('\n');
