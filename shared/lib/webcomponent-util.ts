@@ -137,7 +137,8 @@ export function JSONType<T>(): JSONType<T> {
 type DefinePropTypes = PROP_TYPE|JSONType<any>;
 interface DefinePropTypeConfig {
 	type: DefinePropTypes;
-	watch?: string[];
+	watch?: boolean;
+	watchProperties?: string[];
 }
 
 function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): DefinePropTypeConfig {
@@ -146,6 +147,7 @@ function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): Defin
 		return data;
 	} else {
 		return {
+			watch: true,
 			type: value as DefinePropTypes
 		}
 	}
@@ -250,8 +252,9 @@ export function defineProps<P extends {
 		const mapKey = key as Extract<keyof P|T, string>;
 
 		const { 
+			watch,
 			type: mapType,
-			watch = []
+			watchProperties = []
 		} = getDefinePropConfig(value);
 
 		if (reflectToAttr) {
@@ -262,7 +265,9 @@ export function defineProps<P extends {
 				set(value) {
 					setter(element, mapKey, value, mapType);
 					props[mapKey] = value;
-					doRender();
+					if (watch) {
+						doRender();
+					}
 				}
 			});
 		}
@@ -272,14 +277,16 @@ export function defineProps<P extends {
 			},
 			set(value) {
 				const original = value;
-				if (typeof value === 'object' && watch.length > 0) {
-					value = watchObject(value, watch, doRender);
+				if (typeof value === 'object' && watchProperties.length > 0) {
+					value = watchObject(value, watchProperties, doRender);
 				}
 				propValues[mapKey] = value;
 				if (reflectToAttr) {
 					setter(element, mapKey, original, mapType);
 				}
-				doRender();
+				if (watch) {
+					doRender();
+				}
 			}
 		});
 		propValues[mapKey] = getter(element, mapKey, mapType) as any;
