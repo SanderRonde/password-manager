@@ -70,7 +70,7 @@ export class VerticalCenterer extends WebComponent {
 					height: 100%;
 				}
 
-				.fullscreen {
+				#container.fullscreen {
 					height: 100vh;
 				}
 
