@@ -230,6 +230,19 @@ function watchObject(obj: any, path: (string|'*')[], callback: () => void) {
 	}
 }
 
+function casingToDashes(name: string) {
+	let newStr = '';
+	for (const char of name) {
+		const code = char.charCodeAt(0);
+		if (code >= 65 && code <= 90) {
+			newStr += `-${char.toLowerCase()}`;
+		} else {
+			newStr += char;
+		}
+	}
+	return newStr;
+}
+
 export function defineProps<P extends {
 	[key: string]: DefinePropTypes|DefinePropTypeConfig;
 }, T extends {
@@ -265,13 +278,14 @@ export function defineProps<P extends {
 			watchProperties = []
 		} = getDefinePropConfig(value);
 
+		const propName = casingToDashes(mapKey);
 		if (reflectToAttr) {
 			Object.defineProperty(element, mapKey, {
 				get() {
-					return getter(element, mapKey, mapType);
+					return getter(element, propName, mapType);
 				},
 				set(value) {
-					setter(element, mapKey, value, mapType);
+					setter(element, propName, value, mapType);
 					props[mapKey] = value;
 					if (watch) {
 						doRender();
@@ -290,17 +304,17 @@ export function defineProps<P extends {
 				}
 				propValues[mapKey] = value;
 				if (reflectToAttr) {
-					setter(element, mapKey, original, mapType);
+					setter(element, propName, original, mapType);
 				}
 				if (watch) {
 					doRender();
 				}
 			}
 		});
-		propValues[mapKey] = getter(element, mapKey, mapType) as any;
+		propValues[mapKey] = getter(element, propName, mapType) as any;
 		if (defaultValue !== undefined) {
 			propValues[mapKey] = defaultValue as any;
-			setter(element, mapKey, defaultValue, mapType);
+			setter(element, propName, defaultValue, mapType);
 		}
 	}
 	return props as R;
