@@ -124,6 +124,11 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/lit-html/lit-html.js')));
 		res.end();
 	});
+	webserver.app.all('/modules/lit-html.js.map', async (_req, res) => {
+		res.contentType('.js');
+		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/lit-html/lit-html.js.map')));
+		res.end();
+	});
 	webserver.app.use(serve(path.join(base, 'src/'), {
 		rewrite(content, filePath) {
 			if (filePath.endsWith('.js')) {
