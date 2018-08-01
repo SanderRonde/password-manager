@@ -136,7 +136,89 @@ export function JSONType<T>(): JSONType<T> {
 
 type DefinePropTypes = PROP_TYPE|JSONType<any>;
 interface DefinePropTypeConfig {
-	type: DefinePropTypes;	
+	type: DefinePropTypes;
+	watch?: string[];
+}
+
+function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): DefinePropTypeConfig {
+	if (typeof value === 'object' && 'type' in value) {
+		const data = value as DefinePropTypeConfig;
+		return data;
+	} else {
+		return {
+			type: value as DefinePropTypes
+		}
+	}
+}
+
+function createDeepProxy(obj: any, callback: () => void) {
+	const proxy = new Proxy(obj, {
+		set(_obj, prop, value) {
+			if (typeof value === 'object') {
+				value = createDeepProxy(value, callback);
+			}
+			obj[prop] = value;
+			callback();
+			return true;
+		},
+		deleteProperty(_obj, prop) {
+			if (Reflect.has(obj, prop)) {
+				const deleted = Reflect.deleteProperty(obj, prop);
+				callback();
+				return deleted;
+			}
+			return false;
+		}
+	});
+	for (const key of Object.keys(obj)) {
+		createDeepProxy(obj[key], callback);
+	}
+	return proxy;
+}
+
+function createProxyLevel(obj: any, path: string|'*', nextLevels: (string|'*')[], callback: () => void) {
+	const proxy = new Proxy(obj, {
+		set(_obj, prop, value) {
+			if (path === '*' || prop === path) {
+				if (nextLevels.length && typeof value === 'object') {
+					value = createProxyLevel(value, 
+						nextLevels[0], nextLevels.slice(1), callback);
+				}
+				obj[prop] = value;
+				callback();
+			} else {
+				obj[prop] = value;
+			}
+			return true;
+		},
+		deleteProperty(_obj, prop) {
+			if (Reflect.has(obj, prop)) {
+				const deleted = Reflect.deleteProperty(obj, prop);
+				callback();
+				return deleted;
+			}
+			return false;
+		}
+	});
+	if (nextLevels.length && Reflect.has(obj, path)) {
+		createProxyLevel(obj[path], nextLevels[0], nextLevels.slice(1), callback);
+	}
+	return proxy;
+}
+
+function watchObject(obj: any, path: (string|'*')[], callback: () => void) {
+	if (typeof obj !== 'object' || obj === undefined || obj === null) {
+		return;
+	}
+	if (path.indexOf('**') !== -1 && path.length > 1) {
+		throw new Error('Attempting to watch object through ** and more path operators')
+	}
+
+	if (path[0] === '**') {
+		return createDeepProxy(obj, callback);
+	} else {
+		return createProxyLevel(obj, path[0], path.slice(1), callback);
+	}
 }
 
 export function defineProps<P extends {
@@ -155,28 +237,24 @@ export function defineProps<P extends {
 		return {
 			key: key as Extract<keyof P, string>,
 			value: reflect[key],
-			reflect: true
+			reflectToAttr: true
 		}
 	}), ...Object.getOwnPropertyNames(priv).map((key) => {
 		return {
 			key: key as Extract<keyof T, string>,
 			value: priv[key],
-			reflect: false
+			reflectToAttr: false
 		}
 	})];
-	for (const { key, reflect, value } of keys) {
+	for (const { key, reflectToAttr, value } of keys) {
 		const mapKey = key as Extract<keyof P|T, string>;
 
-		const mapData = value;
-		let mapType: DefinePropTypes;
-		if (typeof mapData === 'object' && 'type' in mapData) {
-			const objMapData = mapData as DefinePropTypeConfig;
-			mapType = objMapData.type;
-		} else {
-			mapType = mapData as DefinePropTypes;
-		}
+		const { 
+			type: mapType,
+			watch = []
+		} = getDefinePropConfig(value);
 
-		if (reflect) {
+		if (reflectToAttr) {
 			Object.defineProperty(element, mapKey, {
 				get() {
 					return getter(element, mapKey, mapType);
@@ -193,9 +271,13 @@ export function defineProps<P extends {
 				return propValues[mapKey];
 			},
 			set(value) {
+				const original = value;
+				if (typeof value === 'object' && watch.length > 0) {
+					value = watchObject(value, watch, doRender);
+				}
 				propValues[mapKey] = value;
-				if (reflect) {
-					setter(element, mapKey, value, mapType);
+				if (reflectToAttr) {
+					setter(element, mapKey, original, mapType);
 				}
 				doRender();
 			}
