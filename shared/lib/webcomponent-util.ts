@@ -335,7 +335,7 @@ export function defineProps<P extends {
 			}
 		});
 		propValues[mapKey] = getter(element, propName, mapType) as any;
-		if (defaultValue !== undefined) {
+		if (defaultValue !== undefined && propValues[mapKey] === undefined) {
 			propValues[mapKey] = defaultValue as any;
 			setter(element, propName, defaultValue, mapType);
 		}
@@ -346,7 +346,7 @@ export function defineProps<P extends {
 export class WebComponent extends HTMLElement {
 	protected static dependencies: typeof WebComponent[] = [];
 	protected static is: [string, typeof WebComponent];
-	private _root = this.attachShadow({
+	protected __root = this.attachShadow({
 		mode: 'closed'
 	});
 
@@ -355,7 +355,7 @@ export class WebComponent extends HTMLElement {
 	}
 	protected __render() {
 		this.__preRender();
-		render(this.render(), this._root);
+		render(this.render(), this.__root);
 		this.__postRender();
 	}
 	protected __preRender() {}
