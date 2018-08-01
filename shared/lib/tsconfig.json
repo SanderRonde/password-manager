@@ -2,9 +2,9 @@
     "compilerOptions": {
         "jsx": "react",
         "alwaysStrict": true,
-        "baseUrl": "../typings/",
+        "baseUrl": "../../typings/",
         "forceConsistentCasingInFileNames": true,
-        "module": "esnext",
+        "module": "commonjs",
         "moduleResolution": "node",
         "noImplicitAny": true,
         "noImplicitThis": true,
@@ -25,10 +25,7 @@
 	},
     "compileOnSave": true,
     "allowJs": true,
-    "include": [],
-    "references": [{
-		"path": "./lib"
-	}, {
-		"path": "./components"
-	}]
+    "include": [
+        "./**/*", "../../server/app/actions/server/webserver/client/html.ts"
+    ]
 }

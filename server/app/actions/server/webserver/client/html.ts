@@ -25,13 +25,11 @@ export function preAppHTML({
 }
 
 export function postAppHTML({
-	css, script
+	script
 }: {
-	css: string;
 	script: string;
 }) {
 	return `</div>
-		<style id="jss-server-side">${css}</style>
 		<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
 		<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
 		<script type="module" src="${script}"></script>
@@ -40,10 +38,9 @@ export function postAppHTML({
 }
 
 export const html = ({ 
-	title, script, css,
+	title, script,
 	development = false
 }: { 
-	css: string;
 	title: string,
 	script: string;
 	development?: boolean;
@@ -53,7 +50,7 @@ export const html = ({
 			development, title
 		}),
 		post: postAppHTML({
-			script, css
+			script
 		})
 	}
 }

@@ -1,45 +1,13 @@
-import { GetDashboard } from "../../../../../../../../shared/components/entrypoints/dashboard/dashboard";
-import { GetLoginStyled } from "../../../../../../../../shared/components/entrypoints/login/login";
 import { ResponseCaptured } from "../../modules/ratelimit";
-import { ServerConfig } from "../../../../server";
 import { render } from "../../modules/render";
 import { Webserver } from "../../webserver";
 import { COUNT } from "../../modules/auth";
 import * as express from 'express'
 import * as path from 'path'
 
-function importFresh(moduleId: string) {
-	delete require.cache[require.resolve(moduleId)];
-	return require(moduleId);
-}
-
 export const enum ROUTES {
 	LOGIN,
 	DASHBOARD
-}
-
-function getRouteComponent(config: ServerConfig, route: ROUTES.LOGIN): typeof GetLoginStyled;
-function getRouteComponent(config: ServerConfig, route: ROUTES.DASHBOARD): typeof GetDashboard;
-function getRouteComponent(config: ServerConfig, route: ROUTES): ((...args: any[]) => any)|null {
-	if (!config.development) {
-		switch (route) {
-			case ROUTES.LOGIN:
-				return GetLoginStyled;
-			case ROUTES.DASHBOARD:
-				return GetDashboard;
-		}
-	} else {
-		const sharedComponentsBase = '../../../../../../../../shared/components';
-		switch (route) {
-			case ROUTES.LOGIN:
-				return importFresh(`${sharedComponentsBase}/entrypoints/login/login.js`)
-					.GetLoginStyled;
-			case ROUTES.DASHBOARD:
-				return importFresh(`${sharedComponentsBase}/entrypoints/dashboard/dashboard.js`)
-					.GetDashboard;
-		}
-	}
-	return null;
 }
 
 const routesBase = path.join(__dirname, '../../../client/');
@@ -75,11 +43,12 @@ export class RoutesDashboard {
 		} = this.server.Auth.genDashboardCommToken();
 
 		render(res, {
-			App: getRouteComponent(this.server.config, ROUTES.LOGIN)({
+			data: {
 				comm_token: token,
 				server_public_key: publicKey
-			}),
-			script: 'entrypoints/login/login-hydrate.js',
+			},
+			rootName: 'login-page',
+			script: 'entrypoints/login/login-page.js',
 			title: 'Log in to your dashboard',
 			development: this.server.config.development
 		});
@@ -91,8 +60,9 @@ export class RoutesDashboard {
 		}
 
 		render(res, {
-			App: getRouteComponent(this.server.config, ROUTES.DASHBOARD)(),
-			script: 'entrypoints/dashboard/dashboard-hydrate.js',
+			data: {},
+			rootName: 'dashboard-page',
+			script: 'entrypoints/dashboard/dashboard-page.js',
 			title: 'Your Dashboard',
 			development: this.server.config.development
 		});
