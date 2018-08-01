@@ -436,6 +436,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 										<Input id="email-input" name="email" type="email"
 											title="Account's email" onBlur={this.onEmailBlur}
 											onChange={multiFunctions(this.checkInputData)}
+											autoComplete="username" autoFocus margin="dense"
 											error={!this.state.emailValidation.valid}
 											innerRef={this.emailInput} endAdornment={
 												<InputAdornment position="end">
@@ -461,6 +462,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 											this.props.classes.filling
 										)} name="password" type="password" 
 											error={!this.state.passwordValidation.valid}
+											autoComplete="password" margin="dense"
 											title="Account password" id="password-input" 
 											onBlur={this.onPasswordBlur} 
 											onChange={multiFunctions(this.checkInputData)} />
@@ -476,7 +478,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 											error={!this.state.twofactorValidation.valid}
 											title="Twofactor authentication token (if enabled for the account)"
 											autoComplete="off" id="twofactor-input" 
-											onBlur={this.onTwofactorBlur} 
+											onBlur={this.onTwofactorBlur} margin="dense"
 											onChange={multiFunctions(this.checkInputData)} />
 										<FormHelperText id="twofactor-descr">{
 											this.state.twofactorValidation.errorString
