@@ -1,5 +1,5 @@
 import { WebComponent, genIs } from '../../../lib/webcomponent-util';
-import { html, render } from 'lit-html';
+import { html } from 'lit-html';
 
 export class HorizontalCenterer extends WebComponent {
 	static is = genIs('horizontal-centerer', HorizontalCenterer);

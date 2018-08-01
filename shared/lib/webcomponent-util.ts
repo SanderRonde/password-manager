@@ -1,4 +1,4 @@
-import { TemplateResult, render } from "lit-html";
+import { TemplateResult } from "lit-html";
 
 // From https://github.com/JedWatson/classnames
 
@@ -111,10 +111,15 @@ export function setter(element: HTMLElement, name: string, value: string|boolean
 	}
 }
 
-type GetTSType<V extends PROP_TYPE|JSONType<any>> = V extends PROP_TYPE.BOOL ? 
-	boolean : V extends PROP_TYPE.NUMBER ? 
-		number : V extends PROP_TYPE.STRING ?
-			string : V extends JSONType<infer R> ? R : void;
+type GetTSType<V extends PROP_TYPE|JSONType<any>|DefinePropTypeConfig> = 
+	V extends PROP_TYPE.BOOL ? boolean : 
+		V extends PROP_TYPE.NUMBER ?  number : 
+			V extends PROP_TYPE.STRING ? string : 
+				V extends JSONType<infer R> ? R : 
+					V extends DefinePropTypeConfig ? 
+						V['type'] extends PROP_TYPE.BOOL ? boolean : 
+							V['type'] extends PROP_TYPE.NUMBER ?  number : 
+								V['type'] extends PROP_TYPE.STRING ? string : void : void;
 
 export const enum PROP_TYPE {
 	STRING = 'string',
@@ -123,43 +128,79 @@ export const enum PROP_TYPE {
 }
 type JSONType<T> = 'json' & {
 	__data: T;
-}
+};
+
 export function JSONType<T>(): JSONType<T> {
 	return 'json' as JSONType<T>;
 }
 
+type DefinePropTypes = PROP_TYPE|JSONType<any>;
+interface DefinePropTypeConfig {
+	type: DefinePropTypes;	
+}
+
 export function defineProps<P extends {
-	[key: string]: PROP_TYPE|JSONType<any>;
+	[key: string]: DefinePropTypes|DefinePropTypeConfig;
+}, T extends {
+	[key: string]: DefinePropTypes|DefinePropTypeConfig;
 }, R extends {
 	[K in keyof P]: GetTSType<P[K]>;
-}>(element: WebComponent, map: P, doRender: () => void): R {
+} & {
+	[K in keyof T]: GetTSType<T[K]>;
+}>(element: HTMLElement, reflect: P, priv: T, doRender: () => void): R {
 	const propValues: Partial<R> = {};
 	const props: Partial<R> = {};
 
-	const keys = Object.getOwnPropertyNames(map);
-	for (const key of keys) {
-		const mapKey = key as Extract<keyof P, string>;
-		Object.defineProperty(element, mapKey, {
-			get() {
-				return getter(element, mapKey, map[mapKey]);
-			},
-			set(value) {
-				setter(element, mapKey, value, map[mapKey]);
-				props[mapKey] = value;
-				doRender();
-			}
-		});
+	const keys = [...Object.getOwnPropertyNames(reflect).map((key) => {
+		return {
+			key: key as Extract<keyof P, string>,
+			value: reflect[key],
+			reflect: true
+		}
+	}), ...Object.getOwnPropertyNames(priv).map((key) => {
+		return {
+			key: key as Extract<keyof T, string>,
+			value: priv[key],
+			reflect: false
+		}
+	})];
+	for (const { key, reflect, value } of keys) {
+		const mapKey = key as Extract<keyof P|T, string>;
+
+		const mapData = value;
+		let mapType: DefinePropTypes;
+		if (typeof mapData === 'object' && 'type' in mapData) {
+			const objMapData = mapData as DefinePropTypeConfig;
+			mapType = objMapData.type;
+		} else {
+			mapType = mapData as DefinePropTypes;
+		}
+
+		if (reflect) {
+			Object.defineProperty(element, mapKey, {
+				get() {
+					return getter(element, mapKey, mapType);
+				},
+				set(value) {
+					setter(element, mapKey, value, mapType);
+					props[mapKey] = value;
+					doRender();
+				}
+			});
+		}
 		Object.defineProperty(props, mapKey, {
 			get() {
 				return propValues[mapKey];
 			},
 			set(value) {
 				propValues[mapKey] = value;
-				setter(element, mapKey, value, map[mapKey]);
+				if (reflect) {
+					setter(element, mapKey, value, mapType);
+				}
 				doRender();
 			}
 		});
-		propValues[mapKey] = getter(element, mapKey, map[mapKey]) as any;
+		propValues[mapKey] = getter(element, mapKey, mapType) as any;
 	}
 	return props as R;
 }

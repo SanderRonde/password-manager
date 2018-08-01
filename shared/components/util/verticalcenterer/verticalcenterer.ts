@@ -51,9 +51,13 @@ import { html } from 'lit-html';
 export class VerticalCenterer extends WebComponent {
 	static is = genIs('vertical-centerer', VerticalCenterer);
 
-	public props = defineProps(this, {
+	constructor() {
+		super();
+	}
+
+	props = defineProps(this, {
 		fullscreen: PROP_TYPE.BOOL
-	}, this.__render);
+	}, {}, this.__render);
 
 	render() {
 		return html`
@@ -74,7 +78,7 @@ export class VerticalCenterer extends WebComponent {
 				}
 			</style>
 			<div id="container" class="${classNames({
-				fullscreen: this.props.fullscreen
+				fullscreen: true
 			})}">
 				<div id="content">
 					<slot></slot>

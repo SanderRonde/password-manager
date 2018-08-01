@@ -512,7 +512,7 @@
 import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
 import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
 import { WebComponent, genIs } from '../../../lib/webcomponent-util'
-import { html, render } from 'lit-html/lib/lit-extended';
+import { html } from 'lit-html/lib/lit-extended';
 
 export class Login extends WebComponent {
 	static dependencies = [VerticalCenterer, HorizontalCenterer];
