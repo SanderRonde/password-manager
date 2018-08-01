@@ -32,3 +32,24 @@
 // 	}
 // })();
 // export const HorizontalCenterer = withStyles(styles)(_HorizontalCenterer);
+
+import { html, render } from 'lit-html';
+import { WebComponent } from '../../../lib/webcomponent-util';
+
+export class HorizontalCenterer extends HTMLElement implements WebComponent {
+	constructor() {
+		super();
+
+		this.render(this.attachShadow({
+			mode: 'closed'
+		}));
+	}
+
+	render(root: ShadowRoot) {
+
+	}
+
+	static define() {
+		window.customElements.define('horizontal-centerer', HorizontalCenterer);
+	}
+}
