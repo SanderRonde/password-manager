@@ -30,7 +30,7 @@
         "test/**/*"
     ],
     "exclude": [
-        "app/actions/server/websever/client/"
+        "app/actions/server/webserver/client/"
     ],
     "references": [{
         "path": "../shared"   
