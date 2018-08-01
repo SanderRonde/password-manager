@@ -517,6 +517,11 @@ import { html } from 'lit-html/lib/lit-extended';
 export class Login extends WebComponent {
 	static dependencies = [VerticalCenterer, HorizontalCenterer];
 	static is = genIs('login-page', Login);
+
+	constructor() {
+		super();
+		this.__render();
+	}
 	
 	render() {
 		return html`

@@ -4,6 +4,11 @@ import { html } from 'lit-html';
 export class HorizontalCenterer extends WebComponent {
 	static is = genIs('horizontal-centerer', HorizontalCenterer);
 
+	constructor() {
+		super();
+		this.__render();
+	}
+
 	render() {
 		return html`
 			<style>

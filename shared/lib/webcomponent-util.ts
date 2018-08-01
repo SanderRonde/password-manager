@@ -1,4 +1,4 @@
-import { TemplateResult } from "lit-html";
+import { TemplateResult, render } from "lit-html";
 
 // From https://github.com/JedWatson/classnames
 
@@ -294,16 +294,11 @@ export class WebComponent extends HTMLElement {
 		mode: 'closed'
 	});
 
-	constructor() {
-		super();
-		this.__render();
-	}
-
 	render(): TemplateResult {
 		throw new Error('No render method implemented');
 	}
 	protected __render() {
-		this.render(), this._root
+		render(this.render(), this._root);
 	}
 
 	static define() {
