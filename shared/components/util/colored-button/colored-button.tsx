@@ -1,11 +1,11 @@
 import { withStyles, createStyles } from '@material-ui/core/styles';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
+import { classNames, important } from '../../../lib/react-util';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import { ButtonBaseProps } from '@material-ui/core/ButtonBase';
 import { ButtonBase, StandardProps } from '@material-ui/core';
 import { ButtonClassKey } from '@material-ui/core/Button';
-import { classNames } from '../../../lib/react-util';
 import * as React from 'react';
 
 // const FAILED_COLOR = '#F44336';
@@ -53,7 +53,7 @@ const styles = (theme: Theme) => createStyles({
 
 	/* Styles applied to the root element if `variant="text"` and `color="primary"`. */
 	textPrimary: {
-		color: theme.palette.primary.main,
+		color: important(theme.palette.primary.main),
 		'&:hover': {
 			backgroundColor: fade(theme.palette.primary.main, (theme.palette.action as any).hoverOpacity),
 				// Reset on touch devices, it doesn't add specificity
@@ -65,7 +65,7 @@ const styles = (theme: Theme) => createStyles({
 
 	/* Styles applied to the root element if `variant="text"` and `color="secondary"`. */
 	textSecondary: {
-		color: theme.palette.secondary.main,
+		color: important(theme.palette.secondary.main),
 		'&:hover': {
 			backgroundColor: fade(theme.palette.secondary.main, (theme.palette.action as any).hoverOpacity),
 				// Reset on touch devices, it doesn't add specificity
@@ -91,8 +91,8 @@ const styles = (theme: Theme) => createStyles({
 
 	/* Styles applied to the root element if `variant="[contained | fab]"`. */
 	contained: {
-		color: theme.palette.getContrastText(theme.palette.grey[300]),
-		backgroundColor: theme.palette.grey[300],
+		color: important(theme.palette.getContrastText(theme.palette.grey[300])),
+		backgroundColor: important(theme.palette.grey[300]),
 		boxShadow: theme.shadows[2],
 		'&$focusVisible': {
 			boxShadow: theme.shadows[6]
@@ -119,8 +119,8 @@ const styles = (theme: Theme) => createStyles({
 
 	/* Styles applied to the root element if `variant="[contained | fab|"` and `color="primary"`. */
 	containedPrimary: {
-		color: theme.palette.primary.contrastText,
-		backgroundColor: theme.palette.primary.main,
+		color: important(theme.palette.primary.contrastText),
+		backgroundColor: important(theme.palette.primary.main),
 		'&:hover': {
 			backgroundColor: theme.palette.primary.dark,
 			// Reset on touch devices, it doesn't add specificity
@@ -132,8 +132,8 @@ const styles = (theme: Theme) => createStyles({
 
 	/* Styles applied to the root element if `variant="[contained | fab]"` and `color="secondary"`. */
 	containedSecondary: {
-		color: theme.palette.secondary.contrastText,
-		backgroundColor: theme.palette.secondary.main,
+		color: important(theme.palette.secondary.contrastText),
+		backgroundColor: important(theme.palette.secondary.main),
 		'&:hover': {
 			backgroundColor: theme.palette.secondary.dark,
 			// Reset on touch devices, it doesn't add specificity
