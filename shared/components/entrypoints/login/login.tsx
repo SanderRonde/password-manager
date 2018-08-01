@@ -452,7 +452,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 													</IconButton>
 												</InputAdornment>	
 											}/>
-											<FormHelperText id="email-descr">{
+											<FormHelperText error id="email-descr">{
 												this.state.emailValidation.errorString
 											}</FormHelperText>
 									</FormControl>
@@ -466,7 +466,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 											title="Account password" id="password-input" 
 											onBlur={this.onPasswordBlur} 
 											onChange={multiFunctions(this.checkInputData)} />
-										<FormHelperText id="password-descr">{
+										<FormHelperText error color="#f44336" id="password-descr">{
 											this.state.passwordValidation.errorString
 										}</FormHelperText>
 									</FormControl>
@@ -480,7 +480,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 											autoComplete="off" id="twofactor-input" 
 											onBlur={this.onTwofactorBlur} margin="dense"
 											onChange={multiFunctions(this.checkInputData)} />
-										<FormHelperText id="twofactor-descr">{
+										<FormHelperText error color="#f44336" id="twofactor-descr">{
 											this.state.twofactorValidation.errorString
 										}</FormHelperText>
 									</FormControl>
