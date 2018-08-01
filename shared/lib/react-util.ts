@@ -37,7 +37,6 @@ export function classNames(...args: ClassNamesArg[]) {
 
 export function multiFunctions(...fns: Function[]) {
 	return (...args: any[]) => {
-		console.log(args);
 		fns.forEach((fn) => {
 			fn(...args);
 		});
