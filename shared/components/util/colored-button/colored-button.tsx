@@ -20,10 +20,10 @@ const styles = (theme: Theme) => createStyles({
 		minWidth: 64,
 		minHeight: 36,
 		padding: '8px 16px',
-		borderRadius: theme.shape.borderRadius,
-		color: theme.palette.text.primary,
+		borderRadius: important('4px'),
+		color: important(theme.palette.text.primary),
 		transition: theme.transitions.create(['background-color', 'box-shadow'], {
-		duration: theme.transitions.duration.short
+		duration: important(theme.transitions.duration.short)
 		}),
 		'&:hover': {
 			textDecoration: 'none',

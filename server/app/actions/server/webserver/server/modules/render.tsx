@@ -28,7 +28,7 @@ export function render(res: ResponseCaptured, {
 			primary: blueGrey,
 			secondary: indigo,
 			type: 'light'
-		},
+		}
 	});
 	const html = renderToString(
 		<JssProvider registry={sheetsRegistry} generateClassName={createGenerateClassName({

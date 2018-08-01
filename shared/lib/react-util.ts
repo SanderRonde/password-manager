@@ -49,6 +49,6 @@ export const enum ICON_STATE {
 	HIDDEN
 }
 
-export function important(rule: string) {
+export function important(rule: string|number) {
 	return `${rule}!important`
 }
