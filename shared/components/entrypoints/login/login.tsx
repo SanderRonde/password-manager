@@ -23,7 +23,6 @@ const styles = createStyles({
 	},
 
 	buttonStyles: {
-		marginTop: '25px',
 		fontSize: '150%'
 	},
 
