@@ -66,7 +66,8 @@ function serve(root: string, {
 
 function rewriteEsModuleImports(file: string): string {
 	return file	
-		.replace(/import (.*) from 'lit-html'/g, 'import $1 from \'/modules/lit-html\'');
+		.replace(/import (.*) from 'lit-html'/g, 'import $1 from \'/modules/lit-html\'')
+		.replace(/import (.*) from 'lit-html\/lib\/lit-extended'/g, 'import $1 from \'/modules/lit-html/lib/lit-extended\'');
 }
 
 async function genSingleFileWebpackRoute(res: express.Response, name: string, src: string) {
@@ -119,14 +120,31 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		await genSingleFileWebpackRoute(res, 'browserCrypto', 
 			path.join(PROJECT_ROOT, `shared/lib/browser-crypto.js`));
 	});
-	webserver.app.all('/modules/lit-html', async (_req, res) => {
+	webserver.app.all([
+		'/modules/lit-html',
+		'/modules/lit-html.js',
+		'/modules/lit-html/lit-html.js'
+	], async (_req, res) => {
 		res.contentType('.js');
 		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/lit-html/lit-html.js')));
 		res.end();
 	});
-	webserver.app.all('/modules/lit-html.js.map', async (_req, res) => {
+	webserver.app.all([
+		'/modules/lit-html.js.map',
+		'/modules/lit-html/lit-html.js.map'
+	], async (_req, res) => {
 		res.contentType('.js');
 		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/lit-html/lit-html.js.map')));
+		res.end();
+	});
+	webserver.app.all('/modules/lit-html/lib/lit-extended', async (_req, res) => {
+		res.contentType('.js');
+		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/lit-html/lib/lit-extended.js')));
+		res.end();
+	});
+	webserver.app.all('/modules/lit-html/lib/lit-extended.js.map', async (_req, res) => {
+		res.contentType('.js');
+		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/lit-html/lib/lit-extended.js.map')));
 		res.end();
 	});
 	webserver.app.use(serve(path.join(base, 'src/'), {
