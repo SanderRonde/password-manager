@@ -2,7 +2,7 @@
     "compilerOptions": {
         "jsx": "react",
         "alwaysStrict": true,
-        "baseUrl": "../../typings/",
+        "baseUrl": "../typings/",
         "forceConsistentCasingInFileNames": true,
         "module": "esnext",
         "moduleResolution": "node",
@@ -15,18 +15,20 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "target": "es2015",
+        "target": "es6",
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
-        "strictNullChecks": true
-	}, 
-    "allowJs": true,
+        "strictNullChecks": true,
+        "composite": true,
+        "declaration": true
+	},
     "compileOnSave": true,
-    "include": [
-        "./**/*"
-    ],
-    "exclude": [
-        "../lib"
-    ]
+    "allowJs": true,
+    "include": [],
+    "references": [{
+		"path": "./lib/tsconfig.ts3.json"
+	}, {
+		"path": "./components/tsconfig.ts3.json"
+	}]
 }

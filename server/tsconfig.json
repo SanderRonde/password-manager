@@ -19,20 +19,16 @@
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
-        "strictNullChecks": true,
-        "composite": true,
-        "declaration": true
+        "strictNullChecks": true
 	}, 
-    "compileOnSave": true,
     "allowJs": true,
+    "compileOnSave": true,
     "include": [
-        "app/**/*",
-        "test/**/*"
+        "app/",
+        "test/",
+        "../shared/lib"
     ],
     "exclude": [
         "app/actions/server/webserver/client/"
-    ],
-    "references": [{
-        "path": "../shared"   
-    }]
+    ]
 }

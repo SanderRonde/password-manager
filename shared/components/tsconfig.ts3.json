@@ -2,9 +2,9 @@
     "compilerOptions": {
         "jsx": "react",
         "alwaysStrict": true,
-        "baseUrl": "../typings/",
+        "baseUrl": "../../typings/",
         "forceConsistentCasingInFileNames": true,
-        "module": "commonjs",
+        "module": "esnext",
         "moduleResolution": "node",
         "noImplicitAny": true,
         "noImplicitThis": true,
@@ -15,20 +15,20 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "target": "es2015",
+        "target": "es6",
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
-        "strictNullChecks": true
-	}, 
-    "allowJs": true,
+        "strictNullChecks": true,
+        "composite": true,
+        "declaration": true
+	},
     "compileOnSave": true,
+    "allowJs": true,
     "include": [
-        "app/",
-        "test/",
-        "../shared/lib"
-    ],
-    "exclude": [
-        "app/actions/server/webserver/client/"
-    ]
+        "./**/*"
+	],
+	"references": [{
+		"path": "../lib"
+	}]
 }

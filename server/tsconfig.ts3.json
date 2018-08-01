@@ -4,7 +4,7 @@
         "alwaysStrict": true,
         "baseUrl": "../typings/",
         "forceConsistentCasingInFileNames": true,
-        "module": "esnext",
+        "module": "commonjs",
         "moduleResolution": "node",
         "noImplicitAny": true,
         "noImplicitThis": true,
@@ -15,20 +15,24 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "target": "es6",
+        "target": "es2015",
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
         "strictNullChecks": true,
         "composite": true,
         "declaration": true
-	},
+	}, 
     "compileOnSave": true,
     "allowJs": true,
-    "include": [],
+    "include": [
+        "app/**/*",
+        "test/**/*"
+    ],
+    "exclude": [
+        "app/actions/server/webserver/client/"
+    ],
     "references": [{
-		"path": "./lib"
-	}, {
-		"path": "./components"
-	}]
+        "path": "../shared/tsconfig.ts3.json"
+    }]
 }

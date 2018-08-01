@@ -29,6 +29,6 @@
         "./"
     ],
     "references": [{
-        "path": "../../../../../../../shared"
+        "path": "../../../../../../../shared/tsconfig.ts3.json"
     }]
 }

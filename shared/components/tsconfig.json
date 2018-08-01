@@ -15,20 +15,18 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "target": "es6",
+        "target": "es2015",
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
-        "strictNullChecks": true,
-        "composite": true,
-        "declaration": true
-	},
-    "compileOnSave": true,
+        "strictNullChecks": true
+	}, 
     "allowJs": true,
+    "compileOnSave": true,
     "include": [
         "./**/*"
-	],
-	"references": [{
-		"path": "../lib"
-	}]
+    ],
+    "exclude": [
+        "../lib"
+    ]
 }
