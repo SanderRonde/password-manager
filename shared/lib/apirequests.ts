@@ -1,5 +1,5 @@
 import { APIFns, APIArgs, APIReturns } from "../types/api";
-import { encryptWithPublicKey } from "./shared-crypto";
+import { encryptWithPublicKey } from "./browser-crypto";
 
 export function doHTTPRequest<R>(url: string, method: 'GET'|'POST', data: any): Promise<R> {
 	const json = JSON.stringify(data);

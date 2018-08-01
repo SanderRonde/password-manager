@@ -33,6 +33,6 @@
         "app/actions/server/webserver/client/"
     ],
     "references": [{
-        "path": "../shared/tsconfig.ts3.json"
+        "path": "../shared"
     }]
 }
