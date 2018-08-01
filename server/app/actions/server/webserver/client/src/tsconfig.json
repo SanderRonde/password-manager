@@ -26,7 +26,7 @@
     "allowJs": true,
     "compileOnSave": true,
     "include": [
-        "./", "../html.ts"
+        "./"
     ],
     "references": [{
         "path": "../../../../../../../shared"
