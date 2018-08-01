@@ -52,3 +52,8 @@ export const enum ICON_STATE {
 export function important(rule: string|number) {
 	return `${rule}!important`
 }
+
+export declare class WebComponent {
+	render(root: ShadowRoot): HTMLElement;
+	static define(): void;
+}
