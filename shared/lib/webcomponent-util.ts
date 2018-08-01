@@ -54,6 +54,13 @@ export function important(rule: string|number) {
 }
 
 export declare class WebComponent {
-	render(root: ShadowRoot): HTMLElement;
+	render(root: ShadowRoot): void;
 	static define(): void;
+}
+
+export function define(name: string, component: any) {
+	if (window.customElements.get(name)) {
+		return;
+	}
+	window.customElements.define(name, component);
 }

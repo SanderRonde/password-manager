@@ -509,6 +509,8 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
+import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
+import { define } from '../../../lib/webcomponent-util'
 import { html, render } from 'lit-html';
 
 export class Login extends HTMLElement {
@@ -521,10 +523,16 @@ export class Login extends HTMLElement {
 	}
 
 	render(root: ShadowRoot) {
-		return render(html`<div>hi login</div>`, root);
+		render(html`
+			<div>
+				<horizontal-centerer>
+					<div>hi login</div>
+				</horizontal-centerer>
+			</div>`, root);
 	}
 
 	static define() {
-		window.customElements.define('login-page', Login);
+		HorizontalCenterer.define();
+		define('login-page', Login);
 	}
 }
