@@ -298,8 +298,12 @@ export class WebComponent extends HTMLElement {
 		throw new Error('No render method implemented');
 	}
 	protected __render() {
+		this.__preRender();
 		render(this.render(), this._root);
+		this.__postRender();
 	}
+	protected __preRender() {}
+	protected __postRender() {}
 
 	static define() {
 		for (const dependency of this.dependencies) {
