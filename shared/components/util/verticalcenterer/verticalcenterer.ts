@@ -44,3 +44,35 @@
 // 	}
 // })();
 // export const VerticalCenterer = withStyles(styles)(_VerticalCenterer);
+
+import { WebComponent, defineProps, PROP_TYPE, genIs } from '../../../lib/webcomponent-util';
+import { html, render } from 'lit-html';
+
+export class VerticalCenterer extends WebComponent {
+	static is = genIs('vertical-centerer', VerticalCenterer);
+
+	public props = defineProps(this, {
+		fullscreen: PROP_TYPE.BOOL
+	});
+
+	render(root: ShadowRoot) {
+		render(html`
+			<style>
+				#container {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					height: 100%;
+				}
+
+				#content {
+					display: block;
+				}
+			</style>
+			<div id="container">
+				<div id="content">
+					<slot></slot>
+				</div>
+			</div>`, root)
+	}
+}

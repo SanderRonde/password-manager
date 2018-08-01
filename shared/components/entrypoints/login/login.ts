@@ -510,29 +510,22 @@
 // }
 
 import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
-import { define } from '../../../lib/webcomponent-util'
-import { html, render } from 'lit-html';
+import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
+import { WebComponent, genIs } from '../../../lib/webcomponent-util'
+import { html, render } from 'lit-html/lib/lit-extended';
 
-export class Login extends HTMLElement {
-	constructor() {
-		super();
-
-		this.render(this.attachShadow({
-			mode: 'closed'
-		}));
-	}
-
+export class Login extends WebComponent {
+	static dependencies = [VerticalCenterer, HorizontalCenterer];
+	static is = genIs('login-page', Login);
+	
 	render(root: ShadowRoot) {
 		render(html`
 			<div>
 				<horizontal-centerer>
-					<div>hi login</div>
+					<vertical-centerer fullscreen>
+						<div>hi login</div>
+					</vertical-centerer>
 				</horizontal-centerer>
 			</div>`, root);
-	}
-
-	static define() {
-		HorizontalCenterer.define();
-		define('login-page', Login);
 	}
 }

@@ -1,14 +1,8 @@
-import { WebComponent, define } from '../../../lib/webcomponent-util';
+import { WebComponent, genIs } from '../../../lib/webcomponent-util';
 import { html, render } from 'lit-html';
 
-export class HorizontalCenterer extends HTMLElement implements WebComponent {
-	constructor() {
-		super();
-
-		this.render(this.attachShadow({
-			mode: 'closed'
-		}));
-	}
+export class HorizontalCenterer extends WebComponent {
+	static is = genIs('horizontal-centerer', HorizontalCenterer);
 
 	render(root: ShadowRoot) {
 		render(html`
@@ -28,9 +22,5 @@ export class HorizontalCenterer extends HTMLElement implements WebComponent {
 					<slot></slot>
 				</div>
 			</div>`, root)
-	}
-
-	static define() {
-		define('horizontal-centerer', HorizontalCenterer);
 	}
 }
