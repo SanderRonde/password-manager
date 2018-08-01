@@ -66,8 +66,8 @@ function serve(root: string, {
 
 function rewriteEsModuleImports(file: string): string {
 	return file	
-		.replace(/import (.*) from 'lit-html'/g, 'import $1 from \'/modules/lit-html\'')
-		.replace(/import (.*) from 'lit-html\/lib\/lit-extended'/g, 'import $1 from \'/modules/lit-html/lib/lit-extended\'');
+		.replace(/import (.*) from ['"]lit-html['"]/g, 'import $1 from \'/modules/lit-html\'')
+		.replace(/import (.*) from ['"]lit-html\/lib\/lit-extended['"]/g, 'import $1 from \'/modules/lit-html/lib/lit-extended\'');
 }
 
 async function genSingleFileWebpackRoute(res: express.Response, name: string, src: string) {
