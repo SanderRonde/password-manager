@@ -111,15 +111,20 @@ export function setter(element: HTMLElement, name: string, value: string|boolean
 	}
 }
 
+interface ExactTypeHaver {
+	exactType: any;
+}
+
 type GetTSType<V extends PROP_TYPE|JSONType<any>|DefinePropTypeConfig> = 
 	V extends PROP_TYPE.BOOL ? boolean : 
 		V extends PROP_TYPE.NUMBER ?  number : 
 			V extends PROP_TYPE.STRING ? string : 
 				V extends JSONType<infer R> ? R : 
 					V extends DefinePropTypeConfig ? 
-						V['type'] extends PROP_TYPE.BOOL ? boolean : 
-							V['type'] extends PROP_TYPE.NUMBER ?  number : 
-								V['type'] extends PROP_TYPE.STRING ? string : void : void;
+						V extends ExactTypeHaver ? V['exactType'] :
+							V['type'] extends PROP_TYPE.BOOL ? boolean : 
+								V['type'] extends PROP_TYPE.NUMBER ?  number : 
+									V['type'] extends PROP_TYPE.STRING ? string : void : void;
 
 export const enum PROP_TYPE {
 	STRING = 'string',
@@ -138,7 +143,9 @@ type DefinePropTypes = PROP_TYPE|JSONType<any>;
 interface DefinePropTypeConfig {
 	type: DefinePropTypes;
 	watch?: boolean;
+	defaultValue?: string;
 	watchProperties?: string[];
+	exactType?: any;
 }
 
 function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): DefinePropTypeConfig {
@@ -253,6 +260,7 @@ export function defineProps<P extends {
 
 		const { 
 			watch,
+			defaultValue,
 			type: mapType,
 			watchProperties = []
 		} = getDefinePropConfig(value);
@@ -290,6 +298,10 @@ export function defineProps<P extends {
 			}
 		});
 		propValues[mapKey] = getter(element, mapKey, mapType) as any;
+		if (defaultValue !== undefined) {
+			propValues[mapKey] = defaultValue as any;
+			setter(element, mapKey, defaultValue, mapType);
+		}
 	}
 	return props as R;
 }
