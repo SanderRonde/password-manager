@@ -1,46 +1,46 @@
-import { withStyles, createStyles } from '@material-ui/core/styles';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
-import { classNames } from '../../../lib/react-util';
-import * as React from 'react';
+// import { withStyles, createStyles } from '@material-ui/core/styles';
+// import { WithStyles } from '@material-ui/core/styles/withStyles';
+// import { classNames } from '../../../lib/react-util';
+// import * as React from 'react';
 
-const styles = createStyles({
-	container: {
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'center',
-		height: '100%'
-	},
+// const styles = createStyles({
+// 	container: {
+// 		display: 'flex',
+// 		flexDirection: 'column',
+// 		justifyContent: 'center',
+// 		height: '100%'
+// 	},
 
-	fullscreen: {
-		height: '100vh'
-	},
+// 	fullscreen: {
+// 		height: '100vh'
+// 	},
 
-	main: {
-		display: 'block'
-	}
-});
+// 	main: {
+// 		display: 'block'
+// 	}
+// });
 
-export interface VerticalCentererProps extends WithStyles<typeof styles> {
-	fullscreen?: boolean;
-}
-const _VerticalCenterer = (() => {
-	return class VerticalCenterer extends React.Component<VerticalCentererProps> {
-		constructor(props: VerticalCentererProps) {
-			super(props);
-		}
+// export interface VerticalCentererProps extends WithStyles<typeof styles> {
+// 	fullscreen?: boolean;
+// }
+// const _VerticalCenterer = (() => {
+// 	return class VerticalCenterer extends React.Component<VerticalCentererProps> {
+// 		constructor(props: VerticalCentererProps) {
+// 			super(props);
+// 		}
 
-		render() {
-			return (
-				<div className={classNames(
-					this.props.classes.container, {
-						[this.props.classes.fullscreen]: this.props.fullscreen
-					})}>
-					<div className={this.props.classes.main}>
-						{this.props.children}
-					</div>
-				</div>
-			)
-		}
-	}
-})();
-export const VerticalCenterer = withStyles(styles)(_VerticalCenterer);
+// 		render() {
+// 			return (
+// 				<div className={classNames(
+// 					this.props.classes.container, {
+// 						[this.props.classes.fullscreen]: this.props.fullscreen
+// 					})}>
+// 					<div className={this.props.classes.main}>
+// 						{this.props.children}
+// 					</div>
+// 				</div>
+// 			)
+// 		}
+// 	}
+// })();
+// export const VerticalCenterer = withStyles(styles)(_VerticalCenterer);
