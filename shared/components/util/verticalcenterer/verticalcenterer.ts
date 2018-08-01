@@ -78,7 +78,7 @@ export class VerticalCenterer extends WebComponent {
 				}
 			</style>
 			<div id="container" class="${classNames({
-				fullscreen: true
+				fullscreen: this.props.fullscreen
 			})}">
 				<div id="content">
 					<slot></slot>
