@@ -488,7 +488,7 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 										this.props.classes.floatChildRight,
 										this.props.classes.buttonStyles
 									)}>
-										<ColoredButton variant="raised" size="large" 
+										<ColoredButton variant="contained" size="large" 
 											onClick={this.login}
 										>
 											Submit
