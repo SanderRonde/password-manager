@@ -115,6 +115,10 @@ interface ExactTypeHaver {
 	exactType: any;
 }
 
+interface Coerced {
+	coerce: true;
+}
+
 type GetTSType<V extends PROP_TYPE|JSONType<any>|DefinePropTypeConfig> = 
 	V extends PROP_TYPE.BOOL ? boolean : 
 		V extends PROP_TYPE.NUMBER ?  number : 
@@ -122,9 +126,13 @@ type GetTSType<V extends PROP_TYPE|JSONType<any>|DefinePropTypeConfig> =
 				V extends JSONType<infer R> ? R : 
 					V extends DefinePropTypeConfig ? 
 						V extends ExactTypeHaver ? V['exactType'] :
-							V['type'] extends PROP_TYPE.BOOL ? boolean : 
-								V['type'] extends PROP_TYPE.NUMBER ?  number : 
-									V['type'] extends PROP_TYPE.STRING ? string : void : void;
+							V['type'] extends PROP_TYPE.BOOL ? 
+								V extends Coerced ? boolean : boolean|undefined : 
+							V['type'] extends PROP_TYPE.NUMBER ? 
+								V extends Coerced ? number : number|undefined : 
+							V['type'] extends PROP_TYPE.STRING ? 
+								V extends Coerced ? string : string|undefined : 
+							void : void;
 
 export const enum PROP_TYPE {
 	STRING = 'string',
@@ -146,6 +154,7 @@ interface DefinePropTypeConfig {
 	defaultValue?: GetTSType<this['type']>;
 	watchProperties?: string[];
 	exactType?: any;
+	coerce?: boolean;
 }
 
 function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): DefinePropTypeConfig {
@@ -154,6 +163,7 @@ function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): Defin
 		return data;
 	} else {
 		return {
+			coerce: false,
 			watch: true,
 			type: value as DefinePropTypes
 		}
@@ -273,6 +283,7 @@ export function defineProps<P extends {
 
 		const { 
 			watch,
+			coerce,
 			defaultValue,
 			type: mapType,
 			watchProperties = []
@@ -295,7 +306,19 @@ export function defineProps<P extends {
 		}
 		Object.defineProperty(props, mapKey, {
 			get() {
-				return propValues[mapKey];
+				const value = propValues[mapKey];
+				if (coerce) {
+					switch (mapType) {
+						case PROP_TYPE.STRING:
+							return value || '';
+						case PROP_TYPE.BOOL:
+							return value || false;
+						case PROP_TYPE.NUMBER:
+							return value || 0;
+					}
+				}
+				return value;
+
 			},
 			set(value) {
 				const original = value;
