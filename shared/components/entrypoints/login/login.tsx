@@ -1,7 +1,8 @@
-import { Button, FormHelperText, FormControl, InputLabel, InputAdornment, IconButton, Input } from '@material-ui/core';
+import { FormHelperText, FormControl, InputLabel, InputAdornment, IconButton, Input } from '@material-ui/core';
 import { genRSAKeyPair, encryptWithPublicKey, pad } from '../../../lib/shared-crypto';
 import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
 import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
+import { ColoredButton } from '../../util/colored-button/colored-button';
 import { DataContainer } from '../../util/datacontainer/datacontainer';
 import { classNames, multiFunctions } from '../../../lib/react-util';
 import { withStyles, createStyles } from '@material-ui/core/styles';
@@ -485,11 +486,11 @@ function getLogin<D extends LoginData>(data: D|null = null) {
 										this.props.classes.floatChildRight,
 										this.props.classes.buttonStyles
 									)}>
-										<Button variant="raised" size="large" 
+										<ColoredButton variant="raised" size="large" 
 											onClick={this.login}
 										>
 											Submit
-										</Button>
+										</ColoredButton>
 									</div>
 								</form>
 							</div>

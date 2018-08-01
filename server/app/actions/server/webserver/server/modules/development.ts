@@ -7,6 +7,21 @@ import * as fs from 'fs-extra'
 import * as path from 'path'
 import { parse } from "url";
 
+const IMPORT_MAP = {
+	"login": [{
+		"colored-button": [
+			'ButtonBase'
+		]},
+		'FormHelperText',
+		'FormControl',
+		'InputLabel',
+		'InputAdornment',
+		'IconButton',
+		'Input'
+	],
+	"dashboard": []
+}
+
 function synchronizePromise<T>(prom: Promise<T>): Promise<{
 	err: Error|null;
 	result: T|null;
@@ -68,6 +83,7 @@ function serve(root: string, {
 function rewriteEsModuleImports(file: string): string {
 	return file	
 		.replace(/import React from 'react'/g, 'import React from "/modules/react"')
+		.replace(/import warning from 'warning';/g, 'import warning from "/modules/warning"')
 		.replace(/import pure from 'recompose\/pure'/g, 'import pure from "/modules/recompose/pure"')
 		.replace(/import (\w+) from '@material-ui\/core\/(\w+)'/g, 'import $1 from "/modules/material-ui/$2"');
 }
@@ -115,29 +131,26 @@ function prefixImports(file: string, prefix: string) {
 	return lines.join('\n');
 }
 
-function getMaterialUICoreImportName(content: string) {
-	for (const line of content.split('\n')) {
-		const match = /\w+ (\w+) = require\("@material-ui\/core"\)/.exec(line);
-		if (match) {
-			return match[1];
+type ImportMap = (string|{
+	[key: string]: ImportMap;
+})[];
+function flattenImportMap(current: ImportMap, arr: string[]) {
+	for (const item of current) {
+		if (typeof item === 'string') {
+			arr.push(item);
+		} else {
+			Object.getOwnPropertyNames(item).map((key) => {
+				flattenImportMap(item[key], arr);
+			});
 		}
 	}
-	return 'core_1';
+	return arr;
 }
 
-function genCustomMaterialUICore(content: string) {
-	const imports: string[] = [];
-	const name = getMaterialUICoreImportName(content);
-	const lines = content.split('\n');
-	const nameRegex = new RegExp(`${name}\\.(\\w+)`);
-	for (let line of lines) {
-		while (nameRegex.exec(line)) {
-			const match = nameRegex.exec(line)!;
-			imports.push(match[1]);
+function genCustomMaterialUICore(route: keyof typeof IMPORT_MAP) {
+	const imports = flattenImportMap(IMPORT_MAP[route], []);
 
-			line = line.replace(nameRegex, '---');
-		}
-	}
+	console.log(imports);
 
 	return imports.filter((val, index, arr) => arr.indexOf(val) === index).map((component) => {
 		return `export { default as ${component} } from './${component}';`
@@ -222,9 +235,9 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 	webserver.app.all('/modules/material-ui/core', async (req, res) => {
 		const ref = req.header('Referer')!;
 		const refFile = parse(ref).pathname!;
-		const srcFile = await fs.readFile(path.join(PROJECT_ROOT, refFile));
+		const file = refFile.split('/').pop()!.split('.')[0];
 		res.contentType('.js');
-		res.write(genCustomMaterialUICore(srcFile.toString()));
+		res.write(genCustomMaterialUICore(file as keyof typeof IMPORT_MAP));
 		res.end();
 	});
 	webserver.app.use(serve(materialUIIconsRoot, {
@@ -269,6 +282,20 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 			injectSheet
 		}
 		`);
+		res.end();
+	});
+	webserver.app.all('/modules/warning', async (_req, res) => {
+		res.contentType('.js');
+		res.write(`
+		const warning = (condition, _, args) => { if (!condition) { console.log(args); } };
+		export default warning`)
+		res.end();
+	});
+	webserver.app.all('/modules/material-ui/core/styles/colorManipulator', async (_req, res) => {
+		res.contentType('.js');
+		const file = await fs.readFile(
+			path.join(materialUICoreRoot, 'es/styles/colorManipulator.js'));
+		res.write(rewriteEsModuleImports(file.toString()).replace(/process.env.NODE_ENV/g, '"development"'));
 		res.end();
 	});
 	webserver.app.all('/shared/lib/shared-crypto.js', async (_req, res) => {

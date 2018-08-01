@@ -24,6 +24,7 @@
         "declaration": true
 	},
     "compileOnSave": true,
+    "allowJs": true,
     "include": [
         "./**/*"
     ]
