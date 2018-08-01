@@ -252,7 +252,7 @@ const _ColoredButton = (() => {
 			const fab = variant === 'fab' || variant === 'extendedFab';
 			const contained = variant === 'contained' || variant === 'raised';
 			const text = variant === 'text' || variant === 'flat' || variant === 'outlined';
-			const color = this.props.color || 'inherit';
+			const color = this.props.color || 'primary';
 			
 			return classNames(this.props.classes.root, {
 				[this.props.classes.fab]: fab,
