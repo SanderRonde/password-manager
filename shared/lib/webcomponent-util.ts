@@ -143,7 +143,7 @@ type DefinePropTypes = PROP_TYPE|JSONType<any>;
 interface DefinePropTypeConfig {
 	type: DefinePropTypes;
 	watch?: boolean;
-	defaultValue?: string;
+	defaultValue?: GetTSType<this['type']>;
 	watchProperties?: string[];
 	exactType?: any;
 }
