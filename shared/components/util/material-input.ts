@@ -1,4 +1,4 @@
-import { WebComponent, defineProps, genIs, PROP_TYPE, classNames } from '../../lib/webcomponent-util';
+import { defineProps, genIs, PROP_TYPE, classNames, QueryableWebComponent } from '../../lib/webcomponent-util';
 import { html } from 'lit-html';
 import { bindToClass } from '../../lib/decorators';
 import { theme } from '../theming/theme';
@@ -196,7 +196,12 @@ const styles = html`<style>
 	}
 </style>`;
 
-export class MaterialInput extends WebComponent {
+export class MaterialInput extends QueryableWebComponent<{
+	container: HTMLElement;
+	input: HTMLInputElement;
+	mainInputContainer: HTMLElement;
+	label: HTMLLabelElement;
+}> {
 	static is = genIs('material-input', MaterialInput);
 	private _input: HTMLInputElement|null = null;
 	private _container: HTMLElement|null = null;
@@ -327,8 +332,8 @@ export class MaterialInput extends WebComponent {
 	}
 
 	__postRender() {
-		this._container = this.$('#container');
-		this._input = this.$('input') as HTMLInputElement;
+		this._input = this.$.input;
+		this._container = this.$.container;
 		if (this._input && this._container) {
 			this._input.onkeydown = () => {
 				window.setTimeout(() => {
@@ -377,7 +382,7 @@ export class MaterialInput extends WebComponent {
 						pattern="${this.props.pattern}">
 					<slot class="iconSlot" name="postIcon"></slot>
 				</div>
-				<label class="mdl-textfield__label">${this.props.label}</label>
+				<label id="label" class="mdl-textfield__label">${this.props.label}</label>
 				<span class="mdl-textfield__error">${this.props.error}</span>
 			</div>`;
 	}

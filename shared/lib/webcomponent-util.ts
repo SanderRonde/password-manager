@@ -340,10 +340,17 @@ export function defineProps<P extends {
 	return props as R;
 }
 
+type IDMapFn<IDS> = {
+	// <K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
+    // <K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
+    // <E extends Element = Element>(selector: string): E | null;
+	(selector: string): HTMLElement|null;
+} & IDS;
+
 export class WebComponent extends HTMLElement {
 	protected static dependencies: typeof WebComponent[] = [];
 	protected static is: [string, typeof WebComponent];
-	private _root = this.attachShadow({
+	protected _root = this.attachShadow({
 		mode: 'closed'
 	});
 
@@ -351,9 +358,6 @@ export class WebComponent extends HTMLElement {
 		this.__render();
 	}
 
-	render(): TemplateResult {
-		throw new Error('No render method implemented');
-	}
 	protected __preRender() {}
 	@bindToClass
 	protected __render() {
@@ -363,11 +367,8 @@ export class WebComponent extends HTMLElement {
 	}
 	protected __postRender() {}
 
-	$<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
-    $<K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
-    $<E extends Element = Element>(selector: string): E | null;
-	$(selector: string): HTMLElement|null {
-		return this._root.querySelector(selector);
+	render(): TemplateResult {
+		throw new Error('No render method implemented');
 	}
 
 	$$<K extends keyof HTMLElementTagNameMap>(selector: K): NodeListOf<HTMLElementTagNameMap[K]>;
@@ -386,6 +387,24 @@ export class WebComponent extends HTMLElement {
 		}
 		define(this.is[0], this.is[1]);
 	}
+}
+
+export class QueryableWebComponent<IDS extends {
+	[key: string]: HTMLElement;
+} = {}> extends WebComponent {
+	$: IDMapFn<IDS> = (() => {
+		const __this = this;
+		return new Proxy((selector: string) => {
+			return this._root.querySelector(selector) as HTMLElement;
+		}, {
+			get(_, id) {
+				if (typeof id !== 'string') {
+					return null;
+				}
+				return __this._root.getElementById(id);
+			}
+		});
+	})() as IDMapFn<IDS>
 }
 
 export function genIs(name: string, component: typeof WebComponent): [string, typeof WebComponent] {

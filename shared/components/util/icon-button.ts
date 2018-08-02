@@ -1,4 +1,4 @@
-import { WebComponent, genIs } from "../../lib/webcomponent-util";
+import { genIs, QueryableWebComponent } from "../../lib/webcomponent-util";
 import { html } from "lit-html";
 
 const styles = html`<style>
@@ -247,7 +247,7 @@ const styles = html`<style>
 	}
 </style>`
 
-export class IconButton extends WebComponent {
+export class IconButton extends QueryableWebComponent {
 	static is = genIs('icon-button', IconButton);
 
 	constructor() {

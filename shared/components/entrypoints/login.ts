@@ -509,7 +509,7 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
-import { WebComponent, genIs, defineProps, PROP_TYPE, isDefined } from '../../lib/webcomponent-util'
+import { genIs, defineProps, PROP_TYPE, isDefined, QueryableWebComponent } from '../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../util/horizontalcenterer';
 import { VerticalCenterer } from '../util/verticalcenterer';
 import { MaterialInput } from '../util/material-input';
@@ -525,7 +525,13 @@ const styles = html`<style>
 	}
 </style>`
 
-export class Login extends WebComponent {
+export class Login extends QueryableWebComponent<{
+	lockButton: IconButton;
+	emailInput: MaterialInput;
+	passwordInput: MaterialInput;
+	twofactorInput: MaterialInput;
+	formContainer: HTMLFormElement;
+}> {
 	static dependencies = [
 		VerticalCenterer, 
 		HorizontalCenterer, 
@@ -544,12 +550,12 @@ export class Login extends WebComponent {
 
 		const inputValue = localStorage.getItem('rememberedEmail')
 		if (isDefined(inputValue)) {
-			(this.$('#emailInput')! as MaterialInput).set(inputValue);
+			this.$.emailInput.set(inputValue);
 			this.props.emailRemembered = true;
-			(this.$('#passwordInput') as MaterialInput).input.focus();
+			this.$.passwordInput.input.focus();
 		} else {
 			this.props.emailRemembered = false;
-			(this.$('#emailInput') as MaterialInput).input.focus();
+			this.$.emailInput.input.focus();
 		}
 	}
 
@@ -566,10 +572,7 @@ export class Login extends WebComponent {
 	}
 
 	__postRender() {
-		const icon = this.$('#lockButton');
-		if (icon) {
-			icon.addEventListener('click', this.handleEmailRememberToggle);
-		}
+		this.$.lockButton.addEventListener('click', this.handleEmailRememberToggle);
 	}
 
 	render() {
