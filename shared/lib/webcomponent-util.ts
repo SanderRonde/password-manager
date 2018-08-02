@@ -349,33 +349,31 @@ type IDMapFn<IDS> = {
 
 export class WebComponent extends HTMLElement {
 	protected static dependencies: typeof WebComponent[] = [];
-	protected static is: [string, typeof WebComponent];
-	protected _root = this.attachShadow({
-		mode: 'closed'
-	});
+	protected static is: [string, typeof WebComponent];;
+
+	protected internals = {
+		root: this.attachShadow({
+			mode: 'closed'
+		}),
+		postRenderHooks: [] as (() => void)[]
+	}
 
 	protected __init() {
 		this.__render();
 	}
 
-	protected __preRender() {}
 	@bindToClass
 	protected __render() {
-		this.__preRender();
-		render(this.render(), this._root);
-		this.__postRender();
+		this.preRender();
+		render(this.render(), this.internals.root);
+		this.internals.postRenderHooks.forEach(fn => fn());
+		this.postRender();
 	}
-	protected __postRender() {}
+	protected preRender() {}
+	protected postRender() {}
 
 	render(): TemplateResult {
 		throw new Error('No render method implemented');
-	}
-
-	$$<K extends keyof HTMLElementTagNameMap>(selector: K): NodeListOf<HTMLElementTagNameMap[K]>;
-    $$<K extends keyof SVGElementTagNameMap>(selector: K): NodeListOf<SVGElementTagNameMap[K]>;
-	$$<E extends Element = Element>(selector: string): NodeListOf<E>;
-	$$(selector: string): NodeListOf<HTMLElement> {
-		return this._root.querySelectorAll(selector);
 	}
 
 	static define() {
@@ -392,19 +390,47 @@ export class WebComponent extends HTMLElement {
 export class QueryableWebComponent<IDS extends {
 	[key: string]: HTMLElement;
 } = {}> extends WebComponent {
+	private _thisMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
+
+	constructor() {
+		super();
+
+		this.internals.postRenderHooks.push(this._clearMap);
+	}
+
+	@bindToClass
+	private _clearMap() {
+		this._thisMap.clear();
+	}
+
 	$: IDMapFn<IDS> = (() => {
 		const __this = this;
 		return new Proxy((selector: string) => {
-			return this._root.querySelector(selector) as HTMLElement;
+			return this.internals.root.querySelector(selector) as HTMLElement;
 		}, {
 			get(_, id) {
 				if (typeof id !== 'string') {
 					return null;
 				}
-				return __this._root.getElementById(id);
+				const cached = __this._thisMap.get(id);
+				if (cached) {
+					return cached;
+				}
+				const el = __this.internals.root.getElementById(id);
+				if (el) {
+					__this._thisMap.set(id, el);
+				}
+				return el;
 			}
 		});
 	})() as IDMapFn<IDS>
+
+	$$<K extends keyof HTMLElementTagNameMap>(selector: K): NodeListOf<HTMLElementTagNameMap[K]>;
+    $$<K extends keyof SVGElementTagNameMap>(selector: K): NodeListOf<SVGElementTagNameMap[K]>;
+	$$<E extends Element = Element>(selector: string): NodeListOf<E>;
+	$$(selector: string): NodeListOf<HTMLElement> {
+		return this.internals.root.querySelectorAll(selector);
+	}
 }
 
 export function genIs(name: string, component: typeof WebComponent): [string, typeof WebComponent] {

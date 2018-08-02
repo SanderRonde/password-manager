@@ -329,7 +329,7 @@ export class MaterialInput extends QueryableWebComponent<{
 		}
 	}
 
-	__postRender() {
+	postRender() {
 		this.$.input = this.$.input;
 		this.$.container = this.$.container;
 		if (this.$.input && this.$.container) {

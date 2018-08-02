@@ -571,7 +571,7 @@ export class Login extends QueryableWebComponent<{
 		}
 	}
 
-	__postRender() {
+	postRender() {
 		this.$.lockButton.addEventListener('click', this.handleEmailRememberToggle);
 	}
 
