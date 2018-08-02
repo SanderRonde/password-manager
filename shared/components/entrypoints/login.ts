@@ -509,10 +509,12 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
+import { WebComponent, genIs, defineProps, PROP_TYPE } from '../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../util/horizontalcenterer';
 import { VerticalCenterer } from '../util/verticalcenterer';
 import { MaterialInput } from '../util/material-input';
-import { WebComponent, genIs } from '../../lib/webcomponent-util'
+import { LockClosed } from '../icons/lockClosed';
+import { LockOpen } from '../icons/lockOpen';
 import { html } from 'lit-html';
 
 const styles = html`<style>
@@ -524,6 +526,10 @@ const styles = html`<style>
 export class Login extends WebComponent {
 	static dependencies = [VerticalCenterer, HorizontalCenterer, MaterialInput];
 	static is = genIs('login-page', Login);
+
+	props = defineProps(this, {}, {
+		lockOpen: PROP_TYPE.BOOL
+	}, this.__render);
 
 	constructor() {
 		super();
@@ -541,7 +547,11 @@ export class Login extends WebComponent {
 								type="email" title="Account's email"
 								error="Please enter a valid email address"
 								autoComplete="username" fill required
-								autoFocus label="Email"></material-input>
+								autoFocus label="Email"
+							>
+								<div slot="postIcon">${this.props.lockOpen ?
+									LockOpen : LockClosed}</div>
+							</material-input>
 							<material-input id="passwordInput" name="password"
 								type="password" title="Account password"
 								error="Please enter a password"
