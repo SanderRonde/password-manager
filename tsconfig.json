@@ -25,7 +25,7 @@
     "allowJs": true,
 	"include": [],
 	"references": [{
-		"path": "./server"
+		"path": "./server/tsconfig.ts3.json"
 	}, {
 		"path": "./server/app/actions/server/webserver/client/src"
 	}]
