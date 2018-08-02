@@ -1,4 +1,5 @@
 import { TemplateResult, render } from "lit-html";
+import { bindToClass } from "./decorators";
 
 // From https://github.com/JedWatson/classnames
 
@@ -296,11 +297,7 @@ export function defineProps<P extends {
 					return getter(element, propName, mapType);
 				},
 				set(value) {
-					setter(element, propName, value, mapType);
 					props[mapKey] = value;
-					if (watch) {
-						doRender();
-					}
 				}
 			});
 		}
@@ -360,10 +357,16 @@ export class WebComponent extends HTMLElement {
 		});
 	}
 
+	protected __init() {
+		this.__doBinds(this);
+		this.__render();
+	}
+
 	render(): TemplateResult {
 		throw new Error('No render method implemented');
 	}
 	protected __preRender() {}
+	@bindToClass
 	protected __render() {
 		this.__preRender();
 		render(this.render(), this._root);

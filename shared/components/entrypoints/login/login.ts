@@ -521,7 +521,11 @@ export class Login extends WebComponent {
 
 	constructor() {
 		super();
-		this.__render();
+		this.__init();
+	}
+
+	__postRender() {
+		
 	}
 	
 	render() {
@@ -529,8 +533,8 @@ export class Login extends WebComponent {
 			<div>
 				<horizontal-centerer>
 					<vertical-centerer fullscreen>
-						<material-input name="email"
-							type="email" title="Account's email"
+						<material-input id="emailInput" name="email"
+						type="email" title="Account's email"
 							autoComplete="username"
 							autoFocus label="Email" />
 					</vertical-centerer>

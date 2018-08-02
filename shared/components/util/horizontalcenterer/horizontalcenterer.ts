@@ -18,7 +18,7 @@ export class HorizontalCenterer extends WebComponent {
 
 	constructor() {
 		super();
-		this.__render();
+		this.__init();
 	}
 
 	render() {
