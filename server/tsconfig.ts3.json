@@ -30,7 +30,9 @@
         "test/**/*"
     ],
     "exclude": [
-        "app/actions/server/webserver/client/"
+        "app/actions/server/webserver/client/build",
+        "app/actions/server/webserver/client/src",
+        "app/actions/server/webserver/client/static"
     ],
     "references": [{
         "path": "../shared"
