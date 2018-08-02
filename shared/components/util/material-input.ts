@@ -198,6 +198,8 @@ const styles = html`<style>
 
 export class MaterialInput extends WebComponent {
 	static is = genIs('material-input', MaterialInput);
+	private _input: HTMLInputElement|null = null;
+	private _container: HTMLElement|null = null;
 	private _maxRows: number = -1;
 
 	props = defineProps(this, {
@@ -232,6 +234,25 @@ export class MaterialInput extends WebComponent {
 	constructor() {
 		super();
 		this.__init();
+	}
+
+	disable() {
+		this._input!.disabled = true;
+		this._updateClasses();
+	}
+
+	enable() {
+		this._input!.disabled = false;
+		this._updateClasses();
+	}
+
+	set(value: string) {
+		this._input!.value = value || '';
+		this._updateClasses();
+	}
+
+	get input() {
+		return this._input!;
 	}
 
 	@bindToClass
@@ -271,21 +292,6 @@ export class MaterialInput extends WebComponent {
 		}
 	}
 
-	disable() {
-		this._input!.disabled = true;
-		this._updateClasses();
-	}
-
-	enable() {
-		this._input!.disabled = false;
-		this._updateClasses();
-	}
-
-	set(value: string) {
-		this._input!.value = value || '';
-		this._updateClasses();
-	}
-
 	@bindToClass
 	private _onFocus() {
 		this._container!.classList.add('is-focused');
@@ -320,8 +326,6 @@ export class MaterialInput extends WebComponent {
 		}
 	}
 
-	private _container: HTMLElement|null = null;
-	private _input: HTMLInputElement|null = null;
 	__postRender() {
 		this._container = this.$('#container');
 		this._input = this.$('input') as HTMLInputElement;
