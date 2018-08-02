@@ -282,8 +282,8 @@ export function defineProps<P extends {
 		const mapKey = key as Extract<keyof P|T, string>;
 
 		const { 
-			watch,
-			coerce,
+			watch = true,
+			coerce = false,
 			defaultValue,
 			type: mapType,
 			watchProperties = []
