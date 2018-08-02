@@ -347,18 +347,7 @@ export class WebComponent extends HTMLElement {
 		mode: 'closed'
 	});
 
-	__toBind!: ((__this: any) => void)[];
-	__doBinds(__this: this) {
-		if (!this.__toBind) {
-			return;
-		}
-		this.__toBind.forEach((fn) => {
-			fn(__this);
-		});
-	}
-
 	protected __init() {
-		this.__doBinds(this);
 		this.__render();
 	}
 

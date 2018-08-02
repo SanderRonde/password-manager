@@ -1,17 +1,19 @@
-export type AnyFunction = (...args: any[]) => any;
-
-export function bindToClass(target: Object & {
-	__toBind: ((__this: any) => void)[];
-	__doBinds(__this: any): void;
-}, _propertyKey: string|symbol, 
-	descriptor: TypedPropertyDescriptor<AnyFunction>): TypedPropertyDescriptor<AnyFunction> | void {
-		const originalvalue = descriptor.value!;
-		let __this: any = null;
-		target.__toBind = target.__toBind || [];
-		target.__toBind.push((___this: any) => {
-			__this = ___this;
-		});
-		descriptor.value = function(...args: any[]) {
-			return originalvalue.bind(__this)(...args);
+export function bindToClass<T extends Function>(_target: object, propertyKey: string, 
+	descriptor: TypedPropertyDescriptor<T>): TypedPropertyDescriptor<T> | void {
+		if(!descriptor || (typeof descriptor.value !== 'function')) {
+			throw new TypeError(`Only methods can be decorated with @bind. <${propertyKey}> is not a method!`);
 		}
+		
+		return {
+			configurable: true,
+			get(this: T): T {
+				const bound: T = descriptor.value!.bind(this);
+				Object.defineProperty(this, propertyKey, {
+					value: bound,
+					configurable: true,
+					writable: true
+				});
+				return bound;
+			}
+		};
 	}
