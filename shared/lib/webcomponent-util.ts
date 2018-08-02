@@ -262,7 +262,9 @@ export function defineProps<P extends {
 	[K in keyof P]: GetTSType<P[K]>;
 } & {
 	[K in keyof T]: GetTSType<T[K]>;
-}>(element: HTMLElement, reflect: P, priv: T, doRender: () => void): R {
+}>(element: HTMLElement & {
+	render(): void;	
+}, reflect: P, priv: T): R {
 	const propValues: Partial<R> = {};
 	const props: Partial<R> = {};
 
@@ -320,14 +322,14 @@ export function defineProps<P extends {
 			set(value) {
 				const original = value;
 				if (typeof value === 'object' && watchProperties.length > 0) {
-					value = watchObject(value, watchProperties, doRender);
+					value = watchObject(value, watchProperties, element.render);
 				}
 				propValues[mapKey] = value;
 				if (reflectToAttr) {
 					setter(element, propName, original, mapType);
 				}
 				if (watch) {
-					doRender();
+					element.render();
 				}
 			}
 		});
@@ -341,41 +343,28 @@ export function defineProps<P extends {
 }
 
 type IDMapFn<IDS> = {
-	// <K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
-    // <K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
-    // <E extends Element = Element>(selector: string): E | null;
+	/**
+	 * Query this component's root for given selector
+	 */
+	<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
+    <K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
+    <E extends Element = Element>(selector: string): E | null;
 	(selector: string): HTMLElement|null;
 } & IDS;
 
-export class WebComponent extends HTMLElement {
-	protected static dependencies: typeof WebComponent[] = [];
-	protected static is: [string, typeof WebComponent];;
+class WebComponentDefiner extends HTMLElement {
+	/**
+	 * Any dependencies this component depends on
+	 */
+	protected static dependencies: typeof WebComponentBase[] = [];
+	/**
+	 * A tuple consisting of the name of the component and its class
+	 */
+	protected static is: [string, typeof WebComponentBase];
 
-	protected internals = {
-		root: this.attachShadow({
-			mode: 'closed'
-		}),
-		postRenderHooks: [] as (() => void)[]
-	}
-
-	protected __init() {
-		this.__render();
-	}
-
-	@bindToClass
-	protected __render() {
-		this.preRender();
-		render(this.render(), this.internals.root);
-		this.internals.postRenderHooks.forEach(fn => fn());
-		this.postRender();
-	}
-	protected preRender() {}
-	protected postRender() {}
-
-	render(): TemplateResult {
-		throw new Error('No render method implemented');
-	}
-
+	/**
+	 * Define this component and its dependencies as a webcomponent
+	 */
 	static define() {
 		for (const dependency of this.dependencies) {
 			dependency.define();
@@ -387,10 +376,91 @@ export class WebComponent extends HTMLElement {
 	}
 }
 
-export class QueryableWebComponent<IDS extends {
+class WebComponentRenderer extends WebComponentDefiner {
+	/**
+	 * Whether the render method should be temporarily disabled (to prevent infinite loops)
+	 */
+	private _disableRender: boolean = false;
+
+	/**
+	 * The render method that will render this component
+	 */
+	protected renderer: (this: any, props: any) => TemplateResult = () => {
+		throw new Error('No render method impleented');	
+	};
+
+	/**
+	 * Internal properties used by the WebComponent class
+	 */
+	protected internals = {
+		/**
+		 * The root of this component's DOM
+		 */
+		root: this.attachShadow({
+			mode: 'closed'
+		}),
+		/**
+		 * Any hooks that should be called after rendering
+		 */
+		postRenderHooks: [] as (() => void)[]
+	}
+	/**
+	 * The properties of this component
+	 */
+	props: any = null;
+
+	@bindToClass
+	/**
+	 * The method that starts the rendering cycle
+	 */
+	public render() {
+		if (this._disableRender) return;
+
+		this._disableRender = true;
+		this.preRender();
+		this._disableRender = false;
+
+		render(this.renderer.apply(this, this.props), this.internals.root);
+
+		this.internals.postRenderHooks.forEach(fn => fn());
+		this.postRender();
+	}
+	/**
+	 * A method called before rendering (changing props won't trigger additional re-render)
+	 */
+	protected preRender() {}
+	/**
+	 * A method called after rendering
+	 */
+	protected postRender() {}
+}
+
+export class WebComponentBase extends WebComponentRenderer {
+	/**
+	 * Initialize the component and start rendering
+	 */
+	private __init() {
+		this.render();
+	}
+
+	protected set loaded(_value) {
+		if (_value === true) {
+			this.__init();
+		}
+	}
+	protected get loaded() {
+		return true;
+	}
+}
+
+export class WebComponent<IDS extends {
 	[key: string]: HTMLElement;
-} = {}> extends WebComponent {
-	private _thisMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
+} = {}> extends WebComponentBase {
+	/**
+	 * An ID map containing maps between queried IDs and elements,
+	 * 	cleared upon render
+	 */
+	private _idMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
 
 	constructor() {
 		super();
@@ -399,10 +469,16 @@ export class QueryableWebComponent<IDS extends {
 	}
 
 	@bindToClass
+	/**
+	 * Clears the ID map
+	 */
 	private _clearMap() {
-		this._thisMap.clear();
+		this._idMap.clear();
 	}
 
+	/**
+	 * Access this component's children based on their IDs or query something
+	 */
 	$: IDMapFn<IDS> = (() => {
 		const __this = this;
 		return new Proxy((selector: string) => {
@@ -412,19 +488,22 @@ export class QueryableWebComponent<IDS extends {
 				if (typeof id !== 'string') {
 					return null;
 				}
-				const cached = __this._thisMap.get(id);
+				const cached = __this._idMap.get(id);
 				if (cached) {
 					return cached;
 				}
 				const el = __this.internals.root.getElementById(id);
 				if (el) {
-					__this._thisMap.set(id, el);
+					__this._idMap.set(id, el);
 				}
 				return el;
 			}
 		});
 	})() as IDMapFn<IDS>
 
+	/**
+	 * Apply querySelectorAll to this component's root
+	 */
 	$$<K extends keyof HTMLElementTagNameMap>(selector: K): NodeListOf<HTMLElementTagNameMap[K]>;
     $$<K extends keyof SVGElementTagNameMap>(selector: K): NodeListOf<SVGElementTagNameMap[K]>;
 	$$<E extends Element = Element>(selector: string): NodeListOf<E>;
@@ -433,6 +512,6 @@ export class QueryableWebComponent<IDS extends {
 	}
 }
 
-export function genIs(name: string, component: typeof WebComponent): [string, typeof WebComponent] {
+export function genIs(name: string, component: typeof WebComponentBase): [string, typeof WebComponentBase] {
 	return [name, component];
 }

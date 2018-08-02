@@ -1,44 +1,15 @@
-import { WebComponent, defineProps, PROP_TYPE, genIs, classNames } from '../../../lib/webcomponent-util';
-import { html } from 'lit-html';
+import { defineProps, PROP_TYPE, genIs, WebComponentBase } from '../../../lib/webcomponent-util';
+import { VerticalCentererHTML } from './vertical-centerer.html';
 
-const styles = html`<style>
-	#container {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		height: 100%;
-	}
-
-	#container.fullscreen {
-		height: 100vh;
-	}
-
-	#content {
-		display: block;
-	}
-</style>`;
-
-export class VerticalCenterer extends WebComponent {
+export class VerticalCenterer extends WebComponentBase {
 	static is = genIs('vertical-centerer', VerticalCenterer);
+	renderer = VerticalCentererHTML;
+	loaded = true;
 
 	props = defineProps(this, {
 		fullscreen: PROP_TYPE.BOOL
-	}, {}, this.__render);
-
-	constructor() {
-		super();
-		this.__init();
-	}
-
-	render() {
-		return html`
-			${styles}
-			<div id="container" class="${classNames({
-				fullscreen: this.props.fullscreen
-			})}">
-				<div id="content">
-					<slot></slot>
-				</div>
-			</div>`;
-	}
+	}, {});
 }
+
+export { VerticalCentererHTML };
+export { VerticalCentererCSS } from './vertical-centerer.css';

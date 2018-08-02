@@ -509,24 +509,16 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
-import { genIs, defineProps, PROP_TYPE, isDefined, QueryableWebComponent } from '../../../lib/webcomponent-util'
+import { genIs, defineProps, PROP_TYPE, isDefined, WebComponent } from '../../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
-import { FeedbackButton } from '../../util/animated-button/animated-button';
+import { AnimatedButton } from '../../util/animated-button/animated-button';
 import { MaterialInput } from '../../util/material-input/material-input';
 import { IconButton } from '../../util/icon-button/icon-button';
-import { LockClosed } from '../../icons/lockClosed/lockClosed';
-import { LockOpen } from '../../icons/lockOpen/lockOpen';
 import { bindToClass } from '../../../lib/decorators';
-import { html } from 'lit-html';
+import { LoginHTML } from './login.html';
 
-const styles = html`<style>
-	#formContainer {
-		width: 400px;
-	}
-</style>`
-
-export class Login extends QueryableWebComponent<{
+export class Login extends WebComponent<{
 	lockButton: IconButton;
 	emailInput: MaterialInput;
 	passwordInput: MaterialInput;
@@ -538,17 +530,18 @@ export class Login extends QueryableWebComponent<{
 		HorizontalCenterer, 
 		MaterialInput,
 		IconButton,
-		FeedbackButton
+		AnimatedButton
 	];
 	static is = genIs('login-page', Login);
+	renderer = LoginHTML;
+	done = true;
 
 	props = defineProps(this, {}, {
 		emailRemembered: PROP_TYPE.BOOL
-	}, this.__render);
+	});
 
 	constructor() {
 		super();
-		this.__init();
 
 		const inputValue = localStorage.getItem('rememberedEmail')
 		if (isDefined(inputValue)) {
@@ -575,44 +568,5 @@ export class Login extends QueryableWebComponent<{
 
 	postRender() {
 		this.$.lockButton.addEventListener('click', this.handleEmailRememberToggle);
-	}
-
-	render() {
-		return html`
-			<div>
-			${styles}
-				<horizontal-centerer>
-					<vertical-centerer fullscreen>
-						<form id="formContainer">
-							<material-input id="emailInput" name="email"
-								type="email" title="Account's email"
-								error="Please enter a valid email address"
-								autoComplete="username" fill required
-								autoFocus label="Email"
-							>
-								<icon-button slot="postIcon"
-									aria-label="Remember email"
-									title="Remember email"
-									id="lockButton"
-								>
-									${this.props.emailRemembered ?
-										LockOpen : LockClosed
-								}</icon-button>
-							</material-input>
-							<material-input id="passwordInput" name="password"
-								type="password" title="Account password"
-								error="Please enter a password"
-								autoComplete="password" fill required
-								autoFocus label="Password"></material-input>
-							<material-input id="twofactorInput" name="twofactor"
-								type="tel" autoComplete="off" fill
-								pattern="\d{6}" error="Enter a 6-digit code"
-								title="Twofactor authentication token (if enabled for the account)"
-								autoFocus label="2FA Token (if enabled)"></material-input>
-							<feedback-button>SUBMIT</feedback-button>
-						</form>
-					</vertical-centerer>
-				</horizontal-centerer>
-			</div>`;
 	}
 }

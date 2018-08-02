@@ -1,33 +1,11 @@
 import { WebComponent, genIs } from '../../../lib/webcomponent-util';
-import { html } from 'lit-html';
-
-const styles = html`<style>
-	#container {
-		display: flex;
-		flex-direction: row;
-		justify-content: center
-	}
-
-	#content {
-		display: block;
-	}
-</style>`;
+import { HorizontalCentererHTML } from './horizontal-centerer.html';
 
 export class HorizontalCenterer extends WebComponent {
 	static is = genIs('horizontal-centerer', HorizontalCenterer);
-
-	constructor() {
-		super();
-		this.__init();
-	}
-
-	render() {
-		return html`
-			${styles}
-			<div id="container">
-				<div id="content">
-					<slot></slot>
-				</div>
-			</div>`
-	}
+	renderer = HorizontalCentererHTML;
+	loaded = true;
 }
+
+export { HorizontalCentererHTML }
+export { HorizontalCentererCSS } from './horizontal-centerer.css'
