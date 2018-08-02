@@ -78,6 +78,7 @@
     "gulp": "^4.0.0",
     "gulp-clean-css": "^3.9.4",
     "gulp-rename": "^1.4.0",
+    "html-typings": "1.1.2",
     "ts-loader": "^4.4.2",
     "typescript": "^3.0.1",
     "webpack-stream": "^5.0.0"
