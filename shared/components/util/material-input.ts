@@ -59,11 +59,13 @@ const styles = html`<style>
 		display: flex;
 		flex-direction: row;
 		justify-content: center;
+		height: 27px;
 	}
 
 	.iconSlot {
 		display: inline-block;
 		border-bottom: 1px solid rgba(0,0,0, 0.12);
+		margin-top: -10px;
 	}
 
 	.mdl-textfield__input {

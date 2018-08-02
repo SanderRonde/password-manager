@@ -514,6 +514,7 @@ import { HorizontalCenterer } from '../util/horizontalcenterer';
 import { VerticalCenterer } from '../util/verticalcenterer';
 import { MaterialInput } from '../util/material-input';
 import { LockClosed } from '../icons/lockClosed';
+import { IconButton } from '../util/icon-button';
 import { LockOpen } from '../icons/lockOpen';
 import { html } from 'lit-html';
 
@@ -524,7 +525,12 @@ const styles = html`<style>
 </style>`
 
 export class Login extends WebComponent {
-	static dependencies = [VerticalCenterer, HorizontalCenterer, MaterialInput];
+	static dependencies = [
+		VerticalCenterer, 
+		HorizontalCenterer, 
+		MaterialInput,
+		IconButton
+	];
 	static is = genIs('login-page', Login);
 
 	props = defineProps(this, {}, {
@@ -549,8 +555,10 @@ export class Login extends WebComponent {
 								autoComplete="username" fill required
 								autoFocus label="Email"
 							>
-								<div slot="postIcon">${this.props.lockOpen ?
-									LockOpen : LockClosed}</div>
+								<icon-button slot="postIcon">
+									${this.props.lockOpen ?
+										LockOpen : LockClosed
+								}</icon-button>
 							</material-input>
 							<material-input id="passwordInput" name="password"
 								type="password" title="Account password"
