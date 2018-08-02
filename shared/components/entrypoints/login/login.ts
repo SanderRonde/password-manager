@@ -513,7 +513,13 @@ import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcent
 import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
 import { MaterialInput } from '../../util/material-input/material-input';
 import { WebComponent, genIs } from '../../../lib/webcomponent-util'
-import { html } from 'lit-html/lib/lit-extended';
+import { html } from 'lit-html';
+
+const styles = html`<style>
+	#formContainer {
+		width: 400px;
+	}
+</style>`
 
 export class Login extends WebComponent {
 	static dependencies = [VerticalCenterer, HorizontalCenterer, MaterialInput];
@@ -524,20 +530,19 @@ export class Login extends WebComponent {
 		this.__init();
 	}
 
-	__postRender() {
-		
-	}
-	
 	render() {
 		return html`
 			<div>
+			${styles}
 				<horizontal-centerer>
 					<vertical-centerer fullscreen>
-						<material-input id="emailInput" name="email"
-							type="email" title="Account's email"
-							error="Please enter a valid email address"
-							autoComplete="username"
-							autoFocus label="Email" />
+						<div id="formContainer">
+							<material-input id="emailInput" name="email"
+								type="email" title="Account's email"
+								error="Please enter a valid email address"
+								autoComplete="username" fill
+								autoFocus label="Email" />
+						</div>
 					</vertical-centerer>
 				</horizontal-centerer>
 			</div>`;

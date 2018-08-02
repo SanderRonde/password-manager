@@ -30,6 +30,9 @@ const styles = html`<style>
 		margin: 0;
 		padding: 20px 0;
 	}
+	.mdl-textfield.fill {
+		width: 100%;
+	}
 	.mdl-textfield .mdl-button {
 		position: absolute;
 		bottom: 20px;
@@ -209,7 +212,8 @@ export class MaterialInput extends WebComponent {
 		error: {
 			type: PROP_TYPE.STRING,
 			coerce: true
-		}
+		},
+		fill: PROP_TYPE.BOOL
 	}, {}, this.__render);
 
 	constructor() {
@@ -345,7 +349,8 @@ export class MaterialInput extends WebComponent {
 			${styles}
 			<div id="container" class="${classNames(
 				'mdl-textfield', 'mdl-js-textfield', {
-					'mdl-textfield--floating-label': !this.props.noFloatingLabel
+					'mdl-textfield--floating-label': !this.props.noFloatingLabel,
+					'fill': this.props.fill
 				}
 			)}">
 				<input class="mdl-textfield__input" type="${this.props.type}" 
