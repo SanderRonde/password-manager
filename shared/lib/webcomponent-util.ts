@@ -346,20 +346,44 @@ export function defineProps<P extends {
 export class WebComponent extends HTMLElement {
 	protected static dependencies: typeof WebComponent[] = [];
 	protected static is: [string, typeof WebComponent];
-	protected __root = this.attachShadow({
+	private _root = this.attachShadow({
 		mode: 'closed'
 	});
+
+	__toBind!: ((__this: any) => void)[];
+	__doBinds(__this: this) {
+		if (!this.__toBind) {
+			return;
+		}
+		this.__toBind.forEach((fn) => {
+			fn(__this);
+		});
+	}
 
 	render(): TemplateResult {
 		throw new Error('No render method implemented');
 	}
+	protected __preRender() {}
 	protected __render() {
 		this.__preRender();
-		render(this.render(), this.__root);
+		render(this.render(), this._root);
 		this.__postRender();
 	}
-	protected __preRender() {}
 	protected __postRender() {}
+
+	$<K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null;
+    $<K extends keyof SVGElementTagNameMap>(selector: K): SVGElementTagNameMap[K] | null;
+    $<E extends Element = Element>(selector: string): E | null;
+	$(selector: string): HTMLElement|null {
+		return this._root.querySelector(selector);
+	}
+
+	$$<K extends keyof HTMLElementTagNameMap>(selector: K): NodeListOf<HTMLElementTagNameMap[K]>;
+    $$<K extends keyof SVGElementTagNameMap>(selector: K): NodeListOf<SVGElementTagNameMap[K]>;
+	$$<E extends Element = Element>(selector: string): NodeListOf<E>;
+	$$(selector: string): NodeListOf<HTMLElement> {
+		return this._root.querySelectorAll(selector);
+	}
 
 	static define() {
 		for (const dependency of this.dependencies) {
