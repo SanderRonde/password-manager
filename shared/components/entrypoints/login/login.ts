@@ -511,11 +511,12 @@
 
 import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
 import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
+import { MaterialInput } from '../../util/material-input/material-input';
 import { WebComponent, genIs } from '../../../lib/webcomponent-util'
 import { html } from 'lit-html/lib/lit-extended';
 
 export class Login extends WebComponent {
-	static dependencies = [VerticalCenterer, HorizontalCenterer];
+	static dependencies = [VerticalCenterer, HorizontalCenterer, MaterialInput];
 	static is = genIs('login-page', Login);
 
 	constructor() {
@@ -528,7 +529,10 @@ export class Login extends WebComponent {
 			<div>
 				<horizontal-centerer>
 					<vertical-centerer fullscreen>
-						<div>hi login</div>
+						<material-input name="email"
+							type="email" title="Account's email"
+							autoComplete="username"
+							autoFocus label="Email" />
 					</vertical-centerer>
 				</horizontal-centerer>
 			</div>`;
