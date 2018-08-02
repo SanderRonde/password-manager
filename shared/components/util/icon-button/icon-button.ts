@@ -1,4 +1,4 @@
-import { genIs, QueryableWebComponent } from "../../lib/webcomponent-util";
+import { genIs, QueryableWebComponent } from "../../../lib/webcomponent-util";
 import { html } from "lit-html";
 
 const styles = html`<style>

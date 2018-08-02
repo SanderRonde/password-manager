@@ -509,14 +509,15 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
-import { genIs, defineProps, PROP_TYPE, isDefined, QueryableWebComponent } from '../../lib/webcomponent-util'
-import { HorizontalCenterer } from '../util/horizontalcenterer';
-import { VerticalCenterer } from '../util/verticalcenterer';
-import { MaterialInput } from '../util/material-input';
-import { bindToClass } from '../../lib/decorators';
-import { IconButton } from '../util/icon-button';
-import { LockClosed } from '../icons/lockClosed';
-import { LockOpen } from '../icons/lockOpen';
+import { genIs, defineProps, PROP_TYPE, isDefined, QueryableWebComponent } from '../../../lib/webcomponent-util'
+import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
+import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
+import { FeedbackButton } from '../../util/animated-button/animated-button';
+import { MaterialInput } from '../../util/material-input/material-input';
+import { IconButton } from '../../util/icon-button/icon-button';
+import { LockClosed } from '../../icons/lockClosed/lockClosed';
+import { LockOpen } from '../../icons/lockOpen/lockOpen';
+import { bindToClass } from '../../../lib/decorators';
 import { html } from 'lit-html';
 
 const styles = html`<style>
@@ -536,7 +537,8 @@ export class Login extends QueryableWebComponent<{
 		VerticalCenterer, 
 		HorizontalCenterer, 
 		MaterialInput,
-		IconButton
+		IconButton,
+		FeedbackButton
 	];
 	static is = genIs('login-page', Login);
 
@@ -607,6 +609,7 @@ export class Login extends QueryableWebComponent<{
 								pattern="\d{6}" error="Enter a 6-digit code"
 								title="Twofactor authentication token (if enabled for the account)"
 								autoFocus label="2FA Token (if enabled)"></material-input>
+							<feedback-button>SUBMIT</feedback-button>
 						</form>
 					</vertical-centerer>
 				</horizontal-centerer>

@@ -1,4 +1,4 @@
-import { WebComponent, genIs } from '../../lib/webcomponent-util';
+import { WebComponent, genIs } from '../../../lib/webcomponent-util';
 import { html } from 'lit-html';
 
 const styles = html`<style>
