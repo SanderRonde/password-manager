@@ -85,7 +85,7 @@ const styles = html`<style>
 	fieldset[disabled] .mdl-textfield .mdl-textfield__input, .mdl-textfield.is-disabled .mdl-textfield__input {
 		background-color: transparent;
 		border-bottom: 1px dotted rgba(0,0,0, 0.12);
-		color: rgba(0,0,0, 0.26);
+		color: ${theme.minTextOnWhite};
 	}
 
 	.mdl-textfield textarea.mdl-textfield__input {
@@ -94,7 +94,6 @@ const styles = html`<style>
 
 	.mdl-textfield__label {
 		bottom: 0;
-		color: rgba(0,0,0, 0.26);
 		font-size: 16px;
 		left: 0;
 		right: 0;
@@ -106,6 +105,7 @@ const styles = html`<style>
 		overflow: hidden;
 		white-space: nowrap;
 		text-align: left;
+		color: ${theme.minTextOnWhite};
 	}
 	.mdl-textfield.is-dirty .mdl-textfield__label, .mdl-textfield.has-placeholder .mdl-textfield__label {
 		visibility: hidden;
@@ -118,7 +118,7 @@ const styles = html`<style>
 		transition: none;
 	}
 	fieldset[disabled] .mdl-textfield .mdl-textfield__label, .mdl-textfield.is-disabled.is-disabled .mdl-textfield__label {
-		color: rgba(0,0,0, 0.26);
+		color: ${theme.minTextOnWhite};
 	}
 	.mdl-textfield--floating-label.is-focused .mdl-textfield__label, .mdl-textfield--floating-label.is-dirty .mdl-textfield__label, .mdl-textfield--floating-label.has-placeholder .mdl-textfield__label {
 		font-size: 12px;

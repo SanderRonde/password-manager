@@ -10,6 +10,7 @@ export const theme = {
 		dark: '#4A0072'
 	},
 	error: '#F44336',
+	minTextOnWhite: '#0000008C',
 	textOnWhite: '#000000',
 	textOnBlack: '#FFFFFF',
 	background: '#FFFFFF'
