@@ -1,0 +1,21 @@
+{
+	// The port to use for non-https traffic (default 80)
+	"http": 80,
+	// The port to use for https traffic (default 443)
+	"https": 443,
+
+	// The path to the HTTPS key
+	//"httpsKey": "./certs/https.key",
+
+	// The path to the HTTPS cert
+	//"httpCert": "./certs/https.cert",
+
+	// Enable rate limiting (default true)
+	"rateLimit": true,
+
+	// The password used to decrypt the database
+	//"password": "mypassword",
+
+	// The password used to decrypt the database
+	"database": "mongodb://127.0.0.1:27017/pwmanager"
+}

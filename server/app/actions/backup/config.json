@@ -1,10 +1,10 @@
 {
-	//The path to the mongodb database
+	// The path to the mongodb database
 	"database": "mongodb://127.0.0.1:27017/pwmanager",
 
-	//The path to the backup file to load (if using "load")
-	// "input": "./my.input.file",
+	// The path to the backup file to load (if using "load")
+	//"input": "./my.input.file",
 
-	//The path to the backup file output (if using "local")
-	// "output": "./my.dump"
+	// The path to the backup file output (if using "local")
+	//"output": "./my.dump"
 }
