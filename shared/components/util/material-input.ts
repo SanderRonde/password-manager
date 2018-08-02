@@ -22,7 +22,7 @@ const styles = html`<style>
 	*/
 	.mdl-textfield {
 		position: relative;
-		font-size: 16px;
+		font-size: 18px;
 		display: inline-block;
 		box-sizing: border-box;
 		width: 300px;
@@ -72,7 +72,7 @@ const styles = html`<style>
 		border: none;
 		border-bottom: 1px solid rgba(0,0,0, 0.12);
 		display: inline-block;
-		font-size: 16px;
+		font-size: 18px;
 		font-family: "Helvetica", "Arial", sans-serif;
 		margin: 0;
 		padding: 4px 0;
@@ -107,7 +107,7 @@ const styles = html`<style>
 
 	.mdl-textfield__label {
 		bottom: 0;
-		font-size: 16px;
+		font-size: 18px;
 		left: 0;
 		right: 0;
 		pointer-events: none;
