@@ -509,15 +509,15 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
-import { WebComponent, genIs, defineProps, PROP_TYPE } from '../../lib/webcomponent-util'
+import { WebComponent, genIs, defineProps, PROP_TYPE, isDefined } from '../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../util/horizontalcenterer';
 import { VerticalCenterer } from '../util/verticalcenterer';
 import { MaterialInput } from '../util/material-input';
-import { LockClosed } from '../icons/lockClosed';
+import { bindToClass } from '../../lib/decorators';
 import { IconButton } from '../util/icon-button';
+import { LockClosed } from '../icons/lockClosed';
 import { LockOpen } from '../icons/lockOpen';
 import { html } from 'lit-html';
-import { bindToClass } from '../../lib/decorators';
 
 const styles = html`<style>
 	#formContainer {
@@ -541,6 +541,16 @@ export class Login extends WebComponent {
 	constructor() {
 		super();
 		this.__init();
+
+		const inputValue = localStorage.getItem('rememberedEmail')
+		if (isDefined(inputValue)) {
+			(this.$('#emailInput')! as MaterialInput).set(inputValue);
+			this.props.emailRemembered = true;
+			(this.$('#passwordInput') as MaterialInput).input.focus();
+		} else {
+			this.props.emailRemembered = false;
+			(this.$('#emailInput') as MaterialInput).input.focus();
+		}
 	}
 
 	@bindToClass
