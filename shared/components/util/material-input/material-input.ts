@@ -204,10 +204,7 @@ export class MaterialInput extends WebComponent {
 			type: PROP_TYPE.BOOL,
 			defaultValue: false
 		},
-		pattern: {
-			type: PROP_TYPE.STRING,
-			coerce: true
-		},
+		pattern: PROP_TYPE.STRING,
 		error: {
 			type: PROP_TYPE.STRING,
 			coerce: true
@@ -216,8 +213,7 @@ export class MaterialInput extends WebComponent {
 
 	constructor() {
 		super();
-		this.__doBinds(this);
-		this.__render();
+		this.__init();
 	}
 
 	@bindToClass
