@@ -235,14 +235,14 @@ export class MaterialInput extends WebComponent {
 	}
 
 	@bindToClass
-	updateClasses() {
-		this.checkDisabled();
-		this.checkValidity();
-		this.checkDirty();
-		this.checkFocus();
+	private _updateClasses() {
+		this._checkDisabled();
+		this._checkValidity();
+		this._checkDirty();
+		this._checkFocus();
 	}
 
-	checkDisabled() {
+	private _checkDisabled() {
 		if (this._input!.disabled) {
 			this._container!.classList.add('is-disabled');
 		} else {
@@ -250,7 +250,7 @@ export class MaterialInput extends WebComponent {
 		}
 	}
 
-	checkValidity() {
+	private _checkValidity() {
 		if (this._input!.validity) {
 			if (this._input!.validity.valid) {
 			  	this._container!.classList.remove('is-invalid');
@@ -260,7 +260,7 @@ export class MaterialInput extends WebComponent {
 		}
 	}
 
-	checkDirty() {
+	private _checkDirty() {
 		if (
 			(this._input!.value && this._input!.value.length > 0) ||
 			(this._input!.placeholder.trim() !== '')
@@ -273,36 +273,36 @@ export class MaterialInput extends WebComponent {
 
 	disable() {
 		this._input!.disabled = true;
-		this.updateClasses();
+		this._updateClasses();
 	}
 
 	enable() {
 		this._input!.disabled = false;
-		this.updateClasses();
+		this._updateClasses();
 	}
 
-	change(value: string) {
+	set(value: string) {
 		this._input!.value = value || '';
-		this.updateClasses();
+		this._updateClasses();
 	}
 
 	@bindToClass
-	onFocus() {
+	private _onFocus() {
 		this._container!.classList.add('is-focused');
 	}
 
 	@bindToClass
-	onBlur() {
+	private _onBlur() {
 		this._container!.classList.remove('is-focused');
 	}
 
 	@bindToClass
-	onReset() {
-		this.updateClasses();
+	private _onReset() {
+		this._updateClasses();
 	}
 
 	@bindToClass
-	onKeyDown(event: KeyboardEvent) {
+	private _onKeyDown(event: KeyboardEvent) {
 		var currentRowCount = this.props.value.split('\n').length;
 		if (event.keyCode === 13) {
 			if (currentRowCount >= this._maxRows) {
@@ -311,7 +311,7 @@ export class MaterialInput extends WebComponent {
 		}
 	}
 
-	checkFocus() {
+	private _checkFocus() {
 		if (!this._container) return;
 		if (this._container.querySelector(':focus')) {
 			this._container.classList.add('is-focused');
@@ -337,22 +337,22 @@ export class MaterialInput extends WebComponent {
 			if (this._input.hasAttribute('placeholder')) {
 				this._container.classList.add('has-placeholder');
 			}
-			this._input.addEventListener('input', this.updateClasses);
-			this._input.addEventListener('focus', this.onFocus);
-			this._input.addEventListener('blur', this.onBlur);
-			this._input.addEventListener('reset', this.onReset);
+			this._input.addEventListener('input', this._updateClasses);
+			this._input.addEventListener('focus', this._onFocus);
+			this._input.addEventListener('blur', this._onBlur);
+			this._input.addEventListener('reset', this._onReset);
 			if (this._maxRows !== -1) {
-				this._input.addEventListener('keydown', this.onKeyDown);
+				this._input.addEventListener('keydown', this._onKeyDown);
 			}
 
 			const isInvalid = this._container.classList.contains('is-invalid');
-			this.updateClasses();
+			this._updateClasses();
 			if (isInvalid) {
 				this._container.classList.add('is-invalid');
 			}
 			if (this._input.hasAttribute('autofocus')) {
 				this._container.focus();
-				this.checkFocus();
+				this._checkFocus();
 			}
 		}
 	}
