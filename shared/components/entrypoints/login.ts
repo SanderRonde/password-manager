@@ -552,10 +552,10 @@ export class Login extends QueryableWebComponent<{
 		if (isDefined(inputValue)) {
 			this.$.emailInput.set(inputValue);
 			this.props.emailRemembered = true;
-			this.$.passwordInput.input.focus();
+			this.$.emailInput.input.focus();
 		} else {
 			this.props.emailRemembered = false;
-			this.$.emailInput.input.focus();
+			this.$.passwordInput.input.focus();
 		}
 	}
 
