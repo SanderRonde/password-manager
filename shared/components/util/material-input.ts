@@ -203,8 +203,6 @@ export class MaterialInput extends QueryableWebComponent<{
 	label: HTMLLabelElement;
 }> {
 	static is = genIs('material-input', MaterialInput);
-	private _input: HTMLInputElement|null = null;
-	private _container: HTMLElement|null = null;
 	private _maxRows: number = -1;
 
 	props = defineProps(this, {
@@ -242,22 +240,22 @@ export class MaterialInput extends QueryableWebComponent<{
 	}
 
 	disable() {
-		this._input!.disabled = true;
+		this.$.input!.disabled = true;
 		this._updateClasses();
 	}
 
 	enable() {
-		this._input!.disabled = false;
+		this.$.input!.disabled = false;
 		this._updateClasses();
 	}
 
 	set(value: string) {
-		this._input!.value = value || '';
+		this.$.input!.value = value || '';
 		this._updateClasses();
 	}
 
 	get input() {
-		return this._input!;
+		return this.$.input!;
 	}
 
 	@bindToClass
@@ -269,42 +267,42 @@ export class MaterialInput extends QueryableWebComponent<{
 	}
 
 	private _checkDisabled() {
-		if (this._input!.disabled) {
-			this._container!.classList.add('is-disabled');
+		if (this.$.input!.disabled) {
+			this.$.container!.classList.add('is-disabled');
 		} else {
-			this._container!.classList.remove('is-disabled');
+			this.$.container!.classList.remove('is-disabled');
 		}
 	}
 
 	private _checkValidity() {
-		if (this._input!.validity) {
-			if (this._input!.validity.valid) {
-			  	this._container!.classList.remove('is-invalid');
+		if (this.$.input!.validity) {
+			if (this.$.input!.validity.valid) {
+			  	this.$.container!.classList.remove('is-invalid');
 			} else {
-			  	this._container!.classList.add('is-invalid');
+			  	this.$.container!.classList.add('is-invalid');
 			}
 		}
 	}
 
 	private _checkDirty() {
 		if (
-			(this._input!.value && this._input!.value.length > 0) ||
-			(this._input!.placeholder.trim() !== '')
+			(this.$.input!.value && this.$.input!.value.length > 0) ||
+			(this.$.input!.placeholder.trim() !== '')
 		) {
-			this._container!.classList.add('is-dirty');
+			this.$.container!.classList.add('is-dirty');
 		} else {
-			this._container!.classList.remove('is-dirty');
+			this.$.container!.classList.remove('is-dirty');
 		}
 	}
 
 	@bindToClass
 	private _onFocus() {
-		this._container!.classList.add('is-focused');
+		this.$.container!.classList.add('is-focused');
 	}
 
 	@bindToClass
 	private _onBlur() {
-		this._container!.classList.remove('is-focused');
+		this.$.container!.classList.remove('is-focused');
 	}
 
 	@bindToClass
@@ -323,44 +321,44 @@ export class MaterialInput extends QueryableWebComponent<{
 	}
 
 	private _checkFocus() {
-		if (!this._container) return;
-		if (this._container.querySelector(':focus')) {
-			this._container.classList.add('is-focused');
+		if (!this.$.container) return;
+		if (this.$.container.querySelector(':focus')) {
+			this.$.container.classList.add('is-focused');
 		} else {
-			this._container.classList.remove('is-focused');
+			this.$.container.classList.remove('is-focused');
 		}
 	}
 
 	__postRender() {
-		this._input = this.$.input;
-		this._container = this.$.container;
-		if (this._input && this._container) {
-			this._input.onkeydown = () => {
+		this.$.input = this.$.input;
+		this.$.container = this.$.container;
+		if (this.$.input && this.$.container) {
+			this.$.input.onkeydown = () => {
 				window.setTimeout(() => {
-					if (this._input) {
-						this.props.value = this._input.value;
+					if (this.$.input) {
+						this.props.value = this.$.input.value;
 					}
 				}, 0);
 			}
 
-			if (this._input.hasAttribute('placeholder')) {
-				this._container.classList.add('has-placeholder');
+			if (this.$.input.hasAttribute('placeholder')) {
+				this.$.container.classList.add('has-placeholder');
 			}
-			this._input.addEventListener('input', this._updateClasses);
-			this._input.addEventListener('focus', this._onFocus);
-			this._input.addEventListener('blur', this._onBlur);
-			this._input.addEventListener('reset', this._onReset);
+			this.$.input.addEventListener('input', this._updateClasses);
+			this.$.input.addEventListener('focus', this._onFocus);
+			this.$.input.addEventListener('blur', this._onBlur);
+			this.$.input.addEventListener('reset', this._onReset);
 			if (this._maxRows !== -1) {
-				this._input.addEventListener('keydown', this._onKeyDown);
+				this.$.input.addEventListener('keydown', this._onKeyDown);
 			}
 
-			const isInvalid = this._container.classList.contains('is-invalid');
+			const isInvalid = this.$.container.classList.contains('is-invalid');
 			this._updateClasses();
 			if (isInvalid) {
-				this._container.classList.add('is-invalid');
+				this.$.container.classList.add('is-invalid');
 			}
-			if (this._input.hasAttribute('autofocus')) {
-				this._container.focus();
+			if (this.$.input.hasAttribute('autofocus')) {
+				this.$.container.focus();
 				this._checkFocus();
 			}
 		}
