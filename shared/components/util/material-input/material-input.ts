@@ -1,6 +1,7 @@
 import { WebComponent, defineProps, genIs, PROP_TYPE, classNames } from '../../../lib/webcomponent-util';
 import { html } from 'lit-html';
 import { bindToClass } from '../../../lib/decorators';
+import { theme } from '../../theming/theme';
 
 const styles = html`<style>
 	/** From https://github.com/google/material-design-lite/blob/mdl-1.x/src/textfield/_textfield.scss */
@@ -75,8 +76,8 @@ const styles = html`<style>
 		outline: none;
 	}
 	.mdl-textfield.is-invalid .mdl-textfield__input {
-		border-color: rgb(213,0,0);
 		box-shadow: none;
+		border-color: ${theme.error};
 	}
 	fieldset[disabled] .mdl-textfield .mdl-textfield__input, .mdl-textfield.is-disabled .mdl-textfield__input {
 		background-color: transparent;
@@ -117,20 +118,19 @@ const styles = html`<style>
 		color: rgba(0,0,0, 0.26);
 	}
 	.mdl-textfield--floating-label.is-focused .mdl-textfield__label, .mdl-textfield--floating-label.is-dirty .mdl-textfield__label, .mdl-textfield--floating-label.has-placeholder .mdl-textfield__label {
-		color: rgb(63,81,181);
 		font-size: 12px;
 		top: 4px;
 		visibility: visible;
+		color: ${theme.primary.main};
 	}
 	.mdl-textfield--floating-label.is-focused .mdl-textfield__expandable-holder .mdl-textfield__label, .mdl-textfield--floating-label.is-dirty .mdl-textfield__expandable-holder .mdl-textfield__label, .mdl-textfield--floating-label.has-placeholder .mdl-textfield__expandable-holder .mdl-textfield__label {
 		top: -16px;
 	}
 	.mdl-textfield--floating-label.is-invalid .mdl-textfield__label {
-		color: rgb(213,0,0);
 		font-size: 12px;
+		color: ${theme.primary.main};
 	}
 	.mdl-textfield__label:after {
-		background-color: rgb(63,81,181);
 		bottom: 20px;
 		content: "";
 		height: 2px;
@@ -140,6 +140,7 @@ const styles = html`<style>
 		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 		visibility: hidden;
 		width: 10px;
+		background-color: ${theme.primary.main};
 	}
 	.mdl-textfield.is-focused .mdl-textfield__label:after {
 		left: 0;
@@ -147,16 +148,16 @@ const styles = html`<style>
 		width: 100%;
 	}
 	.mdl-textfield.is-invalid .mdl-textfield__label:after {
-		background-color: rgb(213,0,0);
+		background-color: ${theme.error};
 	}
 
 	.mdl-textfield__error {
-		color: rgb(213,0,0);
 		position: absolute;
 		font-size: 12px;
 		margin-top: 3px;
 		visibility: hidden;
 		display: block;
+		color: ${theme.error};
 	}
 	.mdl-textfield.is-invalid .mdl-textfield__error {
 		visibility: visible;
