@@ -517,6 +517,7 @@ import { LockClosed } from '../icons/lockClosed';
 import { IconButton } from '../util/icon-button';
 import { LockOpen } from '../icons/lockOpen';
 import { html } from 'lit-html';
+import { bindToClass } from '../../lib/decorators';
 
 const styles = html`<style>
 	#formContainer {
@@ -534,12 +535,31 @@ export class Login extends WebComponent {
 	static is = genIs('login-page', Login);
 
 	props = defineProps(this, {}, {
-		lockOpen: PROP_TYPE.BOOL
+		emailRemembered: PROP_TYPE.BOOL
 	}, this.__render);
 
 	constructor() {
 		super();
 		this.__init();
+	}
+
+	@bindToClass
+	handleEmailRememberToggle() {
+		const wasEnabled = this.props.emailRemembered;
+		this.props.emailRemembered = !wasEnabled;
+		if (wasEnabled) {
+			//Now disabled
+			localStorage.removeItem('rememberedEmail');
+		} else {
+			localStorage.setItem('rememberedEmail', '');
+		}
+	}
+
+	__postRender() {
+		const icon = this.$('#lockButton');
+		if (icon) {
+			icon.addEventListener('click', this.handleEmailRememberToggle);
+		}
 	}
 
 	render() {
@@ -555,8 +575,12 @@ export class Login extends WebComponent {
 								autoComplete="username" fill required
 								autoFocus label="Email"
 							>
-								<icon-button slot="postIcon">
-									${this.props.lockOpen ?
+								<icon-button slot="postIcon"
+									aria-label="Remember email"
+									title="Remember email"
+									id="lockButton"
+								>
+									${this.props.emailRemembered ?
 										LockOpen : LockClosed
 								}</icon-button>
 							</material-input>
