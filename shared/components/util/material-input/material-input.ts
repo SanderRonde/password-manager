@@ -1,6 +1,6 @@
-import { defineProps, genIs, PROP_TYPE, WebComponent } from '../../../lib/webcomponent-util';
-import { bindToClass } from '../../../lib/decorators';
+import { defineProps, genIs, PROP_TYPE, WebComponent, ComponentIs } from '../../../lib/webcomponent-util';
 import { MaterialInputHTML } from './material-input.html';
+import { bindToClass } from '../../../lib/decorators';
 
 export class MaterialInput extends WebComponent<{
 	container: HTMLElement;
@@ -8,7 +8,7 @@ export class MaterialInput extends WebComponent<{
 	mainInputContainer: HTMLElement;
 	label: HTMLLabelElement;
 }> {
-	static is = genIs('material-input', MaterialInput);
+	static is: ComponentIs = genIs('material-input', MaterialInput);
 	renderer = MaterialInputHTML;
 	loaded = true;
 

@@ -509,7 +509,7 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
-import { genIs, defineProps, PROP_TYPE, isDefined, WebComponent } from '../../../lib/webcomponent-util'
+import { genIs, defineProps, PROP_TYPE, isDefined, WebComponent, ComponentIs } from '../../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../util/animated-button/animated-button';
@@ -532,7 +532,7 @@ export class Login extends WebComponent<{
 		IconButton,
 		AnimatedButton
 	];
-	static is = genIs('login-page', Login);
+	static is: ComponentIs = genIs('login-page', Login);
 	renderer = LoginHTML;
 	done = true;
 

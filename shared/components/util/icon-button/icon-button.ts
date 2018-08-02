@@ -1,8 +1,8 @@
-import { genIs, WebComponent } from "../../../lib/webcomponent-util";
+import { genIs, WebComponent, ComponentIs } from "../../../lib/webcomponent-util";
 import { IconButtonHTML } from "./icon-button.html";
 
 export class IconButton extends WebComponent {
-	static is = genIs('icon-button', IconButton);
+	static is: ComponentIs = genIs('icon-button', IconButton);
 	renderer = IconButtonHTML;
 	loaded = true;
 }

@@ -360,7 +360,7 @@ class WebComponentDefiner extends HTMLElement {
 	/**
 	 * A tuple consisting of the name of the component and its class
 	 */
-	protected static is: [string, typeof WebComponentBase];
+	protected static is: ComponentIs;
 
 	/**
 	 * Define this component and its dependencies as a webcomponent
@@ -512,6 +512,7 @@ export class WebComponent<IDS extends {
 	}
 }
 
-export function genIs(name: string, component: typeof WebComponentBase): [string, typeof WebComponentBase] {
+export type ComponentIs = [string, typeof WebComponentBase];
+export function genIs(name: string, component: typeof WebComponentBase): ComponentIs {
 	return [name, component];
 }

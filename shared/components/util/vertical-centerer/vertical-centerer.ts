@@ -1,8 +1,8 @@
-import { defineProps, PROP_TYPE, genIs, WebComponentBase } from '../../../lib/webcomponent-util';
+import { defineProps, PROP_TYPE, genIs, WebComponent, ComponentIs } from '../../../lib/webcomponent-util';
 import { VerticalCentererHTML } from './vertical-centerer.html';
 
-export class VerticalCenterer extends WebComponentBase {
-	static is = genIs('vertical-centerer', VerticalCenterer);
+export class VerticalCenterer extends WebComponent {
+	static is: ComponentIs = genIs('vertical-centerer', VerticalCenterer);
 	renderer = VerticalCentererHTML;
 	loaded = true;
 
