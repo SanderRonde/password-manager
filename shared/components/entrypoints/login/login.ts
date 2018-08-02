@@ -534,7 +534,8 @@ export class Login extends WebComponent {
 				<horizontal-centerer>
 					<vertical-centerer fullscreen>
 						<material-input id="emailInput" name="email"
-						type="email" title="Account's email"
+							type="email" title="Account's email"
+							error="Please enter a valid email address"
 							autoComplete="username"
 							autoFocus label="Email" />
 					</vertical-centerer>
