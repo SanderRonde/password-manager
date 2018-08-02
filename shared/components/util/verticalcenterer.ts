@@ -1,4 +1,4 @@
-import { WebComponent, defineProps, PROP_TYPE, genIs, classNames } from '../../../lib/webcomponent-util';
+import { WebComponent, defineProps, PROP_TYPE, genIs, classNames } from '../../lib/webcomponent-util';
 import { html } from 'lit-html';
 
 const styles = html`<style>

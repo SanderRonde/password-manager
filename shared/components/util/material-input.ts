@@ -1,7 +1,7 @@
-import { WebComponent, defineProps, genIs, PROP_TYPE, classNames } from '../../../lib/webcomponent-util';
+import { WebComponent, defineProps, genIs, PROP_TYPE, classNames } from '../../lib/webcomponent-util';
 import { html } from 'lit-html';
-import { bindToClass } from '../../../lib/decorators';
-import { theme } from '../../theming/theme';
+import { bindToClass } from '../../lib/decorators';
+import { theme } from '../theming/theme';
 
 const styles = html`<style>
 	/** From https://github.com/google/material-design-lite/blob/mdl-1.x/src/textfield/_textfield.scss */

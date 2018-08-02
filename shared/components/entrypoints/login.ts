@@ -509,10 +509,10 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
-import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
-import { VerticalCenterer } from '../../util/verticalcenterer/verticalcenterer';
-import { MaterialInput } from '../../util/material-input/material-input';
-import { WebComponent, genIs } from '../../../lib/webcomponent-util'
+import { HorizontalCenterer } from '../util/horizontalcenterer';
+import { VerticalCenterer } from '../util/verticalcenterer';
+import { MaterialInput } from '../util/material-input';
+import { WebComponent, genIs } from '../../lib/webcomponent-util'
 import { html } from 'lit-html';
 
 const styles = html`<style>
@@ -536,7 +536,7 @@ export class Login extends WebComponent {
 			${styles}
 				<horizontal-centerer>
 					<vertical-centerer fullscreen>
-						<div id="formContainer">
+						<form id="formContainer">
 							<material-input id="emailInput" name="email"
 								type="email" title="Account's email"
 								error="Please enter a valid email address"
@@ -552,7 +552,7 @@ export class Login extends WebComponent {
 								pattern="\d{6}" error="Enter a 6-digit code"
 								title="Twofactor authentication token (if enabled for the account)"
 								autoFocus label="2FA Token (if enabled)"></material-input>
-						</div>
+						</form>
 					</vertical-centerer>
 				</horizontal-centerer>
 			</div>`;
