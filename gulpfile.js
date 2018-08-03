@@ -1,7 +1,10 @@
 const rollupResolve = require('rollup-plugin-node-resolve');
+const htmlTypings = require('html-typings');
 const rollup = require('rollup');
+const fs = require('fs-extra');
 const gulp = require('gulp');
 const path = require('path');
+const glob = require('glob');
 
 /**
  * Generates a task with given description
@@ -52,6 +55,131 @@ function dynamicFunctionNameAsync(name, target) {
 function capitalize(str) {
 	return `${str[0].toUpperCase()}${str.slice(1)}`;
 }
+
+/**
+ * Finds files with a glob pattern
+ * 
+ * @param {string} pattern - The pattern to use to search
+ * 
+ * @returns {Promise<string[]>} The found files
+ */
+function findWithGlob(pattern) {
+	return new Promise((resolve, reject) => {
+		glob(pattern, (err, matches) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(matches);
+			}
+		});
+	});
+}
+
+/**
+ * Converts dashes to an uppercase char
+ * 
+ * @param {string} str - The string to transform
+ * 
+ * @returns {string} The transformed string
+ */
+function dashesToUppercase(str) {
+	let newStr = '';
+	for (let i = 0; i < str.length; i++) {
+		const char = str[i];
+		if (char === '-') {
+			newStr += str[i + 1].toUpperCase();
+			i += 1;
+		} else {
+			newStr += char;
+		}
+	}
+	return newStr;
+}
+
+/* Shared */
+(() => {
+	/**
+	 * Converts a JSON object string to typings
+	 * 
+	 * @param {string} str - The initial name
+	 * 
+	 * @returns {string} The new string
+	 */
+	function stringToType(str) {
+		return str.replace(/":( )?"((\w|#|\.|\|)+)"/g, '": $2');
+	}
+	
+	/**
+	 * Formats a JSON object
+	 * 
+	 * @param {string} str - The input string
+	 * 
+	 * @returns {string} The prettified string
+	 */
+	function prettyify(str) {
+		if (str === '{}') {
+			return '{}';
+		}
+		str = str
+			.replace(/"((#|\.)?\w+)": ((\w|\|)+),/g, '"$1": $3,')
+			.replace(/"((#|\.)?\w+)": ((\w|\|)+)},/g, '"$1": $3\n},')
+			.replace(/"(\w+)":{/g, '"$1":{\n')
+			.replace(/\n},"/g, '\n},\n"')
+			.replace(/{\n}/g, '{ }')
+			.replace(/"(\w+)": (\w+)}}/g, '\t"$1": $2\n}\n}')
+			.replace(/{"/g, '{\n"')
+			.replace(/:"{ }",/, ':{ },\n')
+			.replace(/,/g, ';')
+			.replace(/(\s+)\}/g, ';\n}')
+		const split = str.split('\n');
+		return split.join('\n');
+	}
+
+	/**
+	 * Formats a typings object into a string
+	 * 
+	 * @param {{[key: string]: string}} typings - The query object
+	 * 
+	 * @returns {string} The query map
+	 */
+	function formatTypings(typings) {
+		return prettyify(stringToType(JSON.stringify(typings, null, '\t')))
+	}
+
+	/**
+	 * Creates a component query map for given component
+	 * 
+	 * @param {string} name - The name of the component
+	 * @param {HTMLTypings.TypingsObj} queryObj - The query object
+	 * 
+	 * @returns {string} The query map
+	 */
+	function createComponentQueryMap(name, queryObj) {
+		const {
+			// @ts-ignore
+			classes, ids, selectors, tags
+		} = queryObj;
+		const prefix = capitalize(dashesToUppercase(name));
+		return `export type ${prefix}SelectorMap = ${formatTypings(selectors)}
+
+export type ${prefix}IDMap = ${formatTypings(ids)}
+
+export type ${prefix}ClassMap = ${formatTypings(classes)}
+
+export type ${prefix}TagMap = ${formatTypings(tags)}`
+	}
+
+	gulp.task('defs.components', genTask('Generates ID definitions for components', async () => {
+		await Promise.all((await findWithGlob('shared/components/**/*.html.ts')).map(async (fileName) => {
+			const componentName = fileName.split('/').pop().split('.')[0];
+			const defs = await htmlTypings.extractFileTypes(fileName, true);
+			await fs.writeFile(path.join(path.dirname(fileName), `${componentName}-querymap.d.ts`),
+				createComponentQueryMap(componentName, defs));
+		}));
+	}));
+
+	gulp.task('defs', gulp.parallel('defs.components'));
+})();
 
 /* Dashboard */
 (() => {

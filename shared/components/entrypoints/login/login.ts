@@ -516,15 +516,10 @@ import { AnimatedButton } from '../../util/animated-button/animated-button';
 import { MaterialInput } from '../../util/material-input/material-input';
 import { IconButton } from '../../util/icon-button/icon-button';
 import { bindToClass } from '../../../lib/decorators';
+import { LoginIDMap } from './login-querymap';
 import { LoginHTML } from './login.html';
 
-export class Login extends WebComponent<{
-	lockButton: IconButton;
-	emailInput: MaterialInput;
-	passwordInput: MaterialInput;
-	twofactorInput: MaterialInput;
-	formContainer: HTMLFormElement;
-}> {
+export class Login extends WebComponent<LoginIDMap> {
 	static dependencies = [
 		VerticalCenterer, 
 		HorizontalCenterer, 
@@ -569,3 +564,9 @@ export class Login extends WebComponent<{
 		this.$.lockButton.addEventListener('click', this.handleEmailRememberToggle);
 	}
 }
+
+declare global {
+	type HTMLLoginElement = Login;
+}
+export { LoginHTML, LoginIDMap };
+export { LoginCSS } from './login.css'

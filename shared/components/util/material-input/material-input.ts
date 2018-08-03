@@ -1,13 +1,10 @@
 import { defineProps, genIs, PROP_TYPE, WebComponent, ComponentIs } from '../../../lib/webcomponent-util';
+import { MaterialInputIDMap } from './material-input-querymap';
 import { MaterialInputHTML } from './material-input.html';
 import { bindToClass } from '../../../lib/decorators';
 
-export class MaterialInput extends WebComponent<{
-	container: HTMLElement;
-	input: HTMLInputElement;
-	mainInputContainer: HTMLElement;
-	label: HTMLLabelElement;
-}> {
+
+export class MaterialInput extends WebComponent<MaterialInputIDMap> {
 	static is: ComponentIs = genIs('material-input', MaterialInput);
 	renderer = MaterialInputHTML;
 
@@ -169,5 +166,8 @@ export class MaterialInput extends WebComponent<{
 	}
 }
 
-export { MaterialInputHTML };
+declare global {
+	type HTMLMaterialInputElement = MaterialInput;
+}
+export { MaterialInputHTML, MaterialInputIDMap };
 export { MaterialInputCSS } from './material-input.css';
