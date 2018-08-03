@@ -26,7 +26,19 @@
 				"server",
 				"--http", "1256",
 				"-d", "mongodb://127.0.0.1:27017/somedb",
-				"-p", "somepw"
+				"-p", "somepw",
+			],
+		}, {
+			"type": "node",
+			"request": "launch",
+			"name": "Launch Server (databaseless)",
+			"program": "${workspaceFolder}/server/app/main.js",
+			"args": [
+				"server",
+				"--http", "1256",
+				"-d", "mongodb://127.0.0.1:27017/somedb",
+				"-p", "somepw",
+				"--databaseless"
 			],
 		}, {
 			"type": "node",
