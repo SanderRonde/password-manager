@@ -268,7 +268,7 @@ export const AnimatedButtonCSS = html`<style>
 	}
 
 	#button {
-		padding: 4px 38px;
+		padding: 4px 34px;
 		font-weight: bold;
 		font-size: 109%;
 		border-radius: 5px;
