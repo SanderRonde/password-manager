@@ -47,9 +47,6 @@ export const AnimatedButtonCSS = html`<style>
 	.mdl-button::-moz-focus-inner {
 		border: 0;
 	}
-	.mdl-button:hover {
-		background-color: ${theme.primary.light};
-	}
 	.mdl-button:focus:not(:active) {
 		background-color: rgba(0,0,0, 0.12);
 	}
@@ -268,5 +265,13 @@ export const AnimatedButtonCSS = html`<style>
 	}
 	.mdl-ripple.is-visible {
 		opacity: 0.3;
+	}
+
+	#button {
+		padding: 4px 38px;
+		font-weight: bold;
+		font-size: 109%;
+		border-radius: 6px;
+		height: auto;
 	}
 </style>`;

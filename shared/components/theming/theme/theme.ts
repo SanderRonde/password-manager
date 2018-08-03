@@ -7,7 +7,7 @@ export const theme = {
 		 * The main primary color
 		 * dark blue-grey
 		 */
-		main: '#455A64',
+		main: '#607d8b',
 		/**
 		 * The lighter version of the primary color
 		 * light blue-grey
