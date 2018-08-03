@@ -16,5 +16,3 @@ export class VerticalCenterer extends WebComponent<VerticalCentererIDMap> implem
 	}, {});
 	loaded = true;
 }
-
-export { VerticalCentererHTML, VerticalCentererIDMap };

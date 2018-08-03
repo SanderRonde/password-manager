@@ -13,6 +13,3 @@ export class IconButton extends WebComponent<IconButtonIDMap> implements WebComp
 	renderer = IconButtonHTML;
 	loaded = true;
 }
-
-export { IconButtonHTML, IconButtonIDMap }
-export { IconButtonCSS } from './icon-button.css'

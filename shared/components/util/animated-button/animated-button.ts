@@ -45,6 +45,3 @@ export class AnimatedButton extends WebComponent<AnimatedButtonIDMap> implements
 		}
 	}
 }
-
-export { AnimatedButtonHTML }
-export { AnimatedButtonCSS } from './animated-button.css'

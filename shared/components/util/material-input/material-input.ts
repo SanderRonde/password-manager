@@ -170,6 +170,3 @@ export class MaterialInput extends WebComponent<MaterialInputIDMap> implements W
 		}
 	}
 }
-
-export { MaterialInputHTML, MaterialInputIDMap };
-export { MaterialInputCSS } from './material-input.css';

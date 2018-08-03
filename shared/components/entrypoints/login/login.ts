@@ -577,6 +577,3 @@ export class Login extends WebComponent<LoginIDMap> implements WebComponentInter
 		this.$.lockButton.addEventListener('click', this.handleEmailRememberToggle);
 	}
 }
-
-export { LoginHTML, LoginIDMap };
-export { LoginCSS } from './login.css'

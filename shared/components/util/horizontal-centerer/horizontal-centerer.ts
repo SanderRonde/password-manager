@@ -13,6 +13,3 @@ export class HorizontalCenterer extends WebComponent<HorizontalCentererIDMap> im
 	renderer = HorizontalCentererHTML;
 	loaded = true;
 }
-
-export { HorizontalCentererHTML, HorizontalCentererIDMap }
-export { HorizontalCentererCSS } from './horizontal-centerer.css'
