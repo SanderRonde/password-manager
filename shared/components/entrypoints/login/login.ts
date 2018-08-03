@@ -1,3 +1,5 @@
+/// <reference path="../../../types/elements.d.ts" />
+
 // import { FormHelperText, FormControl, InputLabel, InputAdornment, IconButton, Input } from '@material-ui/core';
 // import { genRSAKeyPair, encryptWithPublicKey, pad } from '../../../lib/shared-crypto';
 // import { HorizontalCenterer } from '../../util/horizontalcenterer/horizontalcenterer';
@@ -571,8 +573,5 @@ export class Login extends WebComponent<LoginIDMap> {
 	}
 }
 
-declare global {
-	type HTMLLoginElement = Login;
-}
 export { LoginHTML, LoginIDMap };
 export { LoginCSS } from './login.css'

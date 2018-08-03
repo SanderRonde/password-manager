@@ -1,3 +1,4 @@
+/// <reference path="../../../types/elements.d.ts" />
 import { defineProps, genIs, PROP_TYPE, WebComponent, ComponentIs } from '../../../lib/webcomponent-util';
 import { MaterialInputIDMap } from './material-input-querymap';
 import { MaterialInputHTML } from './material-input.html';
@@ -166,8 +167,5 @@ export class MaterialInput extends WebComponent<MaterialInputIDMap> {
 	}
 }
 
-declare global {
-	type HTMLMaterialInputElement = MaterialInput;
-}
 export { MaterialInputHTML, MaterialInputIDMap };
 export { MaterialInputCSS } from './material-input.css';
