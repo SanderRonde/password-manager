@@ -1,6 +1,5 @@
-const cleanCss = require('gulp-clean-css');
-const webpack = require('webpack-stream');
-const rename = require('gulp-rename');
+const rollupResolve = require('rollup-plugin-node-resolve');
+const rollup = require('rollup');
 const gulp = require('gulp');
 const path = require('path');
 
@@ -17,18 +16,18 @@ function genTask(description, toRun) {
 	return toRun;
 }
 
-/**
- * Generates a function with a dynamic name
- * 
- * @param {string} name - The name of the function
- * @param {Function} target - The content of the function
- * 
- * @returns {(done: (error?: any) => void) => any} The function with the new name
- */
-function dynamicFunctionName(name, target) {
-	const fn = new Function('target', `return function ${name}(){ return target() }`);
-	return fn(target);
-}
+// /**
+//  * Generates a function with a dynamic name
+//  * 
+//  * @param {string} name - The name of the function
+//  * @param {Function} target - The content of the function
+//  * 
+//  * @returns {(done: (error?: any) => void) => any} The function with the new name
+//  */
+// function dynamicFunctionName(name, target) {
+// 	const fn = new Function('target', `return function ${name}(){ return target() }`);
+// 	return fn(target);
+// }
 
 /**
  * Generates an async function with a dynamic name
@@ -58,37 +57,41 @@ function capitalize(str) {
 (() => {
 	const SRC_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/src/');
 	const BUILD_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/build/');
-	const ROUTES = ['dashboard', 'login'];
-
-	/**
-	 * Combine JS files into a single bundle and output it
-	 * 
-	 * @param {string} input - The entrypoint
-	 * @param {string} output - The output location
-	 * @param {string} name - The name of the file
-	 */
-	function bundleJS(input, output, name) {
-		return gulp.src(input)
-			.pipe(webpack({
-				resolve: {
-					extensions: ['.js', '.jsx']
-				},
-				externals: {
-					react: 'window.React',
-					'react-dom': 'window.ReactDOM'
-				},
-				mode: 'production'
-			}))
-			.pipe(rename(name))
-			.pipe(gulp.dest(output));
-	}
+	//TODO: add dashboard route when work started on it
+	const ROUTES = ['login'];
 
 	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
 		gulp.parallel(...ROUTES.map((route) => {
-			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-hydrate.js`);
-			const output = path.join(BUILD_DIR, 'entrypoints/', route);
-			return dynamicFunctionName(`bundleJS${capitalize(route)}`, async () => {
-				await bundleJS(input, output, `${route}.js`);
+			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-page.js`);
+			const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}-page.js`);
+
+			return dynamicFunctionNameAsync(`bundleJS${capitalize(route)}`, async () => {
+				const bundle = await rollup.rollup({
+					input,
+					onwarn(warning) {
+						if (typeof warning !== 'string' && warning.loc) {
+							const line = warning.loc.line;
+							if (line === 1) {
+								//Typescript inserted helper method, ignore it
+								return;
+							}
+						}
+						console.log(warning);
+					},
+					plugins: [
+						rollupResolve({
+							module: true,
+							browser: true,
+							only: ['lit-html'],
+							modulesOnly: true
+						})
+					]
+				});
+
+				await bundle.write({
+					format: 'iife',
+					file: output
+				});
 			});
 		}))));
 
