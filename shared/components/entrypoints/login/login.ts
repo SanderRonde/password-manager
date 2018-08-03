@@ -534,11 +534,10 @@ export class Login extends WebComponent<{
 	];
 	static is: ComponentIs = genIs('login-page', Login);
 	renderer = LoginHTML;
-	done = true;
-
 	props = defineProps(this, {}, {
 		emailRemembered: PROP_TYPE.BOOL
 	});
+	done = true;
 
 	constructor() {
 		super();

@@ -10,7 +10,6 @@ export class MaterialInput extends WebComponent<{
 }> {
 	static is: ComponentIs = genIs('material-input', MaterialInput);
 	renderer = MaterialInputHTML;
-	loaded = true;
 
 	props = defineProps(this, {
 		label: {
@@ -40,6 +39,7 @@ export class MaterialInput extends WebComponent<{
 		},
 		fill: PROP_TYPE.BOOL
 	}, {});
+	loaded = true;
 
 	private _maxRows: number = -1;
 

@@ -420,7 +420,7 @@ class WebComponentRenderer extends WebComponentDefiner {
 		this.preRender();
 		this._disableRender = false;
 
-		render(this.renderer.apply(this, this.props), this.internals.root);
+		render(this.renderer.apply(this, [this.props]), this.internals.root);
 
 		this.internals.postRenderHooks.forEach(fn => fn());
 		this.postRender();
