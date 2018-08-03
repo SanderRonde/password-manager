@@ -1,13 +1,11 @@
 import { LockClosed } from "../../icons/lockClosed/lockClosed";
 import { LockOpen } from "../../icons/lockOpen/lockOpen";
-import { LoginCSS } from "./login.css";
 import { Login } from "./login";
 import { html } from "lit-html";
 
 export function LoginHTML(this: Login, props: Login['props']) {
 	return html`
 		<div>
-		${LoginCSS}
 			<horizontal-centerer>
 				<vertical-centerer fullscreen>
 					<form id="formContainer">

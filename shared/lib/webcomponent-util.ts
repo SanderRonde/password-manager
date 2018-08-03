@@ -352,7 +352,7 @@ type IDMapFn<IDS> = {
 	(selector: string): HTMLElement|null;
 } & IDS;
 
-class WebComponentDefiner extends HTMLElement {
+abstract class WebComponentDefiner extends HTMLElement {
 	/**
 	 * Any dependencies this component depends on
 	 */
@@ -376,7 +376,7 @@ class WebComponentDefiner extends HTMLElement {
 	}
 }
 
-class WebComponentRenderer extends WebComponentDefiner {
+abstract class WebComponentRenderer extends WebComponentDefiner {
 	/**
 	 * Whether the render method should be temporarily disabled (to prevent infinite loops)
 	 */
@@ -390,8 +390,8 @@ class WebComponentRenderer extends WebComponentDefiner {
 	/**
 	 * The render method that will render this component
 	 */
-	protected renderer: (this: any, props: any) => TemplateResult = () => {
-		throw new Error('No render method impleented');	
+	protected abstract renderer: (this: any, props: any) => TemplateResult = () => {
+		throw new Error('No render method implemented');	
 	};
 
 	/**
@@ -402,7 +402,7 @@ class WebComponentRenderer extends WebComponentDefiner {
 		 * The root of this component's DOM
 		 */
 		root: this.attachShadow({
-			mode: 'closed'
+			mode: 'open'
 		}),
 		/**
 		 * Any hooks that should be called after rendering
@@ -412,7 +412,7 @@ class WebComponentRenderer extends WebComponentDefiner {
 	/**
 	 * The properties of this component
 	 */
-	props: any = null;
+	props: any = {};
 
 	@bindToClass
 	/**
@@ -448,7 +448,7 @@ class WebComponentRenderer extends WebComponentDefiner {
 	protected firstRender() {}
 }
 
-export class WebComponentBase extends WebComponentRenderer {
+export abstract class WebComponentBase extends WebComponentRenderer {
 	/**
 	 * Initialize the component and start rendering
 	 */
@@ -466,7 +466,7 @@ export class WebComponentBase extends WebComponentRenderer {
 	}
 }
 
-export class WebComponent<IDS extends {
+export abstract class WebComponent<IDS extends {
 	[key: string]: HTMLElement;
 } = {}> extends WebComponentBase {
 	/**
@@ -523,6 +523,12 @@ export class WebComponent<IDS extends {
 	$$(selector: string): NodeListOf<HTMLElement> {
 		return this.internals.root.querySelectorAll(selector);
 	}
+}
+
+export declare abstract class WebComponentInterface extends WebComponent<any> {
+	static is: ComponentIs;
+	static cssProvider: Promise<TemplateResult>;
+	loaded: boolean;
 }
 
 export type ComponentIs = [string, typeof WebComponentBase];

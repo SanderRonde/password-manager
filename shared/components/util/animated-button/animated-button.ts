@@ -1,14 +1,19 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { WebComponent, ComponentIs, genIsAccessor } from '../../../lib/webcomponent-util';
+import { WebComponent, ComponentIs, genIsAccessor, WebComponentInterface } from '../../../lib/webcomponent-util';
 import { rippleEffect, RippleEffect, bindToClass } from '../../../lib/decorators';
 import { AnimatedButtonIDMap } from './animated-button-querymap';
 import { AnimatedButtonHTML } from './animated-button.html';
 
 @rippleEffect
-export class AnimatedButton extends WebComponent<AnimatedButtonIDMap> {
+export class AnimatedButton extends WebComponent<AnimatedButtonIDMap> implements WebComponentInterface {
 	static is: ComponentIs = genIsAccessor('animated-button', () => {
 		return AnimatedButton;
 	});
+	static get cssProvider() {
+		return import('./animated-button.css').then((mod) => {
+			return mod.AnimatedButtonCSS;
+		});
+	}
 	renderer = AnimatedButtonHTML;
 	loaded = true;
 

@@ -511,7 +511,7 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
-import { genIs, defineProps, PROP_TYPE, isDefined, WebComponent, ComponentIs } from '../../../lib/webcomponent-util'
+import { genIs, defineProps, PROP_TYPE, isDefined, WebComponent, ComponentIs, WebComponentInterface } from '../../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../util/animated-button/animated-button';
@@ -521,7 +521,7 @@ import { bindToClass } from '../../../lib/decorators';
 import { LoginIDMap } from './login-querymap';
 import { LoginHTML } from './login.html';
 
-export class Login extends WebComponent<LoginIDMap> {
+export class Login extends WebComponent<LoginIDMap> implements WebComponentInterface {
 	static dependencies = [
 		VerticalCenterer, 
 		HorizontalCenterer, 
@@ -530,11 +530,16 @@ export class Login extends WebComponent<LoginIDMap> {
 		AnimatedButton
 	];
 	static is: ComponentIs = genIs('login-page', Login);
+	static get cssProvider() {
+		return import('./login.css').then((mod) => {
+			return mod.LoginCSS;
+		});
+	}
 	renderer = LoginHTML;
 	props = defineProps(this, {}, {
 		emailRemembered: PROP_TYPE.BOOL
 	});
-	done = true;
+	loaded = true;
 
 	constructor() {
 		super();

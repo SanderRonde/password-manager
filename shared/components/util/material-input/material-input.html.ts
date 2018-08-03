@@ -1,11 +1,9 @@
 import { classNames } from "../../../lib/webcomponent-util";
-import { MaterialInputCSS } from "./material-input.css";
 import { MaterialInput } from "./material-input";
 import { html } from "lit-html";
 
 export function MaterialInputHTML(this: MaterialInput) {
 	return html`
-			${MaterialInputCSS}
 			<div id="container" class="${classNames(
 				'mdl-textfield', 'mdl-js-textfield', {
 					'mdl-textfield--floating-label': !this.props.noFloatingLabel,

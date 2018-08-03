@@ -1,12 +1,16 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, genIs, PROP_TYPE, WebComponent, ComponentIs } from '../../../lib/webcomponent-util';
+import { defineProps, genIs, PROP_TYPE, WebComponent, ComponentIs, WebComponentInterface } from '../../../lib/webcomponent-util';
 import { MaterialInputIDMap } from './material-input-querymap';
 import { MaterialInputHTML } from './material-input.html';
 import { bindToClass } from '../../../lib/decorators';
 
-
-export class MaterialInput extends WebComponent<MaterialInputIDMap> {
+export class MaterialInput extends WebComponent<MaterialInputIDMap> implements WebComponentInterface {
 	static is: ComponentIs = genIs('material-input', MaterialInput);
+	static get cssProvider() {
+		return import('./material-input.css').then((mod) => {
+			return mod.MaterialInputCSS;
+		});
+	}
 	renderer = MaterialInputHTML;
 
 	props = defineProps(this, {
