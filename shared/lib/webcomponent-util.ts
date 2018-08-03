@@ -529,3 +529,12 @@ export type ComponentIs = [string, typeof WebComponentBase];
 export function genIs(name: string, component: typeof WebComponentBase): ComponentIs {
 	return [name, component];
 }
+export function genIsAccessor(name: string, component: () => typeof WebComponentBase): ComponentIs {
+	const arr = <any>[name] as ComponentIs;
+	Object.defineProperty(arr, 1, {
+		get() {
+			return component();
+		}
+	});
+	return arr;
+}

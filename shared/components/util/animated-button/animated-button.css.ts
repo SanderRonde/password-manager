@@ -243,4 +243,26 @@ export const AnimatedButtonCSS = html`<style>
 	.mdl-button .material-icons {
 		vertical-align: middle;
 	}
+	.mdl-ripple {
+		background: rgb(0,0,0);
+		border-radius: 50%;
+		height: 50px;
+		left: 0;
+		opacity: 0;
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		transform: translate(-50%, -50%);
+		width: 50px;
+		overflow: hidden;
+	}
+	.mdl-ripple.is-animating {
+		transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1), 
+			width 0.3s cubic-bezier(0, 0, 0.2, 1), 
+			height 0.3s cubic-bezier(0, 0, 0.2, 1), 
+			opacity 0.6s cubic-bezier(0, 0, 0.2, 1);
+	}
+	.mdl-ripple.is-visible {
+		opacity: 0.3;
+	}
 </style>`;

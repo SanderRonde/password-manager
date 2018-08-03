@@ -5,7 +5,7 @@ import { html } from "lit-html";
 export function AnimatedButtonHTML(this: AnimatedButton) {
 	return html`
 		${AnimatedButtonCSS}
-		<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+		<button id="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
 			<slot>
 		</button>`;
 }
