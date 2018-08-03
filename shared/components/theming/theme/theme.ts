@@ -12,7 +12,11 @@ export const theme = {
 		 * The lighter version of the primary color
 		 * light blue-grey
 		 */
-		light: '#718792',
+		light: '#b5c5cd',
+		/**
+		 * The even lighter version that appears when you hover over it
+		 */
+		hover: '#d0dbe1',
 		/**
 		 * The darker version of the primary color
 		 * dark blue-grey

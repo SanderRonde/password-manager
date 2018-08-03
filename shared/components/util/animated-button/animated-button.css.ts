@@ -1,4 +1,5 @@
 import { html } from "lit-html";
+import { theme } from "../../theming/theme/theme";
 
 export const AnimatedButtonCSS = html`<style>
 	/**
@@ -47,16 +48,16 @@ export const AnimatedButtonCSS = html`<style>
 		border: 0;
 	}
 	.mdl-button:hover {
-		background-color: rgba(158,158,158, 0.20);
+		background-color: ${theme.primary.light};
 	}
 	.mdl-button:focus:not(:active) {
 		background-color: rgba(0,0,0, 0.12);
 	}
 	.mdl-button:active {
-		background-color: rgba(158,158,158, 0.40);
+		background-color: ${theme.primary.main};
 	}
 	.mdl-button.mdl-button--colored {
-		color: rgb(63,81,181);
+		color: ${theme.primary.main};
 	}
 	.mdl-button.mdl-button--colored:focus:not(:active) {
 		background-color: rgba(0,0,0, 0.12);
@@ -67,29 +68,32 @@ export const AnimatedButtonCSS = html`<style>
 	}
 
 	.mdl-button--raised {
-		background: rgba(158,158,158, 0.20);
 		box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+		background: ${theme.primary.main};
+		color: ${theme.textOnBlack};
 	}
 	.mdl-button--raised:active {
 		box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-		background-color: rgba(158,158,158, 0.40);
+		background-color: ${theme.primary.main};
+		color: ${theme.textOnBlack};
 	}
 	.mdl-button--raised:focus:not(:active) {
 		box-shadow: 0 0 8px rgba(0, 0, 0, 0.18), 0 8px 16px rgba(0, 0, 0, 0.36);
-		background-color: rgba(158,158,158, 0.40);
+		background-color: ${theme.primary.main};
+		color: ${theme.textOnBlack};
 	}
 	.mdl-button--raised.mdl-button--colored {
-		background: rgb(63,81,181);
-		color: rgb(255,255,255);
+		background: ${theme.primary.main};
+		color: ${theme.textOnBlack};
 	}
 	.mdl-button--raised.mdl-button--colored:hover {
-		background-color: rgb(63,81,181);
+		background-color: ${theme.primary.main};
 	}
 	.mdl-button--raised.mdl-button--colored:active {
-		background-color: rgb(63,81,181);
+		background-color: ${theme.primary.main};
 	}
 	.mdl-button--raised.mdl-button--colored:focus:not(:active) {
-		background-color: rgb(63,81,181);
+		background-color: ${theme.primary.main};
 	}
 	.mdl-button--raised.mdl-button--colored .mdl-ripple {
 		background: rgb(255,255,255);
@@ -104,7 +108,7 @@ export const AnimatedButtonCSS = html`<style>
 		width: 56px;
 		padding: 0;
 		overflow: hidden;
-		background: rgba(158,158,158, 0.20);
+		background: ${theme.primary.light};
 		box-shadow: 0 1px 1.5px 0 rgba(0, 0, 0, 0.12), 0 1px 1px 0 rgba(0, 0, 0, 0.24);
 		position: relative;
 		line-height: normal;
@@ -128,24 +132,24 @@ export const AnimatedButtonCSS = html`<style>
 	}
 	.mdl-button--fab:active {
 		box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-		background-color: rgba(158,158,158, 0.40);
+		background-color: ${theme.primary.main};
 	}
 	.mdl-button--fab:focus:not(:active) {
 		box-shadow: 0 0 8px rgba(0, 0, 0, 0.18), 0 8px 16px rgba(0, 0, 0, 0.36);
-		background-color: rgba(158,158,158, 0.40);
+		background-color: ${theme.primary.main};
 	}
 	.mdl-button--fab.mdl-button--colored {
-		background: rgb(255,64,129);
-		color: rgb(255,255,255);
+		background: ${theme.accent.main};
+		color: ${theme.textOnBlack};
 	}
 	.mdl-button--fab.mdl-button--colored:hover {
-		background-color: rgb(255,64,129);
+		background-color: ${theme.accent.main};
 	}
 	.mdl-button--fab.mdl-button--colored:focus:not(:active) {
-		background-color: rgb(255,64,129);
+		background-color: ${theme.accent.main};
 	}
 	.mdl-button--fab.mdl-button--colored:active {
-		background-color: rgb(255,64,129);
+		background-color: ${theme.accent.main};
 	}
 	.mdl-button--fab.mdl-button--colored .mdl-ripple {
 		background: rgb(255,255,255);
@@ -201,25 +205,25 @@ export const AnimatedButtonCSS = html`<style>
 	}
 
 	.mdl-button--primary.mdl-button--primary {
-		color: rgb(63,81,181);
+		color: ${theme.primary.main};
 	}
 	.mdl-button--primary.mdl-button--primary .mdl-ripple {
 		background: rgb(255,255,255);
 	}
 	.mdl-button--primary.mdl-button--primary.mdl-button--raised, .mdl-button--primary.mdl-button--primary.mdl-button--fab {
-		color: rgb(255,255,255);
-		background-color: rgb(63,81,181);
+		color: ${theme.textOnBlack};
+		background-color: ${theme.primary.main};
 	}
 
 	.mdl-button--accent.mdl-button--accent {
-		color: rgb(255,64,129);
+		color: ${theme.accent.main};
 	}
 	.mdl-button--accent.mdl-button--accent .mdl-ripple {
 		background: rgb(255,255,255);
 	}
 	.mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab {
-		color: rgb(255,255,255);
-		background-color: rgb(255,64,129);
+		color: ${theme.textOnBlack};
+		background-color: ${theme.accent.main};
 	}
 
 	.mdl-button[disabled][disabled], .mdl-button.mdl-button--disabled.mdl-button--disabled {
