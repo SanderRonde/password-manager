@@ -36,7 +36,9 @@ export function LoginHTML(this: Login, props: Login['props']) {
 							pattern="\d{6}" error="Enter a 6-digit code"
 							title="Twofactor authentication token (if enabled for the account)"
 							autoFocus label="2FA Token (if enabled)"></material-input>
-						<animated-button>SUBMIT</animated-button>
+						<div id="buttonPositioner">
+							<animated-button>SUBMIT</animated-button>
+						</div>
 					</form>
 				</vertical-centerer>
 			</horizontal-centerer>
