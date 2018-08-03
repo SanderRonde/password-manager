@@ -539,12 +539,18 @@ export class Login extends WebComponent<LoginIDMap> {
 
 		const inputValue = localStorage.getItem('rememberedEmail')
 		if (isDefined(inputValue)) {
-			this.$.emailInput.set(inputValue);
 			this.props.emailRemembered = true;
-			this.$.emailInput.input.focus();
+			this.$.passwordInput.input.focus();
 		} else {
 			this.props.emailRemembered = false;
-			this.$.passwordInput.input.focus();
+			this.$.emailInput.input.focus();
+		}
+	}
+
+	firstRender() {
+		const inputValue = localStorage.getItem('rememberedEmail')
+		if (isDefined(inputValue)) {
+			this.$.emailInput.set(inputValue);
 		}
 	}
 

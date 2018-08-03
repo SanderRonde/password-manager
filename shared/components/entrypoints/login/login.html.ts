@@ -23,7 +23,7 @@ export function LoginHTML(this: Login, props: Login['props']) {
 								id="lockButton"
 							>
 								${props.emailRemembered ?
-									LockOpen : LockClosed
+									LockClosed : LockOpen
 							}</icon-button>
 						</material-input>
 						<material-input id="passwordInput" name="password"

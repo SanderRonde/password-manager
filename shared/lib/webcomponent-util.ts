@@ -383,6 +383,11 @@ class WebComponentRenderer extends WebComponentDefiner {
 	private _disableRender: boolean = false;
 
 	/**
+	 * Whether this is the first render
+	 */
+	private _firstRender: boolean = true;
+
+	/**
 	 * The render method that will render this component
 	 */
 	protected renderer: (this: any, props: any) => TemplateResult = () => {
@@ -423,6 +428,10 @@ class WebComponentRenderer extends WebComponentDefiner {
 		render(this.renderer.apply(this, [this.props]), this.internals.root);
 
 		this.internals.postRenderHooks.forEach(fn => fn());
+		if (this._firstRender) {
+			this._firstRender = false;
+			this.firstRender();
+		}
 		this.postRender();
 	}
 	/**
@@ -433,6 +442,10 @@ class WebComponentRenderer extends WebComponentDefiner {
 	 * A method called after rendering
 	 */
 	protected postRender() {}
+	/**
+	 * A method called after the very first render
+	 */
+	protected firstRender() {}
 }
 
 export class WebComponentBase extends WebComponentRenderer {
