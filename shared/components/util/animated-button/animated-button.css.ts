@@ -1,7 +1,7 @@
-import { html } from "lit-html";
 import { theme } from "../../theming/theme/theme";
+const css = (input: any) => input;
 
-export const AnimatedButtonCSS = html`<style>
+export const AnimatedButtonCSS = css(`<style>
 	/**
 	* Copyright 2015 Google Inc. All Rights Reserved.
 	*
@@ -274,4 +274,4 @@ export const AnimatedButtonCSS = html`<style>
 		border-radius: 5px;
 		height: auto;
 	}
-</style>`;
+</style>`);

@@ -1,5 +1,5 @@
-import { ServerConfig } from '../actions/server/server';
 import { TypedObjectID } from '../../../shared/types/db-types';
+import { ServerConfig } from '../actions/server/server';
 import * as commentJson from 'comment-json'
 import { SERVER_ROOT } from './constants';
 import * as nodemailer from 'nodemailer'
@@ -417,4 +417,11 @@ export function captureFileOutput() {
 			return content;
 		}
 	}
+}
+
+export function conditionalString(str: string, condition: boolean) {
+	if (condition) {
+		return str;
+	}
+	return '';
 }

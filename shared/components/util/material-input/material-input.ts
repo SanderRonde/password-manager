@@ -1,47 +1,50 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, genIs, PROP_TYPE, WebComponent, ComponentIs, WebComponentInterface } from '../../../lib/webcomponent-util';
+import { defineProps, PROP_TYPE, config, ConfigurableWebComponent } from '../../../lib/webcomponent-util';
 import { MaterialInputIDMap } from './material-input-querymap';
 import { MaterialInputHTML } from './material-input.html';
+import { MaterialInputCSS } from './material-input.css';
 import { bindToClass } from '../../../lib/decorators';
 
-export class MaterialInput extends WebComponent<MaterialInputIDMap> implements WebComponentInterface {
-	static is: ComponentIs = genIs('material-input', MaterialInput);
-	static get cssProvider() {
-		return import('./material-input.css').then((mod) => {
-			return mod.MaterialInputCSS;
-		});
-	}
-	renderer = MaterialInputHTML;
+//A lot of functions on this class are based on those in
+// https://github.com/google/material-design-lite/tree/mdl-1.x/src/textfield
+// so credit goes to the original authors
 
+@config({
+	is: 'material-input',
+	css: MaterialInputCSS,
+	renderer: MaterialInputHTML
+})
+export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> {
 	props = defineProps(this, {
-		label: {
-			type: PROP_TYPE.STRING,
-			defaultValue: '',
-			coerce: true
-		},
-		value: {
-			type: PROP_TYPE.STRING,
-			watch: false,
-			defaultValue: '',
-			coerce: true
-		},
-		type: {
-			type: PROP_TYPE.STRING,
-			defaultValue: 'text',
-			exactType: '' as 'text'|'password'|'email'|'tel'
-		},
-		noFloatingLabel: {
-			type: PROP_TYPE.BOOL,
-			defaultValue: false
-		},
-		pattern: PROP_TYPE.STRING,
-		error: {
-			type: PROP_TYPE.STRING,
-			coerce: true
-		},
-		fill: PROP_TYPE.BOOL
-	}, {});
-	loaded = true;
+		reflect: {
+			label: {
+				type: PROP_TYPE.STRING,
+				defaultValue: '',
+				coerce: true
+			},
+			value: {
+				type: PROP_TYPE.STRING,
+				watch: false,
+				defaultValue: '',
+				coerce: true
+			},
+			type: {
+				type: PROP_TYPE.STRING,
+				defaultValue: 'text',
+				exactType: '' as 'text'|'password'|'email'|'tel'
+			},
+			noFloatingLabel: {
+				type: PROP_TYPE.BOOL,
+				defaultValue: false
+			},
+			pattern: PROP_TYPE.STRING,
+			error: {
+				type: PROP_TYPE.STRING,
+				coerce: true
+			},
+			fill: PROP_TYPE.BOOL
+		}
+	});
 
 	private _maxRows: number = -1;
 

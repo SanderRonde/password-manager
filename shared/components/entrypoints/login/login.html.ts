@@ -5,6 +5,7 @@ import { html } from "lit-html";
 
 export function LoginHTML(this: Login, props: Login['props']) {
 	return html`
+		${this.css}
 		<div>
 			<horizontal-centerer>
 				<vertical-centerer fullscreen>

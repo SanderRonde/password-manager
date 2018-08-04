@@ -1,6 +1,6 @@
-import { html } from "lit-html";
+const css = (input: any) => input;
 
-export const IconButtonCSS = html`<style>
+export const IconButtonCSS = css(`<style>
 	/**
 	* Copyright 2015 Google Inc. All Rights Reserved.
 	*
@@ -244,4 +244,4 @@ export const IconButtonCSS = html`<style>
 	.mdl-button .material-icons {
 		vertical-align: middle;
 	}
-</style>`
+</style>`);

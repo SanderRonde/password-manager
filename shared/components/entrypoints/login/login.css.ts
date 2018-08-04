@@ -1,6 +1,6 @@
-import { html } from "lit-html";
+const css = (input: any) => input;
 
-export const LoginCSS = html`<style>
+export const LoginCSS = css(`<style>
 	#formContainer {
 		width: 400px;
 	}
@@ -10,4 +10,4 @@ export const LoginCSS = html`<style>
 		flex-direction: row;
 		justify-content: flex-end;
 	}
-</style>`
+</style>`);

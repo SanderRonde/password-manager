@@ -511,7 +511,7 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
-import { genIs, defineProps, PROP_TYPE, isDefined, WebComponent, ComponentIs, WebComponentInterface } from '../../../lib/webcomponent-util'
+import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config } from '../../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../util/animated-button/animated-button';
@@ -520,44 +520,36 @@ import { IconButton } from '../../util/icon-button/icon-button';
 import { bindToClass } from '../../../lib/decorators';
 import { LoginIDMap } from './login-querymap';
 import { LoginHTML } from './login.html';
+import { LoginCSS } from './login.css';
 
-export class Login extends WebComponent<LoginIDMap> implements WebComponentInterface {
-	static dependencies = [
+@config({
+	is: 'login-page',
+	css: LoginCSS,
+	renderer: LoginHTML,
+	dependencies: [
 		VerticalCenterer, 
 		HorizontalCenterer, 
 		MaterialInput,
 		IconButton,
 		AnimatedButton
-	];
-	static is: ComponentIs = genIs('login-page', Login);
-	static get cssProvider() {
-		return import('./login.css').then((mod) => {
-			return mod.LoginCSS;
-		});
-	}
-	renderer = LoginHTML;
-	props = defineProps(this, {}, {
-		emailRemembered: PROP_TYPE.BOOL
+	]
+})
+export class Login extends ConfigurableWebComponent<LoginIDMap> {
+	props = defineProps(this, {
+		priv: {
+			emailRemembered: PROP_TYPE.BOOL
+		}
 	});
-	loaded = true;
-
-	constructor() {
-		super();
-
+	
+	firstRender() {
 		const inputValue = localStorage.getItem('rememberedEmail')
 		if (isDefined(inputValue)) {
 			this.props.emailRemembered = true;
 			this.$.passwordInput.input.focus();
+			this.$.emailInput.set(inputValue);
 		} else {
 			this.props.emailRemembered = false;
 			this.$.emailInput.input.focus();
-		}
-	}
-
-	firstRender() {
-		const inputValue = localStorage.getItem('rememberedEmail')
-		if (isDefined(inputValue)) {
-			this.$.emailInput.set(inputValue);
 		}
 	}
 

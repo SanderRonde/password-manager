@@ -1,6 +1,6 @@
-import { html } from "lit-html";
+const css = (input: any) => input;
 
-export const HorizontalCentererCSS = html`<style>
+export const HorizontalCentererCSS = css(`<style>
 	#container {
 		display: flex;
 		flex-direction: row;
@@ -10,4 +10,4 @@ export const HorizontalCentererCSS = html`<style>
 	#content {
 		display: block;
 	}
-</style>`;
+</style>`);

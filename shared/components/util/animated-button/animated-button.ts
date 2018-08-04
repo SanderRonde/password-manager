@@ -1,22 +1,18 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { WebComponent, ComponentIs, genIsAccessor, WebComponentInterface } from '../../../lib/webcomponent-util';
-import { rippleEffect, RippleEffect, bindToClass } from '../../../lib/decorators';
+import { ConfigurableWebComponent, config } from '../../../lib/webcomponent-util';
+import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
 import { AnimatedButtonIDMap } from './animated-button-querymap';
 import { AnimatedButtonHTML } from './animated-button.html';
+import { bindToClass } from '../../../lib/decorators';
+import { AnimatedButtonCSS } from './animated-button.css';
 
+@config({
+	is: 'animated-button',
+	css: AnimatedButtonCSS,
+	renderer: AnimatedButtonHTML
+})
 @rippleEffect
-export class AnimatedButton extends WebComponent<AnimatedButtonIDMap> implements WebComponentInterface {
-	static is: ComponentIs = genIsAccessor('animated-button', () => {
-		return AnimatedButton;
-	});
-	static get cssProvider() {
-		return import('./animated-button.css').then((mod) => {
-			return mod.AnimatedButtonCSS;
-		});
-	}
-	renderer = AnimatedButtonHTML;
-	loaded = true;
-
+export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap> {
 	private rippleElement: HTMLElement|null = null;
 	get container() {
 		return this.$.button;

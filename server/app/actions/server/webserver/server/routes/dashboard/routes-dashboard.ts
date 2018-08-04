@@ -1,16 +1,25 @@
+import { ROUTES } from '../../modules/development';
 import { ResponseCaptured } from "../../modules/ratelimit";
-import { render } from "../../modules/render";
+import { render, DevData } from "../../modules/render";
 import { Webserver } from "../../webserver";
 import { COUNT } from "../../modules/auth";
 import * as express from 'express'
 import * as path from 'path'
 
-export const enum ROUTES {
-	LOGIN,
-	DASHBOARD
-}
-
 const routesBase = path.join(__dirname, '../../../client/');
+
+async function getDevData(_route: ROUTES, isDevelopment: boolean): Promise<DevData> {
+	console.log('getting dev data');
+	if (isDevelopment) {
+		return {
+			enabled: true,
+			cssPaths: [] // await getCSSPathsFromCache(route)
+		}
+	}
+	return {
+		enabled: false
+	}
+}
 
 export class RoutesDashboard {
 	serveDir: string;
@@ -42,7 +51,7 @@ export class RoutesDashboard {
 			token, publicKey
 		} = this.server.Auth.genDashboardCommToken();
 
-		render(res, {
+		await render(res, {
 			data: {
 				comm_token: token,
 				server_public_key: publicKey
@@ -50,7 +59,8 @@ export class RoutesDashboard {
 			rootName: 'login-page',
 			script: 'entrypoints/login/login-page.js',
 			title: 'Log in to your dashboard',
-			development: this.server.config.development
+			devData: await getDevData(ROUTES.LOGIN,
+				this.server.config.development)
 		});
 	}
 
@@ -59,12 +69,13 @@ export class RoutesDashboard {
 			return;
 		}
 
-		render(res, {
+		await render(res, {
 			data: {},
 			rootName: 'dashboard-page',
 			script: 'entrypoints/dashboard/dashboard-page.js',
 			title: 'Your Dashboard',
-			development: this.server.config.development
+			devData: await getDevData(ROUTES.DASHBOARD,
+				this.server.config.development)
 		});
 	}
 }

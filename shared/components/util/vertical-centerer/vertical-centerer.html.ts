@@ -4,6 +4,7 @@ import { html } from "lit-html";
 
 export function VerticalCentererHTML(this: VerticalCenterer, props: VerticalCenterer['props']) {
 	return html`
+		${this.css}
 		<div id="container" class="${classNames({
 			fullscreen: props.fullscreen
 		})}">

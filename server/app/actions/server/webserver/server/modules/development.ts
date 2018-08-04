@@ -188,3 +188,137 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		extensions: ['js']
 	}));
 }
+
+function findWithGlob(glob: typeof import('glob'), pattern: string, nodir: boolean) {
+	return new Promise<string[]>((resolve, reject) => {
+		glob(pattern, {
+			nodir: nodir
+		}, (err, matches) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(matches);
+			}
+		});
+	});
+}
+
+let glob: (typeof import('glob'))|null = null;
+let babel: (typeof import('babel-core'))|null = null;
+async function getDevImports() {
+	if (!glob || !babel) {
+		const [ _babel, _glob ] = await Promise.all([
+			import('babel-core'),
+			import('glob')
+		]);
+		babel = _babel;
+		glob = _glob;	
+	}
+	return {
+		glob,
+		babel
+	}
+}
+
+export async function convertSingleFileToCommonJs(filePath: string) {
+	const { babel } = await getDevImports();
+	const originalFile = await fs.readFile(filePath, {
+		encoding: 'utf8'
+	});
+
+	await fs.writeFile(filePath, babel.transform(originalFile, {
+		plugins: ['transform-es2015-modules-commonjs']
+	}), {
+		encoding: 'utf8'
+	});
+
+	return async () => {
+		await fs.writeFile(filePath, originalFile, {
+			encoding: 'utf8'
+		});
+	}
+}
+
+export async function convertComponentsToCommonJS() {
+	const { babel, glob } = await getDevImports();
+	const pattern = `${path.join(PROJECT_ROOT, 'shared')}/**/*.js`
+	const files = await findWithGlob(glob, pattern, true);
+
+	console.log('found');
+	const originalFiles: Map<string, string> = new Map();
+	await Promise.all(files.map(async (file) => {
+		const content = await fs.readFile(file, {
+			encoding: 'utf8'
+		});
+		originalFiles.set(file, content);
+	}));
+	console.log('read');
+
+	await Promise.all(files.map(async (file) => {
+		await fs.writeFile(file, 
+			babel.transform(originalFiles.get(file)!, {
+				plugins: ['transform-es2015-modules-commonjs']
+			}), {
+				encoding: 'utf8'
+			});
+	}));
+	console.log('written"0;')
+
+	/**
+	 * Undo function
+	 */
+	return async () => {
+		await Promise.all(files.map(async (file) => {
+			await fs.writeFile(file, originalFiles.get(file)!, {
+				encoding: 'utf8'
+			});
+		}));
+	}
+}
+
+// type WebComponentBase = typeof import('../../../../../../../shared/lib/webcomponent-util')
+// 	.WebComponentBase;
+
+export const enum ROUTES {
+	LOGIN = 'login',
+	DASHBOARD = 'dashboard'
+}
+
+// async function getRoute(route: ROUTES): Promise<WebComponentBase> {
+// 	//Convert all components to commonjs temporarily
+// 	switch (route) {
+// 		case ROUTES.LOGIN:
+// 			return (await import('../../../../../../../shared/components/entrypoints/login/login'))
+// 				.Login;
+// 		case ROUTES.DASHBOARD:
+// 			return (await import('../../../../../../../shared/components/entrypoints/dashboard/dashboard'))
+// 				.Dashboard;
+// 	}
+// }
+
+// function extractRouteCSSPaths(component: WebComponentBase): string[] {
+// 	return [
+// 		component.getCssProvider(path),
+// 		...(([] as string[]).concat(...component.dependencies.map((dependency) => {
+// 			return extractRouteCSSPaths(dependency);
+// 		})))
+// 	]
+// }
+
+// const cachedRoutes: Map<ROUTES, string[]> = new Map()
+// export async function getCSSPathsFromCache(route: ROUTES): Promise<string[]> {
+// 	if (cachedRoutes.has(route)) {
+// 		return cachedRoutes.get(route)!;
+// 	}
+// 	console.log('doing conversion');
+// 	const undo = await convertComponentsToCommonJS();
+// 	console.log('done converting');
+// 	const component = await getRoute(route);
+// 	console.log('getting route');
+// 	await undo();
+// 	console.log('undone');
+// 	const paths = extractRouteCSSPaths(component);
+// 	console.log('extracting', paths);
+// 	cachedRoutes.set(route, paths);
+// 	return paths;
+// }

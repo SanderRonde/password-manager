@@ -1,4 +1,4 @@
-import { TemplateResult, render } from "lit-html";
+import { TemplateResult, render, html } from "lit-html";
 import { bindToClass } from "./decorators";
 
 // From https://github.com/JedWatson/classnames
@@ -263,8 +263,13 @@ export function defineProps<P extends {
 } & {
 	[K in keyof T]: GetTSType<T[K]>;
 }>(element: HTMLElement & {
-	render(): void;	
-}, reflect: P, priv: T): R {
+	renderToDOM(): void;
+}, {
+	reflect = {} as P, priv = {} as T
+}: {
+	reflect?: P;
+	priv?: T;
+} = {}): R {
 	const propValues: Partial<R> = {};
 	const props: Partial<R> = {};
 
@@ -322,14 +327,14 @@ export function defineProps<P extends {
 			set(value) {
 				const original = value;
 				if (typeof value === 'object' && watchProperties.length > 0) {
-					value = watchObject(value, watchProperties, element.render);
+					value = watchObject(value, watchProperties, element.renderToDOM);
 				}
 				propValues[mapKey] = value;
 				if (reflectToAttr) {
 					setter(element, propName, original, mapType);
 				}
 				if (watch) {
-					element.render();
+					element.renderToDOM();
 				}
 			}
 		});
@@ -356,7 +361,7 @@ abstract class WebComponentDefiner extends HTMLElement {
 	/**
 	 * Any dependencies this component depends on
 	 */
-	protected static dependencies: typeof WebComponentBase[] = [];
+	public static dependencies: typeof WebComponentBase[] = [];
 	/**
 	 * A tuple consisting of the name of the component and its class
 	 */
@@ -369,14 +374,20 @@ abstract class WebComponentDefiner extends HTMLElement {
 		for (const dependency of this.dependencies) {
 			dependency.define();
 		}
-		if (!this.is || this.is.length !== 2) {
+		if (!this.is) {
+			throw new Error('No component definition given (name and class)')
+		}
+		if (!this.is.name) {
 			throw new Error('No name given for component');
 		}
-		define(this.is[0], this.is[1]);
+		if (!this.is.component) {
+			throw new Error('No class given for component');
+		}
+		define(this.is.name, this.is.component);
 	}
 }
 
-abstract class WebComponentRenderer extends WebComponentDefiner {
+export abstract class WebComponentBase extends WebComponentDefiner {
 	/**
 	 * Whether the render method should be temporarily disabled (to prevent infinite loops)
 	 */
@@ -414,19 +425,13 @@ abstract class WebComponentRenderer extends WebComponentDefiner {
 	 */
 	props: any = {};
 
-	@bindToClass
-	/**
-	 * The method that starts the rendering cycle
-	 */
-	public render() {
-		if (this._disableRender) return;
-
+	private _doPreRenderLifecycle() {
 		this._disableRender = true;
 		this.preRender();
 		this._disableRender = false;
+	}
 
-		render(this.renderer.apply(this, [this.props]), this.internals.root);
-
+	private _doPostRenderLifecycle() {
 		this.internals.postRenderHooks.forEach(fn => fn());
 		if (this._firstRender) {
 			this._firstRender = false;
@@ -434,6 +439,18 @@ abstract class WebComponentRenderer extends WebComponentDefiner {
 		}
 		this.postRender();
 	}
+
+	@bindToClass
+	/**
+	 * The method that starts the rendering cycle
+	 */
+	public renderToDOM() {
+		if (this._disableRender) return;
+		this._doPreRenderLifecycle();
+		render(this.renderer.apply(this, [this.props]), this.internals.root);
+		this._doPostRenderLifecycle();
+	}
+
 	/**
 	 * A method called before rendering (changing props won't trigger additional re-render)
 	 */
@@ -446,24 +463,6 @@ abstract class WebComponentRenderer extends WebComponentDefiner {
 	 * A method called after the very first render
 	 */
 	protected firstRender() {}
-}
-
-export abstract class WebComponentBase extends WebComponentRenderer {
-	/**
-	 * Initialize the component and start rendering
-	 */
-	private __init() {
-		this.render();
-	}
-
-	protected set loaded(_value) {
-		if (_value === true) {
-			this.__init();
-		}
-	}
-	protected get loaded() {
-		return true;
-	}
 }
 
 export abstract class WebComponent<IDS extends {
@@ -523,24 +522,87 @@ export abstract class WebComponent<IDS extends {
 	$$(selector: string): NodeListOf<HTMLElement> {
 		return this.internals.root.querySelectorAll(selector);
 	}
+
+	/**
+	 * Called when the component is mounted to the dom
+	 */
+	connectedCallback() {
+		this.renderToDOM();
+	}
+}
+
+export class ConfigurableWebComponent<IDS extends {
+	[key: string]: HTMLElement;
+} = {}> extends WebComponent<IDS> {
+	protected renderer!: (this: any, props: any) => TemplateResult;
+	get css() { throw new Error('Not implemented'); }
 }
 
 export declare abstract class WebComponentInterface extends WebComponent<any> {
 	static is: ComponentIs;
-	static cssProvider: Promise<TemplateResult>;
 	loaded: boolean;
 }
 
-export type ComponentIs = [string, typeof WebComponentBase];
+export type ComponentIs = {
+	name: string;
+	component: typeof WebComponentBase;
+};
 export function genIs(name: string, component: typeof WebComponentBase): ComponentIs {
-	return [name, component];
+	return {
+		name,
+		component
+	}
 }
+
 export function genIsAccessor(name: string, component: () => typeof WebComponentBase): ComponentIs {
-	const arr = <any>[name] as ComponentIs;
-	Object.defineProperty(arr, 1, {
+	const data: Partial<ComponentIs> = {
+		name
+	}
+	Object.defineProperty(data, 'constructor', {
 		get() {
 			return component();
 		}
 	});
-	return arr;
+	return data as ComponentIs;
+}
+
+function genTemplateArr(...input: string[])	 {
+	const arr: Partial<TemplateStringsArray> = input;
+	const raw = [...input];
+	Object.defineProperty(arr, 'raw', {
+		get() {
+			return raw;
+		}
+	});
+	return arr as TemplateStringsArray;
+}
+
+interface WebComponentConfiguration {
+	is: string;
+	css: string|null;
+	dependencies?: typeof WebComponentBase[];
+	renderer: (this: any, props: any) => TemplateResult;
+}
+export function config(config: WebComponentConfiguration) {
+	const {
+		is, renderer,
+		dependencies = []	
+	} = config;
+	return <I extends {
+		[key: string]: HTMLElement;
+	}, T>(target: T): T => {
+		const targetComponent = <any>target as typeof WebComponent;
+		class WebComponentConfig extends targetComponent<I> implements WebComponentBase {
+			static is = genIs(is, WebComponentConfig);
+			static dependencies = dependencies
+			static config: WebComponentConfiguration = config;
+			renderer = renderer;
+
+			private _templateCSS = html(genTemplateArr(config.css || ''));
+			get css() {
+				return this._templateCSS;
+			}
+		}
+		return <any>WebComponentConfig as T;
+	}
 }
