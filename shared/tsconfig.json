@@ -21,7 +21,8 @@
         "strictPropertyInitialization": true,
         "strictNullChecks": true,
         "composite": true,
-        "declaration": true
+        "declaration": true,
+        "sourceMap": true
 	},
     "compileOnSave": true,
     "allowJs": true,
