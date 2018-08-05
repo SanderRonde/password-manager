@@ -1,6 +1,6 @@
 import { GenericTestContext, Context } from "ava";
 import { listenWithoutRef } from "./util";
-import { spawn } from "child_process";
+import { spawn, ChildProcess } from "child_process";
 import * as path from 'path'
 
 export enum LOG_VALS {
@@ -12,9 +12,12 @@ function isLogVal(value: any): value is LOG_VALS {
 }
 
 export class ProcRunner {
+	private _proc: ChildProcess|null = null;
 	private _written: string[] = [];
 	private _exitCode: number|undefined;
 	private _exitCodeExpected: number|undefined;
+	private _timeout: NodeJS.Timer|null = null;
+	private _listeners: ((text: string) => void)[] = [];
 	private _reads: string[] = [];
 	private _writtenExpected: ({
 		type: 'regular';
@@ -46,7 +49,15 @@ export class ProcRunner {
 		if (this._config.printlogs) {
 			console.log(chunk);
 		}
-		this._written.push(chunk.toString());
+		const str = chunk.toString();
+		for (const listener of this._listeners) {
+			listener(str);
+		}
+		this._written.push(str);
+	}
+
+	public onText(listener: (text: string) => void) {
+		this._listeners.push(listener);
 	}
 
 	public expectRead(answer: string) {
@@ -182,54 +193,72 @@ export class ProcRunner {
 		this._checkExitCode();
 	}
 
+	private _kill() {
+		this._proc!.kill();
+		if (!this.done) {
+			this._exitCode = -1;
+			this.done = true;
+
+			if (this.ondone) {
+				this.ondone();
+			}
+		}
+	}
+
+	public updateTimer(timeout: number) {
+		if (this._timeout) {
+			clearTimeout(this._timeout);
+		}
+		this._timeout = setTimeout(() => {
+			this._kill();
+		}, timeout);
+		return new Promise((resolve) => {
+			this.ondone = resolve;
+		});
+	}
+
+	private ondone!: (() => void);
+	private done: boolean = false;
 	public run(timeout?: number): Promise<void> {
 		return new Promise((resolve) => {
-			let done: boolean = false;
-			let ondone: () => void = resolve;
+			this.done = false;
+			this.ondone = resolve;
 
-			const proc = spawn('node', [
+			this._proc = spawn('node', [
 				path.join(__dirname, './../../app/main.js'),
 				...this._args
 			], {
 				env: {...process.env, ...(this._config.env || {})}
 			}).once('exit', (code: number) => {
-				if (!done) {
+				if (!this.done) {
 					this._exitCode = code;
-					done = true;
+					this.done = true;
 
-					if (ondone) {
-						ondone();
+					if (this.ondone) {
+						this.ondone();
 					}
 				}
 			});
 
-			if (timeout) {
-				setTimeout(() => {
-					proc.kill();
-					if (!done) {
-						this._exitCode = -1;
-						done = true;
-
-						if (ondone) {
-							ondone();
-						}
-					}
+			if (timeout && timeout !== Infinity) {
+				this._timeout = setTimeout(() => {
+					this._kill();
 				}, timeout);
 			}
 			
-			listenWithoutRef(proc.stdout, (chunk) => {
+			listenWithoutRef(this._proc!.stdout, (chunk) => {
 				this._readText(chunk);
 			});
-			listenWithoutRef(proc.stderr, (chunk) => {
+			listenWithoutRef(this._proc!.stderr, (chunk) => {
 				this._readText(chunk);
 			});
 
 			for (const val of this._reads) {
-				proc.stdin.write(val + '\n');
+				this._proc!.stdin.write(val + '\n');
 			}
-			proc.stdin.end();
+			this._proc!.stdin.end();
 
-			if (done) {
+			if (this.done) {
 				resolve(undefined);
 			}
 		});

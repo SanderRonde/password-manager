@@ -16,6 +16,7 @@ export interface ServerArgs {
 	debug: boolean;
 	development: boolean;
 	databaseless: boolean;
+	httpsOnly: boolean;
 }
 
 export interface ServerConfig extends ServerArgs {

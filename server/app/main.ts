@@ -141,6 +141,7 @@ export function initCommander(handledHolder: {
 		.option('--debug', 'Whether to enable debug parameters to the API')
 		.option('--development', 'Whether to enable development mode')
 		.option('--databaseless', 'Don\'t use any database (for development)')
+		.option('--no-https-only', 'Disable only using HTTPS and redirecting HTTP requests')
 		.action(async (settings: ServerSettings) => {
 			handledHolder.handled = true;
 			if (settings.config) {
@@ -149,6 +150,10 @@ export function initCommander(handledHolder: {
 					config: settings.config,
 					isConfig: true
 				}
+			}
+			if (settings.httpsOnly && (!settings.httpsCert || !settings.httpsKey)) {
+				console.log('You enabled HTTPS only mode but haven\'t provided HTTPS certs,' + 
+					' this means all requests are redirected to a non-existent server');
 			}
 			Server.run(await getDatabase(settings.database, settings.password, false, 
 				settings.databaseless), settings as  ServerConfig);

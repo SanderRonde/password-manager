@@ -79,7 +79,13 @@ export class Webserver {
 				})
 			}, !!(this.config.httpsKey && this.config.httpsCert)),
 			new Promise((resolve) => {
-				http.createServer(this.app).listen(this.config.http, () => {
+				const handler = this.config.httpsOnly ? (req: express.Request, res: express.Response) => {
+					res.writeHead(301, {
+						'Location': `https://${req.headers.host}${req.url}`
+					});
+					res.end();
+				} : this.app;
+				http.createServer(handler).listen(this.config.http, () => {
 					console.log(`HTTP server listening on port ${this.config.http}`);
 					resolve();
 				});

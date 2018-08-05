@@ -27,6 +27,7 @@
 				"--http", "1256",
 				"-d", "mongodb://127.0.0.1:27017/somedb",
 				"-p", "somepw",
+				"--no-https-only"
 			],
 		}, {
 			"type": "node",
@@ -38,7 +39,8 @@
 				"--http", "1256",
 				"-d", "mongodb://127.0.0.1:27017/somedb",
 				"-p", "somepw",
-				"--databaseless"
+				"--databaseless",
+				"--no-https-only"
 			],
 		}, {
 			"type": "node",
@@ -50,7 +52,8 @@
 				"--http", "1256",
 				"-d", "mongodb://127.0.0.1:27017/somedb",
 				"-p", "somepw",
-				"--development"
+				"--development",
+				"--no-https-only"
 			],
 		}, {
 			"type": "node",
@@ -62,7 +65,8 @@
 				"--http", "1256",
 				"-p", "somepw",
 				"--development",
-				"--databaseless"
+				"--databaseless",
+				"--no-https-only"
 			],
 		}, {
 			"type": "node",
@@ -77,7 +81,8 @@
 				"--https-cert", "./certs/cert.crt",
 				"-p", "somepw",
 				"--development",
-				"--databaseless"
+				"--databaseless",
+				"--no-https-only"
 			],
 		}
 	]

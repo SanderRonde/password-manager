@@ -153,6 +153,7 @@ export function createServer({
 				path.join(__dirname, './../../app/main.js'),
 				'server',
 				'--http', http + '',
+				'--no-https-only',
 				'-p', dbpw,
 				'-d', uri	
 			], 
