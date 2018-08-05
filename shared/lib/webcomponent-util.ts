@@ -648,5 +648,5 @@ export function isNewElement(element: HTMLElement) {
 	if (!has) {
 		usedElements.add(element);
 	}
-	return has;
+	return !has;
 }
