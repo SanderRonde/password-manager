@@ -525,7 +525,7 @@ import { LoginCSS } from './login.css';
 @config({
 	is: 'login-page',
 	css: LoginCSS,
-	renderer: LoginHTML,
+	html: LoginHTML,
 	dependencies: [
 		VerticalCenterer, 
 		HorizontalCenterer, 

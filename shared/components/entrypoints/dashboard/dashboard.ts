@@ -4,6 +4,6 @@ import { html } from "lit-html";
 @config({
 	is: 'dashboard-page',
 	css: null,
-	renderer: () => html`<div>Dashboard</div>`
+	html: () => html`<div>Dashboard</div>`
 })
 export class Dashboard extends ConfigurableWebComponent { }

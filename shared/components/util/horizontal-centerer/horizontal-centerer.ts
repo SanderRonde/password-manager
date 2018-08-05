@@ -7,6 +7,6 @@ import { HorizontalCentererCSS } from './horizontal-centerer.css';
 @config({
 	is: 'horizontal-centerer',
 	css: HorizontalCentererCSS,
-	renderer: HorizontalCentererHTML
+	html: HorizontalCentererHTML
 })
 export class HorizontalCenterer extends ConfigurableWebComponent<HorizontalCentererIDMap> { }

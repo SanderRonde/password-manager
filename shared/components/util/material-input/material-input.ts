@@ -12,7 +12,7 @@ import { bindToClass } from '../../../lib/decorators';
 @config({
 	is: 'material-input',
 	css: MaterialInputCSS,
-	renderer: MaterialInputHTML
+	html: MaterialInputHTML
 })
 export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> {
 	props = defineProps(this, {

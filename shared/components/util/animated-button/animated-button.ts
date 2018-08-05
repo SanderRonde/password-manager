@@ -9,7 +9,7 @@ import { AnimatedButtonCSS } from './animated-button.css';
 @config({
 	is: 'animated-button',
 	css: AnimatedButtonCSS,
-	renderer: AnimatedButtonHTML
+	html: AnimatedButtonHTML
 })
 @rippleEffect
 export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap> {

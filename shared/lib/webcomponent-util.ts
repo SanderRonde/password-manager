@@ -1,4 +1,4 @@
-import { TemplateResult, render, html } from "lit-html";
+import { TemplateResult, render } from "lit-html";
 import { bindToClass } from "./decorators";
 
 // From https://github.com/JedWatson/classnames
@@ -535,6 +535,7 @@ export class ConfigurableWebComponent<IDS extends {
 	[key: string]: HTMLElement;
 } = {}> extends WebComponent<IDS> {
 	protected renderer!: (this: any, props: any) => TemplateResult;
+	public static config: WebComponentConfiguration;
 	get css() { throw new Error('Not implemented'); }
 }
 
@@ -581,11 +582,11 @@ interface WebComponentConfiguration {
 	is: string;
 	css: string|null;
 	dependencies?: typeof WebComponentBase[];
-	renderer: (this: any, props: any) => TemplateResult;
+	html: (this: any, props: any) => TemplateResult;
 }
 export function config(config: WebComponentConfiguration) {
 	const {
-		is, renderer,
+		is, html,
 		dependencies = []	
 	} = config;
 	return <I extends {
@@ -596,7 +597,7 @@ export function config(config: WebComponentConfiguration) {
 			static is = genIs(is, WebComponentConfig);
 			static dependencies = dependencies
 			static config: WebComponentConfiguration = config;
-			renderer = renderer;
+			renderer = html;
 
 			private _templateCSS = html(genTemplateArr(config.css || ''));
 			get css() {

@@ -7,6 +7,6 @@ import { IconButtonCSS } from "./icon-button.css";
 @config({
 	is: 'icon-button',
 	css: IconButtonCSS,
-	renderer: IconButtonHTML
+	html: IconButtonHTML
 })
 export class IconButton extends ConfigurableWebComponent<IconButtonIDMap> { }

@@ -7,7 +7,7 @@ import { VerticalCentererCSS } from './vertical-centerer.css';
 @config({
 	is: 'vertical-centerer',
 	css: VerticalCentererCSS,
-	renderer: VerticalCentererHTML
+	html: VerticalCentererHTML
 })
 export class VerticalCenterer extends ConfigurableWebComponent<VerticalCentererIDMap> {
 	props = defineProps(this, {
