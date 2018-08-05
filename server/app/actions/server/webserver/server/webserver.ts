@@ -13,6 +13,7 @@ import * as express from 'express'
 import * as morgan from 'morgan'
 import * as https from 'https'
 import * as fs from 'fs-extra'
+import * as spdy from 'spdy'
 import * as http from 'http'
 import * as path from 'path'
 
@@ -65,7 +66,7 @@ export class Webserver {
 		
 		await Promise.all([...optionalArrayFn(() => {
 				return new Promise(async (resolve) => {
-					https.createServer({
+					spdy.createServer({
 						key: await fs.readFile(path.join(process.cwd(), this.config.httpsKey!), {
 							encoding: 'utf8'
 						}),
