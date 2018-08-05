@@ -65,10 +65,10 @@ export class Webserver {
 		await Promise.all([...(this.config.httpsKey && this.config.httpsCert ?
 			[new Promise(async (resolve) => {
 				https.createServer({
-					key: await fs.readFile(this.config.httpsKey!, {
+					key: await fs.readFile(path.join(process.cwd(), this.config.httpsKey!), {
 						encoding: 'utf8'
 					}),
-					cert: await fs.readFile(this.config.httpsCert!, {
+					cert: await fs.readFile(path.join(process.cwd(), this.config.httpsCert!), {
 						encoding: 'utf8'
 					})
 				}, this.app).listen(this.config.https, () => {
