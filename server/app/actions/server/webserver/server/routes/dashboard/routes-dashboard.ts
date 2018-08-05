@@ -1,25 +1,11 @@
-import { ROUTES } from '../../modules/development';
 import { ResponseCaptured } from "../../modules/ratelimit";
-import { render, DevData } from "../../modules/render";
+import { render } from "../../modules/render";
 import { Webserver } from "../../webserver";
 import { COUNT } from "../../modules/auth";
 import * as express from 'express'
 import * as path from 'path'
 
 const routesBase = path.join(__dirname, '../../../client/');
-
-async function getDevData(_route: ROUTES, isDevelopment: boolean): Promise<DevData> {
-	console.log('getting dev data');
-	if (isDevelopment) {
-		return {
-			enabled: true,
-			cssPaths: [] // await getCSSPathsFromCache(route)
-		}
-	}
-	return {
-		enabled: false
-	}
-}
 
 export class RoutesDashboard {
 	serveDir: string;
@@ -59,8 +45,7 @@ export class RoutesDashboard {
 			rootName: 'login-page',
 			script: 'entrypoints/login/login-page.js',
 			title: 'Log in to your dashboard',
-			devData: await getDevData(ROUTES.LOGIN,
-				this.server.config.development)
+			development: this.server.config.development
 		});
 	}
 
@@ -74,8 +59,7 @@ export class RoutesDashboard {
 			rootName: 'dashboard-page',
 			script: 'entrypoints/dashboard/dashboard-page.js',
 			title: 'Your Dashboard',
-			devData: await getDevData(ROUTES.DASHBOARD,
-				this.server.config.development)
+			development: this.server.config.development
 		});
 	}
 }
