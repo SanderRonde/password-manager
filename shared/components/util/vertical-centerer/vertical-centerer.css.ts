@@ -1,6 +1,6 @@
-const css = (input: any) => input;
+import { html } from "lit-html";
 
-export const VerticalCentererCSS = css(`<style>
+export const VerticalCentererCSS = html`<style>
 	#container {
 		display: flex;
 		flex-direction: column;
@@ -15,4 +15,4 @@ export const VerticalCentererCSS = css(`<style>
 	#content {
 		display: block;
 	}
-</style>`);
+</style>`;

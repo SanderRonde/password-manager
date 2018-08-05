@@ -567,20 +567,9 @@ export function genIsAccessor(name: string, component: () => typeof WebComponent
 	return data as ComponentIs;
 }
 
-function genTemplateArr(...input: string[])	 {
-	const arr: Partial<TemplateStringsArray> = input;
-	const raw = [...input];
-	Object.defineProperty(arr, 'raw', {
-		get() {
-			return raw;
-		}
-	});
-	return arr as TemplateStringsArray;
-}
-
 interface WebComponentConfiguration {
 	is: string;
-	css: string|null;
+	css: TemplateResult|null;
 	dependencies?: typeof WebComponentBase[];
 	html: (this: any, props: any) => TemplateResult;
 }
@@ -599,7 +588,7 @@ export function config(config: WebComponentConfiguration) {
 			static config: WebComponentConfiguration = config;
 			renderer = html;
 
-			private _templateCSS = html(genTemplateArr(config.css || ''));
+			private _templateCSS = config.css || html``;
 			get css() {
 				return this._templateCSS;
 			}

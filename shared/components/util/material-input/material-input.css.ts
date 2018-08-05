@@ -1,7 +1,7 @@
 import { theme } from "../../theming/theme/theme";
-const css = (input: any) => input;
+import { html } from "lit-html";
 
-export const MaterialInputCSS = css(`<style>
+export const MaterialInputCSS = html`<style>
 	/** From https://github.com/google/material-design-lite/blob/mdl-1.x/src/textfield/_textfield.scss */
 	/**
 	* Copyright 2015 Google Inc. All Rights Reserved.
@@ -192,4 +192,4 @@ export const MaterialInputCSS = css(`<style>
 	.mdl-textfield__expandable-holder .mdl-textfield__label:after {
 		bottom: 0;
 	}
-</style>`);
+</style>`;
