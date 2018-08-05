@@ -1,6 +1,7 @@
 import { initDevelopmentMiddleware } from "./modules/development";
 import { Database } from "../../../../database/database";
 import { initPeriodicals } from "./modules/periodicals";
+import { optionalArrayFn } from "../../../../lib/util";
 import { WebserverRouter } from "./modules/routing";
 import { WebserverRoutes } from "./modules/routes";
 import { WebserverAuth } from "./modules/auth";
@@ -14,7 +15,6 @@ import * as https from 'https'
 import * as fs from 'fs-extra'
 import * as http from 'http'
 import * as path from 'path'
-import { optionalArrayFn } from "../../../../lib/util";
 
 export class Webserver {
 	public debug: boolean;
