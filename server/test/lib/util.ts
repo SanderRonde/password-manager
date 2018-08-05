@@ -1,10 +1,10 @@
 import { encryptWithPublicKey, genRSAKeyPair, ERRS, hash, pad, decryptWithPrivateKey, encrypt, decryptWithSalt, decrypt } from "../../app/lib/crypto";
-import { getDB, clearDB, genDBWithPW, genAccountOnly, genInstancesOnly } from "./db";
 import { EncryptedInstance, TypedObjectID, MongoRecord, EncryptedPassword } from "../../app/../../shared/types/db-types";
-import { GenericTestContext, Context, RegisterContextual } from "ava";
+import { getDB, clearDB, genDBWithPW, genAccountOnly, genInstancesOnly } from "./db";
 import { APIFns, APIArgs, APIReturns } from "../../app/../../shared/types/api";
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM } from "../../app/lib/constants";
-import { genRandomString } from "../../app/lib/util";
+import { genRandomString, optionalArrayItem } from "../../app/lib/util";
+import { GenericTestContext, Context, RegisterContextual } from "ava";
 import { spawn, ChildProcess } from "child_process";
 import { EventEmitter } from "events";
 import { Readable } from "stream";
@@ -150,13 +150,15 @@ export function createServer({
 }: UserAndDbData, env?: {}): Promise<ChildProcess> {
 	return new Promise((resolve) => {
 		const proc = spawn('node', [...[
-			path.join(__dirname, './../../app/main.js'),
-			'server',
-			'--http', http + '',
-			'-p', dbpw,
-			'-d', uri
-		], ...(env ? ['--debug'] : []), 
-			...(!enableRateLimit ? ['--no-rate-limit'] : [])], {
+				path.join(__dirname, './../../app/main.js'),
+				'server',
+				'--http', http + '',
+				'-p', dbpw,
+				'-d', uri	
+			], 
+			...optionalArrayItem('--debug', !!env),
+			...optionalArrayItem('--no-ratelimit-', !enableRateLimit)
+		], {
 			env: {...process.env, ...(env || {})}
 		});
 		proc.unref();

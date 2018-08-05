@@ -14,6 +14,7 @@ import * as https from 'https'
 import * as fs from 'fs-extra'
 import * as http from 'http'
 import * as path from 'path'
+import { optionalArrayFn } from "../../../../lib/util";
 
 export class Webserver {
 	public debug: boolean;
@@ -62,20 +63,21 @@ export class Webserver {
 		this.Router.init();
 		initPeriodicals(this);
 		
-		await Promise.all([...(this.config.httpsKey && this.config.httpsCert ?
-			[new Promise(async (resolve) => {
-				https.createServer({
-					key: await fs.readFile(path.join(process.cwd(), this.config.httpsKey!), {
-						encoding: 'utf8'
-					}),
-					cert: await fs.readFile(path.join(process.cwd(), this.config.httpsCert!), {
-						encoding: 'utf8'
-					})
-				}, this.app).listen(this.config.https, () => {
-					console.log(`HTTPS server listening on port ${this.config.https}`);
-					resolve();
-				});
-			})] : []), 
+		await Promise.all([...optionalArrayFn(() => {
+				return new Promise(async (resolve) => {
+					https.createServer({
+						key: await fs.readFile(path.join(process.cwd(), this.config.httpsKey!), {
+							encoding: 'utf8'
+						}),
+						cert: await fs.readFile(path.join(process.cwd(), this.config.httpsCert!), {
+							encoding: 'utf8'
+						})
+					}, this.app).listen(this.config.https, () => {
+						console.log(`HTTPS server listening on port ${this.config.https}`);
+						resolve();
+					});
+				})
+			}, !!(this.config.httpsKey && this.config.httpsCert)),
 			new Promise((resolve) => {
 				http.createServer(this.app).listen(this.config.http, () => {
 					console.log(`HTTP server listening on port ${this.config.http}`);

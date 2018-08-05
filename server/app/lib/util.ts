@@ -425,3 +425,17 @@ export function conditionalString(str: string, condition: boolean) {
 	}
 	return '';
 }
+
+export function optionalArrayFn<T>(item: () => T, condition: boolean): [T]|[];
+export function optionalArrayFn<T>(item: () => T, condition: true): [T];
+export function optionalArrayFn<T>(item: () => T, condition: false): [];
+export function optionalArrayFn<T>(item: () => T, condition: boolean): [T]|[] {
+	return condition ? [item()] : [];
+}
+
+export function optionalArrayItem<T>(item: T, condition: boolean): [T]|[];
+export function optionalArrayItem<T>(item: T, condition: true): [T];
+export function optionalArrayItem<T>(item: T, condition: false): [];
+export function optionalArrayItem<T>(item: T, condition: boolean): [T]|[] {
+	return condition ? [item] : [];
+}
