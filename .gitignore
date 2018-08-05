@@ -77,3 +77,4 @@ shared/**/*.d.ts
 !shared/types/**/*.d.ts
 package-lock.json
 **/*.js.map
+certs/
