@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { ConfigurableWebComponent, config } from '../../../lib/webcomponent-util';
+import { ConfigurableWebComponent, config, isNewElement } from '../../../lib/webcomponent-util';
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
 import { AnimatedButtonIDMap } from './animated-button-querymap';
 import { AnimatedButtonHTML } from './animated-button.html';
@@ -24,7 +24,7 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 	}
 
 	postRender() {
-		if (this.$.button) {
+		if (this.$.button && isNewElement(this.$.button)) {
 			if (this.$.button.classList.contains('mdl-js-ripple-effect')) {
 				var rippleContainer = document.createElement('span');
 				rippleContainer.classList.add('mdl-button__ripple-container');
@@ -33,7 +33,7 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 				rippleContainer.appendChild(this.rippleElement);
 				this.rippleElement.addEventListener('mouseup', this.blurHandler);
 				this.$.button.appendChild(rippleContainer);
-				(<any>this as RippleEffect).resetRipple();
+
 				(<any>this as RippleEffect).applyRipple();
 			}
 			this.$.button.addEventListener('mouseup', this.blurHandler);

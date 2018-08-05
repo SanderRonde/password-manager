@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, config, ConfigurableWebComponent } from '../../../lib/webcomponent-util';
+import { defineProps, PROP_TYPE, config, ConfigurableWebComponent, listen } from '../../../lib/webcomponent-util';
 import { MaterialInputIDMap } from './material-input-querymap';
 import { MaterialInputHTML } from './material-input.html';
 import { MaterialInputCSS } from './material-input.css';
@@ -142,23 +142,23 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> 
 		this.$.input = this.$.input;
 		this.$.container = this.$.container;
 		if (this.$.input && this.$.container) {
-			this.$.input.onkeydown = () => {
+			listen(this.$.input, 'keydown', () => {
 				window.setTimeout(() => {
 					if (this.$.input) {
 						this.props.value = this.$.input.value;
 					}
 				}, 0);
-			}
+			});
 
 			if (this.$.input.hasAttribute('placeholder')) {
 				this.$.container.classList.add('has-placeholder');
 			}
-			this.$.input.addEventListener('input', this._updateClasses);
-			this.$.input.addEventListener('focus', this._onFocus);
-			this.$.input.addEventListener('blur', this._onBlur);
-			this.$.input.addEventListener('reset', this._onReset);
+			listen(this.$.input, 'input', this._updateClasses);
+			listen(this.$.input, 'focus', this._onFocus);
+			listen(this.$.input, 'blur', this._onBlur);
+			listen(this.$.input, 'reset', this._onReset);
 			if (this._maxRows !== -1) {
-				this.$.input.addEventListener('keydown', this._onKeyDown);
+				listen(this.$.input, 'keydown', this._onKeyDown);
 			}
 
 			const isInvalid = this.$.container.classList.contains('is-invalid');

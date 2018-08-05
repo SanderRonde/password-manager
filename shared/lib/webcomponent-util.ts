@@ -596,3 +596,57 @@ export function config(config: WebComponentConfiguration) {
 		return <any>WebComponentConfig as T;
 	}
 }
+
+const listenerMap: WeakMap<HTMLElement, Set<string>> = new WeakMap();
+export function listen<K extends keyof HTMLElementEventMap>(target: HTMLElement, 
+	event: K, listener: (this: HTMLInputElement, ev: HTMLElementEventMap[K]) => any) {
+		if (listenerMap.has(target)) {
+			const eventSet = listenerMap.get(target)!;
+			if (!eventSet.has(event)) {
+				target.addEventListener(event, listener as any);
+				eventSet.add(event);
+			} else {
+				//Listener already exists
+			}
+		} else {
+			target.addEventListener(event, listener as any);
+			const eventSet = new Set();
+			eventSet.add(event);
+			listenerMap.set(target, eventSet);
+		}
+	}
+
+const boundMap: WeakMap<Function, WeakMap<any, Function>> = new WeakMap();
+function getBoundFn(listener: Function, bindTarget: any) {
+	if (boundMap.has(listener)) {
+		const bindMap = boundMap.get(listener)!;
+		if (bindMap.has(bindTarget)) {
+			return bindMap.get(bindTarget)!;
+		}
+
+		const fn = listener.bind(bindTarget);
+		bindMap.set(bindTarget, fn);
+		return fn;
+	} else {
+		const fn = listener.bind(bindTarget);
+		const map = new WeakMap();
+		map.set(bindTarget, fn);
+		boundMap.set(listener, map);
+		return fn;
+	}
+}
+
+export function listenAndBind<K extends keyof HTMLElementEventMap>(target: HTMLElement, 
+	event: K, listener: (this: HTMLInputElement, ev: HTMLElementEventMap[K]) => any, bindTarget: any) {
+		const bound = getBoundFn(listener, bindTarget);
+		listen(target, event, bound);	
+	}
+
+const usedElements: WeakSet<HTMLElement> = new WeakSet();
+export function isNewElement(element: HTMLElement) {
+	const has = usedElements.has(element);
+	if (!has) {
+		usedElements.add(element);
+	}
+	return has;
+}

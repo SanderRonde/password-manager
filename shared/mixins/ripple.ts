@@ -1,8 +1,8 @@
 import { ExtendableComponent } from '../lib/decorators';
+import { listen } from '../lib/webcomponent-util';
 
 export interface RippleEffect {
 	applyRipple(): void;
-	resetRipple(): void;
 }
 //A lot of functions on this class are based on those in
 // https://github.com/google/material-design-lite/tree/mdl-1.x/src/ripple
@@ -142,20 +142,16 @@ export function rippleEffect(target: ExtendableComponent): any {
 				// mouse down after a touch start.
 				this._ignoringMouseDown = false;
 		
-				this.container.addEventListener('mousedown',
+				listen(this.container, 'mousedown',
 					this._downHandler.bind(this));
-				this.container.addEventListener('touchstart',
+				listen(this.container, 'touchstart',
 					this._downHandler.bind(this));
 		
-				this.container.addEventListener('mouseup', this._upHandler.bind(this));
-				this.container.addEventListener('mouseleave', this._upHandler.bind(this));
-				this.container.addEventListener('touchend', this._upHandler.bind(this));
-				this.container.addEventListener('blur', this._upHandler.bind(this));
+				listen(this.container, 'mouseup', this._upHandler.bind(this));
+				listen(this.container, 'mouseleave', this._upHandler.bind(this));
+				listen(this.container, 'touchend', this._upHandler.bind(this));
+				listen(this.container, 'blur', this._upHandler.bind(this));
 			}
-		}
-
-		resetRipple() {
-
 		}
 	}
 }
