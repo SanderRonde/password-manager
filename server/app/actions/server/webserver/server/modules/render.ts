@@ -1,21 +1,21 @@
 import { preAppHTML, postAppHTML } from '../../client/html';
-import { ResponseCaptured } from './ratelimit';
+import { ServerResponse } from './ratelimit';
 
-export async function render(res: ResponseCaptured, {
-	title, script, development, data, rootName
+export async function render(res: ServerResponse, {
+	title, script, isDevelopment, data, rootElement
 }: {
 	data: any;
 	title: string;
 	script: string;
-	rootName: string;
-	development: boolean;
+	rootElement: string;
+	isDevelopment: boolean;
 }) {
 	res.write(preAppHTML({
 		title,
-		development: development
+		development: isDevelopment
 	}));
 
-	res.write(`<${rootName}></${rootName}/>`);
+	res.write(`<${rootElement}></${rootElement}/>`);
 	res.write(`<textarea hidden>${JSON.stringify(data)}</textarea>`)
 
 	res.write(postAppHTML({
