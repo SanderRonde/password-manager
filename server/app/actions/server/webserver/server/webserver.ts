@@ -16,6 +16,19 @@ import * as spdy from 'spdy'
 import * as http from 'http'
 import * as path from 'path'
 
+const base = path.join(__dirname, '../client/');
+export const STATIC_SERVE_PATH = path.join(base, 'static/');
+export const DEVELOPMENT_SERVE_PATH = path.join(base, 'src/');
+export const DEVELOPMENT_SERVE_PATHS = [
+	DEVELOPMENT_SERVE_PATH,
+	STATIC_SERVE_PATH
+];
+export const PRODUCTION_SERVE_PATH = path.join(base, 'build/');
+export const PRODUCTION_SERVE_PATHS = [
+	DEVELOPMENT_SERVE_PATH,
+	PRODUCTION_SERVE_PATH
+]
+
 export class Webserver {
 	public debug: boolean;
 	public app: express.Express;
@@ -36,8 +49,7 @@ export class Webserver {
 		this.app.use(morgan(this.config.development ? 'dev' : 'short'));
 		this.app.use(cookieParser());
 		this.app.use(bodyParser.json());
-		const base = path.join(__dirname, '../client/');
-		this.app.use(serveStatic(path.join(base, 'static/'), {
+		this.app.use(serveStatic(STATIC_SERVE_PATH, {
 			maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
 			dotfiles: this.config.development ? 'allow' : 'ignore',
 			fallthrough: true,
@@ -45,9 +57,9 @@ export class Webserver {
 			redirect: false
 		}));
 		if (this.config.development) {
-			initDevelopmentMiddleware(this, base);
+			initDevelopmentMiddleware(this);
 		} else {
-			this.app.use(serveStatic(path.join(base, 'build/'), {
+			this.app.use(serveStatic(PRODUCTION_SERVE_PATH, {
 				maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
 				dotfiles: this.config.development ? 'allow' : 'ignore',
 				fallthrough: true,

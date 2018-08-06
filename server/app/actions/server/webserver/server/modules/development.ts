@@ -1,7 +1,7 @@
+import { Webserver, STATIC_SERVE_PATH, DEVELOPMENT_SERVE_PATH } from "../webserver";
 import { synchronizePromise } from "../../../../../lib/util";
 import { PROJECT_ROOT } from "../../../../../lib/constants";
 import { ServerResponse } from "./ratelimit";
-import { Webserver } from "../webserver";
 import * as express from 'express'
 import * as webpack from 'webpack'
 import * as fs from 'fs-extra'
@@ -93,7 +93,7 @@ async function genSingleFileWebpackRoute(res: express.Response, name: string, sr
 	});
 }
 
-export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
+export function initDevelopmentMiddleware(webserver: Webserver) {
 	webserver.app.all('/shared/lib/shared-crypto.js', async (_req, res) => {
 		await genSingleFileWebpackRoute(res, 'sharedCrypto', 
 			path.join(PROJECT_ROOT, `shared/lib/shared-crypto.js`));
@@ -129,7 +129,7 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/lit-html/lib/lit-extended.js.map')));
 		res.end();
 	});
-	webserver.app.use(serve(path.join(base, 'src/'), {
+	webserver.app.use(serve(DEVELOPMENT_SERVE_PATH, {
 		rewrite(content, filePath) {
 			if (filePath.endsWith('.js')) {
 				return rewriteEsModuleImports(content);
@@ -137,7 +137,7 @@ export function initDevelopmentMiddleware(webserver: Webserver, base: string) {
 			return content;
 		}
 	}));
-	webserver.app.use(serve(path.join(base, 'build/static/'), {
+	webserver.app.use(serve(STATIC_SERVE_PATH, {
 		prefix: '/static/'
 	}));
 	webserver.app.use(serve(path.join(PROJECT_ROOT, 'shared/components/'), {
