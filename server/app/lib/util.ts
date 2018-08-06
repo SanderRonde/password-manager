@@ -439,3 +439,25 @@ export function optionalArrayItem<T>(item: T, condition: false): never[];
 export function optionalArrayItem<T>(item: T, condition: boolean): [T]|never[] {
 	return condition ? [item] : [];
 }
+
+export function synchronizePromise<T>(prom: Promise<T>): Promise<{
+	err: Error;
+	result: null;
+}|{
+	err: null;
+	result: T;
+}> {
+	return new Promise((resolve) => {
+		prom.catch((err) => {
+			resolve({
+				err,
+				result: null
+			})
+		}).then((result) => {
+			resolve({
+				err: null,
+				result: result as T
+			})
+		});
+	});
+}

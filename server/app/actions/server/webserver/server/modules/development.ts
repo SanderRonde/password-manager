@@ -1,3 +1,4 @@
+import { synchronizePromise } from "../../../../../lib/util";
 import { PROJECT_ROOT } from "../../../../../lib/constants";
 import { ServerResponse } from "./ratelimit";
 import { Webserver } from "../webserver";
@@ -5,25 +6,6 @@ import * as express from 'express'
 import * as webpack from 'webpack'
 import * as fs from 'fs-extra'
 import * as path from 'path'
-
-function synchronizePromise<T>(prom: Promise<T>): Promise<{
-	err: Error|null;
-	result: T|null;
-}> {
-	return new Promise((resolve) => {
-		prom.catch((err) => {
-			resolve({
-				err,
-				result: null
-			})
-		}).then((result) => {
-			resolve({
-				err: null,
-				result: result as T
-			})
-		});
-	});
-}
 
 function serve(root: string, {
 	rewrite = (val) => val,
