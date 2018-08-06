@@ -86,7 +86,7 @@
     "webpack-stream": "^5.0.0"
   },
   "scripts": {
-    "compile": "gulp defs && tsc tsconfig.json --build --force",
+    "compile": "gulp defs && tsc --build tsconfig.json --force",
     "build": "yarn compile && yarn compile:server:modules && gulp dashboard",
     "test": "ava"
   }
