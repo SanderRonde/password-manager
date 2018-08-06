@@ -1,5 +1,10 @@
 import { conditionalString } from "../../../../lib/util";
 
+export const DEFAULT_FILES = {
+	css: ['/css/default.css'],
+	scripts: []
+}
+
 export function preAppHTML({
 	title,
 	development = false, 
@@ -22,7 +27,9 @@ export function preAppHTML({
 		<meta name="description" content="Your password manager dashboard">
 		<title>${title}</title>
 		<link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
-		<link href="/css/default.css" rel="stylesheet">
+		${DEFAULT_FILES.css.map((defaultCSS) => {
+			return `<link href="${defaultCSS}" rel="stylesheet">`;
+		})}
 		${css.map((stylesheet) => {
 			return `<style>\n${stylesheet}\n</style>`
 		})}
@@ -37,6 +44,9 @@ export function postAppHTML({
 	script: string;
 }) {
 	return `</div>
+		${DEFAULT_FILES.scripts.map((defaultJS) => {
+			return `<script src="${defaultJS}"></script>`;
+		})}
 		<script type="module" src="${script}"></script>
 	</body>
 	</html>`
