@@ -3,7 +3,7 @@ import { Hashed, Padded, MasterPasswordVerificationPadding, encryptWithPublicKey
 import { TwofactorVerifyToken } from "../../../../../../../../../../shared/types/crypto";
 import { API_ERRS } from '../../../../../../../../../../shared/types/api';
 import { COLLECTIONS } from '../../../../../../../../database/database';
-import { ResponseCaptured } from '../../../../modules/ratelimit';
+import { ServerResponse } from '../../../../modules/ratelimit';
 import { Webserver } from '../../../../webserver';
 import * as speakeasy from 'speakeasy'
 import * as express from 'express'
@@ -12,7 +12,7 @@ import * as express from 'express'
 export class RoutesAPIInstanceTwofactor {
 	constructor(public server: Webserver) { }
 
-	public enable(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public enable(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			email: string;
@@ -111,7 +111,7 @@ export class RoutesAPIInstanceTwofactor {
 		})(req, res, next);
 	}	
 
-	public disable(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public disable(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			email: string;
@@ -189,7 +189,7 @@ export class RoutesAPIInstanceTwofactor {
 		})(req, res, next);
 	}
 
-	public confirm(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public confirm(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			twofactor_token: string;
@@ -253,7 +253,7 @@ export class RoutesAPIInstanceTwofactor {
 		})(req, res, next);
 	}
 
-	public verify(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public verify(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			twofactor_token: string;

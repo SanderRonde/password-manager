@@ -1,5 +1,5 @@
 import { PROJECT_ROOT } from "../../../../../lib/constants";
-import { ResponseCaptured } from "./ratelimit";
+import { ServerResponse } from "./ratelimit";
 import { Webserver } from "../webserver";
 import * as express from 'express'
 import * as webpack from 'webpack'
@@ -36,7 +36,7 @@ function serve(root: string, {
 	exclude?: string[];
 	extensions?: string[]
 } = {}): express.RequestHandler {
-	return async (req: express.Request, res: ResponseCaptured, next: express.NextFunction) => {
+	return async (req: express.Request, res: ServerResponse, next: express.NextFunction) => {
 		if (!req.url.startsWith(prefix)) {
 			return next();
 		}

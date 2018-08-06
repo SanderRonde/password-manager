@@ -1,9 +1,10 @@
+import { API_ERRS } from '../../../../../../../shared/types/api';
 import { unref } from '../../../../../../test/lib/util';
 import { getDebug } from '../../../../../lib/debug';
-import * as RateLimit from 'express-rate-limit'
 import { ServerConfig } from '../../../server';
-import { API_ERRS } from '../../../../../../../shared/types/api';
+import * as RateLimit from 'express-rate-limit'
 import * as express from 'express'
+import * as spdy from 'spdy';
 
 export type APIResponse = {
 	success: true;
@@ -17,7 +18,7 @@ export type APIResponse = {
 	ERR: API_ERRS;
 }
 
-export interface ResponseCaptured extends express.Response {
+export interface ServerResponse extends express.Response, spdy.ServerResponse {
 	__jsonResponse: APIResponse;
 	json(data: APIResponse): express.Response;
 }
@@ -102,7 +103,7 @@ class RatelimitStore<K extends string> {
 	}
 }
 
-function blockHandler(_req: express.Request, res: ResponseCaptured) {
+function blockHandler(_req: express.Request, res: ServerResponse) {
 	res.status(429);
 	res.json({
 		success: false,
@@ -123,7 +124,7 @@ function getBruteforceLimiter(factor: number) {
 			return (req.body && req.body.instance_id) || req.ip;
 		},
 		skipFailedRequests: true,
-		skip(req, res: ResponseCaptured) {
+		skip(req, res: ServerResponse) {
 			const key = (req.body && req.body.instance_id) || req.ip;
 			res.once('finish', () => {
 				if (res.__jsonResponse && res.__jsonResponse.success === false) {
@@ -137,7 +138,7 @@ function getBruteforceLimiter(factor: number) {
 	});
 }
 
-function noOp(_req: express.Request, _res: ResponseCaptured, next: express.NextFunction) {
+function noOp(_req: express.Request, _res: ServerResponse, next: express.NextFunction) {
 	next();
 }
 

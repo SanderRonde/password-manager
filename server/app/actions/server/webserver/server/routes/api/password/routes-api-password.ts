@@ -3,7 +3,7 @@ import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPasswo
 import { UnstringifyObjectIDs, APIToken } from "../../../../../../../../../shared/types/crypto";
 import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
-import { ResponseCaptured } from "../../../modules/ratelimit";
+import { ServerResponse } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
 import * as express from 'express'
 import * as mongo from 'mongodb'
@@ -13,7 +13,7 @@ export class RoutesApiPassword {
 	constructor(public server: Webserver) { }
 
 	private async _getPasswordIfOwner(passwordId: StringifiedObjectId<EncryptedPassword>, 
-		instance: DecryptedInstance, res: ResponseCaptured) {
+		instance: DecryptedInstance, res: ServerResponse) {
 			//Make sure this password is actually theirs
 			const password = await this.server.database.Manipulation.findOne(COLLECTIONS.PASSWORDS, {
 				_id: new mongo.ObjectId(passwordId)
@@ -35,7 +35,7 @@ export class RoutesApiPassword {
 		}
 
 	private _verify2FAIfEnabled(twofactorSecret: string|null, twofactorToken: string|undefined,
-		password: MongoRecord<UnstringifyObjectIDs<EncryptedPassword>>, res: ResponseCaptured) {
+		password: MongoRecord<UnstringifyObjectIDs<EncryptedPassword>>, res: ServerResponse) {
 			const decryptedPassword = this.server.database.Crypto.dbDecryptPasswordRecord(password);
 			if (decryptedPassword.twofactor_enabled && twofactorSecret !== null) {
 				//Password is secured with 2FA
@@ -61,7 +61,7 @@ export class RoutesApiPassword {
 			return true;
 		}
 
-	public set(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public set(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
@@ -160,7 +160,7 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 
-	public update(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public update(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
@@ -281,7 +281,7 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 
-	public remove(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public remove(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
@@ -346,7 +346,7 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 
-	public get(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public get(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
@@ -407,7 +407,7 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 	
-	public getmeta(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public getmeta(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
@@ -458,7 +458,7 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 
-	public allmeta(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public allmeta(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
@@ -543,7 +543,7 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 
-	public querymeta(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public querymeta(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {

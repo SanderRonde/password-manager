@@ -4,7 +4,7 @@ import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa"
 import { APIToken } from "../../../../../../../../../shared/types/crypto";
 import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
-import { ResponseCaptured } from "../../../modules/ratelimit";
+import { ServerResponse } from "../../../modules/ratelimit";
 import { sendEmail } from "../../../../../../../lib/util";
 import { Webserver } from "../../../webserver";
 import * as express from 'express'
@@ -20,7 +20,7 @@ export class RoutesApiInstance {
 		email: string;
 		public_key: string;
 		password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-	}, res: ResponseCaptured) {
+	}, res: ServerResponse) {
 		const auth = await this.server.Router.checkEmailPassword(
 			email, password, res);
 		if (auth === false) {
@@ -64,7 +64,7 @@ export class RoutesApiInstance {
 			'New instance registered', 'A new instance was registered to your email');
 	}
 
-	public register(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public register(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			email: string;
 			public_key: string;
@@ -87,7 +87,7 @@ export class RoutesApiInstance {
 		})(req, res, next);
 	}
 
-	public login(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public login(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			challenge: RSAEncrypted<EncodedString<string>, ServerPublicKey>;
@@ -177,7 +177,7 @@ export class RoutesApiInstance {
 		})(req, res, next);
 	}
 
-	public logout(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public logout(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			token: APIToken;
@@ -212,7 +212,7 @@ export class RoutesApiInstance {
 		})(req, res, next);
 	}
 
-	public extendKey(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public extendKey(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			oldToken: APIToken;

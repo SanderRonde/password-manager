@@ -1,6 +1,6 @@
 import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../../../shared/types/db-types";
 import { Hashed, Padded, MasterPasswordVerificationPadding, decryptWithPrivateKey, ERRS } from "../../../../../lib/crypto";
-import { getStores, ResponseCaptured, APIResponse } from "./ratelimit";
+import { getStores, ServerResponse, APIResponse } from "./ratelimit";
 import { APIToken } from "../../../../../../../shared/types/crypto";
 import { API_ERRS } from "../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../database/database";
@@ -10,7 +10,7 @@ import * as express from 'express'
 import * as mongo from 'mongodb'
 
 type ResponseCapturedRequestHandler = (req: express.Request,
-	res: ResponseCaptured, next: express.NextFunction) => any;
+	res: ServerResponse, next: express.NextFunction) => any;
 
 type BasicType = 'string'|'boolean'|'number';
 type TypecheckConfig = {
@@ -29,7 +29,7 @@ export class WebserverRouter {
 		this._register();
 	}
 
-	public checkPassword(_req: express.Request, res: ResponseCaptured,
+	public checkPassword(_req: express.Request, res: ServerResponse,
 		actualPassword: Hashed<Padded<string, MasterPasswordVerificationPadding>>,
 		expectedPassword: Hashed<Padded<string, MasterPasswordVerificationPadding>>) {
 				if (actualPassword !== expectedPassword) {
@@ -45,7 +45,7 @@ export class WebserverRouter {
 			}
 
 	public async checkEmailPassword(email: string, 
-		password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>, res: ResponseCaptured, 
+		password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>, res: ServerResponse, 
 		supressErr: boolean = false): Promise<false|MongoRecord<EncryptedAccount>> {
 			if (!email || !password) {
 				res.status(200);
@@ -255,7 +255,7 @@ export class WebserverRouter {
 				}
 			}
 
-	public async verifyAndGetInstance(instanceId: StringifiedObjectId<EncryptedInstance>, res: ResponseCaptured) {
+	public async verifyAndGetInstance(instanceId: StringifiedObjectId<EncryptedInstance>, res: ServerResponse) {
 		const instance = await this.getInstance(instanceId);
 		if (!instance) {
 			res.status(200);
@@ -285,7 +285,7 @@ export class WebserverRouter {
 	}
 
 	public verifyLoginToken(token: APIToken, count: number, 
-		instanceId: StringifiedObjectId<EncryptedInstance>, res: ResponseCaptured) {
+		instanceId: StringifiedObjectId<EncryptedInstance>, res: ServerResponse) {
 			if (!this.parent.Auth.verifyAPIToken(token, count, instanceId)) {
 				res.status(200);
 				res.json({
@@ -298,7 +298,7 @@ export class WebserverRouter {
 			return true;
 		}
 
-	private _printTypeErr(res: ResponseCaptured, val: string, type: BasicType|'array', inner?: BasicType) {
+	private _printTypeErr(res: ServerResponse, val: string, type: BasicType|'array', inner?: BasicType) {
 		if (inner) {
 			res.status(200);
 			res.json({
@@ -316,7 +316,7 @@ export class WebserverRouter {
 		}
 	}
 
-	public typeCheck(src: any, res: ResponseCaptured, configs: TypecheckConfig[]) {
+	public typeCheck(src: any, res: ServerResponse, configs: TypecheckConfig[]) {
 		for (const config of configs) {
 			const { val, type } = config;
 			if (!(val in src)) {
@@ -350,8 +350,8 @@ export class WebserverRouter {
 		return true;
 	}
 
-	private _wrapInErrorHandler(fn: (req: express.Request, res: ResponseCaptured, next: express.NextFunction) => any) {
-		return (req: express.Request, res: ResponseCaptured, next: express.NextFunction) => {
+	private _wrapInErrorHandler(fn: (req: express.Request, res: ServerResponse, next: express.NextFunction) => any) {
+		return (req: express.Request, res: ServerResponse, next: express.NextFunction) => {
 			try {
 				fn(req, res, next);
 			} catch(e) {
@@ -380,7 +380,7 @@ export class WebserverRouter {
 		this.parent.app.get('/dashboard', 
 			this._doBind(this.parent.Routes.Dashboard, 'dashboard'));
 
-		this.parent.app.use((_req: express.Request, res: ResponseCaptured, next) => {
+		this.parent.app.use((_req: express.Request, res: ServerResponse, next) => {
 			const originalFn = res.json.bind(res);
 			res.json = (response: APIResponse) => {
 				res.__jsonResponse = response;

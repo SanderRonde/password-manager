@@ -3,7 +3,7 @@ import { ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from "../../../../../../../lib
 import { decrypt, encrypt, hash, pad, ERRS } from "../../../../../../../lib/crypto";
 import { genRandomString, sendEmail } from "../../../../../../../lib/util";
 import { COLLECTIONS } from "../../../../../../../database/database";
-import { ResponseCaptured } from "../../../modules/ratelimit";
+import { ServerResponse } from "../../../modules/ratelimit";
 import { getDebug } from "../../../../../../../lib/debug";
 import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { Webserver } from "../../../webserver";
@@ -12,7 +12,7 @@ import * as express from 'express'
 export class RoutesAPIAccount {
 	constructor(public server: Webserver) { }
 
-	public reset(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public reset(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
@@ -272,7 +272,7 @@ export class RoutesAPIAccount {
 		})(req, res, next);
 	}
 
-	public regenkey(req: express.Request, res: ResponseCaptured, next: express.NextFunction) {
+	public regenkey(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {

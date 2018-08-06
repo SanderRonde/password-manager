@@ -1,6 +1,6 @@
 import { decryptWithPrivateKey, ERRS, Hashed, Padded, MasterPasswordVerificationPadding } from "../../../../../../../lib/crypto";
 import { ServerPublicKey, RSAEncrypted, MasterPassword } from "../../../../../../../../../shared/types/db-types";
-import { ResponseCaptured } from "../../../modules/ratelimit";
+import { ServerResponse } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
 import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
@@ -8,7 +8,7 @@ import { COLLECTIONS } from "../../../../../../../database/database";
 export class RoutesAPIDashboard {
 	constructor(public server: Webserver) { }
 
-	public login(res: ResponseCaptured) {
+	public login(res: ServerResponse) {
 		this.server.Router.requireParams<{
 			comm_token: string;
 			public_key: string;

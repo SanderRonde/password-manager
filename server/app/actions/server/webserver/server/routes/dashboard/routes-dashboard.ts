@@ -1,4 +1,4 @@
-import { ResponseCaptured } from "../../modules/ratelimit";
+import { ServerResponse } from "../../modules/ratelimit";
 import { render } from "../../modules/render";
 import { Webserver } from "../../webserver";
 import { COUNT } from "../../modules/auth";
@@ -15,7 +15,7 @@ export class RoutesDashboard {
 			'src/' : 'dest/');
 	}
 
-	public checkDashboardAuthentication(req: express.Request, res: ResponseCaptured) {
+	public checkDashboardAuthentication(req: express.Request, res: ServerResponse) {
 		const { login_auth, instance_id } = req.cookies;
 		if (!login_auth || !this.server.Auth.verifyAPIToken(login_auth, COUNT.ANY_COUNT,
 			instance_id)) {
@@ -25,14 +25,14 @@ export class RoutesDashboard {
 		return true;
 	}
 
-	public async index(req: express.Request, res: ResponseCaptured) {
+	public async index(req: express.Request, res: ServerResponse) {
 		if (this.checkDashboardAuthentication(req, res)) {
 			res.redirect('/dashboard');
 			return;
 		}
 	};
 
-	public async login(_req: express.Request, res: ResponseCaptured) {
+	public async login(_req: express.Request, res: ServerResponse) {
 		const {
 			token, publicKey
 		} = this.server.Auth.genDashboardCommToken();
@@ -42,24 +42,24 @@ export class RoutesDashboard {
 				comm_token: token,
 				server_public_key: publicKey
 			},
-			rootName: 'login-page',
+			rootElement: 'login-page',
 			script: 'entrypoints/login/login-page.js',
 			title: 'Log in to your dashboard',
-			development: this.server.config.development
+			isDevelopment: this.server.config.development
 		});
 	}
 
-	public async dashboard(req: express.Request, res: ResponseCaptured) {
+	public async dashboard(req: express.Request, res: ServerResponse) {
 		if (!this.checkDashboardAuthentication(req, res)) {
 			return;
 		}
 
 		await render(res, {
 			data: {},
-			rootName: 'dashboard-page',
+			rootElement: 'dashboard-page',
 			script: 'entrypoints/dashboard/dashboard-page.js',
 			title: 'Your Dashboard',
-			development: this.server.config.development
+			isDevelopment: this.server.config.development
 		});
 	}
 }
