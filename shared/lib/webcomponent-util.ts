@@ -465,9 +465,52 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	protected firstRender() {}
 }
 
+abstract class WebComponentListenable<E extends string> extends WebComponentBase {
+	private _listenerMap: {
+		[key in E]: ((...params: any[]) => any)[];
+	} = {} as any;
+
+	private _insertOnce<T extends (...args: any[]) => any>(arr: T[], value: T) {
+		const self = (((...args: any[]) => {
+			arr.slice(arr.indexOf(self, 1));
+			return value(...args);
+		}) as any);
+		arr.push(self);
+	}
+
+	private _assertKeyExists<E extends keyof T, T extends {
+		[key: string]: any;
+	}>(key: E, value: T) {
+		if (!(key in value)) {
+			value[key] = [];
+		}
+	}
+
+	public listen<EV extends E>(event: EV, listener: (...args: any[]) => any, once: boolean = false) {
+		this._assertKeyExists(event, this._listenerMap);
+		if (once) {
+			this._insertOnce(this._listenerMap[event], listener);
+		} else {
+			this._listenerMap[event].push(listener);
+		}
+	}
+
+	protected _clearListeners<EV extends E>(event: EV) {
+		if (event in this._listenerMap) {
+			delete this._listenerMap[event as EV];
+		}
+	}
+
+	protected _fire<R, EV extends E>(event: EV, params: any[]): R[] {
+		return !(event in this._listenerMap) ? [] : this._listenerMap[event].map((listener) => {
+			return listener(...params);
+		});
+	}
+}
+
 export abstract class WebComponent<IDS extends {
 	[key: string]: HTMLElement;
-} = {}> extends WebComponentBase {
+} = {}, E extends string = '_'> extends WebComponentListenable<E> {
 	/**
 	 * An ID map containing maps between queried IDs and elements,
 	 * 	cleared upon render
@@ -533,13 +576,13 @@ export abstract class WebComponent<IDS extends {
 
 export class ConfigurableWebComponent<IDS extends {
 	[key: string]: HTMLElement;
-} = {}> extends WebComponent<IDS> {
+} = {}, E extends string = '_'> extends WebComponent<IDS, E> {
 	protected renderer!: (this: any, props: any) => TemplateResult;
 	public static config: WebComponentConfiguration;
 	get css() { throw new Error('Not implemented'); }
 }
 
-export declare abstract class WebComponentInterface extends WebComponent<any> {
+export declare abstract class WebComponentInterface extends WebComponent<any, any> {
 	static is: ComponentIs;
 	loaded: boolean;
 }
@@ -580,9 +623,9 @@ export function config(config: WebComponentConfiguration) {
 	} = config;
 	return <I extends {
 		[key: string]: HTMLElement;
-	}, T>(target: T): T => {
+	}, T, E extends string = '_'>(target: T): T => {
 		const targetComponent = <any>target as typeof WebComponent;
-		class WebComponentConfig extends targetComponent<I> implements WebComponentBase {
+		class WebComponentConfig extends targetComponent<I, E> implements WebComponentBase {
 			static is = genIs(is, WebComponentConfig);
 			static dependencies = dependencies
 			static config: WebComponentConfiguration = config;
