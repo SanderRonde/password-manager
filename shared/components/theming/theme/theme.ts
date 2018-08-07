@@ -49,6 +49,11 @@ export const theme = {
 	 */
 	error: '#F44336',
 	/**
+	 * The color of success messages
+	 * green
+	 */
+	success: '#2E7D32',
+	/**
 	 * The greyest possible text that still fits the contrast spec on a white background
 	 * black
 	 */
