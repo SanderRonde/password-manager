@@ -2,8 +2,8 @@ export { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlg
 import { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms } from '../../../shared/types/crypto'
 import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey } from "../../../shared/types/db-types";
 import { Padded, Paddings } from "../../../shared/types/crypto";
+import { JSEncrypt } from '../libraries/jsencrypt'
 import { genRandomString } from './util';
-import * as NodeRSA from 'node-rsa';
 import * as crypto from 'crypto'
 
 export function hash<T extends string, A extends HashingAlgorithms = 'sha512'>(data: T, 
@@ -121,33 +121,35 @@ export function decrypt<T, A extends EncryptionAlgorithm, K extends string>(encr
 
 export function encryptWithPublicKey<T, K extends InstancePublicKey|ServerPublicKey>(data: T, 
 	publicKey: K): RSAEncrypted<EncodedString<T>, K> {
-		const key = new NodeRSA();
-		key.importKey(publicKey, 'pkcs8-public-pem');
+		const key = new JSEncrypt();
+		key.setPublicKey(publicKey);
 
-		return key.encrypt(JSON.stringify(data), 'base64') as 
+		return key.encrypt(JSON.stringify(data)) as 
 			RSAEncrypted<EncodedString<T>, K>;
 	}
 
 export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: RSAEncrypted<EncodedString<T>, 
 	InstancePublicKey|ServerPublicKey>, 
 		privateKey: K): T|ERRS {
-			const key = new NodeRSA();
-			key.importKey(privateKey, 'pkcs1-pem');
+			const key = new JSEncrypt();
+			key.setPrivateKey(privateKey);
 
-			try {
-				return JSON.parse(key.decrypt(data, 'utf8'));
-			} catch(e) {
+			const decrypted = key.decrypt(data);
+			if (decrypted === false || decrypted === null) {
 				return ERRS.INVALID_DECRYPT;
 			}
+			return JSON.parse(decrypted);
 		}
 
 export function genRSAKeyPair() {
-	const key = new NodeRSA({
-		b: 512
+	const key = new JSEncrypt({
+		default_key_size: '1024'
 	});
+	key.getKey();
+
 	return {
-		publicKey: key.exportKey('pkcs8-public-pem'),
-		privateKey: key.exportKey('pkcs1-pem')
+		publicKey: key.getPublicKey(),
+		privateKey: key.getPrivateKey()
 	}
 }
 

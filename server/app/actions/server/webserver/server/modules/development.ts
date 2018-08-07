@@ -48,7 +48,6 @@ function serve(root: string, {
 
 function rewriteEsModuleImports(file: string): string {
 	return file	
-		.replace(/import (.*) from ['"]node-rsa['"]/g, 'import $1 from \'/modules/node-rsa\'')
 		.replace(/import (.*) from ['"]js-sha512['"]/g, 'import $1 from \'/modules/js-sha512\'')
 		.replace(/import (.*) from ['"]lit-html['"]/g, 'import $1 from \'/modules/lit-html\'')
 		.replace(/import (.*) from ['"]lit-html\/lib\/lit-extended['"]/g, 'import $1 from \'/modules/lit-html/lib/lit-extended\'');
@@ -112,14 +111,6 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 	webserver.app.all('/shared/lib/browser-crypto.js', async (_req, res) => {
 		await genSingleFileWebpackRoute(res, 'browserCrypto', 
 			path.join(PROJECT_ROOT, `shared/lib/browser-crypto.js`));
-	});
-	webserver.app.all([
-		'/modules/node-rsa',
-		'/modules/node-rsa.js',
-		'/modules/node-rsa/lit-html.js'
-	], async (_req, res) => {
-		await genSingleFileWebpackRoute(res, 'nodeRSA',
-			path.join(PROJECT_ROOT, 'node_modules/node-rsa/src/NodeRSA.js'));
 	});
 	webserver.app.all([
 		'/modules/js-sha512',

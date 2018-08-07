@@ -1,4 +1,5 @@
 const rollupResolve = require('rollup-plugin-node-resolve');
+const rollupCommonJs = require('rollup-plugin-commonjs');
 const htmlTypings = require('html-typings');
 const rollup = require('rollup');
 const fs = require('fs-extra');
@@ -199,7 +200,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 					onwarn(warning) {
 						if (typeof warning !== 'string' && warning.loc) {
 							const line = warning.loc.line;
-							if (line === 1) {
+							if (line === 1 || line === 7) {
 								//Typescript inserted helper method, ignore it
 								return;
 							}
@@ -209,9 +210,12 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 					plugins: [
 						rollupResolve({
 							module: true,
-							browser: true,
-							only: ['lit-html'],
-							modulesOnly: true
+							browser: true
+						}),
+						rollupCommonJs({
+							namedExports: {
+								'node_modules/js-sha512/src/sha512.js': ['sha512', 'sha512_256']
+							}
 						})
 					]
 				});
@@ -223,7 +227,11 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 			});
 		}))));
 
-	gulp.task('dashboard', gulp.parallel(
+	gulp.task('dashboard.bundle', gulp.parallel(
 		'dashboard.bundle.js'
+	));
+
+	gulp.task('dashboard', gulp.parallel(
+		'dashboard.bundle'
 	));
 })();

@@ -78,3 +78,5 @@ shared/**/*.d.ts
 package-lock.json
 **/*.js.map
 certs/
+!shared/libraries/jsencrypt.*
+!server/app/libraries/jsencrypt.*
