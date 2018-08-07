@@ -661,9 +661,7 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 
 	@bindToClass
 	private _updateValidity() {
-		const areAllValid = this.$.emailInput.valid &&
-			this.$.passwordInput.valid && 
-			this.$.twofactorInput.valid;
+		if (this._getInputData().valid) {
 		if (areAllValid) {
 			this.$.button.enable();
 		} else {
