@@ -46,6 +46,14 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> 
 		}
 	});
 
+	get value() {
+		return this.props.value;
+	}
+
+	get valid() {
+		return this.$.input.validity.valid;
+	}
+
 	private _maxRows: number = -1;
 
 	disable() {

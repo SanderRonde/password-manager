@@ -7,6 +7,11 @@ import * as path from 'path'
 
 const routesBase = path.join(__dirname, '../../../client/');
 
+export interface LoginData {
+	comm_token: string,
+	server_public_key: string
+}
+
 export class RoutesDashboard {
 	serveDir: string;
 
@@ -41,7 +46,7 @@ export class RoutesDashboard {
 			data: {
 				comm_token: token,
 				server_public_key: publicKey
-			},
+			} as LoginData,
 			rootElement: 'login-page',
 			script: 'entrypoints/login/login-page.js',
 			title: 'Log in to your dashboard',
