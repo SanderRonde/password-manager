@@ -15,6 +15,10 @@ import { bindToClass } from '../../../lib/decorators';
 	html: MaterialInputHTML
 })
 export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> {
+	private _validityChangeListeners: ((valid: boolean) => void)[] = [];
+	private _validityState: boolean = true;
+	private _maxRows: number = -1;
+
 	props = defineProps(this, {
 		reflect: {
 			label: {
@@ -46,6 +50,10 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> 
 		}
 	});
 
+	addValidityListener(listener: (valid: boolean) => void) {
+		this._validityChangeListeners.push(listener);
+	}
+
 	get value() {
 		return this.props.value;
 	}
@@ -53,8 +61,6 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> 
 	get valid() {
 		return this.$.input.validity.valid;
 	}
-
-	private _maxRows: number = -1;
 
 	disable() {
 		this.$.input!.disabled = true;
@@ -150,10 +156,18 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> 
 		this.$.input = this.$.input;
 		this.$.container = this.$.container;
 		if (this.$.input && this.$.container) {
+			this._validityState = this.valid;
+
 			listen(this.$.input, 'keydown', () => {
 				window.setTimeout(() => {
 					if (this.$.input) {
 						this.props.value = this.$.input.value;
+					}
+					if (this._validityState !== this.valid) {
+						this._validityState = this.valid;
+						this._validityChangeListeners.forEach((listener) => {
+							listener(this.valid);
+						});
 					}
 				}, 0);
 			});

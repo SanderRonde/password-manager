@@ -99,6 +99,14 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 		]);
 	}
 
+	disable() {
+		this.$.button.setAttribute('disabled', '');
+	}
+
+	enable() {
+		this.$.button.removeAttribute('disabled');
+	}
+
 	postRender() {
 		if (this.$.button && isNewElement(this.$.button)) {
 			const bcr = this.$.button.getBoundingClientRect();

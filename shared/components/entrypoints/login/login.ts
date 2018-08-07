@@ -511,7 +511,7 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
-import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config } from '../../../lib/webcomponent-util'
+import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config, listen, isNewElement } from '../../../lib/webcomponent-util'
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad } from '../../../lib/browser-crypto';
 import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
@@ -659,7 +659,28 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 		}
 	}
 
+	@bindToClass
+	private _updateValidity() {
+		const areAllValid = this.$.emailInput.valid &&
+			this.$.passwordInput.valid && 
+			this.$.twofactorInput.valid;
+		if (areAllValid) {
+			this.$.button.enable();
+		} else {
+			this.$.button.disable();
+		}
+	}
+
 	postRender() {
-		this.$.lockButton.addEventListener('click', this.handleEmailRememberToggle);
+		listen(this.$.lockButton, 'click', this.handleEmailRememberToggle);
+		if (isNewElement(this.$.emailInput)) {
+			this.$.emailInput.addValidityListener(this._updateValidity);
+		}
+		if (isNewElement(this.$.passwordInput)) {
+			this.$.passwordInput.addValidityListener(this._updateValidity);
+		}
+		if (isNewElement(this.$.twofactorInput)) {
+			this.$.twofactorInput.addValidityListener(this._updateValidity);
+		}
 	}
 }

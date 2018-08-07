@@ -23,6 +23,14 @@ export class AnimatedButton extends ConfigurableWebComponent<PaperButtonIDMap> {
 		this.$.button.blur();
 	}
 
+	disable() {
+		this.$.button.setAttribute('disabled', '');
+	}
+
+	enable() {
+		this.$.button.removeAttribute('disabled');
+	}
+
 	postRender() {
 		if (this.$.button && isNewElement(this.$.button)) {
 			if (this.$.button.classList.contains('mdl-js-ripple-effect')) {
