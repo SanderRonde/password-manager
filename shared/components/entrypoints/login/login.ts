@@ -156,6 +156,7 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 	}
 
 	postRender() {
+		listen(this.$.button, 'click', this.login);
 		listen(this.$.lockButton, 'click', this.handleEmailRememberToggle);
 		if (isNewElement(this.$.emailInput)) {
 			this.$.emailInput.addValidityListener(this._updateValidity);
