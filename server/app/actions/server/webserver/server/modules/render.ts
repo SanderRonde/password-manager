@@ -63,18 +63,20 @@ async function push(res: ServerResponse, file: string) {
 
 	if (file === null) return;
 
-	const stream = res.push(nonAbsolute, {
-		request: {
-			'accept': '*/*'
-		},
-		response: {
-			'Content-Type': mime.getType(file)
-		}
-	});
-	stream.on('error', () => { });
-	const content = await getFileContent(file);
-	stream.write(content);
-	stream.end();
+	try {
+		const stream = res.push(nonAbsolute, {
+			request: {
+				'accept': '*/*'
+			},
+			response: {
+				'Content-Type': mime.getType(file)
+			}
+		});
+		stream.on('error', () => { });
+		const content = await getFileContent(file);
+		stream.write(content);
+		stream.end();
+	} catch(e) { }
 }
 
 function pushAll(res: ServerResponse, arr: string[]): Promise<void[]> {
