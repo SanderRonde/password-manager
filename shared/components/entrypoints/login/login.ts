@@ -619,15 +619,14 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 			return;
 		}
 
-		if (this.props.emailRemembered) {
-			const email = this.$.emailInput.value;
-			localStorage.setItem('rememberedEmail', email || '');
-		}
-	
 		this.$.button.setState('loading');
 		const result = await this._doLoginRequest(inputData);	
 
 		if (result.success) {
+			if (this.props.emailRemembered) {
+				const email = this.$.emailInput.value;
+				localStorage.setItem('rememberedEmail', email || '');
+			}
 			this.$.button.setState('success');
 			await this._proceedToDashboard(result);
 		} else {
@@ -662,7 +661,6 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 	@bindToClass
 	private _updateValidity() {
 		if (this._getInputData().valid) {
-		if (areAllValid) {
 			this.$.button.enable();
 		} else {
 			this.$.button.disable();
