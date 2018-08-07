@@ -96,11 +96,13 @@ export async function render(res: ServerResponse, {
 }) {
 	setBasePath(isDevelopment);
 
-	await Promise.all([
-		pushAll(res, DEFAULT_FILES.css),
-		pushAll(res, DEFAULT_FILES.scripts),
-		push(res, script)
-	]);
+	if ('push' in res) {
+		await Promise.all([
+			pushAll(res, DEFAULT_FILES.css),
+			pushAll(res, DEFAULT_FILES.scripts),
+			push(res, script)
+		]);
+	}
 
 	res.write(preAppHTML({
 		title,
