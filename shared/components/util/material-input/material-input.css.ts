@@ -93,6 +93,10 @@ export const MaterialInputCSS = html`<style>
 		box-shadow: none;
 		border-color: ${theme.error};
 	}
+	.mdl-textfield.is-invalid .iconSlot {
+		box-shadow: none;
+		border-color: ${theme.error};
+	}
 	fieldset[disabled] .mdl-textfield .mdl-textfield__input, .mdl-textfield.is-disabled .mdl-textfield__input {
 		background-color: transparent;
 		border-bottom: 1px dotted rgba(0,0,0, 0.12);
