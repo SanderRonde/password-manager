@@ -11,6 +11,7 @@ import { ServerConfig } from "../../server";
 import * as bodyParser from 'body-parser'
 import * as express from 'express'
 import * as morgan from 'morgan'
+import * as https from 'https'
 import * as fs from 'fs-extra'
 import * as spdy from 'spdy'
 import * as http from 'http'
@@ -77,17 +78,26 @@ export class Webserver {
 		
 		await Promise.all([...optionalArrayFn(() => {
 				return new Promise(async (resolve) => {
-					spdy.createServer({
+					const credentials = {
 						key: await fs.readFile(path.join(process.cwd(), this.config.httpsKey!), {
 							encoding: 'utf8'
 						}),
 						cert: await fs.readFile(path.join(process.cwd(), this.config.httpsCert!), {
 							encoding: 'utf8'
 						})
-					}, this.app).listen(this.config.https, () => {
-						console.log(`HTTPS server listening on port ${this.config.https}`);
-						resolve();
-					});
+					};
+					const useSpdy = ~~process.version.match(/^v(\d+)/)![1] < 10;
+					if (useSpdy) {
+						spdy.createServer(credentials, this.app).listen(this.config.https, () => {
+							console.log(`HTTPS (spdy) server listening on port ${this.config.https}`);
+							resolve();
+						});
+					} else {
+						https.createServer(credentials, this.app).listen(this.config.https, () => {
+							console.log(`HTTPS (non-spdy) server listening on port ${this.config.https}`);
+							resolve();
+						});
+					}
 				})
 			}, !!(this.config.httpsKey && this.config.httpsCert)),
 			new Promise((resolve) => {
