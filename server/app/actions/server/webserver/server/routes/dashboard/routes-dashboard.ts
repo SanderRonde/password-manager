@@ -1,3 +1,4 @@
+import { LoginData } from '../../../../../../../../shared/types/shared-types';
 import { ServerResponse } from "../../modules/ratelimit";
 import { render } from "../../modules/render";
 import { Webserver } from "../../webserver";
@@ -6,11 +7,6 @@ import * as express from 'express'
 import * as path from 'path'
 
 const routesBase = path.join(__dirname, '../../../client/');
-
-export interface LoginData {
-	comm_token: string,
-	server_public_key: string
-}
 
 export class RoutesDashboard {
 	serveDir: string;

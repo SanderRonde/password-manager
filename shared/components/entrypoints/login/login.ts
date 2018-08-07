@@ -511,7 +511,6 @@
 // 	return withStyles(styles)(getLogin(data));
 // }
 
-import { LoginData } from '../../../../server/app/actions/server/webserver/server/routes/dashboard/routes-dashboard';
 import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config } from '../../../lib/webcomponent-util'
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad } from '../../../lib/browser-crypto';
 import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
@@ -521,6 +520,7 @@ import { MaterialInput } from '../../util/material-input/material-input';
 import { IconButton } from '../../util/icon-button/icon-button';
 import { doClientAPIRequest } from '../../../lib/apirequests';
 import { API_ERRS, APIReturns } from '../../../types/api';
+import { LoginData } from '../../../types/shared-types';
 import { bindToClass } from '../../../lib/decorators';
 import { LoginIDMap } from './login-querymap';
 import { LoginHTML } from './login.html';
