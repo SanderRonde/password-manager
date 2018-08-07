@@ -1,14 +1,14 @@
 import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey } from "../types/db-types";
 import { HashingAlgorithms, Hashed, ERRS, Padded, Paddings  } from "../types/crypto";
-import { sha512, sha512_256 } from 'js-sha512';
+import * as jsSha512 from 'js-sha512';
 import * as NodeRSA from 'node-rsa';
 
 function getHashingFunction(algorithm: HashingAlgorithms) {
 	switch (algorithm) {
 		case 'sha512':
-			return sha512;
+			return jsSha512.sha512;
 		case 'sha256':
-			return sha512_256;
+			return jsSha512.sha512_256;
 	}
 	return null;
 }

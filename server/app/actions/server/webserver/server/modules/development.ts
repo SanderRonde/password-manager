@@ -48,49 +48,60 @@ function serve(root: string, {
 
 function rewriteEsModuleImports(file: string): string {
 	return file	
+		.replace(/import (.*) from ['"]node-rsa['"]/g, 'import $1 from \'/modules/node-rsa\'')
+		.replace(/import (.*) from ['"]js-sha512['"]/g, 'import $1 from \'/modules/js-sha512\'')
 		.replace(/import (.*) from ['"]lit-html['"]/g, 'import $1 from \'/modules/lit-html\'')
 		.replace(/import (.*) from ['"]lit-html\/lib\/lit-extended['"]/g, 'import $1 from \'/modules/lit-html/lib/lit-extended\'');
 }
 
+async function getWebpackPacked(name: string, src: string) {
+	return new Promise<string>(async (resolve, reject) => {
+		const { err, result } = await synchronizePromise(fs.readFile(path.join(
+			PROJECT_ROOT, 'temp/', `${name}.js`
+		)));
+		if (!err) {
+			resolve(result!.toString());
+			return;
+		}
+		
+		webpack({
+			mode: "development",
+			entry: src,
+			output: {
+				library: `_${name}`,
+				path: path.join(PROJECT_ROOT, 'temp/'),
+				filename: `${name}.js`
+			}
+		}, async (err) => {
+			if (err) {
+				reject('Failed to convert file');
+			} else {
+				const { err, result: content } = await synchronizePromise(fs.readFile(path.join(
+					PROJECT_ROOT, 'temp/', `${name}.js`
+				)));
+				if (err) {
+					reject('Failed to write file');
+					return;
+				}
+				resolve(content!.toString());
+			}
+		});
+	});
+}
+
 async function genSingleFileWebpackRoute(res: express.Response, name: string, src: string) {
-	const { err, result } = await synchronizePromise(fs.readFile(path.join(
-		PROJECT_ROOT, 'temp/', `${name}.js`
-	)));
-	if (!err) {
-		res.contentType('.js');
-		res.write(`${result}\n\n
-		export default _${name}.default;`);
+	const { err, result } = await synchronizePromise(getWebpackPacked(name, src));
+
+	if (err) {
+		res.status(500);
 		res.end();
 		return;
 	}
-	
-	webpack({
-		mode: "development",
-		entry: src,
-		output: {
-			library: `_${name}`,
-			path: path.join(PROJECT_ROOT, 'temp/'),
-			filename: `${name}.js`
-		}
-	}, async (err) => {
-		if (err) {
-			res.status(500);
-			res.end();
-		} else {
-			res.contentType('.js');
-			const { err, result: content } = await synchronizePromise(fs.readFile(path.join(
-				PROJECT_ROOT, 'temp/', `${name}.js`
-			)));
-			if (err) {
-				res.status(500);
-				res.end();
-				return;
-			}
-			res.write(`${content}\n\n
-			export default _${name}.default;`);
-			res.end();
-		}
-	});
+
+	res.contentType('.js');
+	res.write(`${result}\n\n
+	export default _${name}.default;`);
+	res.end();
 }
 
 export function initDevelopmentMiddleware(webserver: Webserver) {
@@ -101,6 +112,25 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 	webserver.app.all('/shared/lib/browser-crypto.js', async (_req, res) => {
 		await genSingleFileWebpackRoute(res, 'browserCrypto', 
 			path.join(PROJECT_ROOT, `shared/lib/browser-crypto.js`));
+	});
+	webserver.app.all([
+		'/modules/node-rsa',
+		'/modules/node-rsa.js',
+		'/modules/node-rsa/lit-html.js'
+	], async (_req, res) => {
+		await genSingleFileWebpackRoute(res, 'nodeRSA',
+			path.join(PROJECT_ROOT, 'node_modules/node-rsa/src/NodeRSA.js'));
+	});
+	webserver.app.all([
+		'/modules/js-sha512',
+		'/modules/js-sha512.js',
+		'/modules/js-sha512/js-sha512.js'
+	], async (_req, res) => {
+		const result = await getWebpackPacked('jsSha512',
+			path.join(PROJECT_ROOT, 'node_modules/js-sha512/src/sha512.js'));
+		res.contentType('.js');
+		res.write(`${result};export const sha512 = 3; export const sha512_256 = 44`);
+		res.end();
 	});
 	webserver.app.all([
 		'/modules/lit-html',
