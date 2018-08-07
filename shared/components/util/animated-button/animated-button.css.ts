@@ -1,6 +1,8 @@
 import { theme } from "../../theming/theme/theme";
 import { html } from "lit-html";
 
+export const COLOR_FADE_TIME = 500;
+export const FADE_IN_OUT_TIME = COLOR_FADE_TIME / 2;
 export const AnimatedButtonCSS = html`<style>
 	/**
 	* Copyright 2015 Google Inc. All Rights Reserved.
@@ -273,5 +275,38 @@ export const AnimatedButtonCSS = html`<style>
 		font-size: 109%;
 		border-radius: 5px;
 		height: auto;
+	}
+
+	#content > * {
+		display: none;
+		transition: opacity ${FADE_IN_OUT_TIME}ms ease-in-out;
+	}
+
+	#content > *.visible {
+		display: block;
+	}
+
+	#content.fadeOut > * {
+		opacity: 0;
+	}
+
+	#loadingContent {
+		margin-top: 4px;
+	}
+
+	#successContent, #failureContent {
+		fill: white;
+	}
+
+	#button {
+		transition: background ${COLOR_FADE_TIME}ms ease-in-out;
+	}
+
+	#button.success {
+		background: ${theme.success}
+	}
+
+	#button.failure {
+		background: ${theme.error}
 	}
 </style>`;
