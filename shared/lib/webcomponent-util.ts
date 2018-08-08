@@ -715,3 +715,25 @@ export function wait(time: number) {
 		}, time);
 	});
 }
+
+const timeouts: WeakMap<any, Map<string, NodeJS.Timer>> = new WeakMap();
+export function createCancellableTimeout(el: any, name: string, callback: () => void, waitTime: number) {
+	if (!timeouts.has(el)) {
+		timeouts.set(el, new Map());
+	}
+	const elMap = timeouts.get(el)!;
+	if (elMap.has(name)) {
+		cancelTimeout(el, name);
+	}
+	elMap.set(name, setTimeout(callback, waitTime));
+}
+
+export function cancelTimeout(el: any, name: string) {
+	if (!timeouts.has(el)) return;
+
+	const elMap = timeouts.get(el)!;
+	if (!elMap.has(name)) return;
+
+	clearTimeout(elMap.get(name)!);
+	elMap.delete(name);
+}

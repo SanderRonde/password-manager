@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config, listen, isNewElement } from '../../../lib/webcomponent-util'
+import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config, listen, isNewElement, createCancellableTimeout, cancelTimeout } from '../../../lib/webcomponent-util'
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad } from '../../../lib/browser-crypto';
 import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
@@ -115,6 +115,7 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 			return;
 		}
 	
+		cancelTimeout(this, 'failure-button');
 		this.$.button.setState('loading');
 		const result = await this._doLoginRequest(inputData);	
 
@@ -127,6 +128,9 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 			await this._proceedToDashboard(result);
 		} else {
 			this.$.button.setState('failure');
+			createCancellableTimeout(this, 'failure-button', () => {
+				this.$.button.setState('regular');
+			}, 3000);
 		}
 	}
 	
