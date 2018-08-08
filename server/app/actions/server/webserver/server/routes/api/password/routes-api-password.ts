@@ -505,7 +505,7 @@ export class RoutesApiPassword {
 				return;
 			}
 
-			if (!this.server.Router.checkPassword(req, res, 
+			if (!this.server.Router.checkPassword(res, 
 				password_hash, this.server.database.Crypto.dbDecrypt(account.pw))) {
 					return;
 				}

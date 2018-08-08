@@ -782,6 +782,19 @@ export declare namespace APIRoutes {
 				 */
 				twofactor_token?: string;
 			}, ServerPublicKey>;
-		}, encrypted: {}, optional: {}, optionalEncrypted: {}): ReturnType<typeof APIRoutes.Instance.register>;
+		}, encrypted: {}, optional: {}, optionalEncrypted: {}): ReturnType<{
+			/**
+			 * The assigned ID of the instance, used to indicate its identity
+			 */
+			id: PublicKeyEncrypted<StringifiedObjectId<EncryptedInstance>, InstancePublicKey>
+			/**
+			 * The public key of the server, used to encrypt data sent to it
+			 */
+			server_key: PublicKeyEncrypted<ServerPublicKey, InstancePublicKey>;
+			/**
+			 * The auth token that can be used to make API requests. Encrypted with instance key
+			 */
+			auth_token: PublicKeyEncrypted<APIToken, InstancePublicKey>;	
+		}>;
 	}
 }

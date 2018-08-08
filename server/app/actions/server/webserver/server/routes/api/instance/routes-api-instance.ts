@@ -52,17 +52,13 @@ export class RoutesApiInstance {
 				return;
 			}
 		
-		res.status(200);
-		res.json({
-			success: true,
-			data: {
-				id: encryptWithPublicKey(result.toHexString(), public_key),
-				server_key: encryptWithPublicKey(serverPublicKey, public_key)
-			}
-		});
-
+		
 		sendEmail(this.server.config, auth.email,
 			'New instance registered', 'A new instance was registered to your email');
+		return {
+			id: encryptWithPublicKey(result.toHexString(), public_key),
+			server_key: encryptWithPublicKey(serverPublicKey, public_key)
+		}
 	}
 
 	public register(req: express.Request, res: ServerResponse, next: express.NextFunction) {
@@ -84,8 +80,82 @@ export class RoutesApiInstance {
 				type: 'string'
 			}])) return;
 
-			await this.doRegister({ email, password, public_key }, res);
+			const result = await this.doRegister({ email, password, public_key }, res);
+			if (result) {
+				res.status(200);
+				res.json({
+					success: true,
+					data: result
+				});
+			}
 		})(req, res, next);
+	}
+
+	public async doLogin({
+		instance_id, challenge, password_hash
+	}: {
+		instance_id: StringifiedObjectId<EncryptedInstance>;
+		challenge: PublicKeyEncrypted<string, ServerPublicKey>;
+		password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+	}, res: ServerResponse) {
+		//Get user from instance ID
+		const instance = await this.server.Router.getInstance(instance_id);
+			
+		if (!instance) {
+			res.status(200);
+			res.json({
+				success: false,
+				//Invalid instance ID
+				error: 'invalid credentials',
+				ERR: API_ERRS.INVALID_CREDENTIALS
+			});
+			return;
+		}
+
+		const publicKey = this.server.database.Crypto.dbDecrypt(
+			instance.public_key);
+
+		const account = await this.server.database.Manipulation.findOne(
+			COLLECTIONS.USERS, {
+				_id: instance.user_id
+			});
+
+		if (account === null) {
+			res.status(200);
+			res.json({
+				success: false,
+				//Failed to parse JSON, incorrect key
+				error: 'invalid credentials',
+				ERR: API_ERRS.INVALID_CREDENTIALS
+			});
+			return;
+		}
+		//Check password
+		if (!this.server.Router.checkPassword(res, 
+			password_hash, this.server.database.Crypto.dbDecrypt(account.pw))) {
+				return;
+			}
+		
+		//Solve challenge
+		const privateKey = this.server.database.Crypto.dbDecrypt(instance.server_private_key);
+		const solved = decryptWithPrivateKey(challenge, privateKey);
+
+		if (this.server.database.Crypto.dbDecryptWithSalt(instance.twofactor_enabled)) {
+			//Require twofactor authentication before giving out token
+			return {
+				twofactor_required: true,
+				twofactor_auth_token: encryptWithPublicKey(this.server.Auth.genTwofactorToken(
+					instance._id.toHexString(), account._id.toHexString()), publicKey),
+				challenge: solved
+			};
+		} else {
+			return {
+				twofactor_required: false,
+				auth_token: encryptWithPublicKey(this.server.Auth.genLoginToken(
+					instance._id.toHexString(), account._id.toHexString()), publicKey),
+				challenge: solved
+			}
+		}
 	}
 
 	public login(req: express.Request, res: ServerResponse, next: express.NextFunction) {
@@ -109,71 +179,15 @@ export class RoutesApiInstance {
 				type: 'string'
 			}])) return;
 
-			//Get user from instance ID
-			const instance = await this.server.Router.getInstance(instance_id);
-			
-			if (!instance) {
-				res.status(200);
-				res.json({
-					success: false,
-					//Invalid instance ID
-					error: 'invalid credentials',
-					ERR: API_ERRS.INVALID_CREDENTIALS
-				});
-				return;
-			}
-
-			const publicKey = this.server.database.Crypto.dbDecrypt(
-				instance.public_key);
-
-			const account = await this.server.database.Manipulation.findOne(
-				COLLECTIONS.USERS, {
-					_id: instance.user_id
-				});
-
-			if (account === null) {
-				res.status(200);
-				res.json({
-					success: false,
-					//Failed to parse JSON, incorrect key
-					error: 'invalid credentials',
-					ERR: API_ERRS.INVALID_CREDENTIALS
-				});
-				return;
-			}
-			//Check password
-			if (!this.server.Router.checkPassword(req, res, 
-				password_hash, this.server.database.Crypto.dbDecrypt(account.pw))) {
-					return;
-				}
-			
-			//Solve challenge
-			const privateKey = this.server.database.Crypto.dbDecrypt(instance.server_private_key);
-			const solved = decryptWithPrivateKey(challenge, privateKey);
-
-			if (this.server.database.Crypto.dbDecryptWithSalt(instance.twofactor_enabled)) {
-				//Require twofactor authentication before giving out token
+			const data = await this.doLogin({
+				instance_id, password_hash, challenge
+			}, res);
+			if (data) {
 				res.status(200);
 				res.json({
 					success: true,
-					data: {
-						twofactor_required: true,
-						twofactor_auth_token: encryptWithPublicKey(this.server.Auth.genTwofactorToken(
-							instance._id.toHexString(), account._id.toHexString()), publicKey),
-						challenge: solved
-					}
-				});
-			} else {
-				res.status(200);
-				res.json({
-					success: true,
-					data: {
-						twofactor_required: false,
-						auth_token: encryptWithPublicKey(this.server.Auth.genLoginToken(
-							instance._id.toHexString(), account._id.toHexString()), publicKey),
-						challenge: solved
-					}
-				});
+					data
+				})
 			}
 		})(req, res, next);
 	}

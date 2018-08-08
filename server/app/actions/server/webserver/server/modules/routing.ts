@@ -29,7 +29,7 @@ export class WebserverRouter {
 		this._register();
 	}
 
-	public checkPassword(_req: express.Request, res: ServerResponse,
+	public checkPassword(res: ServerResponse,
 		actualPassword: Hashed<Padded<string, MasterPasswordVerificationPadding>>,
 		expectedPassword: Hashed<Padded<string, MasterPasswordVerificationPadding>>) {
 				if (actualPassword !== expectedPassword) {

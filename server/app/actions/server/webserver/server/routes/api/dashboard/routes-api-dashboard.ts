@@ -1,5 +1,5 @@
-import { decryptWithPrivateKey, ERRS, Hashed, Padded, MasterPasswordVerificationPadding } from "../../../../../../../lib/crypto";
-import { ServerPublicKey, MasterPassword, PublicKeyEncrypted } from "../../../../../../../../../shared/types/db-types";
+import { decryptWithPrivateKey, ERRS, Hashed, Padded, MasterPasswordVerificationPadding, encryptWithPublicKey, genRSAKeyPair } from "../../../../../../../lib/crypto";
+import { ServerPublicKey, MasterPassword, PublicKeyEncrypted, StringifiedObjectId, EncryptedInstance } from "../../../../../../../../../shared/types/db-types";
 import { COMM_TOKEN_DEFAULT_EXPIRE_TIME } from "../../../../../../../lib/constants";
 import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
@@ -97,12 +97,53 @@ export class RoutesAPIDashboard {
 					}
 			}
 
-			await this.server.Routes.API.Instance.doRegister({ 
+			//Subsitute public and private key
+			const keyPair = genRSAKeyPair();
+
+			const instanceData = await this.server.Routes.API.Instance.doRegister({ 
 				email: decrypted.email,
 				password: decrypted.password,
-				public_key: public_key,
+				public_key: keyPair.publicKey,
 				expires: COMM_TOKEN_DEFAULT_EXPIRE_TIME
 			}, res);
+			if (!instanceData) return;
+
+			//Decrypt the instance data
+			const decryptedInstanceData = {
+				id: decryptWithPrivateKey(instanceData.id, 
+						keyPair.privateKey),
+				server_key: decryptWithPrivateKey(instanceData.server_key,
+					keyPair.privateKey)
+			}
+
+			//Get a login token
+			const loginData = await this.server.Routes.API.Instance.doLogin({
+				instance_id: decryptedInstanceData.id as StringifiedObjectId<EncryptedInstance>,
+				password_hash: decrypted.password,
+				challenge: encryptWithPublicKey('data', decryptedInstanceData.server_key)
+			}, res);
+
+			if (!loginData) {
+				return;
+			}
+
+			const token = (loginData as {
+				twofactor_required: false,
+				auth_token: PublicKeyEncrypted<string, string>,
+				challenge: string
+			}).auth_token;
+
+			res.status(200);
+			res.json({
+				success: true,
+				data: {
+					auth_token: token,
+					id: encryptWithPublicKey(
+						decryptedInstanceData.id, public_key),
+					server_public_key: encryptWithPublicKey(
+						decryptedInstanceData.server_key, public_key)
+				}
+			});
 		})(req, res, next);
 	}
 }
