@@ -158,14 +158,10 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 	postRender() {
 		listen(this.$.button, 'click', this.login);
 		listen(this.$.lockButton, 'click', this.handleEmailRememberToggle);
-		if (isNewElement(this.$.emailInput)) {
-			this.$.emailInput.listen('valid', this._updateValidity);
-		}
-		if (isNewElement(this.$.passwordInput)) {
-			this.$.passwordInput.listen('valid', this._updateValidity);
-		}
-		if (isNewElement(this.$.twofactorInput)) {
-			this.$.twofactorInput.listen('valid', this._updateValidity);
+		for (const input of [this.$.emailInput, this.$.passwordInput, this.$.twofactorInput]) {
+			if (isNewElement(input)) {
+				input.listen('valid', this._updateValidity);
+			}
 		}
 	}
 }
