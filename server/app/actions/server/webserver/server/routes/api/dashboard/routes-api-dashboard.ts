@@ -13,14 +13,14 @@ export class RoutesAPIDashboard {
 		this.server.Router.requireParams<{
 			comm_token: string;
 			public_key: string;
-			encrypted: PublicKeyEncrypted<{
+			encrypted_data: PublicKeyEncrypted<{
 				email: string;
 				twofactor_token?: string;
 				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 			}, ServerPublicKey>;
 		}, {}, {}, {}>({
-			unencrypted: ['comm_token', 'public_key', 'encrypted']
-		}, {}, async (toCheck, { comm_token, public_key, encrypted }) => {
+			unencrypted: ['comm_token', 'public_key', 'encrypted_data']
+		}, {}, async (toCheck, { comm_token, public_key, encrypted_data }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'comm_token',
 				type: 'string'
@@ -44,7 +44,7 @@ export class RoutesAPIDashboard {
 			}
 
 			//Decrypt data
-			const decrypted = decryptWithPrivateKey(encrypted, commData.server_private_key);
+			const decrypted = decryptWithPrivateKey(encrypted_data, commData.server_private_key);
 			if (decrypted === ERRS.INVALID_DECRYPT) {
 				res.status(200);
 				res.json({

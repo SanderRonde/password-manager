@@ -62,16 +62,16 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 
 		const { comm_token, server_public_key } = serverData;
 		try {
-		return await doClientAPIRequest({},
-			'/api/dashboard/login', {
-				comm_token,
-				public_key: keyPair.publicKey,
-				encrypted: encryptWithPublicKey({
-					email: email,
-					twofactor_token: twofactor_token || undefined,
-					password: hash(pad(password, 'masterpwverify')),
-				}, server_public_key)
-			});
+			return await doClientAPIRequest({},
+				'/api/dashboard/login', {
+					comm_token,
+					public_key: keyPair.publicKey,
+					encrypted_data: encryptWithPublicKey({
+						email: email,
+						twofactor_token: twofactor_token || undefined,
+						password: hash(pad(password, 'masterpwverify')),
+					}, server_public_key)
+				});
 		} catch(e) {
 			return {
 				success: false,
