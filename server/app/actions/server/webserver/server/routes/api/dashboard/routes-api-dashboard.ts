@@ -4,11 +4,12 @@ import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ServerResponse } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
+import * as express from 'express'
 
 export class RoutesAPIDashboard {
 	constructor(public server: Webserver) { }
 
-	public login(res: ServerResponse) {
+	public login(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			comm_token: string;
 			public_key: string;
@@ -100,6 +101,6 @@ export class RoutesAPIDashboard {
 				password: decrypted.password,
 				public_key: public_key
 			}, res);
-		});
+		})(req, res, next);
 	}
 }
