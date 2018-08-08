@@ -7,7 +7,7 @@ import { test } from 'ava';
 const commonjsJSEncrypt = path.join(__dirname, '../../server/app/libraries/jsencrypt.js');
 requireHacker.resolver((path: string, srcModule: any) => {
 	const resolvedPath: string = requireHacker.resolve(path, srcModule);
-	if (resolvedPath.indexOf('shared\\libraries\\jsencrypt.js') > -1) {
+	if (/shared.libraries.jsencrypt\.js/.exec(resolvedPath)) {
 		return commonjsJSEncrypt
 	}
 	return undefined;
