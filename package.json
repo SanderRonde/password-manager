@@ -28,8 +28,7 @@
     "ext": "js",
     "exec": "node server/app/main.js server --http 1256 --https 1257 --https-key ./certs/cert.key --https-cert ./certs/cert.crt -d mongodb://127.0.0.1:27017/somedb -p somepw --development --databaseless --no-https-only",
     "watch": [
-      "server/app/actions/server/webserver/server/",
-      "shared/lib/"
+      "server/app/actions/server/webserver/server/"
     ]
   },
   "dependencies": {
