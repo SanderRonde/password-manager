@@ -120,7 +120,9 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 		const result = await getWebpackPacked('jsSha512',
 			path.join(PROJECT_ROOT, 'node_modules/js-sha512/src/sha512.js'));
 		res.contentType('.js');
-		res.write(`${result}`);
+		res.write(`${result};
+		const { sha512, sha384, sha512_256, sha512_224 } = _jsSha512;
+		export { sha512, sha384, sha512_256, sha512_224 }`);
 		res.end();
 	});
 	webserver.app.all([
