@@ -155,12 +155,21 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 		}
 	}
 
+	@bindToClass
+	private _onSubmit(e: KeyboardEvent) {
+		//Enter
+		if (e.keyCode === 13 && this._getInputData().valid) {
+			this.login();
+		}
+	}
+
 	postRender() {
 		listen(this.$.button, 'click', this.login);
 		listen(this.$.lockButton, 'click', this.handleEmailRememberToggle);
 		for (const input of [this.$.emailInput, this.$.passwordInput, this.$.twofactorInput]) {
 			if (isNewElement(input)) {
 				input.listen('valid', this._updateValidity);
+				input.listen('keydown', this._onSubmit)
 			}
 		}
 	}
