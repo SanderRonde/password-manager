@@ -49,7 +49,6 @@ export async function doClientAPIRequest<K extends keyof APIFns>({ publicKey }: 
 	if (keys.length && !publicKey) {
 		throw new Error('Missing public key for encryption');
 	}
-	console.log(encrypted);
 	const data = {...args as Object, ...(keys.length && publicKey ? {
 		encrypted: encryptWithPublicKey(encrypted, publicKey)
 	} : {})};
