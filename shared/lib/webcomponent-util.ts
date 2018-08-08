@@ -246,7 +246,7 @@ function casingToDashes(name: string) {
 	for (const char of name) {
 		const code = char.charCodeAt(0);
 		if (code >= 65 && code <= 90) {
-			newStr += `-${char.toLowerCase()}`;
+			newStr += '-' + char.toLowerCase();
 		} else {
 			newStr += char;
 		}
