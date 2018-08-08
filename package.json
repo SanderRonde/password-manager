@@ -91,6 +91,6 @@
   "scripts": {
     "compile": "gulp defs && tsc --build tsconfig.json --force",
     "build": "yarn compile && yarn compile:server:modules && gulp dashboard",
-    "test": "ava"
+    "test": "tsc --build --force && tsc -p shared/tsconfig.commonjs.json && ava"
   }
 }
