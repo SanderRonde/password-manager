@@ -782,7 +782,7 @@ export declare namespace APIRoutes {
 				 */
 				twofactor_token?: string;
 			}, ServerPublicKey>;
-		}, encrypted: {}, optional: {}, optionalEncrypted: {}): ReturnType<{
+		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			/**
 			 * The assigned ID of the instance, used to indicate its identity
 			 */
