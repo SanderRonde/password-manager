@@ -50,6 +50,30 @@ export type DatabaseEncryptedWithSalt<T> = {
 }
 
 /**
+ * Data encrypted using a public key, automatically hybrid encrypted
+ *  if message is too long
+ */
+export type PublicKeyEncrypted<T, K extends string> = EncodedString<{
+	/**
+	 * The type of encryption (async or hybrid)
+	 */
+	type: 'async';
+	/**
+	 * The async encrypted data
+	 */
+	data: RSAEncrypted<EncodedString<T>, K>;
+}|{
+	/**
+	 * The type of encryption (async or hybrid)
+	 */
+	type: 'hybrid';
+	/**
+	 * The hybrid encrypted data
+	 */
+	data: HybridEncrypted<T, K>;
+}>;
+
+/**
  * Data encrypted with a public key
  */
 export type RSAEncrypted<T, K extends string> = string & {

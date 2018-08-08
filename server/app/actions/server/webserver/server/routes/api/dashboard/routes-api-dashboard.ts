@@ -1,9 +1,9 @@
 import { decryptWithPrivateKey, ERRS, Hashed, Padded, MasterPasswordVerificationPadding } from "../../../../../../../lib/crypto";
-import { ServerPublicKey, RSAEncrypted, MasterPassword } from "../../../../../../../../../shared/types/db-types";
-import { ServerResponse } from "../../../modules/ratelimit";
-import { Webserver } from "../../../webserver";
+import { ServerPublicKey, MasterPassword, PublicKeyEncrypted } from "../../../../../../../../../shared/types/db-types";
 import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
+import { ServerResponse } from "../../../modules/ratelimit";
+import { Webserver } from "../../../webserver";
 
 export class RoutesAPIDashboard {
 	constructor(public server: Webserver) { }
@@ -12,11 +12,11 @@ export class RoutesAPIDashboard {
 		this.server.Router.requireParams<{
 			comm_token: string;
 			public_key: string;
-			encrypted: RSAEncrypted<EncodedString<{
+			encrypted: PublicKeyEncrypted<{
 				email: string;
 				twofactor_token?: string;
 				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-			}>, ServerPublicKey>;
+			}, ServerPublicKey>;
 		}, {}, {}, {}>({
 			unencrypted: ['comm_token', 'public_key', 'encrypted']
 		}, {}, async (toCheck, { comm_token, public_key, encrypted }) => {

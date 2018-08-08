@@ -1,4 +1,4 @@
-import { RSAEncrypted } from '../../../app/../../shared/types/db-types';
+import { PublicKeyEncrypted } from '../../../app/../../shared/types/db-types';
 import { ENCRYPTION_ALGORITHM } from '../../../app/lib/constants';
 import * as serverCrypto from '../../../app/lib/crypto';
 import { genRandomString } from '../../../app/lib/util';
@@ -124,7 +124,7 @@ test('values encrypted with a public key can be decrypted', t => {
 test('public/private key encryption returns error on invalid decrypt', t => {
 	const { privateKey } = serverCrypto.genRSAKeyPair();
 
-	const decrypted = serverCrypto.decryptWithPrivateKey('baddecrypt' as RSAEncrypted<EncodedString<string>, string>, 
+	const decrypted = serverCrypto.decryptWithPrivateKey('baddecrypt' as PublicKeyEncrypted<string, string>, 
 		privateKey);
 	t.is(decrypted, serverCrypto.ERRS.INVALID_DECRYPT, 'is invalid decrypt');
 });

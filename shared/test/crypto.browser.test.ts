@@ -1,5 +1,5 @@
 import { genRandomString } from '../../server/app/lib/util';
-import { RSAEncrypted } from '../types/db-types';
+import { PublicKeyEncrypted } from '../types/db-types';
 import * as requireHacker from 'require-hacker';
 import { ERRS } from '../types/crypto';
 import path = require('path');
@@ -53,7 +53,7 @@ test('values encrypted with a public key can be decrypted', t => {
 test('public/private key encryption returns error on invalid decrypt', t => {
 	const { privateKey } = browserCrypto.genRSAKeyPair();
 
-	const decrypted = browserCrypto.decryptWithPrivateKey('baddecrypt' as RSAEncrypted<EncodedString<string>, string>, 
+	const decrypted = browserCrypto.decryptWithPrivateKey('baddecrypt' as PublicKeyEncrypted<string, string>, 
 		privateKey);
 	t.is(decrypted, ERRS.INVALID_DECRYPT, 'is invalid decrypt');
 });

@@ -1,6 +1,6 @@
 export { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms, MasterPasswordDecryptionpadding, MasterPasswordVerificationPadding, Padded } from '../../../shared/types/crypto'
 import { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms } from '../../../shared/types/crypto'
-import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey, HybridEncrypted } from "../../../shared/types/db-types";
+import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey, HybridEncrypted, PublicKeyEncrypted } from "../../../shared/types/db-types";
 import { Padded, Paddings } from "../../../shared/types/crypto";
 import { JSEncrypt } from '../libraries/jsencrypt'
 import { genRandomString } from './util';
@@ -121,7 +121,7 @@ export function decrypt<T, A extends EncryptionAlgorithm, K extends string>(encr
 	}
 }
 
-export function encryptWithPublicKey<T, K extends InstancePublicKey|ServerPublicKey>(data: T, 
+export function asyncEncrypt<T, K extends InstancePublicKey|ServerPublicKey>(data: T, 
 	publicKey: K): RSAEncrypted<EncodedString<T>, K> {
 		const key = new JSEncrypt();
 		key.setPublicKey(publicKey);
@@ -130,7 +130,7 @@ export function encryptWithPublicKey<T, K extends InstancePublicKey|ServerPublic
 			RSAEncrypted<EncodedString<T>, K>;
 	}
 
-export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: RSAEncrypted<EncodedString<T>, 
+export function asyncDecrypt<T, K extends ServerPrivateKey>(data: RSAEncrypted<EncodedString<T>, 
 	InstancePublicKey|ServerPublicKey>, 
 		privateKey: K): T|ERRS {
 			const key = new JSEncrypt();
@@ -141,6 +141,37 @@ export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: RSAEn
 				return ERRS.INVALID_DECRYPT;
 			}
 			return JSON.parse(decrypted);
+		}
+
+export function encryptWithPublicKey<T, K extends InstancePublicKey|ServerPublicKey>(data: T, 
+	publicKey: K): PublicKeyEncrypted<T, K> {
+		const stringified = JSON.stringify(data);
+		if (stringified.length > 115) {
+			return JSON.stringify({
+				type: 'hybrid' as 'hybrid',
+				data: hybridEncrypt(data, publicKey)
+			})
+		} else {
+			return JSON.stringify({
+				type: 'async' as 'async',
+				data: asyncEncrypt(data, publicKey)
+			});
+		}
+	}
+
+export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: PublicKeyEncrypted<T, 
+	InstancePublicKey|ServerPublicKey>, 
+		privateKey: K): T|ERRS {
+			try {
+				const parsed = JSON.parse(data);
+				if (parsed.type === 'async') {
+					return asyncDecrypt(parsed.data, privateKey);
+				} else {
+					return hybdridDecrypt(parsed.data, privateKey);
+				}
+			} catch(e) {
+				return ERRS.INVALID_DECRYPT;
+			}
 		}
 
 export function genRSAKeyPair() {
@@ -167,7 +198,10 @@ export function hybridEncrypt<T, K extends InstancePublicKey|ServerPublicKey>(da
 		}));
 
 		//Encrypt the AES key with the public key
-		const encryptedAESKey = encryptWithPublicKey(aesKey, publicKey);
+		const encryptedAESKey = JSON.parse(encryptWithPublicKey(aesKey, publicKey) as EncodedString<{
+			type: 'async';
+			data: RSAEncrypted<EncodedString<string>, K>;
+		}>).data;
 
 		//Encrypt the data with the AES key
 		const aes = new aesjs.ModeOfOperation.ctr(
@@ -188,7 +222,10 @@ export function hybdridDecrypt<T, K extends ServerPrivateKey>(data: HybridEncryp
 			const { symmetricKey, data: encrypted } = JSON.parse(data);
 
 			//Decrypt the key
-			const decryptedKey = decryptWithPrivateKey(symmetricKey, privateKey);
+			const decryptedKey = decryptWithPrivateKey(JSON.stringify({
+				data: symmetricKey,
+				type: 'async' as 'async'
+			}), privateKey);
 
 			//Decrypt the data 
 			const aes = new aesjs.ModeOfOperation.ctr(
