@@ -1,7 +1,7 @@
 import { theme } from "../../theming/theme/theme";
 import { html } from "lit-html";
 
-export const COLOR_FADE_TIME = 500;
+export const COLOR_FADE_TIME = 300;
 export const FADE_IN_OUT_TIME = COLOR_FADE_TIME / 2;
 export const AnimatedButtonCSS = html`<style>
 	/**
