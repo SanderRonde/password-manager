@@ -103,7 +103,8 @@ export const enum API_ERRS {
 	MISSING_PARAMS = 'MISSING_PARAMS',
 	INVALID_PARAM_TYPES = 'INVALID_PARAM_TYPES',
 	SERVER_ERROR = 'SERVER_ERROR',
-	TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS'
+	TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS',
+	CLIENT_ERR = 'CLIENT_ERR'
 }
 
 export type JSONResponse<S> = {
@@ -767,7 +768,7 @@ export declare namespace APIRoutes {
 			/**
 			 * Data encrypted with the server's public key, sent along as data on page load
 			 */
-			encrypted: PublicKeyEncrypted<{
+			encrypted_data: PublicKeyEncrypted<{
 				/**
 				 * The email of the user
 				 */
