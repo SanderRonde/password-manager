@@ -485,11 +485,11 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 		fns.add(self);
 	}
 
-	private _assertKeyExists<E extends keyof T, T extends {
-		[key: string]: any;
-	}>(key: E, value: T) {
+	private _assertKeyExists<EV extends keyof T, T extends {
+		[P in keyof E]: Set<(...params: E[P]['args']) => E[P]['returnType']>;
+	}>(key: EV, value: T) {
 		if (!(key in value)) {
-			value[key] = [];
+			value[key] = new Set();
 		}
 	}
 
@@ -498,9 +498,6 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 		if (once) {
 			this._insertOnce(this._listenerMap[event], listener);
 		} else {
-			if (!(event in this._listenerMap)) {
-				this._listenerMap[event] = new Set();
-			}
 			this._listenerMap[event].add(listener);
 		}
 	}
