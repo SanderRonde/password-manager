@@ -61,6 +61,7 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 		localStorage.setItem('instance_public_key', keyPair.publicKey);
 
 		const { comm_token, server_public_key } = serverData;
+		try {
 		return await doClientAPIRequest({},
 			'/api/dashboard/login', {
 				comm_token,
@@ -71,6 +72,13 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 					password: hash(pad(password, 'masterpwverify')),
 				}, server_public_key)
 			});
+		} catch(e) {
+			return {
+				success: false,
+				ERR: API_ERRS.CLIENT_ERR,
+				error: 'failed to complete request'
+			}
+		}
 	}
 
 	private async _proceedToDashboard(_serverResponse: ServerLoginResponse) {
