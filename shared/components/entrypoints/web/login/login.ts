@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config, listen, isNewElement, createCancellableTimeout, cancelTimeout, wait } from '../../../../lib/webcomponent-util'
-import { genRSAKeyPair, encryptWithPublicKey, hash, pad } from '../../../../lib/browser-crypto';
+import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config, listen, isNewElement, createCancellableTimeout, cancelTimeout, wait, setCookie } from '../../../../lib/webcomponent-util'
+import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
@@ -46,13 +46,19 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 		email: string;
 		password: string;
 		twofactor_token: string|null;
-	}): Promise<ServerLoginResponse> {
+	}): Promise<{
+		privateKey: string|null;
+		response: ServerLoginResponse
+	}> {
 		const serverData = this.getData();
 		if (serverData === null) {
 			return {
-				success: false,
-				ERR: API_ERRS.NO_REQUEST_BODY,
-				error: 'no data provided by server on page load'
+				privateKey: null,
+				response: {
+					success: false,
+					ERR: API_ERRS.NO_REQUEST_BODY,
+					error: 'no data provided by server on page load'
+				}
 			}
 		}
 
@@ -62,27 +68,60 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 
 		const { comm_token, server_public_key } = serverData;
 		try {
-			return await doClientAPIRequest({},
-				'/api/dashboard/login', {
-					comm_token,
-					public_key: keyPair.publicKey,
-					encrypted_data: encryptWithPublicKey({
-						email: email,
-						twofactor_token: twofactor_token || undefined,
-						password: hash(pad(password, 'masterpwverify')),
-					}, server_public_key)
-				});
+			return {
+				privateKey: keyPair.privateKey,
+				response: await doClientAPIRequest({},
+					'/api/dashboard/login', {
+						comm_token,
+						public_key: keyPair.publicKey,
+						encrypted_data: encryptWithPublicKey({
+							email: email,
+							twofactor_token: twofactor_token || undefined,
+							password: hash(pad(password, 'masterpwverify')),
+						}, server_public_key)
+					})
+			}
 		} catch(e) {
 			return {
-				success: false,
-				ERR: API_ERRS.CLIENT_ERR,
-				error: 'failed to complete request'
+				privateKey: keyPair.privateKey,
+				response: {
+					success: false,
+					ERR: API_ERRS.CLIENT_ERR,
+					error: 'failed to complete request'
+				}
 			}
 		}
 	}
 
-	private async _proceedToDashboard(_serverResponse: ServerLoginResponse) {
-		alert('Proceeding to dashboard');
+	private async _proceedToDashboard({
+		privateKey, response	
+	}: {
+		privateKey: string;
+		response: ServerLoginResponse
+	}) {
+		if (!response.success) return;
+
+		//Decrypt data
+		const {
+			instance_id, server_public_key, auth_token
+		} = {
+			instance_id: decryptWithPrivateKey(
+				response.data.id, privateKey),
+			server_public_key: decryptWithPrivateKey(
+				response.data.server_key, privateKey),
+			auth_token: decryptWithPrivateKey(
+				response.data.auth_token, privateKey)
+		}
+
+		//Set localstorage
+		localStorage.setItem('server_public_key', server_public_key);
+
+		//Set cookies
+		setCookie('login_auth', auth_token);
+		setCookie('instance_id', instance_id);
+		
+		//Do navigation
+		location.href = '/dashboard';
 	}
 
 	private _getInputData() {
@@ -120,15 +159,15 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 
 		//Wait for the ripple animation to clear before doing heavy work
 		await wait(300);
-		const result = await this._doLoginRequest(inputData);	
+		const { privateKey, response } = await this._doLoginRequest(inputData);	
 
-		if (result.success) {
+		if (response.success && privateKey) {
 			if (this.props.emailRemembered) {
 				const email = this.$.emailInput.value;
 				localStorage.setItem('rememberedEmail', email || '');
 			}
 			this.$.button.setState('success');
-			await this._proceedToDashboard(result);
+			await this._proceedToDashboard({ privateKey, response });
 		} else {
 			this.$.button.setState('failure');
 			createCancellableTimeout(this, 'failure-button', () => {
