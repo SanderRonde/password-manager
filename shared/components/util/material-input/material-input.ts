@@ -14,8 +14,11 @@ import { bindToClass } from '../../../lib/decorators';
 	css: MaterialInputCSS,
 	html: MaterialInputHTML
 })
-export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> {
-	private _validityChangeListeners: ((valid: boolean) => void)[] = [];
+export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, {
+	valid: {
+		args: [boolean]
+	}	
+}> {
 	private _validityState: boolean = true;
 	private _maxRows: number = -1;
 
@@ -49,10 +52,6 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> 
 			fill: PROP_TYPE.BOOL
 		}
 	});
-
-	addValidityListener(listener: (valid: boolean) => void) {
-		this._validityChangeListeners.push(listener);
-	}
 
 	get value() {
 		return this.props.value;
@@ -165,9 +164,7 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap> 
 					}
 					if (this._validityState !== this.valid) {
 						this._validityState = this.valid;
-						this._validityChangeListeners.forEach((listener) => {
-							listener(this.valid);
-						});
+						this._fire('valid', [this.valid]);
 					}
 				}, 0);
 			});
