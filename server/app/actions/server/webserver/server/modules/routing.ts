@@ -396,7 +396,7 @@ export class WebserverRouter {
 		} = getStores(this.parent.config);
 
 		//Interal API
-		this.parent.app.post('/../../shared/types/api/dashboard/login', bruteforceLimiter,
+		this.parent.app.post('/api/dashboard/login', bruteforceLimiter,
 			instanceCreateLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Dashboard, 'login')));
 
