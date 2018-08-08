@@ -44,7 +44,7 @@ export declare class JSEncrypt {
      * @return {string} the decrypted string
      * @public
      */
-    public decrypt(str:string): string|false;
+    public decrypt(str:string): string|false|null;
 
     /**
      * Proxy method for RSAKey object's encrypt, encrypt the string using the public
@@ -54,7 +54,7 @@ export declare class JSEncrypt {
      * @return {string} the encrypted string encoded in base64
      * @public
      */
-    public encrypt(str:string): string|false;
+    public encrypt(str:string): string|false|null;
 
     /**
      * Proxy method for RSAKey object's sign.

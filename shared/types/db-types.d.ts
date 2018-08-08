@@ -50,7 +50,7 @@ export type DatabaseEncryptedWithSalt<T> = {
 }
 
 /**
- * Data anecrypted witha  public key
+ * Data encrypted with a public key
  */
 export type RSAEncrypted<T, K extends string> = string & {
 	/**
@@ -62,6 +62,20 @@ export type RSAEncrypted<T, K extends string> = string & {
 	 */
 	__key: K;
 }
+
+/**
+ * Data encrypted with both a symmetric and asynchronous key
+ */
+export type HybridEncrypted<T, K extends string, S = string> = EncodedString<{
+	/**
+	 * The original data, symmetrically encrypted with the symmetric key
+	 */
+	data: Encrypted<EncodedString<T>, S>;
+	/**
+	 * The key to the data, encrypted with the asynchronous key
+	 */
+	symmetricKey: RSAEncrypted<EncodedString<S>, K>;
+}>;
 
 //Keys
 /**

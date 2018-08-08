@@ -49,6 +49,7 @@ function serve(root: string, {
 function rewriteEsModuleImports(file: string): string {
 	return file	
 		.replace(/import (.*) from ['"]js-sha512['"]/g, 'import $1 from \'/modules/js-sha512\'')
+		.replace(/import (.*) from ['"]aes-js['"]/g, 'import $1 from \'/modules/aes-js\'')
 		.replace(/import (.*) from ['"]lit-html['"]/g, 'import $1 from \'/modules/lit-html\'')
 		.replace(/import (.*) from ['"]lit-html\/lib\/lit-extended['"]/g, 'import $1 from \'/modules/lit-html/lib/lit-extended\'');
 }
@@ -123,6 +124,19 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 		res.write(`${result};
 		const { sha512, sha384, sha512_256, sha512_224 } = _jsSha512;
 		export { sha512, sha384, sha512_256, sha512_224 }`);
+		res.end();
+	});
+	webserver.app.all([
+		'/modules/aes-js',
+		'/modules/aes-js.js',
+		'/modules/aes-js/aes-js.js'
+	], async (_req, res) => {
+		const result = await getWebpackPacked('aesJs',
+			path.join(PROJECT_ROOT, 'node_modules/aes-js/index.js'));
+		res.contentType('.js');
+		res.write(`${result};
+		const { AES, Counter, ModeOfOperation, utils, padding } = _aesJs;
+		export { AES, Counter, ModeOfOperation, utils, padding }`);
 		res.end();
 	});
 	webserver.app.all([

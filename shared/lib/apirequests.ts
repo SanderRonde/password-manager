@@ -49,10 +49,12 @@ export async function doClientAPIRequest<K extends keyof APIFns>({ publicKey }: 
 	if (keys.length && !publicKey) {
 		throw new Error('Missing public key for encryption');
 	}
+	console.log(encrypted);
 	const data = {...args as Object, ...(keys.length && publicKey ? {
 		encrypted: encryptWithPublicKey(encrypted, publicKey)
 	} : {})};
 
 	const baseURL = `${location.protocol}//${location.host}`;
+	console.log(`Doing request to ${baseURL}${path} with method POST and data`, data);
 	return doHTTPRequest(`${baseURL}${path}`, 'POST', data) as Promise<APIReturns[K]>;
 }

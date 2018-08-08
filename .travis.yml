@@ -19,6 +19,7 @@ before_script:
 script:
 - gulp defs
 - tsc --build --force
+- tsc -p shared/tsconfig.commonjs.json
 - ava --timeout=5m
 notifications:
   email:
