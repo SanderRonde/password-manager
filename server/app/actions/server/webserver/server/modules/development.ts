@@ -294,50 +294,7 @@ export async function convertComponentsToCommonJS() {
 		}));
 	}
 }
-
-// type WebComponentBase = typeof import('../../../../../../../shared/lib/webcomponent-util')
-// 	.WebComponentBase;
-
 export const enum ROUTES {
 	LOGIN = 'login',
 	DASHBOARD = 'dashboard'
 }
-
-// async function getRoute(route: ROUTES): Promise<WebComponentBase> {
-// 	//Convert all components to commonjs temporarily
-// 	switch (route) {
-// 		case ROUTES.LOGIN:
-// 			return (await import('../../../../../../../shared/components/entrypoints/web/login/login'))
-// 				.Login;
-// 		case ROUTES.DASHBOARD:
-// 			return (await import('../../../../../../../shared/components/entrypoints/web/dashboard/dashboard'))
-// 				.Dashboard;
-// 	}
-// }
-
-// function extractRouteCSSPaths(component: WebComponentBase): string[] {
-// 	return [
-// 		component.getCssProvider(path),
-// 		...(([] as string[]).concat(...component.dependencies.map((dependency) => {
-// 			return extractRouteCSSPaths(dependency);
-// 		})))
-// 	]
-// }
-
-// const cachedRoutes: Map<ROUTES, string[]> = new Map()
-// export async function getCSSPathsFromCache(route: ROUTES): Promise<string[]> {
-// 	if (cachedRoutes.has(route)) {
-// 		return cachedRoutes.get(route)!;
-// 	}
-// 	console.log('doing conversion');
-// 	const undo = await convertComponentsToCommonJS();
-// 	console.log('done converting');
-// 	const component = await getRoute(route);
-// 	console.log('getting route');
-// 	await undo();
-// 	console.log('undone');
-// 	const paths = extractRouteCSSPaths(component);
-// 	console.log('extracting', paths);
-// 	cachedRoutes.set(route, paths);
-// 	return paths;
-// }
