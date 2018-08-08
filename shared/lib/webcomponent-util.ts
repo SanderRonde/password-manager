@@ -508,7 +508,7 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 		}
 	}
 
-	protected _fire<EV extends keyof E, R extends E[EV]['returnType']>(event: EV, params: E[EV]['args']): R[] {
+	protected _fire<EV extends keyof E, R extends E[EV]['returnType']>(event: EV, ...params: E[EV]['args']): R[] {
 		if (!(event in this._listenerMap)) {
 			return [];
 		}
