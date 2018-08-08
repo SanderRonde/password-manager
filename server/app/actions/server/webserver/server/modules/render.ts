@@ -109,7 +109,7 @@ export async function render(res: ServerResponse, {
 		development: isDevelopment
 	}));
 
-	res.write(`<${rootElement}></${rootElement}/>`);
+	res.write(`<${rootElement}></${rootElement}>`);
 	res.write(`<textarea id="data" hidden>${JSON.stringify(data)}</textarea>`)
 
 	res.write(postAppHTML({
