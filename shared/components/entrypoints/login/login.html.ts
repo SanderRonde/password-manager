@@ -16,7 +16,7 @@ export function LoginHTML(this: Login, props: Login['props']) {
 							autoComplete="username" fill required
 							autoFocus label="Email"
 						>
-							<icon-button slot="postIcon"
+							<icon-button tabIndex="-1" slot="postIcon"
 								aria-label="Remember email"
 								title="Remember email"
 								id="lockButton"
