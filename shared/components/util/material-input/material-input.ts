@@ -17,7 +17,10 @@ import { bindToClass } from '../../../lib/decorators';
 export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, {
 	valid: {
 		args: [boolean]
-	}	
+	},
+	keydown: {
+		args: [KeyboardEvent]
+	}
 }> {
 	private _validityState: boolean = true;
 	private _maxRows: number = -1;
@@ -157,15 +160,16 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 		if (this.$.input && this.$.container) {
 			this._validityState = this.valid;
 
-			listen(this.$.input, 'keydown', () => {
+			listen(this.$.input, 'keydown', (e) => {
 				window.setTimeout(() => {
 					if (this.$.input) {
 						this.props.value = this.$.input.value;
 					}
 					if (this._validityState !== this.valid) {
 						this._validityState = this.valid;
-						this._fire('valid', [this.valid]);
+						this._fire('valid', this.valid);
 					}
+					this._fire('keydown', e)
 				}, 0);
 			});
 
