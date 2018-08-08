@@ -128,3 +128,18 @@ test('public/private key encryption returns error on invalid decrypt', t => {
 		privateKey);
 	t.is(decrypted, serverCrypto.ERRS.INVALID_DECRYPT, 'is invalid decrypt');
 });
+test('hybrid encryption works', t => {
+	const input = genRandomString(25);
+	const { publicKey } = serverCrypto.genRSAKeyPair();
+	t.notThrows(() => {
+		serverCrypto.hybridEncrypt(input, publicKey);
+	}, 'hybrid encryption can be done without error');
+});
+test('hybrid encrypted data can be decrypted', t => {
+	const input = genRandomString(25);
+	const { publicKey, privateKey } = serverCrypto.genRSAKeyPair();
+
+	const encrypted = serverCrypto.hybridEncrypt(input, publicKey);
+	const decrypted = serverCrypto.hybdridDecrypt(encrypted, privateKey);
+	t.is(decrypted, input, 'decrypted value is the same as input');
+});

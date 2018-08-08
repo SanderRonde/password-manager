@@ -1,10 +1,12 @@
 export { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms, MasterPasswordDecryptionpadding, MasterPasswordVerificationPadding, Padded } from '../../../shared/types/crypto'
 import { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms } from '../../../shared/types/crypto'
-import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey } from "../../../shared/types/db-types";
+import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey, HybridEncrypted } from "../../../shared/types/db-types";
 import { Padded, Paddings } from "../../../shared/types/crypto";
 import { JSEncrypt } from '../libraries/jsencrypt'
 import { genRandomString } from './util';
 import * as crypto from 'crypto'
+import * as aesjs from 'aes-js';
+import { Bytes } from "aes-js";
 
 export function hash<T extends string, A extends HashingAlgorithms = 'sha512'>(data: T, 
 	algorithm: A = 'sha512' as A): Hashed<T, A> {
@@ -156,3 +158,46 @@ export function genRSAKeyPair() {
 export function pad<T extends string, P extends Paddings>(data: T, padding: P): Padded<T, P> {
 	return `${data}${padding}` as Padded<T, P>;
 }
+
+export function hybridEncrypt<T, K extends InstancePublicKey|ServerPublicKey>(data: T,
+	publicKey: K): HybridEncrypted<T, K> {
+		//Generate an AES key of length 32
+		const aesKey = aesjs.utils.hex.fromBytes(new Array(32).fill(0).map(() => {
+			return Math.floor(Math.random() * 256);
+		}));
+
+		//Encrypt the AES key with the public key
+		const encryptedAESKey = encryptWithPublicKey(aesKey, publicKey);
+
+		//Encrypt the data with the AES key
+		const aes = new aesjs.ModeOfOperation.ctr(
+			aesjs.utils.hex.toBytes(aesKey));
+		const encryptedData = aes.encrypt(aesjs.utils.utf8.toBytes(
+			JSON.stringify(data)
+		));
+
+		return JSON.stringify({
+			data: aesjs.utils.hex.fromBytes(encryptedData as Bytes<Encrypted<EncodedString<T>, string>>),
+			symmetricKey: encryptedAESKey
+		});
+	}
+
+export function hybdridDecrypt<T, K extends ServerPrivateKey>(data: HybridEncrypted<T, K>,
+	privateKey: K): T|ERRS {
+		try {
+			const { symmetricKey, data: encrypted } = JSON.parse(data);
+
+			//Decrypt the key
+			const decryptedKey = decryptWithPrivateKey(symmetricKey, privateKey);
+
+			//Decrypt the data 
+			const aes = new aesjs.ModeOfOperation.ctr(
+				aesjs.utils.hex.toBytes(decryptedKey));
+			const decryptedData = aesjs.utils.utf8.fromBytes(
+				aes.decrypt(aesjs.utils.hex.toBytes(encrypted)) as Bytes<EncodedString<T>>);
+			const parsed = JSON.parse(decryptedData);
+			return parsed;
+		} catch(e) {
+			return ERRS.INVALID_DECRYPT;
+		}
+	}
