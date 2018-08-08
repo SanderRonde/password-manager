@@ -18,6 +18,7 @@ before_script:
   - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 script:
 - gulp defs
+- tsc --build --force && tsc -p shared/tsconfig.commonjs.json
 - cat server/test/tests/env.test.js
 - yarn test
 notifications:
