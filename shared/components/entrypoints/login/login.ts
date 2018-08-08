@@ -102,7 +102,7 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 	@bindToClass
 	async login() {
 		const inputData = this._getInputData();
-		if (inputData.valid === false) {
+		if (inputData.valid === false || this.$.button.getState() === 'loading') {
 			//Just do nothing
 			return;
 		}

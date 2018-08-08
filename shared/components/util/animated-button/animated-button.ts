@@ -20,6 +20,7 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 			content: PROP_TYPE.STRING
 		}
 	});
+	private _state: 'success'|'failure'|'loading'|'regular' = 'regular';
 
 	private rippleElement: HTMLElement|null = null;
 	get container() {
@@ -89,9 +90,16 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 		await wait(COLOR_FADE_TIME)
 	}
 
+	getState() {
+		return this._state;
+	}
+
 	async setState(state: 'success'|'failure'|'loading'|'regular') {
 		const STATES = ['success', 'failure', 'loading', 'regular'];
 		if (STATES.indexOf(state) === -1) throw new Error(`State "${state}" is not a valid state`);
+
+		this._state = state;
+
 		//These should run concurrently
 		return Promise.all([
 			this._setContent(state), 
