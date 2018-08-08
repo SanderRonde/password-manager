@@ -1,5 +1,6 @@
 import { decryptWithPrivateKey, ERRS, Hashed, Padded, MasterPasswordVerificationPadding } from "../../../../../../../lib/crypto";
 import { ServerPublicKey, MasterPassword, PublicKeyEncrypted } from "../../../../../../../../../shared/types/db-types";
+import { COMM_TOKEN_DEFAULT_EXPIRE_TIME } from "../../../../../../../lib/constants";
 import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ServerResponse } from "../../../modules/ratelimit";
@@ -99,7 +100,8 @@ export class RoutesAPIDashboard {
 			await this.server.Routes.API.Instance.doRegister({ 
 				email: decrypted.email,
 				password: decrypted.password,
-				public_key: public_key
+				public_key: public_key,
+				expires: COMM_TOKEN_DEFAULT_EXPIRE_TIME
 			}, res);
 		})(req, res, next);
 	}

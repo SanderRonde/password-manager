@@ -15,11 +15,12 @@ export class RoutesApiInstance {
 	constructor(public server: Webserver) { }
 
 	public async doRegister({
-		email, password, public_key
+		email, password, public_key, expires = Infinity
 	}: {
 		email: string;
 		public_key: string;
 		password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+		expires?: number
 	}, res: ServerResponse) {
 		const auth = await this.server.Router.checkEmailPassword(
 			email, password, res);
@@ -37,7 +38,7 @@ export class RoutesApiInstance {
 			public_key: this.server.database.Crypto.dbEncrypt(public_key),
 			user_id: auth._id,
 			server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey),
-			expires: Infinity
+			expires: expires
 		};
 		const result = await this.server.database.Manipulation.insertOne(
 			COLLECTIONS.INSTANCES, record);
