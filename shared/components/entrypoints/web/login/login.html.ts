@@ -1,5 +1,5 @@
-import { LockClosed } from "../../icons/lockClosed/lockClosed";
-import { LockOpen } from "../../icons/lockOpen/lockOpen";
+import { LockClosed } from "../../../icons/lockClosed/lockClosed";
+import { LockOpen } from "../../../icons/lockOpen/lockOpen";
 import { Login } from "./login";
 import { html } from "lit-html";
 

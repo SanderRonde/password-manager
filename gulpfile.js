@@ -191,8 +191,8 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 
 	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
 		gulp.parallel(...ROUTES.map((route) => {
-			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-page.js`);
-			const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}-page.js`);
+			const input = path.join(SRC_DIR, 'entrypoints/web/', route, `${route}-page.js`);
+			const output = path.join(BUILD_DIR, 'entrypoints/web/', route, `${route}-page.js`);
 
 			return dynamicFunctionNameAsync(`bundleJS${capitalize(route)}`, async () => {
 				const bundle = await rollup.rollup({

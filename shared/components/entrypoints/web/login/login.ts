@@ -1,15 +1,15 @@
-/// <reference path="../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config, listen, isNewElement, createCancellableTimeout, cancelTimeout, wait } from '../../../lib/webcomponent-util'
-import { genRSAKeyPair, encryptWithPublicKey, hash, pad } from '../../../lib/browser-crypto';
-import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
-import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
-import { AnimatedButton } from '../../util/animated-button/animated-button';
-import { MaterialInput } from '../../util/material-input/material-input';
-import { IconButton } from '../../util/icon-button/icon-button';
-import { doClientAPIRequest } from '../../../lib/apirequests';
-import { API_ERRS, APIReturns } from '../../../types/api';
-import { LoginData } from '../../../types/shared-types';
-import { bindToClass } from '../../../lib/decorators';
+/// <reference path="../../../../types/elements.d.ts" />
+import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config, listen, isNewElement, createCancellableTimeout, cancelTimeout, wait } from '../../../../lib/webcomponent-util'
+import { genRSAKeyPair, encryptWithPublicKey, hash, pad } from '../../../../lib/browser-crypto';
+import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
+import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
+import { AnimatedButton } from '../../../util/animated-button/animated-button';
+import { MaterialInput } from '../../../util/material-input/material-input';
+import { IconButton } from '../../../util/icon-button/icon-button';
+import { doClientAPIRequest } from '../../../../lib/apirequests';
+import { API_ERRS, APIReturns } from '../../../../types/api';
+import { LoginData } from '../../../../types/shared-types';
+import { bindToClass } from '../../../../lib/decorators';
 import { LoginIDMap } from './login-querymap';
 import { LoginHTML } from './login.html';
 import { LoginCSS } from './login.css';

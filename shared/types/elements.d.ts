@@ -3,7 +3,7 @@ import { VerticalCenterer } from "../components/util/vertical-centerer/vertical-
 import { AnimatedButton } from "../components/util/animated-button/animated-button";
 import { MaterialInput } from "../components/util/material-input/material-input";
 import { IconButton } from "../components/util/icon-button/icon-button";
-import { Login } from "../components/entrypoints/login/login";
+import { Login } from "../components/entrypoints/web/login/login";
 
 declare global {
 	type HTMLLoginElement = Login;

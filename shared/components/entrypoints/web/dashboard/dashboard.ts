@@ -1,4 +1,4 @@
-import { ConfigurableWebComponent, config } from "../../../lib/webcomponent-util";
+import { ConfigurableWebComponent, config } from "../../../../lib/webcomponent-util";
 import { html } from "lit-html";
 
 @config({

@@ -307,10 +307,10 @@ export const enum ROUTES {
 // 	//Convert all components to commonjs temporarily
 // 	switch (route) {
 // 		case ROUTES.LOGIN:
-// 			return (await import('../../../../../../../shared/components/entrypoints/login/login'))
+// 			return (await import('../../../../../../../shared/components/entrypoints/web/login/login'))
 // 				.Login;
 // 		case ROUTES.DASHBOARD:
-// 			return (await import('../../../../../../../shared/components/entrypoints/dashboard/dashboard'))
+// 			return (await import('../../../../../../../shared/components/entrypoints/web/dashboard/dashboard'))
 // 				.Dashboard;
 // 	}
 // }
