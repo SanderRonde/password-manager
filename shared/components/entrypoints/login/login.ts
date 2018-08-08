@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config, listen, isNewElement, createCancellableTimeout, cancelTimeout } from '../../../lib/webcomponent-util'
+import { defineProps, PROP_TYPE, isDefined, ConfigurableWebComponent, config, listen, isNewElement, createCancellableTimeout, cancelTimeout, wait } from '../../../lib/webcomponent-util'
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad } from '../../../lib/browser-crypto';
 import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
@@ -117,6 +117,9 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 	
 		cancelTimeout(this, 'failure-button');
 		this.$.button.setState('loading');
+
+		//Wait for the ripple animation to clear before doing heavy work
+		await wait(300);
 		const result = await this._doLoginRequest(inputData);	
 
 		if (result.success) {
