@@ -53,7 +53,6 @@ export async function doClientAPIRequest<K extends keyof APIFns>({ publicKey }: 
 		encrypted: encryptWithPublicKey(encrypted, publicKey)
 	} : {})};
 
-	const port = location.port.length > 0 ? `:${location.port}` : '';
-	const baseURL = `${location.protocol}://${location.host}${port}`;
+	const baseURL = `${location.protocol}//${location.host}`;
 	return doHTTPRequest(`${baseURL}${path}`, 'POST', data) as Promise<APIReturns[K]>;
 }
