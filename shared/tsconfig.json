@@ -19,6 +19,7 @@
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
         "strictNullChecks": true,
+        "importHelpers": true,
         "composite": true,
         "declaration": true,
         "sourceMap": true
