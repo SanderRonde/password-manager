@@ -50,6 +50,7 @@ function rewriteEsModuleImports(file: string): string {
 	return file	
 		.replace(/import (.*) from ['"]js-sha512['"]/g, 'import $1 from \'/modules/js-sha512\'')
 		.replace(/import (.*) from ['"]aes-js['"]/g, 'import $1 from \'/modules/aes-js\'')
+		.replace(/import (.*) from ['"]tslib['"]/g, 'import $1 from \'/modules/tslib\'')
 		.replace(/import (.*) from ['"]lit-html['"]/g, 'import $1 from \'/modules/lit-html\'')
 		.replace(/import (.*) from ['"]lit-html\/lib\/lit-extended['"]/g, 'import $1 from \'/modules/lit-html/lib/lit-extended\'');
 }
@@ -137,6 +138,15 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 		res.write(`${result};
 		const { AES, Counter, ModeOfOperation, utils, padding } = _aesJs;
 		export { AES, Counter, ModeOfOperation, utils, padding }`);
+		res.end();
+	});
+	webserver.app.all([
+		'/modules/tslib',
+		'/modules/tslib.js',
+		'/modules/tslib/tslib.js'
+	], async (_req, res) => {
+		res.contentType('.js');
+		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/tslib/tslib.es6.js')));
 		res.end();
 	});
 	webserver.app.all([
