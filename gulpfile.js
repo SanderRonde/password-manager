@@ -1,5 +1,6 @@
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonJs = require('rollup-plugin-commonjs');
+const htmlMinifier = require('html-minifier');
 const htmlTypings = require('html-typings');
 const uglify = require('uglify-es');
 const rollup = require('rollup');
@@ -191,69 +192,93 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 	const ROUTES = ['login'];
 
 	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
-		gulp.parallel(...ROUTES.map((route) => {
-			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-page.js`);
-			const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}-page.js`);
-
-			return gulp.series(
-				dynamicFunctionNameAsync(`bundleJS${capitalize(route)}`, async () => {
-					const bundle = await rollup.rollup({
-						input,
-						onwarn(warning) {
-							if (typeof warning !== 'string' && warning.loc) {
-								const line = warning.loc.line;
-								if (line === 1 || line === 7) {
-									//Typescript inserted helper method, ignore it
-									return;
-								}
-							}
-							console.log(warning);
-						},
-						plugins: [
-							rollupResolve({
-								module: true,
-								browser: true
-							}),
-							rollupCommonJs({
-								namedExports: {
-									'node_modules/js-sha512/src/sha512.js': [
-										'sha512', 
-										'sha512_256'
-									],
-									'node_modules/aes-js/index.js': [
-										'AES',
-										'Counter',
-										'ModeOfOperation',
-										'utils',
-										'padding',
-										'_arrayTest'
-									]
-								}
-							})
-						]
-					});
-
-					await bundle.write({
-						format: 'iife',
-						file: output
-					});
-				}),
-				dynamicFunctionNameAsync(`minifyJS${capitalize(route)}`, async () => {
-					const file = await fs.readFile(output, {
+		gulp.series(
+			async () => {
+				const files = await findWithGlob('shared/components/**/*.html.js');
+				await Promise.all(files.map(async (file) => {
+					const content = await fs.readFile(file, {
 						encoding: 'utf8'
 					});
-					const result = uglify.minify(file, {
-						keep_classnames: true,
-						ecma: 6
+					const startIndex = content.indexOf('`') + 1;
+					const endIndex = content.lastIndexOf('`');
+					const html = content.slice(startIndex, endIndex);
+					const minified = htmlMinifier.minify(html, {
+						collapseWhitespace: true,
+						caseSensitive: true,
+						minifyCSS: true,
+						minifyJS: true
 					});
-					if (result.error) {
-						throw result.error;
-					}
-					await fs.writeFile(output, result.code, {
+
+					const replaced = content.slice(0, startIndex) +
+						minified + content.slice(endIndex);
+					await fs.writeFile(file, replaced, {
 						encoding: 'utf8'
 					});
-				}))
-		}))));
+				}));
+			},
+			gulp.parallel(...ROUTES.map((route) => {
+				const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-page.js`);
+				const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}-page.js`);
+
+				return gulp.series(
+					dynamicFunctionNameAsync(`bundleJS${capitalize(route)}`, async () => {
+						const bundle = await rollup.rollup({
+							input,
+							onwarn(warning) {
+								if (typeof warning !== 'string' && warning.loc) {
+									const line = warning.loc.line;
+									if (line === 1 || line === 7) {
+										//Typescript inserted helper method, ignore it
+										return;
+									}
+								}
+								console.log(warning);
+							},
+							plugins: [
+								rollupResolve({
+									module: true,
+									browser: true
+								}),
+								rollupCommonJs({
+									namedExports: {
+										'node_modules/js-sha512/src/sha512.js': [
+											'sha512', 
+											'sha512_256'
+										],
+										'node_modules/aes-js/index.js': [
+											'AES',
+											'Counter',
+											'ModeOfOperation',
+											'utils',
+											'padding',
+											'_arrayTest'
+										]
+									}
+								})
+							]
+						});
+
+						await bundle.write({
+							format: 'iife',
+							file: output
+						});
+					}),
+					dynamicFunctionNameAsync(`minifyJS${capitalize(route)}`, async () => {
+						const file = await fs.readFile(output, {
+							encoding: 'utf8'
+						});
+						const result = uglify.minify(file, {
+							keep_classnames: true,
+							ecma: 6
+						});
+						if (result.error) {
+							throw result.error;
+						}
+						await fs.writeFile(output, result.code, {
+							encoding: 'utf8'
+						});
+					}))
+			})))));
 
 	gulp.task('dashboard.bundle', gulp.parallel(
 		'dashboard.bundle.js'
