@@ -522,9 +522,127 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 	}
 }
 
+interface GlobalProperties {
+	theme: 'dark'|'light';
+}
+type GlobalProp<K extends keyof GlobalProperties> = [K, GlobalProperties[K]]
+abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends WebComponentListenable<E & {
+	globalPropChange: {
+		args: GlobalProp<keyof GlobalProperties>;
+	}	
+}> {
+	private _children: Set<WebComponentHierarchyManager<any>> = new Set();
+	private _parent: WebComponentHierarchyManager<any>|null = null;
+	private _isRoot: boolean = this.hasAttribute('_root');
+	private _globalProperties: GlobalProperties = {...{
+		theme: 'light'
+	}, ...this._getGlobalProperties()}
+
+	private _getGlobalProperties() {
+		if (!this._isRoot) {
+			return {};
+		}
+
+		const props: Partial<GlobalProperties> = {};
+		for (let i = 0; i < this.attributes.length; i++) {
+			const attr = this.attributes[i];
+			if (attr.name.startsWith('prop_')) {
+				props[attr.name.slice('prop_'.length) as keyof GlobalProperties] = 
+					attr.value as GlobalProperties[keyof GlobalProperties];
+			}
+		}
+
+		return props;
+	}
+
+	connectedCallback() {
+		this._registerToParent();
+	}
+
+	@bindToClass
+	private _registerToParent() {
+		let element: HTMLElement|null = this;
+		while (element && !(element instanceof (window as any).ShadowRoot) && 
+			(element as any) !== document && !(element instanceof DocumentFragment)) {
+				element = element.parentNode as HTMLElement|null;
+			}
+
+		if (!element) {
+			//Ignore this
+			return;
+		}
+		if (<any>element === document) {
+			//This is in the light DOM, ignore it since it's the root
+			this._isRoot = true;
+			return;
+		}
+		const root = <ShadowRoot><any>element;
+		const host = root.host;
+
+		if (!(host instanceof WebComponentHierarchyManager)) {
+			return;
+		}
+
+		this._parent = host;
+		this._globalProperties = {...host.registerChild(this)};
+	}
+
+	private _clearNonExistentChildren() {
+		for (const child of this._children.values()) {
+			if (!this.shadowRoot!.contains(child)) {
+				this._children.delete(child);
+			}
+		}
+	}
+
+	public registerChild(element: WebComponentHierarchyManager<any>): GlobalProperties {
+		this._clearNonExistentChildren();
+		this._children.add(element);
+		return this._globalProperties;
+	}
+
+	private _setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
+		value: V) {
+			if (this._globalProperties[key] !== value) {
+				this._globalProperties[key] = value;
+				this._fire('globalPropChange', key, value);
+			}
+		}
+
+	protected _setGlobalPropertyFromChild<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
+		value: V) {
+			this._setGlobalProperty(key, value);
+			if (this._isRoot) {
+				for (const child of this._children) {
+					child._setGlobalPropertyFromParent(key, value);
+				}
+			} else if (this._parent) {
+				this._parent._setGlobalPropertyFromChild(key, value);
+			}
+		}
+
+	protected _setGlobalPropertyFromParent<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
+		value: V) {
+			this._setGlobalProperty(key, value);
+			for (const child of this._children) {
+				child._setGlobalPropertyFromParent(key, value);
+			}
+		}
+
+	public setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
+		value: V) {
+			this._setGlobalProperty(key, value);
+			if (this._parent) {
+				this._parent._setGlobalPropertyFromChild(key, value);
+			} else {
+				console.warn(`Failed to propagate global property "${key}" since this element has no registered parent`);
+			}
+		}
+}
+
 export abstract class WebComponent<IDS extends {
 	[key: string]: HTMLElement;
-} = {}, E extends EventListenerObj = {}> extends WebComponentListenable<E> {
+} = {}, E extends EventListenerObj = {}> extends WebComponentHierarchyManager<E> {
 	/**
 	 * An ID map containing maps between queried IDs and elements,
 	 * 	cleared upon render
@@ -584,6 +702,7 @@ export abstract class WebComponent<IDS extends {
 	 * Called when the component is mounted to the dom
 	 */
 	connectedCallback() {
+		super.connectedCallback();
 		this.renderToDOM();
 	}
 }

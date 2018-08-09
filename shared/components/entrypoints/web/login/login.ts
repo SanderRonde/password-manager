@@ -36,7 +36,10 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 	});
 
 	getData(): LoginData {
-		return JSON.parse(document.getElementById('data')!.innerText);
+		if (this._globalProperties.page !== 'login') {
+			throw new Error('Failed to get login data');
+		}
+		return this._globalProperties as LoginData;;
 	}
 
 	private async _doLoginRequest({
