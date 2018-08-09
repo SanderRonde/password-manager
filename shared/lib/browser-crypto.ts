@@ -1,16 +1,16 @@
 import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey, HybridEncrypted, PublicKeyEncrypted } from "../types/db-types";
 import { HashingAlgorithms, Hashed, ERRS, Padded, Paddings, Encrypted  } from "../types/crypto";
 import { JSEncrypt } from '../libraries/jsencrypt'
-import * as jsSha512 from 'js-sha512';
-import * as aesjs from 'aes-js';
+import { utils, ModeOfOperation } from 'aes-js';
+import { sha512, sha512_256 } from 'js-sha512';
 import { Bytes } from "aes-js";
 
 function getHashingFunction(algorithm: HashingAlgorithms) {
 	switch (algorithm) {
 		case 'sha512':
-			return jsSha512.sha512;
+			return sha512;
 		case 'sha256':
-			return jsSha512.sha512_256;
+			return sha512_256;
 	}
 	return null;
 }
@@ -82,7 +82,7 @@ export function hash<T extends string, A extends HashingAlgorithms = 'sha512'>(d
 export function hybridEncrypt<T, K extends InstancePublicKey|ServerPublicKey>(data: T,
 	publicKey: K): HybridEncrypted<T, K> {
 		//Generate an AES key of length 32
-		const aesKey = aesjs.utils.hex.fromBytes(new Array(32).fill(0).map(() => {
+		const aesKey = utils.hex.fromBytes(new Array(32).fill(0).map(() => {
 			return Math.floor(Math.random() * 256);
 		}));
 
@@ -93,14 +93,14 @@ export function hybridEncrypt<T, K extends InstancePublicKey|ServerPublicKey>(da
 		}>).data;
 
 		//Encrypt the data with the AES key
-		const aes = new aesjs.ModeOfOperation.ctr(
-			aesjs.utils.hex.toBytes(aesKey));
-		const encryptedData = aes.encrypt(aesjs.utils.utf8.toBytes(
+		const aes = new ModeOfOperation.ctr(
+			utils.hex.toBytes(aesKey));
+		const encryptedData = aes.encrypt(utils.utf8.toBytes(
 			JSON.stringify(data)
 		));
 
 		return JSON.stringify({
-			data: aesjs.utils.hex.fromBytes(encryptedData as Bytes<Encrypted<EncodedString<T>, string>>),
+			data: utils.hex.fromBytes(encryptedData as Bytes<Encrypted<EncodedString<T>, string>>),
 			symmetricKey: encryptedAESKey
 		});
 	}
@@ -117,10 +117,10 @@ export function hybdridDecrypt<T, K extends ServerPrivateKey>(data: HybridEncryp
 			}), privateKey);
 
 			//Decrypt the data 
-			const aes = new aesjs.ModeOfOperation.ctr(
-				aesjs.utils.hex.toBytes(decryptedKey));
-			const decryptedData = aesjs.utils.utf8.fromBytes(
-				aes.decrypt(aesjs.utils.hex.toBytes(encrypted)) as Bytes<EncodedString<T>>);
+			const aes = new ModeOfOperation.ctr(
+				utils.hex.toBytes(decryptedKey));
+			const decryptedData = utils.utf8.fromBytes(
+				aes.decrypt(utils.hex.toBytes(encrypted)) as Bytes<EncodedString<T>>);
 			const parsed = JSON.parse(decryptedData);
 			return parsed;
 		} catch(e) {
