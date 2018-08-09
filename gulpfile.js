@@ -214,7 +214,18 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 						}),
 						rollupCommonJs({
 							namedExports: {
-								'node_modules/js-sha512/src/sha512.js': ['sha512', 'sha512_256']
+								'node_modules/js-sha512/src/sha512.js': [
+									'sha512', 
+									'sha512_256'
+								],
+								'node_modules/aes-js/index.js': [
+									'AES',
+									'Counter',
+									'ModeOfOperation',
+									'utils',
+									'padding',
+									'_arrayTest'
+								]
 							}
 						})
 					]
