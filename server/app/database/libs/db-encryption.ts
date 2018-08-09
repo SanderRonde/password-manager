@@ -7,6 +7,7 @@ import { MockMongoDb } from "../mocks";
 
 export class DatabaseEncryption {
 	protected _obfuscatedKey: string | undefined;
+	private _keyListeners: ((key: string) => void)[] = [];
 
 	constructor(private _parent: Database) {
 		
@@ -23,8 +24,19 @@ export class DatabaseEncryption {
 			.toString('binary');
 	}
 
-	public getKey() {
-		return this._deObfuscateKey();
+	public getKey(): string;
+	public getKey(callback?: (key: string) => void): null;
+	public getKey(callback?: (key: string) => void): string|null {
+		if (callback) {
+			if (this._obfuscatedKey) {
+				callback(this._deObfuscateKey());
+			} else {
+				this._keyListeners.push(callback);
+			}
+			return null;
+		} else {
+			return this._deObfuscateKey();
+		}
 	}
 
 	public dbEncrypt<T>(data: T, 
@@ -72,6 +84,9 @@ export class DatabaseEncryption {
 
 	public setKey(key: string) {
 		this._obfuscatedKey = this._obfuscateKey(key);
+		this._keyListeners.forEach((listener) => {
+			listener(this._deObfuscateKey());
+		})
 	}
 
 	public dbDecryptPasswordRecord({ 

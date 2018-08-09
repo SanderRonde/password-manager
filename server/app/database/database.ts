@@ -59,7 +59,7 @@ export class Database {
 		if (this._initialized) {
 			return this;
 		}
-		this.mongoInstance = this._mockDb ? new MockMongoDb() : await this._connectToMongo();
+		this.mongoInstance = this._mockDb ? new MockMongoDb(this) : await this._connectToMongo();
 		this.collections = await this._getCollections();
 		this._initialized = true;
 		return this;

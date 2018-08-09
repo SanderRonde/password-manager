@@ -1,5 +1,9 @@
 import { MongoCallback, FilterQuery, CommonOptions, DeleteWriteOpResultObject, FindAndModifyWriteOpResultObject, FindOneAndReplaceOption, InsertOneWriteOpResult, CollectionInsertOneOptions, FindOneOptions } from 'mongodb';
-import { TypedObjectID } from './../../../shared/types/db-types';
+import { TypedObjectID, EncryptedAccount, MongoRecord, EncryptedInstance, EncryptedPassword } from './../../../shared/types/db-types';
+import { DEFAULT_EMAIL, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../lib/constants';
+import { encrypt, hash, pad, encryptWithSalt, genRSAKeyPair } from '../lib/crypto';
+import { genRandomString } from '../lib/util';
+import { Database } from './database';
 import * as mongo from 'mongodb'
 
 interface TypedCursor<C> {
@@ -8,13 +12,15 @@ interface TypedCursor<C> {
 }
 
 class MockCursor<C> implements TypedCursor<C> {
+	constructor(private _records: C[]) { }
+
 	toArray(): Promise<C[]>;
 	toArray(callback: MongoCallback<C[]>): void;
 	toArray(callback?: MongoCallback<C[]>): Promise<C[]>|void {
 		if (callback) {
-			callback(null!, []);
+			callback(null!, this._records);
 		} else {
-			return Promise.resolve([]);
+			return Promise.resolve(this._records);
 		}
 	}
 }
@@ -68,9 +74,130 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 	writeConcern = '';
 	readConcern = '';
 	hint = '';
-	constructor(name: string) {
+
+	private _records: any[] = [];
+	public done: Promise<any>;
+
+	constructor(private _parent: MockMongoDb, name: string) {
 		this.collectionName = name;
+		this.done = this.doDev();
 	}
+
+	private _getKey() {
+		return new Promise<string>((resolve) => {
+			this._parent.parent.Crypto.getKey((dbpw) => {
+				resolve(dbpw);
+			});
+		});
+	}
+
+	public async doDev() {
+		const name = this.collectionName;
+		if (process.env.NODE_ENV === 'development') {
+			const pw = 'defaultpassword';
+			const dbpw = await this._getKey();
+			if (name === 'users') {
+				//Create a user
+				const resetKey = genRandomString(RESET_KEY_LENGTH);
+				const user: MongoRecord<EncryptedAccount> = {
+					_id: new mongo.ObjectId() as TypedObjectID<EncryptedAccount>,
+					email: DEFAULT_EMAIL,
+					pw: encrypt(hash(pad(pw, 'masterpwverify')), dbpw,
+						ENCRYPTION_ALGORITHM),
+					twofactor_enabled: encryptWithSalt(false, dbpw, 
+						ENCRYPTION_ALGORITHM),
+					twofactor_secret: encryptWithSalt(null, dbpw, 
+						ENCRYPTION_ALGORITHM),
+					reset_key: encrypt(encrypt({
+						integrity: true as true,
+						pw: pw
+					}, resetKey, ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
+				};
+				console.log(`Created dev record with email "${
+					DEFAULT_EMAIL}" and password "${pw}"`);
+				this._records.push(user);
+			} else if (name === 'instances') {
+				let userId: TypedObjectID<EncryptedAccount>;
+				await this._parent.collection('users').done;
+				this._parent.collection('users').find().toArray((_err, userRecord) => {
+					userId = (userRecord as any)._id;
+				});
+
+				const { publicKey } = genRSAKeyPair();
+				const { privateKey } = genRSAKeyPair();
+				const instance: MongoRecord<EncryptedInstance> = {
+					_id: new mongo.ObjectId() as TypedObjectID<EncryptedInstance>,
+					twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+					public_key: encrypt(publicKey, dbpw, ENCRYPTION_ALGORITHM),
+					user_id: userId!,
+					server_private_key: encrypt(privateKey, dbpw, ENCRYPTION_ALGORITHM),
+					expires: Infinity
+				};
+				this._records.push(instance);
+			} else if (name === 'passwords') {
+				let userId: TypedObjectID<EncryptedAccount>;
+				await this._parent.collection('users').done;
+				this._parent.collection('users').find().toArray((_err, userRecord) => {
+					userId = (userRecord as any)._id;
+				});
+
+				const passwords: MongoRecord<EncryptedPassword>[] = [{
+					_id: new mongo.ObjectId() as TypedObjectID<EncryptedPassword>,
+					user_id: userId!,
+					twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+					websites: [{
+						exact: encrypt('www.google.com/login', dbpw, ENCRYPTION_ALGORITHM),
+						host: encrypt('www.google.com', dbpw, ENCRYPTION_ALGORITHM)
+					}],
+					encrypted: encrypt(encrypt({
+						username: 'someusername',
+						password: 'smepw',
+						notes: []
+					}, hash(pad(pw, 'masterpwdecrypt')),
+						ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
+				}, {
+					_id: new mongo.ObjectId() as TypedObjectID<EncryptedPassword>,
+					user_id: userId!,
+					twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+					websites: [{
+						exact: encrypt('www.reddit.com/r/random', dbpw, ENCRYPTION_ALGORITHM),
+						host: encrypt('www.reddit.com', dbpw, ENCRYPTION_ALGORITHM)
+					}],
+					encrypted: encrypt(encrypt({
+						username: 'someusername2',
+						password: 'smepw2',
+						notes: []
+					}, hash(pad(pw, 'masterpwdecrypt')),
+						ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
+				}];
+				this._records.push(...passwords);
+			}
+		}
+	}
+
+	private _getHexString(id: mongo.ObjectId|string) {
+		if (typeof id === 'string') {
+			return id;
+		}
+		return id.toHexString();
+	}
+
+	private _find<T = R>(filter: {
+		_id: TypedObjectID<T>;
+	} | mongo.FilterQuery<any>) {
+		const matches: T[] = [];
+		for (const key in filter) {
+			for (const item of this._records) {
+				if ((key === '_id' &&
+					this._getHexString(item._id) === this._getHexString(filter[key])) ||
+					filter[key as keyof typeof filter] ===item[key]) {
+						matches.push(item);
+					}
+			}
+		}
+		return matches;
+	}
+
 	findOne<T = R>(filter: {
 		_id: TypedObjectID<T>;
 	}, callback: mongo.MongoCallback<T | null>): void;
@@ -83,17 +210,18 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 	findOne<T = R>(filter: mongo.FilterQuery<R>, callback: mongo.MongoCallback<T | null>): void;
 	findOne<T = R>(filter: mongo.FilterQuery<R>, options?: mongo.FindOneOptions): Promise<T | null>;
 	findOne<T = R>(filter: mongo.FilterQuery<R>, options: mongo.FindOneOptions, callback: mongo.MongoCallback<T | null>): void;
-	findOne<T = R>(_filter: {
+	findOne<T = R>(filter: {
 		_id: TypedObjectID<T>;
 	} | mongo.FilterQuery<R>, optionsOrCallback?: mongo.MongoCallback<T | null> | mongo.FindOneOptions, callback?: mongo.MongoCallback<T | null>): void | Promise<T | null> {
+		const matches = this._find<T>(filter)[0] || null;
 		if (callback) {
-			callback(null!, null);
+			callback(null!, matches);
 		}
 		else if (typeof optionsOrCallback === 'function') {
-			optionsOrCallback(null!, null);
+			optionsOrCallback(null!, matches);
 		}
 		else {
-			return Promise.resolve(null);
+			return Promise.resolve(matches);
 		}
 	}
 	count(callback: MongoCallback<number>): void;
@@ -102,47 +230,51 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 	count(query: Object, options: mongo.MongoCountPreferences, callback: MongoCallback<number>): void;
 	count(callbackOrQuery: MongoCallback<number> | Object, callbackOrOptions?: MongoCallback<number> | mongo.MongoCountPreferences, callback?: MongoCallback<number>): Promise<number> | void {
 		if (callback) {
-			callback(null!, 0);
+			callback(null!, this._records.length);
 		}
 		else if (typeof callbackOrOptions === 'function') {
-			callbackOrOptions(null!, 0);
+			callbackOrOptions(null!, this._records.length);
 		}
 		else if (typeof callbackOrQuery === 'function') {
-			callbackOrQuery(null!, 0);
+			callbackOrQuery(null!, this._records.length);
 		}
 		else {
-			return Promise.resolve(0);
+			return Promise.resolve(this._records.length);
 		}
 	}
 	deleteMany(filter: FilterQuery<R>, callback: MongoCallback<DeleteWriteOpResultObject>): void;
 	deleteMany(filter: FilterQuery<R>, options?: CommonOptions): Promise<DeleteWriteOpResultObject>;
 	deleteMany(filter: FilterQuery<R>, options: CommonOptions, callback: MongoCallback<DeleteWriteOpResultObject>): void;
-	deleteMany(_filter: FilterQuery<R>, callbackOrOptions?: MongoCallback<DeleteWriteOpResultObject> | CommonOptions, callback?: MongoCallback<DeleteWriteOpResultObject>): Promise<DeleteWriteOpResultObject> | void {
+	deleteMany(filter: FilterQuery<R>, callbackOrOptions?: MongoCallback<DeleteWriteOpResultObject> | CommonOptions, callback?: MongoCallback<DeleteWriteOpResultObject>): Promise<DeleteWriteOpResultObject> | void {
+		const matches = this._find(filter);
+		for (const match of matches) {
+			this._records.splice(this._records.indexOf(match), 1);
+		}
 		if (callback) {
 			callback(null!, {
 				result: {
-					ok: undefined,
-					n: 0
+					ok: matches.length,
+					n: matches.length
 				},
-				deletedCount: 0
+				deletedCount: matches.length
 			});
 		}
 		else if (typeof callbackOrOptions === 'function') {
 			callbackOrOptions(null!, {
 				result: {
-					ok: undefined,
-					n: 0
+					ok: matches.length,
+					n: matches.length
 				},
-				deletedCount: 0
+				deletedCount: matches.length
 			});
 		}
 		else {
 			return Promise.resolve({
 				result: {
-					ok: undefined,
-					n: 0
+					ok: matches.length,
+					n: matches.length
 				},
-				deletedCount: 0
+				deletedCount: matches.length
 			});
 		}
 	}
@@ -150,23 +282,28 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 	deleteOne(filter: FilterQuery<R>, callback: MongoCallback<DeleteWriteOpResultObject>): void;
     deleteOne(filter: FilterQuery<R>, options?: CommonOptions & { bypassDocumentValidation?: boolean }): Promise<DeleteWriteOpResultObject>;
 	deleteOne(filter: FilterQuery<R>, options: CommonOptions & { bypassDocumentValidation?: boolean }, callback: MongoCallback<DeleteWriteOpResultObject>): void;
-	deleteOne(_filter: FilterQuery<R>, optionsOrCallback?: CommonOptions & { bypassDocumentValidation?: boolean }|MongoCallback<DeleteWriteOpResultObject>, callback?: MongoCallback<DeleteWriteOpResultObject>): Promise<DeleteWriteOpResultObject>|void {
+	deleteOne(filter: FilterQuery<R>, optionsOrCallback?: CommonOptions & { bypassDocumentValidation?: boolean }|MongoCallback<DeleteWriteOpResultObject>, callback?: MongoCallback<DeleteWriteOpResultObject>): Promise<DeleteWriteOpResultObject>|void {
+		const matches = this._find(filter);
+		for (const match of matches) {
+			this._records.splice(this._records.indexOf(match), 1);
+			break;
+		}
 		if (callback) {
 			callback(null!, {
 				result: {
-					ok: undefined
+					ok: matches.length
 				}
 			});
 		} else if (typeof optionsOrCallback === 'function') {
 			optionsOrCallback(null!, {
 				result: {
-					ok: undefined
+					ok: matches.length
 				}
 			});
 		} else {
 			return Promise.resolve({
 				result: {
-					ok: undefined
+					ok: matches.length
 				}
 			});
 		}
@@ -174,25 +311,32 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 	
 	find<T = R>(query?: FilterQuery<R>): TypedCursor<T>;
 	find<T = R>(query: FilterQuery<R>, options?: FindOneOptions): TypedCursor<T>;
-	find<T = R>(_query?: FilterQuery<R>, _options?: FindOneOptions): TypedCursor<T> {
-		return new MockCursor<T>();
+	find<T = R>(query?: FilterQuery<R>, _options?: FindOneOptions): TypedCursor<T> {
+		const matches = query ? this._find(query) : this._records;
+		return new MockCursor<T>(matches);
 	}
 
 	findOneAndUpdate(filter: FilterQuery<R>, update: Object, callback: MongoCallback<FindAndModifyWriteOpResultObject<R>>): void;
     findOneAndUpdate(filter: FilterQuery<R>, update: Object, options?: mongo.FindOneAndReplaceOption): Promise<FindAndModifyWriteOpResultObject<R>>;
 	findOneAndUpdate(filter: FilterQuery<R>, update: Object, options: FindOneAndReplaceOption, callback: MongoCallback<FindAndModifyWriteOpResultObject<R>>): void;
-	findOneAndUpdate(_filter: FilterQuery<R>, _update: Object, optionsOrCallback?: FindOneAndReplaceOption|MongoCallback<FindAndModifyWriteOpResultObject<R>>, callback?: MongoCallback<FindAndModifyWriteOpResultObject<R>>): void|Promise<FindAndModifyWriteOpResultObject<R>> {
+	findOneAndUpdate(filter: FilterQuery<R>, update: Object, optionsOrCallback?: FindOneAndReplaceOption|MongoCallback<FindAndModifyWriteOpResultObject<R>>, callback?: MongoCallback<FindAndModifyWriteOpResultObject<R>>): void|Promise<FindAndModifyWriteOpResultObject<R>> {
+		const match = this._find(filter)[0];
+		if (match) {
+			for (const key in update) {
+				(match as any)[key] = (update as any)[key];		
+			}
+		}
 		if (callback) {
 			callback(null!, {
-				ok: undefined
+				ok: match ? 1 : undefined
 			});
 		} else if (typeof optionsOrCallback === 'function') {
 			optionsOrCallback(null!, {
-				ok: undefined
+				ok: match ? 1 : undefined
 			});
 		} else {
 			return Promise.resolve({
-				ok: undefined
+				ok: match ? 1 : undefined
 			});
 		}
 	}
@@ -200,38 +344,40 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 	insertOne(docs: Object, callback: MongoCallback<InsertOneWriteOpResult>): void;
     insertOne(docs: Object, options?: CollectionInsertOneOptions): Promise<InsertOneWriteOpResult>;
 	insertOne(docs: Object, options: CollectionInsertOneOptions, callback: MongoCallback<InsertOneWriteOpResult>): void;
-	insertOne(_docs: Object, optionsOrCallback?: CollectionInsertOneOptions|MongoCallback<InsertOneWriteOpResult>, callback?: MongoCallback<InsertOneWriteOpResult>): void|Promise<InsertOneWriteOpResult> {
+	insertOne(docs: Object, optionsOrCallback?: CollectionInsertOneOptions|MongoCallback<InsertOneWriteOpResult>, callback?: MongoCallback<InsertOneWriteOpResult>): void|Promise<InsertOneWriteOpResult> {
+		const id = (docs as any)._id || new mongo.ObjectId()
+		this._records.push(docs);
 		if (callback) {
 			callback(null!, {
 				result: {
-					ok: 0,
-					n: 0
+					ok: 1,
+					n: 1
 				},
-				insertedCount: 0,
+				insertedCount: 1,
 				ops: [],
-				insertedId: new mongo.ObjectId(),
+				insertedId: id,
 				connection: ''
 			});
 		} else if (typeof optionsOrCallback === 'function') {
 			optionsOrCallback(null!, {
 				result: {
-					ok: 0,
-					n: 0
+					ok: 1,
+					n: 1
 				},
-				insertedCount: 0,
+				insertedCount: 1,
 				ops: [],
-				insertedId: new mongo.ObjectId(),
+				insertedId: id,
 				connection: ''
 			});
 		} else {
 			return Promise.resolve({
 				result: {
-					ok: 0,
-					n: 0
+					ok: 1,
+					n: 1
 				},
-				insertedCount: 0,
+				insertedCount: 1,
 				ops: [],
-				insertedId: new mongo.ObjectId(),
+				insertedId: id,
 				connection: ''
 			});
 		}
@@ -239,11 +385,24 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 }
 
 export class MockMongoDb {
+	constructor(public parent: Database) {}
+
+	private _collections: Map<string, MockMongoCollection<any>> = new Map();
+
+	private _getCollection<R>(name: string) {
+		if (this._collections.has(name)) {
+			return this._collections.get(name)!;
+		}
+		const collection = new MockMongoCollection<R>(this, name);
+		this._collections.set(name, collection);
+		return collection;
+	}
+
 	collection<R = any>(name: string): MockMongoCollection<R>;
     collection<R = any>(name: string, callback: MongoCallback<MockMongoCollection<R>>): MockMongoCollection<R>;
 	collection<R = any>(name: string, options: mongo.DbCollectionOptions, callback: MongoCallback<MockMongoCollection<R>>): MockMongoCollection<R>;
 	collection<R = any>(name: string, callbackOrOptions?: MongoCallback<MockMongoCollection<R>>|mongo.DbCollectionOptions, callback?: MongoCallback<MockMongoCollection<R>>): MockMongoCollection<R> {
-		const collection = new MockMongoCollection<R>(name);
+		const collection = this._getCollection<R>(name);
 		if (callback) {
 			callback(null!, collection);
 		} else if (typeof callbackOrOptions === 'function') {
