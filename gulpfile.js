@@ -1,6 +1,7 @@
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonJs = require('rollup-plugin-commonjs');
 const htmlTypings = require('html-typings');
+const uglify = require('uglify-es');
 const rollup = require('rollup');
 const fs = require('fs-extra');
 const gulp = require('gulp');
@@ -20,18 +21,18 @@ function genTask(description, toRun) {
 	return toRun;
 }
 
-// /**
-//  * Generates a function with a dynamic name
-//  * 
-//  * @param {string} name - The name of the function
-//  * @param {Function} target - The content of the function
-//  * 
-//  * @returns {(done: (error?: any) => void) => any} The function with the new name
-//  */
-// function dynamicFunctionName(name, target) {
-// 	const fn = new Function('target', `return function ${name}(){ return target() }`);
-// 	return fn(target);
-// }
+/**
+ * Generates a function with a dynamic name
+ * 
+ * @param {string} name - The name of the function
+ * @param {Function} target - The content of the function
+ * 
+ * @returns {(done: (error?: any) => void) => any} The function with the new name
+ */
+function dynamicFunctionName(name, target) {
+	const fn = new Function('target', `return function ${name}(){ return target() }`);
+	return fn(target);
+}
 
 /**
  * Generates an async function with a dynamic name
@@ -194,48 +195,64 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 			const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-page.js`);
 			const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}-page.js`);
 
-			return dynamicFunctionNameAsync(`bundleJS${capitalize(route)}`, async () => {
-				const bundle = await rollup.rollup({
-					input,
-					onwarn(warning) {
-						if (typeof warning !== 'string' && warning.loc) {
-							const line = warning.loc.line;
-							if (line === 1 || line === 7) {
-								//Typescript inserted helper method, ignore it
-								return;
+			return gulp.series(
+				dynamicFunctionNameAsync(`bundleJS${capitalize(route)}`, async () => {
+					const bundle = await rollup.rollup({
+						input,
+						onwarn(warning) {
+							if (typeof warning !== 'string' && warning.loc) {
+								const line = warning.loc.line;
+								if (line === 1 || line === 7) {
+									//Typescript inserted helper method, ignore it
+									return;
+								}
 							}
-						}
-						console.log(warning);
-					},
-					plugins: [
-						rollupResolve({
-							module: true,
-							browser: true
-						}),
-						rollupCommonJs({
-							namedExports: {
-								'node_modules/js-sha512/src/sha512.js': [
-									'sha512', 
-									'sha512_256'
-								],
-								'node_modules/aes-js/index.js': [
-									'AES',
-									'Counter',
-									'ModeOfOperation',
-									'utils',
-									'padding',
-									'_arrayTest'
-								]
-							}
-						})
-					]
-				});
+							console.log(warning);
+						},
+						plugins: [
+							rollupResolve({
+								module: true,
+								browser: true
+							}),
+							rollupCommonJs({
+								namedExports: {
+									'node_modules/js-sha512/src/sha512.js': [
+										'sha512', 
+										'sha512_256'
+									],
+									'node_modules/aes-js/index.js': [
+										'AES',
+										'Counter',
+										'ModeOfOperation',
+										'utils',
+										'padding',
+										'_arrayTest'
+									]
+								}
+							})
+						]
+					});
 
-				await bundle.write({
-					format: 'iife',
-					file: output
-				});
-			});
+					await bundle.write({
+						format: 'iife',
+						file: output
+					});
+				}),
+				dynamicFunctionNameAsync(`minifyJS${capitalize(route)}`, async () => {
+					const file = await fs.readFile(output, {
+						encoding: 'utf8'
+					});
+					const result = uglify.minify(file, {
+						keep_classnames: true,
+						ecma: 6
+					});
+					if (result.error) {
+						throw result.error;
+					}
+					await fs.writeFile(output, result.code, {
+						encoding: 'utf8'
+					});
+				}))
 		}))));
 
 	gulp.task('dashboard.bundle', gulp.parallel(
