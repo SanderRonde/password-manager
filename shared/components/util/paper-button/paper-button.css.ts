@@ -1,5 +1,6 @@
+import { createThemedRules, forEachTheme, changeOpacity } from '../../../lib/webcomponent-util';
+import { theme } from '../../theming/theme/theme';
 import { html } from "lit-html";
-import { createThemedRules } from '../../../lib/webcomponent-util';
 
 export const PaperButtonCSS = html`<style>
 	/**
@@ -50,10 +51,10 @@ export const PaperButtonCSS = html`<style>
 	.mdl-button:focus:not(:active) {
 		background-color: rgba(0,0,0, 0.12);
 	}
-	${createThemedRules('.mdl-button:active', {
+	${createThemedRules('.mdl-button:active', { 
 		backgroundColor: ['primary', 'main']
 	})}
-	${createThemedRules('.mdl-button.mdl-button--colored', {
+	${createThemedRules('.mdl-button.mdl-button--colored', { 
 		color: ['primary', 'main']
 	})}
 	.mdl-button.mdl-button--colored:focus:not(:active) {
@@ -64,45 +65,46 @@ export const PaperButtonCSS = html`<style>
 		-webkit-appearance: none;
 	}
 
-	.mdl-button--raised {
+	${createThemedRules('.mdl-button--raised', {
+		background: ['primary', 'main'],
+		color: ['textOnNonbackground']
+	})}
+	.mdl-button--raised
 		box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 	}
-	${createThemedRules('.mdl-button--raised', {
-		background: ['primary', 'main']
-	})}
-	${createThemedRules('.mdl-button--raised', {
+	${createThemedRules('.mdl-button--raised:active', { 
+		backgroundColor: ['primary', 'main'],
 		color: ['textOnNonbackground']
 	})}
-	.mdl-button--raised:active {
+	.mdl-button--raised:active
 		box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 	}
-	${createThemedRules('.mdl-button--raised:active', {
+	${createThemedRules('.mdl-button--raised:focus:not(:active)', { 
 		backgroundColor: ['primary', 'main'],
 		color: ['textOnNonbackground']
 	})}
-	.mdl-button--raised:focus:not(:active) {
+	.mdl-button--raised:focus:not(:active)
 		box-shadow: 0 0 8px rgba(0, 0, 0, 0.18), 0 8px 16px rgba(0, 0, 0, 0.36);
 	}
-	${createThemedRules('.mdl-button--raised:focus:not(:active)', {
-		backgroundColor: ['primary', 'main'],
-		color: ['textOnNonbackground']
-	})}
-	${createThemedRules('.mdl-button--raised.mdl-button--colored', {
-		'background': ['primary', 'main'],
+	${createThemedRules('.mdl-button--raised.mdl-button--colored', { 
+		background: ['primary', 'main'],
 		color: ['textOnNonbackground']
 	})}
 	${createThemedRules([
 		'.mdl-button--raised.mdl-button--colored:hover',
 		'.mdl-button--raised.mdl-button--colored:active',
 		'.mdl-button--raised.mdl-button--colored:focus:not(:active)'
-	], {
+	], { 
 		backgroundColor: ['primary', 'main']
 	})}
-	.mdl-button--raised.mdl-button--colored .mdl-ripple {
-		background: rgb(255,255,255);
-	}
+	${createThemedRules('.mdl-button--raised.mdl-button--colored .mdl-ripple', { 
+		background: ['textOnNonbackground']
+	})}
 
-	.mdl-button--fab {
+	${createThemedRules('.mdl-button--fab', { 
+		background: ['primary', 'weak']
+	})}
+	.mdl-button--fab
 		border-radius: 50%;
 		font-size: 24px;
 		height: 56px;
@@ -115,9 +117,6 @@ export const PaperButtonCSS = html`<style>
 		position: relative;
 		line-height: normal;
 	}
-	${createThemedRules('.mdl-button--fab', {
-		background: ['primary', 'weak']
-	})}
 	.mdl-button--fab .material-icons {
 		position: absolute;
 		top: 50%;
@@ -135,19 +134,19 @@ export const PaperButtonCSS = html`<style>
 		border-radius: 50%;
 		-webkit-mask-image: -webkit-radial-gradient(circle, white, black);
 	}
-	.mdl-button--fab:active {
-		box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-	}
-	.mdl-button--fab:focus:not(:active) {
-		box-shadow: 0 0 8px rgba(0, 0, 0, 0.18), 0 8px 16px rgba(0, 0, 0, 0.36);
-	}
-	${createThemedRules([
-		'.mdl-button--fab:active',
-		'.mdl-button--fab:focus:not(:active)'
-	], {
+	${createThemedRules('.mdl-button--fab:active', { 
 		backgroundColor: ['primary', 'main']
 	})}
-	${createThemedRules('.mdl-button--fab.mdl-button--colored', {
+	.mdl-button--fab:active
+		box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+	}
+	${createThemedRules('.mdl-button--fab:focus:not(:active)', { 
+		backgroundColor: ['primary', 'main']
+	})}
+	.mdl-button--fab:focus:not(:active)
+		box-shadow: 0 0 8px rgba(0, 0, 0, 0.18), 0 8px 16px rgba(0, 0, 0, 0.36);
+	}
+	${createThemedRules('.mdl-button--fab.mdl-button--colored', { 
 		background: ['accent', 'main'],
 		color: ['textOnNonbackground']
 	})}
@@ -155,12 +154,12 @@ export const PaperButtonCSS = html`<style>
 		'.mdl-button--fab.mdl-button--colored:hover',
 		'.mdl-button--fab.mdl-button--colored:focus:not(:active)',
 		'.mdl-button--fab.mdl-button--colored:active'
-	], {
+	], { 
 		backgroundColor: ['accent', 'main']
 	})}
-	.mdl-button--fab.mdl-button--colored .mdl-ripple {
-		background: rgb(255,255,255);
-	}
+	${createThemedRules('.mdl-button--fab.mdl-button--colored .mdl-ripple', { 
+		background: ['textOnNonbackground']
+	})}
 
 	.mdl-button--icon {
 		border-radius: 50%;
@@ -211,50 +210,55 @@ export const PaperButtonCSS = html`<style>
 		background-color: transparent;
 	}
 
-	${createThemedRules('.mdl-button--primary.mdl-button--primary ', {
+	${createThemedRules('.mdl-button--primary.mdl-button--primary', { 
 		color: ['primary', 'main']
 	})}
-	${createThemedRules('.mdl-button--primary.mdl-button--primary .mdl-ripple ', {
+	${createThemedRules('.mdl-button--primary.mdl-button--primary .mdl-ripple', { 
 		background: ['textOnNonbackground']
 	})}
-	${createThemedRules('.mdl-button--primary.mdl-button--primary.mdl-button--raised, .mdl-button--primary.mdl-button--primary.mdl-button--fab ', {
+	${createThemedRules('.mdl-button--primary.mdl-button--primary.mdl-button--raised, .mdl-button--primary.mdl-button--primary.mdl-button--fab', { 
 		color: ['textOnNonbackground'],
 		backgroundColor: ['primary', 'main']
 	})}
-	${createThemedRules('.mdl-button--accent.mdl-button--accent ', {
+
+	${createThemedRules('.mdl-button--accent.mdl-button--accent', { 
 		color: ['accent', 'main']
 	})}
-	${createThemedRules('.mdl-button--accent.mdl-button--accent .mdl-ripple ', {
+	${createThemedRules('.mdl-button--accent.mdl-button--accent .mdl-ripple', { 
 		background: ['textOnNonbackground']
 	})}
-	${createThemedRules('.mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab ', {
+	${createThemedRules('.mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab', { 
 		color: ['textOnNonbackground'],
 		backgroundColor: ['accent', 'main']
 	})}
 
 	.mdl-button[disabled][disabled], .mdl-button.mdl-button--disabled.mdl-button--disabled {
-		color: rgba(0,0,0, 0.26);
 		cursor: default;
 		background-color: transparent;
 	}
-	.mdl-button--fab[disabled][disabled], .mdl-button--fab.mdl-button--disabled.mdl-button--disabled {
-		background-color: rgba(0,0,0, 0.12);
-		color: rgba(0,0,0, 0.26);
-	}
 	.mdl-button--raised[disabled][disabled], .mdl-button--raised.mdl-button--disabled.mdl-button--disabled {
-		background-color: rgba(0,0,0, 0.12);
-		color: rgba(0,0,0, 0.26);
 		box-shadow: none;
 	}
-	.mdl-button--colored[disabled][disabled], .mdl-button--colored.mdl-button--disabled.mdl-button--disabled {
-		color: rgba(0,0,0, 0.26);
-	}
+	${forEachTheme((themeName, prefix) => {
+		return [
+			`${prefix} .mdl-button[disabled][disabled], .mdl-button.mdl-button--disabled.mdl-button--disabled {
+				color: ${changeOpacity(theme[themeName].textOnBackground, 26)};
+			}`,
+			`${prefix} .mdl-button--fab[disabled][disabled], .mdl-button--fab.mdl-button--disabled.mdl-button--disabled,
+			 ${prefix} .mdl-button--raised[disabled][disabled], .mdl-button--raised.mdl-button--disabled.mdl-button--disabled {
+				background-color: ${changeOpacity(theme[themeName].textOnBackground, 12)};
+				color: ${changeOpacity(theme[themeName].textOnBackground, 26)};
+			}`,
+			`${prefix} .mdl-button--colored[disabled][disabled], .mdl-button--colored.mdl-button--disabled.mdl-button--disabled {
+				color: ${changeOpacity(theme[themeName].textOnBackground, 26)}
+			}`
+		].join(' ');
+	})}
 
 	.mdl-button .material-icons {
 		vertical-align: middle;
 	}
 	.mdl-ripple {
-		background: rgb(0,0,0);
 		border-radius: 50%;
 		height: 50px;
 		left: 0;
@@ -266,6 +270,9 @@ export const PaperButtonCSS = html`<style>
 		width: 50px;
 		overflow: hidden;
 	}
+	${createThemedRules('.mdl-ripple', {
+		color: ['textOnBackground']
+	})}
 	.mdl-ripple.is-animating {
 		transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1), 
 			width 0.3s cubic-bezier(0, 0, 0.2, 1), 
