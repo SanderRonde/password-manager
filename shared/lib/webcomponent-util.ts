@@ -542,7 +542,7 @@ function createRulesForTheme(themeName: VALID_THEMES_T, rules: string|string[],
 		]|[
 			Exclude<keyof Theme, 'primary'|'accent'>
 		]
-	}>, themePrefix: string = `:host(.${themeName}) `): string {
+	}>, hostCSS: string, themePrefix: string = `:host(.${themeName}${hostCSS}) `): string {
 		return (Array.isArray(rules) ? rules : [rules]).map((rule) => {
 			return createRule(`${themePrefix}${rule}`,
 				Object.getOwnPropertyNames(props).map((property) => {
@@ -561,9 +561,9 @@ export function createThemedRules(rules: string|string[], props: Partial<{
 	]|[
 		Exclude<keyof Theme, 'primary'|'accent'>
 	]
-}>): string {
-	return [createRulesForTheme(defaultTheme, rules, props, ''),
+}>, host: string = ''): string {
+	return [createRulesForTheme(defaultTheme, rules, props, host, ''),
 		...Object.getOwnPropertyNames(theme).map((themeName: VALID_THEMES_T) => {
-			return createRulesForTheme(themeName, rules, props);	
+			return createRulesForTheme(themeName, rules, props, host);	
 		})].join('');
 }
