@@ -908,8 +908,12 @@ export function getCookie(name: string) {
     return "";
 }
 
-function createSingleRule(rule: string, property: string, value: string) {
-	return `${rule} { ${casingToDashes(property)}: ${value}; }`;
+function createProperty(property: string, value: string) {
+	return `${property}: ${value};`
+}
+
+function createRule(rule: string, properties: string) {
+	return `${rule} { ${properties} }`;
 }
 
 function getArrColor(themeName: keyof typeof theme, arr: [
@@ -924,6 +928,25 @@ function getArrColor(themeName: keyof typeof theme, arr: [
 	return theme[themeName][arr[0] as Exclude<keyof Theme, 'primary'|'accent'>];
 }
 
+function createRulesForTheme(themeName: keyof typeof theme, rules: string|string[], 
+	props: Partial<{
+		[P in keyof CSSStyleDeclaration]: [
+			'primary'|'accent',
+			keyof Theme['primary'|'accent']
+		]|[
+			Exclude<keyof Theme, 'primary'|'accent'>
+		]
+	}>, themePrefix: string = `:host(.${themeName}) `): string {
+		return (Array.isArray(rules) ? rules : [rules]).map((rule) => {
+			return createRule(`${themePrefix}${rule}`,
+				Object.getOwnPropertyNames(props).map((property) => {
+					const colorArr = props[property as keyof typeof props]!;
+					const color = getArrColor(themeName as keyof typeof theme, colorArr)
+					return createProperty(property, color);
+				}).join(' '));
+		}).join('');
+	}
+
 export function createThemedRules(rules: string|string[], props: Partial<{
 	[P in keyof CSSStyleDeclaration]: [
 		'primary'|'accent',
@@ -932,18 +955,8 @@ export function createThemedRules(rules: string|string[], props: Partial<{
 		Exclude<keyof Theme, 'primary'|'accent'>
 	]
 }>): string {
-	let cssString: string = '';
-	for (const rule of Array.isArray(rules) ? rules : [rules]) {
-		for (const property in props) {
-			const colorArr = props[property as keyof typeof props]!;
-			cssString += createSingleRule(rule, property,
-				getArrColor('light', colorArr));
-			for (const themeName in theme) {
-				const color = getArrColor(themeName as keyof typeof theme, colorArr)
-				cssString += createSingleRule(`:host(.${themeName}) ${rule}`, property,
-					color);
-			}
-		}
-	}
-	return cssString;
+	return [createRulesForTheme('light', rules, props, ''),
+		...Object.getOwnPropertyNames(theme).map((themeName: keyof typeof theme) => {
+			return createRulesForTheme(themeName, rules, props);	
+		})].join('');
 }
