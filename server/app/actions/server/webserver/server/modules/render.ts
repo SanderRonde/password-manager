@@ -1,3 +1,4 @@
+import { GlobalProperties } from '../../../../../../../shared/lib/webcomponent-util';
 import { DEVELOPMENT_SERVE_PATHS, PRODUCTION_SERVE_PATHS } from '../webserver';
 import { preAppHTML, postAppHTML, DEFAULT_FILES } from '../../client/html';
 import { ServerResponse } from './ratelimit';
@@ -85,12 +86,10 @@ function pushAll(res: ServerResponse, arr: string[]): Promise<void[]> {
 	}));
 }
 
-export async function render<D = {
-	[key: string]: string;
-}>(res: ServerResponse, {
+export async function render(res: ServerResponse, {
 	title, script, isDevelopment, data, rootElement
 }: {
-	data: D;
+	data: GlobalProperties;
 	title: string;
 	script: string;
 	rootElement: string;
@@ -113,7 +112,7 @@ export async function render<D = {
 
 	const propStr: string[] = [];
 	for (const key in data) {
-		const value = data[key];
+		const value = data[key as keyof GlobalProperties];
 		propStr.push(`prop_${key}="${value}"`);
 	}
 	res.write(`<${rootElement} _root ${propStr.join(' ')}></${rootElement}>`);

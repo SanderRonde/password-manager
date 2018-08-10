@@ -525,7 +525,7 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 	}
 }
 
-type GlobalProperties = {
+export type GlobalProperties = {
 	theme: 'dark'|'light';
 } & Partial<(({
 	page: 'login';

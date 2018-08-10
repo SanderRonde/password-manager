@@ -1,5 +1,7 @@
 import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../../../shared/types/db-types";
 import { Hashed, Padded, MasterPasswordVerificationPadding, decryptWithPrivateKey, ERRS } from "../../../../../lib/crypto";
+import { VALID_THEMES } from '../../../../../../../shared/components/theming/theme/theme'
+import { DEFAULT_THEME } from "../../../../../../../shared/lib/shared-constants";
 import { getStores, ServerResponse, APIResponse } from "./ratelimit";
 import { APIToken } from "../../../../../../../shared/types/crypto";
 import { API_ERRS } from "../../../../../../../shared/types/api";
@@ -348,6 +350,23 @@ export class WebserverRouter {
 			}
 		}
 		return true;
+	}
+
+	private readonly _NEXT_MILLENIUM = new Date(Date.now() + (60 * 60 * 1000 * 24 * 365.25 * 1000));
+	public getTheme(req: express.Request, res: ServerResponse): VALID_THEMES {
+		const { theme } = req.cookies;
+		if (theme) {
+			if (VALID_THEMES.indexOf(theme) !== -1) {
+				return theme;
+			} else {
+				//Set the cookie again
+				res.cookie('theme', DEFAULT_THEME, {
+					expires: this._NEXT_MILLENIUM,
+					path: '/'
+				});
+			}
+		}
+		return DEFAULT_THEME;
 	}
 
 	private _wrapInErrorHandler(fn: (req: express.Request, res: ServerResponse, next: express.NextFunction) => any) {

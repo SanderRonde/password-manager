@@ -1,4 +1,3 @@
-import { LoginData } from '../../../../../../../../shared/types/shared-types';
 import { ServerResponse } from "../../modules/ratelimit";
 import { render } from "../../modules/render";
 import { Webserver } from "../../webserver";
@@ -33,16 +32,18 @@ export class RoutesDashboard {
 		}
 	};
 
-	public async login(_req: express.Request, res: ServerResponse) {
+	public async login(req: express.Request, res: ServerResponse) {
 		const {
 			token, publicKey
 		} = this.server.Auth.genDashboardCommToken();
 
 		await render(res, {
 			data: {
+				page: 'login',
+				theme: this.server.Router.getTheme(req, res),
 				comm_token: token,
 				server_public_key: publicKey
-			} as LoginData,
+			},
 			rootElement: 'login-page',
 			script: 'entrypoints/login/login-page.js',
 			title: 'Log in to your dashboard',
@@ -56,7 +57,10 @@ export class RoutesDashboard {
 		}
 
 		await render(res, {
-			data: {},
+			data: {
+				page: 'dashboard',
+				theme: this.server.Router.getTheme(req, res)
+			},
 			rootElement: 'dashboard-page',
 			script: 'entrypoints/dashboard/dashboard-page.js',
 			title: 'Your Dashboard',
