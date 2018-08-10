@@ -67,9 +67,11 @@ export interface Theme {
 	background: string
 }
 
+export type VALID_THEMES = 'light'|'dark';
+export const VALID_THEMES: VALID_THEMES[] = ['light', 'dark'];
+
 export const theme: {
-	light: Theme;
-	dark: Theme;
+	[T in VALID_THEMES]: Theme;
 } = {
 	light: {
 		primary: {

@@ -1,7 +1,8 @@
+import { theme, Theme, VALID_THEMES } from '../components/theming/theme/theme';
+import { DEFAULT_THEME } from './shared-constants';
+import { LoginData } from '../types/shared-types';
 import { TemplateResult, render } from "lit-html";
 import { bindToClass } from "./decorators";
-import { LoginData } from '../types/shared-types';
-import { theme, Theme } from '../components/theming/theme/theme';
 
 // From https://github.com/JedWatson/classnames
 
@@ -659,9 +660,8 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 		});
 	}
 
-	private readonly _themes: (keyof typeof theme)[] = ['light', 'dark'];
 	private _setTheme(theme: GlobalProperties['theme']) {
-		for (const otherTheme of this._themes) {
+		for (const otherTheme of VALID_THEMES) {
 			this.classList.remove(otherTheme);
 		}
 		this.classList.add(theme);
@@ -916,7 +916,7 @@ function createRule(rule: string, properties: string) {
 	return `${rule} { ${properties} }`;
 }
 
-function getArrColor(themeName: keyof typeof theme, arr: [
+function getArrColor(themeName: VALID_THEMES, arr: [
 	'primary'|'accent',
 	keyof Theme['primary'|'accent']
 ]|[
@@ -928,7 +928,7 @@ function getArrColor(themeName: keyof typeof theme, arr: [
 	return theme[themeName][arr[0] as Exclude<keyof Theme, 'primary'|'accent'>];
 }
 
-function createRulesForTheme(themeName: keyof typeof theme, rules: string|string[], 
+function createRulesForTheme(themeName: VALID_THEMES, rules: string|string[], 
 	props: Partial<{
 		[P in keyof CSSStyleDeclaration]: [
 			'primary'|'accent',
@@ -941,7 +941,7 @@ function createRulesForTheme(themeName: keyof typeof theme, rules: string|string
 			return createRule(`${themePrefix}${rule}`,
 				Object.getOwnPropertyNames(props).map((property) => {
 					const colorArr = props[property as keyof typeof props]!;
-					const color = getArrColor(themeName as keyof typeof theme, colorArr)
+					const color = getArrColor(themeName as VALID_THEMES, colorArr)
 					return createProperty(property, color);
 				}).join(' '));
 		}).join('');
@@ -955,8 +955,8 @@ export function createThemedRules(rules: string|string[], props: Partial<{
 		Exclude<keyof Theme, 'primary'|'accent'>
 	]
 }>): string {
-	return [createRulesForTheme('light', rules, props, ''),
-		...Object.getOwnPropertyNames(theme).map((themeName: keyof typeof theme) => {
+	return [createRulesForTheme(DEFAULT_THEME, rules, props, ''),
+		...Object.getOwnPropertyNames(theme).map((themeName: VALID_THEMES) => {
 			return createRulesForTheme(themeName, rules, props);	
 		})].join('');
 }
