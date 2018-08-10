@@ -567,3 +567,87 @@ export function createThemedRules(rules: string|string[], props: Partial<{
 			return createRulesForTheme(themeName, rules, props, host);	
 		})].join('');
 }
+
+export function forEachTheme(callback: (themeName: VALID_THEMES_T, themePrefix: string) => string): string {
+	return [callback(defaultTheme, ''),
+		...Object.getOwnPropertyNames(theme).map((themeName: VALID_THEMES_T) => {
+			return callback(themeName, `:host(.${themeName}) `);
+		})].join('\n');
+};
+
+interface ColorRepresentation {
+	r: number;
+	g: number;
+	b: number;
+	a: number;
+}
+
+const HEX_REGEX = /#([a-fA-F\d]{2})([a-fA-F\d]{2})([a-fA-F\d]{2})/;
+const HEX_ALPHA_REGEX = /#([a-fA-F\d]{2})([a-fA-F\d]{2})([a-fA-F\d]{2})([a-fA-F\d]{2})/;
+const RGB_REGEX = /rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\s*\)/;
+const RGBA_REGEX = /rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d\.)?(\d+)\s*\)/;
+const BLACK: ColorRepresentation = {
+	r: 0,
+	g: 0,
+	b: 0,
+	a: 100
+};
+function getColorRepresentation(color: string): ColorRepresentation {
+	if (color.startsWith('#') && HEX_ALPHA_REGEX.exec(color)) {
+		const match = HEX_ALPHA_REGEX.exec(color);
+		if (!match) return BLACK;
+
+		const [ , a, r, g, b ] = match;
+		return {
+			r: parseInt(r, 16),
+			g: parseInt(g, 16),
+			b: parseInt(b, 16),
+			a: parseInt(a, 16) / 256
+		}
+	} else if (color.startsWith('#')) {
+		const match = HEX_REGEX.exec(color);
+		if (!match) return BLACK;
+
+		const [ , r, g, b ] = match;
+		return {
+			r: parseInt(r, 16),
+			g: parseInt(g, 16),
+			b: parseInt(b, 16),
+			a: 100
+		}
+	} else if (color.startsWith('rgba')) {
+		const match = RGBA_REGEX.exec(color);
+		if (!match) return BLACK;
+
+		const [ , r, g, b, preDot, postDot ] = match;
+		return {
+			r: parseInt(r, 10),
+			g: parseInt(g, 10),
+			b: parseInt(b, 10),
+			a: preDot ? parseInt(postDot, 10) : 100
+		}
+	} else if (color.startsWith('rgb')) {
+		const match = RGB_REGEX.exec(color);
+		if (!match) return BLACK;
+
+		const [ , r, g, b ] = match;
+		return {
+			r: parseInt(r, 10),
+			g: parseInt(g, 10),
+			b: parseInt(b, 10),
+			a: 100
+		}
+	}
+	return BLACK;
+}
+
+function toStringColor(color: ColorRepresentation) {
+	return `rgba(${color.r}, ${color.g}, ${color.b}, ${
+		color.a === 100 ? '1' : `0.${color.a}`	
+	})`;
+}
+
+export function changeOpacity(color: string, opacity: number) {
+	const colorRepr = getColorRepresentation(color);
+	return toStringColor({...colorRepr, a: opacity});
+}

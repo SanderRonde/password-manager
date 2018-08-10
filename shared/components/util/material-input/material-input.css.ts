@@ -1,5 +1,6 @@
-import { createThemedRules } from '../../../lib/webcomponent-util';
+import { createThemedRules, forEachTheme, changeOpacity } from '../../../lib/webcomponent-util';
 import { html } from "lit-html";
+import { theme } from '../../theming/theme/theme';
 
 export const MaterialInputCSS = html`<style>
 	/** From https://github.com/google/material-design-lite/blob/mdl-1.x/src/textfield/_textfield.scss */
@@ -62,13 +63,10 @@ export const MaterialInputCSS = html`<style>
 
 	.iconSlot {
 		display: inline-block;
-		border-bottom: 1px solid rgba(0,0,0, 0.12);
 		margin-top: -10px;
 	}
-
 	.mdl-textfield__input {
 		border: none;
-		border-bottom: 1px solid rgba(0,0,0, 0.12);
 		display: inline-block;
 		font-size: 18px;
 		font-family: "Helvetica", "Arial", sans-serif;
@@ -79,6 +77,19 @@ export const MaterialInputCSS = html`<style>
 		text-align: left;
 		color: inherit;
 	}
+	${forEachTheme((themeName, prefix) => {
+		return [
+			`${prefix} .iconSlot {
+				border-bottom: 1px solid ${changeOpacity(theme[themeName].textOnBackground,
+					12)};
+			}`, 
+			`${prefix} .mdl-textfield__input {
+				border-bottom: 1px solid ${changeOpacity(theme[themeName].textOnBackground,
+					12)};
+			}`
+		].join(' ');
+	})}
+
 	.mdl-textfield__input[type=number] {
 		-moz-appearance: textfield;
 	}
@@ -103,8 +114,13 @@ export const MaterialInputCSS = html`<style>
 	})}
 	fieldset[disabled] .mdl-textfield .mdl-textfield__input, .mdl-textfield.is-disabled .mdl-textfield__input {
 		background-color: transparent;
-		border-bottom: 1px dotted rgba(0,0,0, 0.12);
 	}
+	${forEachTheme((themeName, prefix) => {
+		return `${prefix} fieldset[disabled] .mdl-textfield .mdl-textfield__input, .mdl-textfield.is-disabled .mdl-textfield__input {
+			border-bottom: 1px dotted ${changeOpacity(theme[themeName].textOnBackground,
+				12)};
+		}`
+	})}
 	${createThemedRules('fieldset[disabled] .mdl-textfield .mdl-textfield__input, .mdl-textfield.is-disabled .mdl-textfield__input', {
 		color: ['minOppositeColorText']
 	})}
