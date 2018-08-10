@@ -238,7 +238,11 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		}
 
 		this._parent = host;
-		this._globalProperties = {...host.registerChild(this)};
+		const newProps = {...host.registerChild(this)};
+		for (const key in newProps) {
+			this._setGlobalProperty(key as keyof typeof newProps, 
+				newProps[key as keyof typeof newProps]);
+		}
 	}
 
 	private _clearNonExistentChildren() {
