@@ -111,8 +111,12 @@ export async function render<D = {
 		development: isDevelopment
 	}));
 
-	res.write(`<${rootElement}></${rootElement}>`);
-	res.write(`<textarea id="data" hidden>${JSON.stringify(data)}</textarea>`)
+	const propStr: string[] = [];
+	for (const key in data) {
+		const value = data[key];
+		propStr.push(`prop_${key}="${value}"`);
+	}
+	res.write(`<${rootElement} _root ${propStr.join(' ')}></${rootElement}>`);
 
 	res.write(postAppHTML({
 		script

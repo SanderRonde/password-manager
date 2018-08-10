@@ -1,4 +1,4 @@
-interface Theme {
+export interface Theme {
 	/**
 	 * The primary color
 	 */
@@ -31,11 +31,15 @@ interface Theme {
 		/**
 		 * The lighter version of the accent color
 		 */
-		light: string,
+		weak: string,
+		/**
+		 * The even lighter version that appears when you hover over it
+		 */
+		hover: string,
 		/**
 		 * The darker version of the accent color
 		 */
-		dark: string
+		heavy: string
 	},
 	/**
 	 * The color of error messages
@@ -46,17 +50,17 @@ interface Theme {
 	 */
 	success: string,
 	/**
-	 * The greyest possible text that still fits the contrast spec on a white background
+	 * The greyest possible text that still fits the contrast spec on this theme's background
 	 */
 	minOppositeColorText: string,
 	/**
-	 * Regular black text on a white background
+	 * Regular black text on this theme's background color
 	 */
-	textOnWhite: string,
+	textOnBackground: string,
 	/**
-	 * Regular white text on a black background
+	 * Regular white text on the opposite of this theme's background color
 	 */
-	textOnBlack: string,
+	textOnNonbackground: string,
 	/**
 	 * The default page background color
 	 */
@@ -76,14 +80,15 @@ export const theme: {
 		},
 		accent: {
 			main: '#7B1FA2',
-			light: '#AE52D4',
-			dark: '#4A0072'
+			weak: '#AE52D4',
+			hover: '#AE52D4',
+			heavy: '#4A0072'
 		},
 		error: '#F44336',
 		success: '#2E7D32',
 		minOppositeColorText: '#0000008C',
-		textOnWhite: '#000000',
-		textOnBlack: '#FFFFFF',
+		textOnBackground: '#000000',
+		textOnNonbackground: '#FFFFFF',
 		background: '#FFFFFF'
 	},
 	dark: {
@@ -95,14 +100,15 @@ export const theme: {
 		},
 		accent: {
 			main: '#7B1FA2',
-			light: '#4A0072',
-			dark: '#AE52D4'
+			weak: '#4A0072',
+			hover: '#4A0072',
+			heavy: '#AE52D4'
 		},
 		error: '#e34839',
 		success: '#1dba25',
 		minOppositeColorText: '#FFFFFF8C',
-		textOnWhite: '#FFFFFF',
-		textOnBlack: '#000000',
+		textOnBackground: '#FFFFFF',
+		textOnNonbackground: '#000000',
 		background: '#171718'
 	}
 };

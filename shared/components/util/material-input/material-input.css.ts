@@ -1,4 +1,4 @@
-import { theme } from "../../theming/theme/theme";
+import { createThemedRules } from '../../../lib/webcomponent-util';
 import { html } from "lit-html";
 
 export const MaterialInputCSS = html`<style>
@@ -91,17 +91,23 @@ export const MaterialInputCSS = html`<style>
 	}
 	.mdl-textfield.is-invalid .mdl-textfield__input {
 		box-shadow: none;
-		border-color: ${theme.error};
 	}
+	${createThemedRules('.mdl-textfield.is-invalid .mdl-textfield__input', {
+		'border-color': ['error']
+	})}
 	.mdl-textfield.is-invalid .iconSlot {
 		box-shadow: none;
-		border-color: ${theme.error};
 	}
+	${createThemedRules('.mdl-textfield.is-invalid .iconSlot', {
+		'border-color': ['error']
+	})}
 	fieldset[disabled] .mdl-textfield .mdl-textfield__input, .mdl-textfield.is-disabled .mdl-textfield__input {
 		background-color: transparent;
 		border-bottom: 1px dotted rgba(0,0,0, 0.12);
-		color: ${theme.minTextOnWhite};
 	}
+	${createThemedRules('fieldset[disabled] .mdl-textfield .mdl-textfield__input, .mdl-textfield.is-disabled .mdl-textfield__input', {
+		color: ['minOppositeColorText']
+	})}
 
 	.mdl-textfield textarea.mdl-textfield__input {
 		display: block;
@@ -120,8 +126,10 @@ export const MaterialInputCSS = html`<style>
 		overflow: hidden;
 		white-space: nowrap;
 		text-align: left;
-		color: ${theme.minTextOnWhite};
 	}
+	${createThemedRules('.mdl-textfield__label', {
+		color: ['minOppositeColorText']
+	})}
 	.mdl-textfield.is-dirty .mdl-textfield__label, .mdl-textfield.has-placeholder .mdl-textfield__label {
 		visibility: hidden;
 	}
@@ -132,22 +140,26 @@ export const MaterialInputCSS = html`<style>
 	.mdl-textfield--floating-label.has-placeholder .mdl-textfield__label {
 		transition: none;
 	}
-	fieldset[disabled] .mdl-textfield .mdl-textfield__label, .mdl-textfield.is-disabled.is-disabled .mdl-textfield__label {
-		color: ${theme.minTextOnWhite};
-	}
+	${createThemedRules('fieldset[disabled] .mdl-textfield .mdl-textfield__label, .mdl-textfield.is-disabled.is-disabled .mdl-textfield__label', {
+		color: ['minOppositeColorText']
+	})}
 	.mdl-textfield--floating-label.is-focused .mdl-textfield__label, .mdl-textfield--floating-label.is-dirty .mdl-textfield__label, .mdl-textfield--floating-label.has-placeholder .mdl-textfield__label {
 		font-size: 12px;
 		top: 4px;
 		visibility: visible;
-		color: ${theme.primary.main};
 	}
+	${createThemedRules('.mdl-textfield--floating-label.is-focused .mdl-textfield__label, .mdl-textfield--floating-label.is-dirty .mdl-textfield__label, .mdl-textfield--floating-label.has-placeholder .mdl-textfield__label', {
+		color: ['primary', 'main']
+	})}
 	.mdl-textfield--floating-label.is-focused .mdl-textfield__expandable-holder .mdl-textfield__label, .mdl-textfield--floating-label.is-dirty .mdl-textfield__expandable-holder .mdl-textfield__label, .mdl-textfield--floating-label.has-placeholder .mdl-textfield__expandable-holder .mdl-textfield__label {
 		top: -16px;
 	}
 	.mdl-textfield--floating-label.is-invalid .mdl-textfield__label {
 		font-size: 12px;
-		color: ${theme.primary.main};
 	}
+	${createThemedRules('.mdl-textfield--floating-label.is-invalid .mdl-textfield__label', {
+		color: ['primary', 'main']
+	})}
 	.mdl-textfield__label:after {
 		bottom: 20px;
 		content: "";
@@ -158,16 +170,18 @@ export const MaterialInputCSS = html`<style>
 		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 		visibility: hidden;
 		width: 10px;
-		background-color: ${theme.primary.main};
 	}
+	${createThemedRules('.mdl-textfield__label:after', {
+		'background-color': ['primary', 'main']
+	})}
 	.mdl-textfield.is-focused .mdl-textfield__label:after {
 		left: 0;
 		visibility: visible;
 		width: 100%;
 	}
-	.mdl-textfield.is-invalid .mdl-textfield__label:after {
-		background-color: ${theme.error};
-	}
+	${createThemedRules('.mdl-textfield.is-invalid .mdl-textfield__label:after', {
+		'background-color': ['error']
+	})}
 
 	.mdl-textfield__error {
 		position: absolute;
@@ -175,8 +189,10 @@ export const MaterialInputCSS = html`<style>
 		margin-top: 3px;
 		visibility: hidden;
 		display: block;
-		color: ${theme.error};
 	}
+	${createThemedRules('.mdl-textfield__error', {
+		color: ['error']
+	})}
 	.mdl-textfield.is-invalid .mdl-textfield__error {
 		visibility: visible;
 	}

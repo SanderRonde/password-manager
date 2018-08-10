@@ -1,5 +1,7 @@
 import { TemplateResult, render } from "lit-html";
 import { bindToClass } from "./decorators";
+import { LoginData } from '../types/shared-types';
+import { theme, Theme } from '../components/theming/theme/theme';
 
 // From https://github.com/JedWatson/classnames
 
@@ -522,20 +524,23 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 	}
 }
 
-interface GlobalProperties {
+type GlobalProperties = {
 	theme: 'dark'|'light';
-}
-type GlobalProp<K extends keyof GlobalProperties> = [K, GlobalProperties[K]]
+} & Partial<(({
+	page: 'login';
+} & LoginData)|{
+	page: 'dashboard';
+})>;
 abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends WebComponentListenable<E & {
 	globalPropChange: {
-		args: GlobalProp<keyof GlobalProperties>;
+		args: [keyof GlobalProperties, GlobalProperties[keyof GlobalProperties]]
 	}	
 }> {
 	private _children: Set<WebComponentHierarchyManager<any>> = new Set();
 	private _parent: WebComponentHierarchyManager<any>|null = null;
 	private _isRoot: boolean = this.hasAttribute('_root');
-	private _globalProperties: GlobalProperties = {...{
-		theme: 'light'
+	protected _globalProperties: GlobalProperties = {...{
+		theme: 'light',
 	}, ...this._getGlobalProperties()}
 
 	private _getGlobalProperties() {
@@ -634,15 +639,38 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 			this._setGlobalProperty(key, value);
 			if (this._parent) {
 				this._parent._setGlobalPropertyFromChild(key, value);
+			} else if (this._isRoot) {
+				this._setGlobalPropertyFromParent(key, value);
 			} else {
 				console.warn(`Failed to propagate global property "${key}" since this element has no registered parent`);
 			}
 		}
 }
 
+abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebComponentHierarchyManager<E> {
+	constructor() {
+		super();
+
+		this._setTheme(this._globalProperties.theme);
+		this.listen('globalPropChange', (prop, value): any => {
+			if (prop === 'theme') {
+				this._setTheme(value as GlobalProperties['theme']);
+			}
+		});
+	}
+
+	private readonly _themes: (keyof typeof theme)[] = ['light', 'dark'];
+	private _setTheme(theme: GlobalProperties['theme']) {
+		for (const otherTheme of this._themes) {
+			this.classList.remove(otherTheme);
+		}
+		this.classList.add(theme);
+	}
+}
+
 export abstract class WebComponent<IDS extends {
 	[key: string]: HTMLElement;
-} = {}, E extends EventListenerObj = {}> extends WebComponentHierarchyManager<E> {
+} = {}, E extends EventListenerObj = {}> extends WebComponentThemeManger<E> {
 	/**
 	 * An ID map containing maps between queried IDs and elements,
 	 * 	cleared upon render
@@ -878,4 +906,44 @@ export function getCookie(name: string) {
         }
     }
     return "";
+}
+
+function createSingleRule(rule: string, property: string, value: string) {
+	return `${rule} { ${property}: ${value}; }`;
+}
+
+function getArrColor(themeName: keyof typeof theme, arr: [
+	'primary'|'accent',
+	keyof Theme['primary'|'accent']
+]|[
+	Exclude<keyof Theme, 'primary'|'accent'>
+]): string {
+	if (arr[0] === 'primary' || arr[0] === 'accent') {
+		return theme[themeName][arr[0] as 'primary'|'accent'][arr[1] as keyof Theme['primary'|'accent']];
+	}
+	return theme[themeName][arr[0] as Exclude<keyof Theme, 'primary'|'accent'>];
+}
+
+export function createThemedRules(rules: string|string[], props: {
+	[key: string]: [
+		'primary'|'accent',
+		keyof Theme['primary'|'accent']
+	]|[
+		Exclude<keyof Theme, 'primary'|'accent'>
+	]
+}): string {
+	let cssString: string = '';
+	for (const rule of Array.isArray(rules) ? rules : [rules]) {
+		for (const property in props) {
+			const colorArr = props[property as keyof typeof props];
+			cssString += createSingleRule(rule, property,
+				getArrColor('light', colorArr));
+			for (const themeName in theme) {
+				const color = getArrColor(themeName as keyof typeof theme, colorArr)
+				cssString += createSingleRule(`:host(.${themeName}) ${rule}`, property,
+					color);
+			}
+		}
+	}
+	return cssString;
 }
