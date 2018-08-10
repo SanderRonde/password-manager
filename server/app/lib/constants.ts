@@ -1,4 +1,4 @@
-import { DEFAULT_THEME as DEFAULT_THEME_T } from '../../../shared/components/theming/theme/theme'
+import { DEFAULT_THEME_T } from '../../../shared/types/shared-types'
 import * as path from 'path'
 
 /**

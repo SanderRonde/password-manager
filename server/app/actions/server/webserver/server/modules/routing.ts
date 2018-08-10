@@ -1,11 +1,11 @@
 import { MongoRecord, EncryptedAccount, EncryptedInstance, StringifiedObjectId, MasterPassword } from "../../../../../../../shared/types/db-types";
 import { Hashed, Padded, MasterPasswordVerificationPadding, decryptWithPrivateKey, ERRS } from "../../../../../lib/crypto";
-import { VALID_THEMES } from '../../../../../../../shared/components/theming/theme/theme'
-import { DEFAULT_THEME } from "../../../../../../../shared/lib/shared-constants";
+import { VALID_THEMES_T } from "../../../../../../../shared/types/shared-types";
 import { getStores, ServerResponse, APIResponse } from "./ratelimit";
 import { APIToken } from "../../../../../../../shared/types/crypto";
 import { API_ERRS } from "../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../database/database";
+import { DEFAULT_THEME } from "../../../../../lib/constants";
 import { Webserver } from "../webserver";
 import * as speakeasy from 'speakeasy'
 import * as express from 'express'
@@ -353,8 +353,8 @@ export class WebserverRouter {
 	}
 
 	private readonly _NEXT_MILLENIUM = new Date(Date.now() + (60 * 60 * 1000 * 24 * 365.25 * 1000));
-	private readonly _VALID_THEMES: VALID_THEMES[] = ['light', 'dark'];
-	public getTheme(req: express.Request, res: ServerResponse): VALID_THEMES {
+	private readonly _VALID_THEMES: VALID_THEMES_T[] = ['light', 'dark'];
+	public getTheme(req: express.Request, res: ServerResponse): VALID_THEMES_T {
 		const { theme } = req.cookies;
 		if (theme) {
 			if (this._VALID_THEMES.indexOf(theme) !== -1) {

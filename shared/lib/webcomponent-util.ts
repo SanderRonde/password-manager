@@ -1,6 +1,5 @@
-import { theme, Theme, VALID_THEMES } from '../components/theming/theme/theme';
-import { GlobalProperties } from '../types/shared-types';
-import { DEFAULT_THEME } from './shared-constants';
+import { GlobalProperties, VALID_THEMES_T, Theme, DEFAULT_THEME } from '../types/shared-types';
+import { theme, VALID_THEMES } from '../components/theming/theme/theme';
 import { TemplateResult, render } from "lit-html";
 import { bindToClass } from "./decorators";
 
@@ -909,7 +908,7 @@ function createRule(rule: string, properties: string) {
 	return `${rule} { ${properties} }`;
 }
 
-function getArrColor(themeName: VALID_THEMES, arr: [
+function getArrColor(themeName: VALID_THEMES_T, arr: [
 	'primary'|'accent',
 	keyof Theme['primary'|'accent']
 ]|[
@@ -921,7 +920,7 @@ function getArrColor(themeName: VALID_THEMES, arr: [
 	return theme[themeName][arr[0] as Exclude<keyof Theme, 'primary'|'accent'>];
 }
 
-function createRulesForTheme(themeName: VALID_THEMES, rules: string|string[], 
+function createRulesForTheme(themeName: VALID_THEMES_T, rules: string|string[], 
 	props: Partial<{
 		[P in keyof CSSStyleDeclaration]: [
 			'primary'|'accent',
@@ -934,12 +933,13 @@ function createRulesForTheme(themeName: VALID_THEMES, rules: string|string[],
 			return createRule(`${themePrefix}${rule}`,
 				Object.getOwnPropertyNames(props).map((property) => {
 					const colorArr = props[property as keyof typeof props]!;
-					const color = getArrColor(themeName as VALID_THEMES, colorArr)
+					const color = getArrColor(themeName as VALID_THEMES_T, colorArr)
 					return createProperty(property, color);
 				}).join(' '));
 		}).join('');
 	}
 
+const defaultTheme: DEFAULT_THEME = 'light';
 export function createThemedRules(rules: string|string[], props: Partial<{
 	[P in keyof CSSStyleDeclaration]: [
 		'primary'|'accent',
@@ -948,8 +948,8 @@ export function createThemedRules(rules: string|string[], props: Partial<{
 		Exclude<keyof Theme, 'primary'|'accent'>
 	]
 }>): string {
-	return [createRulesForTheme(DEFAULT_THEME, rules, props, ''),
-		...Object.getOwnPropertyNames(theme).map((themeName: VALID_THEMES) => {
+	return [createRulesForTheme(defaultTheme, rules, props, ''),
+		...Object.getOwnPropertyNames(theme).map((themeName: VALID_THEMES_T) => {
 			return createRulesForTheme(themeName, rules, props);	
 		})].join('');
 }
