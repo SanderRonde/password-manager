@@ -1,3 +1,4 @@
+import { DEFAULT_THEME as DEFAULT_THEME_T } from '../../../shared/components/theming/theme/theme'
 import * as path from 'path'
 
 /**
@@ -40,3 +41,7 @@ export const DEFAULT_EMAIL = 'some@email.com';
  * The time in which a dashboard instance expires (24 hours)
  */
 export const DASHBOARD_INSTANCE_EXPIRE_TIME = 1000 * 60 * 60 * 24;
+/**
+ * The theme that is active by default
+ */
+export const DEFAULT_THEME: DEFAULT_THEME_T = 'light';

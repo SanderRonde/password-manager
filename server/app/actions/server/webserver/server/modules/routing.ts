@@ -353,10 +353,11 @@ export class WebserverRouter {
 	}
 
 	private readonly _NEXT_MILLENIUM = new Date(Date.now() + (60 * 60 * 1000 * 24 * 365.25 * 1000));
+	private readonly _VALID_THEMES: VALID_THEMES[] = ['light', 'dark'];
 	public getTheme(req: express.Request, res: ServerResponse): VALID_THEMES {
 		const { theme } = req.cookies;
 		if (theme) {
-			if (VALID_THEMES.indexOf(theme) !== -1) {
+			if (this._VALID_THEMES.indexOf(theme) !== -1) {
 				return theme;
 			} else {
 				//Set the cookie again

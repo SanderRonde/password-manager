@@ -69,6 +69,7 @@ export interface Theme {
 
 export type VALID_THEMES = 'light'|'dark';
 export const VALID_THEMES: VALID_THEMES[] = ['light', 'dark'];
+export type DEFAULT_THEME = 'light';
 
 export const theme: {
 	[T in VALID_THEMES]: Theme;
