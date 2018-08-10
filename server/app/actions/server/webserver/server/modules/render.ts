@@ -1,4 +1,4 @@
-import { GlobalProperties } from '../../../../../../../shared/lib/webcomponent-util';
+import { GlobalProperties } from '../../../../../../../shared/types/shared-types'
 import { DEVELOPMENT_SERVE_PATHS, PRODUCTION_SERVE_PATHS } from '../webserver';
 import { preAppHTML, postAppHTML, DEFAULT_FILES } from '../../client/html';
 import { ServerResponse } from './ratelimit';
@@ -112,7 +112,7 @@ export async function render(res: ServerResponse, {
 
 	const propStr: string[] = [];
 	for (const key in data) {
-		const value = data[key as keyof GlobalProperties];
+		const value = data[key as keyof typeof data];
 		propStr.push(`prop_${key}="${value}"`);
 	}
 	res.write(`<${rootElement} _root ${propStr.join(' ')}></${rootElement}>`);

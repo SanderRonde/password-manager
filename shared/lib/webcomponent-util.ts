@@ -1,6 +1,6 @@
 import { theme, Theme, VALID_THEMES } from '../components/theming/theme/theme';
+import { GlobalProperties } from '../types/shared-types';
 import { DEFAULT_THEME } from './shared-constants';
-import { LoginData } from '../types/shared-types';
 import { TemplateResult, render } from "lit-html";
 import { bindToClass } from "./decorators";
 
@@ -525,13 +525,6 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 	}
 }
 
-export type GlobalProperties = {
-	theme: 'dark'|'light';
-} & Partial<(({
-	page: 'login';
-} & LoginData)|{
-	page: 'dashboard';
-})>;
 abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends WebComponentListenable<E & {
 	globalPropChange: {
 		args: [keyof GlobalProperties, GlobalProperties[keyof GlobalProperties]]
