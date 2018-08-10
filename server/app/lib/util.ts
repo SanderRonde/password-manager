@@ -4,6 +4,7 @@ import * as commentJson from 'comment-json'
 import { SERVER_ROOT } from './constants';
 import * as nodemailer from 'nodemailer'
 import { EventEmitter } from 'events';
+import * as babel from 'babel-core';
 import { Readable } from 'stream';
 import { Stream } from 'stream';
 import * as mongo from 'mongodb'
@@ -433,6 +434,13 @@ export function optionalArrayFn<T>(item: () => T, condition: boolean): [T]|never
 	return condition ? [item()] : [];
 }
 
+export async function optionalAsyncArrayFn<T>(item: () => Promise<T>, condition: boolean): Promise<[T]|never[]>;
+export async function optionalAsyncArrayFn<T>(item: () => Promise<T>, condition: true): Promise<[T]>;
+export async function optionalAsyncArrayFn<T>(item: () => Promise<T>, condition: false): Promise<never[]>;
+export async function optionalAsyncArrayFn<T>(item: () => Promise<T>, condition: boolean): Promise<[T]|never[]> {
+	return condition ? [await item()] : [];
+}
+
 export function optionalArrayItem<T>(item: T, condition: boolean): [T]|never[];
 export function optionalArrayItem<T>(item: T, condition: true): [T];
 export function optionalArrayItem<T>(item: T, condition: false): never[];
@@ -460,4 +468,27 @@ export function synchronizePromise<T>(prom: Promise<T>): Promise<{
 			})
 		});
 	});
+}
+
+const requireMap: Map<string, any> = new Map();
+
+export async function requireES6File<T>(filePath: string): Promise<T> {
+	if (requireMap.has(filePath)) {
+		return requireMap.get(filePath)!;
+	}
+
+	const content = await fs.readFile(filePath, {
+		encoding: 'utf8'
+	});
+	const transformed = babel.transform(content, {
+		plugins: ['transform-es2015-modules-commonjs']
+	});
+	const outfile = path.join(__dirname, `../../temp/${genRandomString(25)}.js`);
+	await fs.writeFile(outfile, transformed.code, {
+		encoding: 'utf8'
+	});
+	const required = require(outfile);
+	await fs.unlink(outfile);
+	requireMap.set(filePath, required);
+	return required;
 }

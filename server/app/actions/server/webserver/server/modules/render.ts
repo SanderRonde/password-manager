@@ -1,68 +1,21 @@
 import { GlobalProperties } from '../../../../../../../shared/types/shared-types'
-import { DEVELOPMENT_SERVE_PATHS, PRODUCTION_SERVE_PATHS } from '../webserver';
 import { preAppHTML, postAppHTML, DEFAULT_FILES } from '../../client/html';
+import { getFileContent, setBasePath } from "./resolveServerFile";
+import { PROJECT_ROOT } from '../../../../../lib/constants';
+import { requireES6File } from '../../../../../lib/util';
 import { ServerResponse } from './ratelimit';
-import fs = require('fs-extra');
-import path = require('path');
 import mime = require('mime');
-
-let basePath: string[]|null = null;
-function setBasePath(isDevelopment: boolean) {
-	if (isDevelopment) {
-		basePath = DEVELOPMENT_SERVE_PATHS;
-	} else {
-		basePath = PRODUCTION_SERVE_PATHS;
-	}
-}
-
-const fileCache: Map<string, string> = new Map();
-const resolvedPaths: Map<string, string|null> = new Map();
-
-async function resolveFile(file: string, paths: string[]): Promise<string|null> {
-	const result = (await Promise.all(paths.map((possiblePrefix) => {
-		return new Promise<string|null>((resolve) => {
-			const fullPath = path.join(possiblePrefix, file);
-			fs.access(fullPath, (err) => {
-				if (err) {
-					resolve(null);
-				} else {
-					resolve(fullPath);
-				}
-			});
-		});
-	}))).filter(res => res !== null)[0];
-	if (!result) {
-		console.log('Failed to resolve file', file, 'against paths', paths);
-		return null;
-	}
-	return result;
-}
-
-async function getFileContent(file: string): Promise<string> {
-	if (fileCache.has(file)) {
-		return fileCache.get(file)!;
-	}
-	const content = await fs.readFile(file, {
-		encoding: 'utf8'
-	});
-	fileCache.set(file, content);
-	return content;
-}
+import * as path from 'path';
 
 async function push(res: ServerResponse, file: string) {
 	const nonAbsolute = file;
 	if (file.startsWith('/')) {
 		file = file.slice(1);
 	}
-	if (resolvedPaths.has(file)) {
-		file = resolvedPaths.get(file)!;
-	} else {
-		const resolved = await resolveFile(file, basePath!);
-		file = resolved!;
-		resolvedPaths.set(nonAbsolute, file);
-	}
 
-	if (file === null) return;
+	const content = await getFileContent(file);
+	
+	if (content === '') return;
 
 	try {
 		const stream = res.push(nonAbsolute, {
@@ -74,7 +27,6 @@ async function push(res: ServerResponse, file: string) {
 			}
 		});
 		stream.on('error', () => { });
-		const content = await getFileContent(file);
 		stream.write(content);
 		stream.end();
 	} catch(e) { }
@@ -105,9 +57,21 @@ export async function render(res: ServerResponse, {
 		]);
 	}
 
-	res.write(preAppHTML({
+	res.write(await preAppHTML({
 		title,
-		development: isDevelopment
+		development: isDevelopment,
+		bodyStyles: data.theme ? await (async () => {
+			const { theme } = await requireES6File<{
+				theme: {
+					[key: string]: {
+						background: string;
+					}
+				}
+			}>(path.join(PROJECT_ROOT,
+				'shared/components/theming/theme/theme.js'));
+			const themeName = data.theme;
+			return `style="background-color:${theme[themeName].background};`;
+		})() : ''
 	}));
 
 	const propStr: string[] = [];

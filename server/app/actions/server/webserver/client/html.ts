@@ -1,19 +1,30 @@
+import { INLINED_FILES, getFileContent, setBasePath } from "../server/modules/resolveServerFile";
 import { conditionalString } from "../../../../lib/util";
 
 export const DEFAULT_FILES = {
-	css: ['/css/default.css'],
+	css: [],
 	scripts: []
 }
 
-export function preAppHTML({
+async function getInlinedCSS() {
+	return Promise.all(INLINED_FILES.css.map((file) => {
+		return getFileContent(file);
+	}))
+}
+
+export async function preAppHTML({
 	title,
+	bodyStyles = '',
 	development = false, 
-	css = []
+	stylesheets = []
 }: {
 	title: string,
+	bodyStyles?: string;
 	development?: boolean;
-	css?: string[];
+	stylesheets?: string[];
 }) {
+	setBasePath(development);
+	
 	return `
 <!DOCTYPE HTML>
 <html>
@@ -30,11 +41,14 @@ export function preAppHTML({
 		${DEFAULT_FILES.css.map((defaultCSS) => {
 			return `<link href="${defaultCSS}" rel="stylesheet">`;
 		})}
-		${css.map((stylesheet) => {
-			return `<style>\n${stylesheet}\n</style>`
-		})}
+		${[
+			...await getInlinedCSS(), 
+			...stylesheets
+		].map((stylesheet) => {
+			return `<style>${stylesheet}</style>`;
+		}).join('\n')}
 	</head>
-	<body ${conditionalString('class="dev"', development)}>
+	<body ${bodyStyles} ${conditionalString('class="dev"', development)}>
 		<div id="app">`
 }
 
@@ -46,23 +60,25 @@ export function postAppHTML({
 	return `</div>
 		${DEFAULT_FILES.scripts.map((defaultJS) => {
 			return `<script src="${defaultJS}"></script>`;
-		})}
+		}).join('\n')}
 		<script type="module" src="${script}"></script>
 	</body>
 	</html>`
 }
 
-export const html = ({ 
-	title, script,
-	development = false
+export const html = async ({ 
+	title, script, bodyStyles = '',
+	development = false, stylesheets = []
 }: { 
 	title: string,
 	script: string;
+	bodyStyles?: string;
 	development?: boolean;
+	stylesheets?: string[];
 }) => {
 	return {
-		pre: preAppHTML({
-			development, title
+		pre: await preAppHTML({
+			development, title, bodyStyles, stylesheets
 		}),
 		post: postAppHTML({
 			script

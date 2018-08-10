@@ -9,6 +9,7 @@ import * as cookieParser from 'cookie-parser'
 import * as serveStatic from 'serve-static'
 import { ServerConfig } from "../../server";
 import * as bodyParser from 'body-parser'
+import { Cache } from "./modules/cache";
 import * as express from 'express'
 import * as morgan from 'morgan'
 import * as https from 'https'
@@ -76,6 +77,7 @@ export class Webserver {
 		this.Router.init();
 		initPeriodicals(this);
 		
+		new Cache().warmup();
 		await Promise.all([...optionalArrayFn(() => {
 				return new Promise(async (resolve) => {
 					const credentials = {
