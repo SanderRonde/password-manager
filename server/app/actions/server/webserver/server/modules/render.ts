@@ -85,10 +85,12 @@ function pushAll(res: ServerResponse, arr: string[]): Promise<void[]> {
 	}));
 }
 
-export async function render(res: ServerResponse, {
+export async function render<D = {
+	[key: string]: string;
+}>(res: ServerResponse, {
 	title, script, isDevelopment, data, rootElement
 }: {
-	data: any;
+	data: D;
 	title: string;
 	script: string;
 	rootElement: string;
