@@ -934,7 +934,7 @@ function createRulesForTheme(themeName: VALID_THEMES_T, rules: string|string[],
 				Object.getOwnPropertyNames(props).map((property) => {
 					const colorArr = props[property as keyof typeof props]!;
 					const color = getArrColor(themeName as VALID_THEMES_T, colorArr)
-					return createProperty(property, color);
+					return createProperty(casingToDashes(property), color);
 				}).join(' '));
 		}).join('');
 	}
