@@ -6,7 +6,7 @@ import { html } from "lit-html";
 export function LoginHTML(this: Login, props: Login['props']) {
 	return html`
 		${this.css}
-		<div>
+		<div id="pageContainer">
 			<horizontal-centerer>
 				<vertical-centerer fullscreen>
 					<form id="formContainer">

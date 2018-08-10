@@ -1,3 +1,4 @@
+import { createThemedRules } from '../../../../lib/webcomponent-util';
 import { html } from "lit-html";
 
 export const LoginCSS = html`<style>
@@ -10,4 +11,8 @@ export const LoginCSS = html`<style>
 		flex-direction: row;
 		justify-content: flex-end;
 	}
+
+	${createThemedRules('#pageContainer', {
+		backgroundColor: ['background']
+	})}
 </style>`;
