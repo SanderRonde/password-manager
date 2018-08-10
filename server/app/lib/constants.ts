@@ -1,4 +1,4 @@
-import { DEFAULT_THEME } from '../../../shared/types/shared-types'
+import { DEFAULT_THEME as DEFAULT_THEME_T } from '../../../shared/types/shared-types'
 import * as path from 'path'
 
 /**
@@ -44,4 +44,4 @@ export const DASHBOARD_INSTANCE_EXPIRE_TIME = 1000 * 60 * 60 * 24;
 /**
  * The theme that is active by default
  */
-export const DEFAULT_THEME: DEFAULT_THEME = 'light';
+export const DEFAULT_THEME: DEFAULT_THEME_T = 'light';
