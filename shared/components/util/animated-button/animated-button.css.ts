@@ -1,4 +1,5 @@
-import { createThemedRules } from '../../../lib/webcomponent-util';
+import { createThemedRules, forEachTheme, changeOpacity } from '../../../lib/webcomponent-util';
+import { theme } from '../../theming/theme/theme';
 import { html } from "lit-html";
 
 export const COLOR_FADE_TIME = 300;
@@ -234,28 +235,32 @@ export const AnimatedButtonCSS = html`<style>
 	})}
 
 	.mdl-button[disabled][disabled], .mdl-button.mdl-button--disabled.mdl-button--disabled {
-		color: rgba(0,0,0, 0.26);
 		cursor: default;
 		background-color: transparent;
 	}
-	.mdl-button--fab[disabled][disabled], .mdl-button--fab.mdl-button--disabled.mdl-button--disabled {
-		background-color: rgba(0,0,0, 0.12);
-		color: rgba(0,0,0, 0.26);
-	}
 	.mdl-button--raised[disabled][disabled], .mdl-button--raised.mdl-button--disabled.mdl-button--disabled {
-		background-color: rgba(0,0,0, 0.12);
-		color: rgba(0,0,0, 0.26);
 		box-shadow: none;
 	}
-	.mdl-button--colored[disabled][disabled], .mdl-button--colored.mdl-button--disabled.mdl-button--disabled {
-		color: rgba(0,0,0, 0.26);
-	}
+	${forEachTheme((themeName, prefix) => {
+		return [
+			`${prefix} .mdl-button[disabled][disabled], .mdl-button.mdl-button--disabled.mdl-button--disabled {
+				color: ${changeOpacity(theme[themeName].textOnBackground, 26)};
+			}`,
+			`${prefix} .mdl-button--fab[disabled][disabled], .mdl-button--fab.mdl-button--disabled.mdl-button--disabled,
+			 ${prefix} .mdl-button--raised[disabled][disabled], .mdl-button--raised.mdl-button--disabled.mdl-button--disabled {
+				background-color: ${changeOpacity(theme[themeName].textOnBackground, 12)};
+				color: ${changeOpacity(theme[themeName].textOnBackground, 26)};
+			}`,
+			`${prefix} .mdl-button--colored[disabled][disabled], .mdl-button--colored.mdl-button--disabled.mdl-button--disabled {
+				color: ${changeOpacity(theme[themeName].textOnBackground, 26)}
+			}`
+		].join(' ');
+	})}
 
 	.mdl-button .material-icons {
 		vertical-align: middle;
 	}
 	.mdl-ripple {
-		background: rgb(0,0,0);
 		border-radius: 50%;
 		height: 50px;
 		left: 0;
@@ -267,6 +272,9 @@ export const AnimatedButtonCSS = html`<style>
 		width: 50px;
 		overflow: hidden;
 	}
+	${createThemedRules('.mdl-ripple', {
+		color: ['textOnBackground']
+	})}
 	.mdl-ripple.is-animating {
 		transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1), 
 			width 0.3s cubic-bezier(0, 0, 0.2, 1), 
