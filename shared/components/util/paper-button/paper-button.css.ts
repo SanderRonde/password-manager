@@ -51,7 +51,7 @@ export const PaperButtonCSS = html`<style>
 		background-color: rgba(0,0,0, 0.12);
 	}
 	${createThemedRules('.mdl-button:active', {
-		'background-color': ['primary', 'main']
+		backgroundColor: ['primary', 'main']
 	})}
 	${createThemedRules('.mdl-button.mdl-button--colored', {
 		color: ['primary', 'main']
@@ -77,14 +77,14 @@ export const PaperButtonCSS = html`<style>
 		box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 	}
 	${createThemedRules('.mdl-button--raised:active', {
-		'background-color': ['primary', 'main'],
+		backgroundColor: ['primary', 'main'],
 		color: ['textOnNonbackground']
 	})}
 	.mdl-button--raised:focus:not(:active) {
 		box-shadow: 0 0 8px rgba(0, 0, 0, 0.18), 0 8px 16px rgba(0, 0, 0, 0.36);
 	}
 	${createThemedRules('.mdl-button--raised:focus:not(:active)', {
-		'background-color': ['primary', 'main'],
+		backgroundColor: ['primary', 'main'],
 		color: ['textOnNonbackground']
 	})}
 	${createThemedRules('.mdl-button--raised.mdl-button--colored', {
@@ -96,7 +96,7 @@ export const PaperButtonCSS = html`<style>
 		'.mdl-button--raised.mdl-button--colored:active',
 		'.mdl-button--raised.mdl-button--colored:focus:not(:active)'
 	], {
-		'background-color': ['primary', 'main']
+		backgroundColor: ['primary', 'main']
 	})}
 	.mdl-button--raised.mdl-button--colored .mdl-ripple {
 		background: rgb(255,255,255);
@@ -145,7 +145,7 @@ export const PaperButtonCSS = html`<style>
 		'.mdl-button--fab:active',
 		'.mdl-button--fab:focus:not(:active)'
 	], {
-		'background-color': ['primary', 'main']
+		backgroundColor: ['primary', 'main']
 	})}
 	${createThemedRules('.mdl-button--fab.mdl-button--colored', {
 		background: ['accent', 'main'],
@@ -156,7 +156,7 @@ export const PaperButtonCSS = html`<style>
 		'.mdl-button--fab.mdl-button--colored:focus:not(:active)',
 		'.mdl-button--fab.mdl-button--colored:active'
 	], {
-		'background-color': ['accent', 'main']
+		backgroundColor: ['accent', 'main']
 	})}
 	.mdl-button--fab.mdl-button--colored .mdl-ripple {
 		background: rgb(255,255,255);
@@ -219,7 +219,7 @@ export const PaperButtonCSS = html`<style>
 	})}
 	${createThemedRules('.mdl-button--primary.mdl-button--primary.mdl-button--raised, .mdl-button--primary.mdl-button--primary.mdl-button--fab ', {
 		color: ['textOnNonbackground'],
-		'background-color': ['primary', 'main']
+		backgroundColor: ['primary', 'main']
 	})}
 	${createThemedRules('.mdl-button--accent.mdl-button--accent ', {
 		color: ['accent', 'main']
@@ -229,7 +229,7 @@ export const PaperButtonCSS = html`<style>
 	})}
 	${createThemedRules('.mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab ', {
 		color: ['textOnNonbackground'],
-		'background-color': ['accent', 'main']
+		backgroundColor: ['accent', 'main']
 	})}
 
 	.mdl-button[disabled][disabled], .mdl-button.mdl-button--disabled.mdl-button--disabled {

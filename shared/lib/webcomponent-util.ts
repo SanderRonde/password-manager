@@ -909,7 +909,7 @@ export function getCookie(name: string) {
 }
 
 function createSingleRule(rule: string, property: string, value: string) {
-	return `${rule} { ${property}: ${value}; }`;
+	return `${rule} { ${casingToDashes(property)}: ${value}; }`;
 }
 
 function getArrColor(themeName: keyof typeof theme, arr: [
@@ -924,18 +924,18 @@ function getArrColor(themeName: keyof typeof theme, arr: [
 	return theme[themeName][arr[0] as Exclude<keyof Theme, 'primary'|'accent'>];
 }
 
-export function createThemedRules(rules: string|string[], props: {
-	[key: string]: [
+export function createThemedRules(rules: string|string[], props: Partial<{
+	[P in keyof CSSStyleDeclaration]: [
 		'primary'|'accent',
 		keyof Theme['primary'|'accent']
 	]|[
 		Exclude<keyof Theme, 'primary'|'accent'>
 	]
-}): string {
+}>): string {
 	let cssString: string = '';
 	for (const rule of Array.isArray(rules) ? rules : [rules]) {
 		for (const property in props) {
-			const colorArr = props[property as keyof typeof props];
+			const colorArr = props[property as keyof typeof props]!;
 			cssString += createSingleRule(rule, property,
 				getArrColor('light', colorArr));
 			for (const themeName in theme) {

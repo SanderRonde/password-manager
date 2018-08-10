@@ -93,13 +93,13 @@ export const MaterialInputCSS = html`<style>
 		box-shadow: none;
 	}
 	${createThemedRules('.mdl-textfield.is-invalid .mdl-textfield__input', {
-		'border-color': ['error']
+		borderColor: ['error']
 	})}
 	.mdl-textfield.is-invalid .iconSlot {
 		box-shadow: none;
 	}
 	${createThemedRules('.mdl-textfield.is-invalid .iconSlot', {
-		'border-color': ['error']
+		borderColor: ['error']
 	})}
 	fieldset[disabled] .mdl-textfield .mdl-textfield__input, .mdl-textfield.is-disabled .mdl-textfield__input {
 		background-color: transparent;
@@ -172,7 +172,7 @@ export const MaterialInputCSS = html`<style>
 		width: 10px;
 	}
 	${createThemedRules('.mdl-textfield__label:after', {
-		'background-color': ['primary', 'main']
+		backgroundColor: ['primary', 'main']
 	})}
 	.mdl-textfield.is-focused .mdl-textfield__label:after {
 		left: 0;
@@ -180,7 +180,7 @@ export const MaterialInputCSS = html`<style>
 		width: 100%;
 	}
 	${createThemedRules('.mdl-textfield.is-invalid .mdl-textfield__label:after', {
-		'background-color': ['error']
+		backgroundColor: ['error']
 	})}
 
 	.mdl-textfield__error {
