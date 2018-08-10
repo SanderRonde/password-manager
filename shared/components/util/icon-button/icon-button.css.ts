@@ -1,3 +1,4 @@
+import { createThemedRules } from '../../../lib/webcomponent-util';
 import { html } from "lit-html";
 
 export const IconButtonCSS = html`<style>
@@ -244,4 +245,14 @@ export const IconButtonCSS = html`<style>
 	.mdl-button .material-icons {
 		vertical-align: middle;
 	}
+
+	${createThemedRules('*', {
+		fill: ['textOnBackground']
+	}, '')}
+	${createThemedRules('*', {
+		fill: ['textOnNonbackground']
+	}, '[fill="text"]')}
+	${createThemedRules('*', {
+		fill: ['textOnBackground']
+	}, '[fill="nontext"]')}
 </style>`;
