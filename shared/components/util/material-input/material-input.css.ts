@@ -75,8 +75,10 @@ export const MaterialInputCSS = html`<style>
 		flex-grow: 100;
 		background: none;
 		text-align: left;
-		color: inherit;
 	}
+	${createThemedRules('.mdl-textfield__input', {
+		color: ['textOnBackground']
+	})}
 	${forEachTheme((themeName, prefix) => {
 		return [
 			`${prefix} .iconSlot {
