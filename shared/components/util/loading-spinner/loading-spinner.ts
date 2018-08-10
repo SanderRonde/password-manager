@@ -1,6 +1,7 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { ConfigurableWebComponent, config, isNewElement } from "../../../lib/webcomponent-util";
+import { config, isNewElement } from "../../../lib/webcomponent-util";
+import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { LoadingSpinnerIDMap } from "./loading-spinner-querymap";
 import { LoadingSpinnerHTML } from "./loading-spinner.html";
 import { LoadingSpinnerCSS } from "./loading-spinner.css";

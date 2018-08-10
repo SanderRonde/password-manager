@@ -1,8 +1,9 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { ConfigurableWebComponent, config } from '../../../lib/webcomponent-util';
+import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { HorizontalCentererIDMap } from './horizontal-centerer-querymap';
 import { HorizontalCentererHTML } from './horizontal-centerer.html';
 import { HorizontalCentererCSS } from './horizontal-centerer.css';
+import { config } from '../../../lib/webcomponent-util';
 
 @config({
 	is: 'horizontal-centerer',

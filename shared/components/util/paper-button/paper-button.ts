@@ -1,5 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { ConfigurableWebComponent, config, isNewElement } from '../../../lib/webcomponent-util';
+import { config, isNewElement } from '../../../lib/webcomponent-util';
+import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
 import { PaperButtonIDMap } from './paper-button-querymap';
 import { PaperButtonHTML } from './paper-button.html';

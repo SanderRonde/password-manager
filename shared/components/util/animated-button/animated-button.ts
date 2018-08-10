@@ -1,6 +1,7 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { ConfigurableWebComponent, config, isNewElement, defineProps, PROP_TYPE, wait } from '../../../lib/webcomponent-util';
+import { config, isNewElement, defineProps, PROP_TYPE, wait } from '../../../lib/webcomponent-util';
 import { AnimatedButtonCSS, FADE_IN_OUT_TIME, COLOR_FADE_TIME } from './animated-button.css';
+import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
 import { AnimatedButtonIDMap } from './animated-button-querymap';

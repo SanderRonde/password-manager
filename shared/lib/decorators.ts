@@ -1,4 +1,4 @@
-import { WebComponentBase } from "./webcomponent-util";
+import { WebComponentBase } from "./webcomponents";
 
 export function bindToClass<T extends Function>(_target: object, propertyKey: string, 
 	descriptor: TypedPropertyDescriptor<T>): TypedPropertyDescriptor<T> | void {
