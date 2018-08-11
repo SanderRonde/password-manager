@@ -15,4 +15,10 @@ export const LoginCSS = html`<style>
 	${createThemedRules('#pageContainer', {
 		backgroundColor: ['background']
 	})}
+
+	#themeSelector {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+	}
 </style>`;

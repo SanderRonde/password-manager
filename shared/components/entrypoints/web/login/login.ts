@@ -5,6 +5,7 @@ import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
+import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { ConfigurableWebComponent } from "../../../../lib/webcomponents";
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
@@ -26,7 +27,8 @@ type ServerLoginResponse = APIReturns['/api/dashboard/login'];
 		HorizontalCenterer, 
 		MaterialInput,
 		IconButton,
-		AnimatedButton
+		AnimatedButton,
+		ThemeSelector
 	]
 })
 export class Login extends ConfigurableWebComponent<LoginIDMap> {

@@ -41,5 +41,6 @@ export function LoginHTML(this: Login, props: Login['props']) {
 					</form>
 				</vertical-centerer>
 			</horizontal-centerer>
+			<theme-selector id="themeSelector"></theme-selector>
 		</div>`;
 }
