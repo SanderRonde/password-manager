@@ -218,7 +218,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 						});
 					}));
 				},
-				async function minifyCSS {
+				async function minifyCSS() {
 					const files = await findWithGlob('shared/components/**/*.css.js');
 					await Promise.all(files.map(async (file) => {
 						const content = await fs.readFile(file, {
