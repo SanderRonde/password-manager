@@ -1,16 +1,16 @@
 /// <reference path="../../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, isDefined, config, listen, isNewElement, createCancellableTimeout, cancelTimeout, wait, setCookie } from '../../../../lib/webcomponent-util'
+import { defineProps, PROP_TYPE, isDefined, config, listen, isNewElement, createCancellableTimeout, cancelTimeout, wait, setCookie, getCookie } from '../../../../lib/webcomponent-util'
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
+import { LoginData, VALID_THEMES_T } from '../../../../types/shared-types';
 import { ConfigurableWebComponent } from "../../../../lib/webcomponents";
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { API_ERRS, APIReturns } from '../../../../types/api';
-import { LoginData } from '../../../../types/shared-types';
 import { bindToClass } from '../../../../lib/decorators';
 import { LoginIDMap } from './login-querymap';
 import { LoginHTML } from './login.html';
@@ -37,6 +37,19 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 			emailRemembered: PROP_TYPE.BOOL
 		}
 	});
+
+	constructor() {
+		super();
+
+		if (!this.getAttribute('prop_theme')) {
+			//This is a non-server-served page
+			const currentTheme = this._globalProperties.theme;
+			const cookieTheme = getCookie('theme');
+			if (cookieTheme && cookieTheme !== currentTheme) {
+				this.setGlobalProperty('theme', cookieTheme as VALID_THEMES_T);
+			}
+		}
+	}
 
 	getData(): LoginData {
 		if (this._globalProperties.page !== 'login') {
