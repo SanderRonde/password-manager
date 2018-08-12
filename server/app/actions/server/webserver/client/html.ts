@@ -3,7 +3,7 @@ import { conditionalString } from "../../../../lib/util";
 
 export const DEFAULT_FILES = {
 	css: [],
-	scripts: []
+	scripts: ['/js/sw.js']
 }
 
 async function getInlinedCSS() {
