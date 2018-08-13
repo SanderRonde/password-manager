@@ -286,7 +286,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 							encoding: 'utf8'
 						});
 				}
-			}, ...ROUTES.map((route) => {
+			), ...ROUTES.map((route) => {
 				const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-page.js`);
 				const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}-page.js`);
 
