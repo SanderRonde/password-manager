@@ -32,6 +32,10 @@ self.addEventListener('install', (event) => {
 	})());
 });
 
+self.addEventListener('activate', (event) => {
+	event.waitUntil(self.clients.claim());
+});
+
 function race<T>(...promises: Promise<T>[]): Promise<T> {
 	return new Promise<T>((resolve, reject) => {
 		promises.forEach((promise) => {

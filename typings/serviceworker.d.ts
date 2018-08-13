@@ -8,6 +8,7 @@ type Remove<T, K> = {
 
 interface Window {
 	addEventListener(type: 'install', listener: (this: Window, ev: Event & ServiceWorkerEvent) => void): void;
+	addEventListener(type: 'activate', listener: (this: Window, ev: Event & ServiceWorkerEvent) => void): void;
 	addEventListener<T = any>(type: 'message', listener: (this: Window, ev: Remove<MessageEvent, 'data'> & ServiceWorkerEvent & {
 		data: T;
 	}) => void): void;
@@ -16,4 +17,7 @@ interface Window {
 		request: Request;
 	}) => void): void;
 	skipWaiting(): void;
+	clients: {
+		claim(): Promise<any>;
+	}
 }
