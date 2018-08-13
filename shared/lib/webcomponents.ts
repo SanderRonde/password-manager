@@ -1,4 +1,4 @@
-import { ComponentIs, define, WebComponentConfiguration } from './webcomponent-util';
+import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
 import { VALID_THEMES } from '../components/theming/theme/theme';
 import { GlobalProperties } from '../types/shared-types';
 import { TemplateResult, render } from 'lit-html';
@@ -393,4 +393,11 @@ export class ConfigurableWebComponent<IDS extends {
 	protected renderer!: (this: any, props: any) => TemplateResult;
 	public static config: WebComponentConfiguration;
 	get css() { throw new Error('Not implemented'); }
+}
+
+export function define(name: string, component: any) {
+	if (window.customElements.get(name)) {
+		return;
+	}
+	window.customElements.define(name, component);
 }

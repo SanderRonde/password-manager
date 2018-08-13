@@ -58,13 +58,6 @@ export function important(rule: string|number) {
 	return `${rule}!important`
 }
 
-export function define(name: string, component: any) {
-	if (window.customElements.get(name)) {
-		return;
-	}
-	window.customElements.define(name, component);
-}
-
 export function isDefined<U>(value: null|undefined|U): value is U {
 	return value !== undefined && value !== null;
 }
