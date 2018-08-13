@@ -53,6 +53,15 @@ export class ThemeSelector extends ConfigurableWebComponent<ThemeSelectorIDMap> 
 						document.cookie = `theme=${name}; expires=${expire}; path=/`;
 						this.setGlobalProperty('theme',
 							name as VALID_THEMES_T);
+
+						if (navigator.serviceWorker.controller) {
+							navigator.serviceWorker.controller.postMessage({
+								type: 'setCookie',
+								data: {
+									theme: name
+								}
+							});	
+						}
 					});
 				}
 			}

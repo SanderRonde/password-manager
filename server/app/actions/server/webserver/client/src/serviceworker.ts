@@ -1,3 +1,5 @@
+import { set } from 'idb-keyval';
+
 const CACHE_NAME = 'password-manager';
 
 const CACHE_STATIC = [
@@ -105,7 +107,13 @@ async function checkVersions() {
 	}
 
 	const cache = await caches.open(CACHE_NAME);
-	const localVersionsFile = await cache.match('/versions.json');
+	const localVersionsFile = (await cache.match('/versions.json')) || {
+		json() {
+			return {} as {
+				[key: string]: string;
+			};
+		}
+	};
 	const localVersions = await localVersionsFile.json();
 
 	await Promise.all(Object.getOwnPropertyNames(remoteVersions).map(async (file) => {
@@ -119,10 +127,6 @@ async function checkVersions() {
 		}
 	}));
 	await cache.put('/versions.json', remoteVersionsFile);
-}
-
-function setIDBValue(key: string, value: any) {
-	
 }
 
 interface TypedServiceWorker extends ServiceWorker {
@@ -142,7 +146,7 @@ export type ServiceworkerMessages = {
 }|{
 	type: 'setCookie';
 	data: {
-		cookie: string;
+		theme: string;
 	}
 };
 self.addEventListener<ServiceworkerMessages>('message', (event) => {
@@ -152,7 +156,8 @@ self.addEventListener<ServiceworkerMessages>('message', (event) => {
 				await checkVersions();
 				break;
 			case 'setCookie':
-				
+				set('theme', event.data.theme);
+				break;
 		}
 	})());
 });

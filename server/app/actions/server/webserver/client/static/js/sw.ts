@@ -17,7 +17,7 @@ if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.controller.postMessage({
 				type: 'setCookie',
 				data: {
-					cookie: cookieTheme
+					theme: cookieTheme
 				}
 			});	
 		}
