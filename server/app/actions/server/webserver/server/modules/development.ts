@@ -14,7 +14,7 @@ function serve(root: string, {
 	extensions = []
 }: {
 	rewrite?: (content: string, filename: string) => Promise<string>|string;
-	prefix?: string;
+prefix?: string;
 	exclude?: string[];
 	extensions?: string[]
 } = {}): express.RequestHandler {
@@ -185,7 +185,8 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 		}
 	}));
 	webserver.app.use(serve(STATIC_SERVE_PATH, {
-		prefix: '/static/'
+		prefix: '/static/',
+		extensions: ['js']
 	}));
 	webserver.app.use(serve(path.join(PROJECT_ROOT, 'shared/components/'), {
 		rewrite(content, filePath) {
