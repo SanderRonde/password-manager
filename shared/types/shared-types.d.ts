@@ -4,7 +4,7 @@ export interface LoginData {
 }
 
 export type GlobalProperties = {
-	theme: 'dark'|'light';
+	theme?: 'dark'|'light';
 } & Partial<(({
 	page: 'login';
 } & LoginData)|{

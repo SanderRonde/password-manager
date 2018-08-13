@@ -51,6 +51,19 @@ export class RoutesDashboard {
 		});
 	}
 
+	public async login_offline(_req: express.Request, res: ServerResponse) {
+		await render(res, {
+			data: {
+				page: 'login'
+			},
+			rootElement: 'login-page',
+			script: 'entrypoints/login/login-page.js',
+			title: 'Log in to your dashboard',
+			isDevelopment: this.server.config.development,
+			isOffline: true
+		});
+	}
+
 	public async dashboard(req: express.Request, res: ServerResponse) {
 		if (!this.checkDashboardAuthentication(req, res)) {
 			return;
@@ -65,6 +78,19 @@ export class RoutesDashboard {
 			script: 'entrypoints/dashboard/dashboard-page.js',
 			title: 'Your Dashboard',
 			isDevelopment: this.server.config.development
+		});
+	}
+
+	public async dashboard_offline(_req: express.Request, res: ServerResponse) {
+		await render(res, {
+			data: {
+				page: 'dashboard'
+			},
+			rootElement: 'dashboard-page',
+			script: 'entrypoints/dashboard/dashboard-page.js',
+			title: 'Your Dashboard',
+			isDevelopment: this.server.config.development,
+			isOffline: true
 		});
 	}
 }

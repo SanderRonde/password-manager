@@ -399,6 +399,10 @@ export class WebserverRouter {
 			this._doBind(this.parent.Routes.Dashboard, 'login'));
 		this.parent.app.get('/dashboard', 
 			this._doBind(this.parent.Routes.Dashboard, 'dashboard'));
+		this.parent.app.get('/login_offline', 
+			this._doBind(this.parent.Routes.Dashboard, 'login_offline'));
+		this.parent.app.get('/dashboard_offline', 
+			this._doBind(this.parent.Routes.Dashboard, 'dashboard_offline'));
 
 		this.parent.app.use((_req: express.Request, res: ServerResponse, next) => {
 			const originalFn = res.json.bind(res);
