@@ -77,11 +77,14 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 			throw new Error('Failed to get login data');
 		}
 
-		await this._fetchData().catch(() => {});
 		if (!this._globalProperties.comm_token ||
 			!this._globalProperties.server_public_key) {
-				return null;
-			}
+			await this._fetchData().catch(() => {});
+			if (!this._globalProperties.comm_token ||
+				!this._globalProperties.server_public_key) {
+					return null;
+				}
+		}
 
 		return this._globalProperties as LoginData;
 	}
