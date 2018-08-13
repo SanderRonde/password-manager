@@ -136,8 +136,8 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 		localStorage.setItem('server_public_key', server_public_key);
 
 		//Set cookies
-		setCookie('login_auth', auth_token);
-		setCookie('instance_id', instance_id);
+		setCookie('login_auth', auth_token, 1000 * 60 * 18);
+		setCookie('instance_id', instance_id, 1000 * 60 * 60 * 24);
 		
 		//Do navigation
 		location.href = '/dashboard';
