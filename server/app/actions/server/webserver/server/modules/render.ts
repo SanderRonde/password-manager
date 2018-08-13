@@ -2,7 +2,7 @@ import { GlobalProperties } from '../../../../../../../shared/types/shared-types
 import { preAppHTML, postAppHTML, DEFAULT_FILES } from '../../client/html';
 import { getFileContent, setBasePath } from "./resolveServerFile";
 import { PROJECT_ROOT } from '../../../../../lib/constants';
-import { requireES6File } from '../../../../../lib/util';
+import { requireES6File, optionalArrayItem } from '../../../../../lib/util';
 import { ServerResponse } from './ratelimit';
 import mime = require('mime');
 import * as path from 'path';
@@ -39,11 +39,12 @@ function pushAll(res: ServerResponse, arr: string[]): Promise<void[]> {
 }
 
 export async function render(res: ServerResponse, {
-	title, script, isDevelopment, data, rootElement
+	title, script, isDevelopment, data, rootElement, isOffline = false
 }: {
 	data: GlobalProperties;
 	title: string;
 	script: string;
+	isOffline?: boolean;
 	rootElement: string;
 	isDevelopment: boolean;
 }) {
@@ -60,7 +61,7 @@ export async function render(res: ServerResponse, {
 	res.write(await preAppHTML({
 		title,
 		development: isDevelopment,
-		bodyStyles: data.theme ? await (async () => {
+		bodyStyles: (data.theme && !isOffline) ? await (async () => {
 			const { theme } = await requireES6File<{
 				theme: {
 					[key: string]: {
@@ -70,8 +71,9 @@ export async function render(res: ServerResponse, {
 			}>(path.join(PROJECT_ROOT,
 				'shared/components/theming/theme/theme.js'));
 			const themeName = data.theme;
-			return `style="background-color:${theme[themeName].background};`;
-		})() : ''
+			return `style="background-color:${theme[themeName!].background};`;
+		})() : '',
+		css: [...optionalArrayItem('/css/offline_fonts.css', isOffline)]
 	}));
 
 	const propStr: string[] = [];

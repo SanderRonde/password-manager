@@ -14,10 +14,12 @@ async function getInlinedCSS() {
 
 export async function preAppHTML({
 	title,
+	css = [],
 	bodyStyles = '',
 	development = false, 
 	stylesheets = []
 }: {
+	css?: string[];
 	title: string,
 	bodyStyles?: string;
 	development?: boolean;
@@ -38,7 +40,7 @@ export async function preAppHTML({
 		<meta name="description" content="Your password manager dashboard">
 		<title>${title}</title>
 		<link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
-		${DEFAULT_FILES.css.map((defaultCSS) => {
+		${[...DEFAULT_FILES.css, css].map((defaultCSS) => {
 			return `<link href="${defaultCSS}" rel="stylesheet">`;
 		})}
 		${[
