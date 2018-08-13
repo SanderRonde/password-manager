@@ -88,9 +88,7 @@ self.addEventListener('fetch', (event) => {
 			if (hostname === location.origin) {
 				event.respondWith(fastest(event.request));
 			} else {
-				event.respondWith(fetch(event.request, {
-					credentials: 'include'
-				}));
+				event.respondWith(fetch(event.request));
 			}
 	}
 });
