@@ -7,7 +7,7 @@ export const DEFAULT_FILES: {
 	}[];
 	scripts: {
 		name: string;
-		module?: boolean;
+		isModule?: boolean;
 	}[];
 } = {
 	css: [],
