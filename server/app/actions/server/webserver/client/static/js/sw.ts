@@ -3,27 +3,29 @@ import { TypedNavigator } from '../../src/serviceworker';
 
 declare const navigator: TypedNavigator;
 
-if ('serviceWorker' in navigator) {
-	window.addEventListener('load', () => {
-		navigator.serviceWorker.register('/serviceworker.js', {
-			scope: '/',
-			type: 'module'
+export function registerServiceWorker() {
+	if ('serviceWorker' in navigator) {
+		window.addEventListener('load', () => {
+			navigator.serviceWorker.register('/serviceworker.js', {
+				scope: '/',
+				type: 'module'
+			});
 		});
-	});
 
-	if (navigator.serviceWorker.controller) {
-		const cookieTheme = getCookie('theme');
+		if (navigator.serviceWorker.controller) {
+			const cookieTheme = getCookie('theme');
 
-		if (cookieTheme) {
+			if (cookieTheme) {
+				navigator.serviceWorker.controller.postMessage({
+					type: 'setCookie',
+					data: {
+						theme: cookieTheme
+					}
+				});	
+			}
 			navigator.serviceWorker.controller.postMessage({
-				type: 'setCookie',
-				data: {
-					theme: cookieTheme
-				}
-			});	
+				type: 'checkVersions'
+			});
 		}
-		navigator.serviceWorker.controller.postMessage({
-			type: 'checkVersions'
-		});
 	}
 }

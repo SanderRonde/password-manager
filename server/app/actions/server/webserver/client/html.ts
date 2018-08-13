@@ -1,9 +1,17 @@
 import { INLINED_FILES, getFileContent, setBasePath } from "../server/modules/resolveServerFile";
 import { conditionalString } from "../../../../lib/util";
 
-export const DEFAULT_FILES = {
+export const DEFAULT_FILES: {
+	css: {
+		name: string;
+	}[];
+	scripts: {
+		name: string;
+		module?: boolean;
+	}[];
+} = {
 	css: [],
-	scripts: ['/js/sw.js']
+	scripts: []
 }
 
 async function getInlinedCSS() {
@@ -60,8 +68,8 @@ export function postAppHTML({
 	script: string;
 }) {
 	return `</div>
-		${DEFAULT_FILES.scripts.map((defaultJS) => {
-			return `<script src="${defaultJS}"></script>`;
+		${DEFAULT_FILES.scripts.map(({ name, isModule }) => {
+			return `<script ${isModule ? 'type="module"' : ''} src="${name}"></script>`;
 		}).join('\n')}
 		<script type="module" src="${script}"></script>
 	</body>
