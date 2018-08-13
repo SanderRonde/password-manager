@@ -1,4 +1,6 @@
-import { set } from 'idb-keyval';
+import { theme } from '../../../../../../../shared/components/theming/theme/theme';
+import { VALID_THEMES_T } from '../../../../../../../shared/types/shared-types';
+import { set, get } from 'idb-keyval';
 
 const CACHE_NAME = 'password-manager';
 
@@ -54,6 +56,46 @@ async function fastest(req: Request) {
 	}));
 }
 
+function arrToObj<T>(arr: [string, T][]): {
+	[key: string]: T;
+} {
+	const obj = {} as {
+		[key: string]: T;
+	};
+	for (const [ key, val ] of arr) {
+		obj[key] = val;
+	}
+	return obj;
+}
+
+function renderTheme(prom: Promise<Response|undefined>): Promise<Response> {
+	return new Promise<Response>((resolve, reject) => {
+		prom.then(async (res) => {
+			if (res === undefined) {
+				resolve(res);
+				return;
+			}
+
+			//Get current theme
+			const themeName = await get('theme') as VALID_THEMES_T;
+			const body = await res.text();
+			const headers: [string, string][] = [];
+			res.headers.forEach((value, key) => {
+				headers.push([key, value]);
+			});
+			const init = {
+				status: res.status,
+				statusText: res.statusText,
+				headers: arrToObj(headers)
+			}
+
+			resolve(new Response(body.replace(/<body/, 
+				`<body style="background-color: ${theme[themeName].background}"`), 
+				init));
+		}).catch(reject);
+	});
+}
+
 self.addEventListener('fetch', (event) => {
 	const { pathname, hostname } = new URL(event.request.url);
 	if (pathname.startsWith('/api')) {
@@ -68,7 +110,7 @@ self.addEventListener('fetch', (event) => {
 		case '/login':
 			//Redirect to /login anyway
 			event.respondWith(race(
-				caches.match('/login_offline'),
+				renderTheme(caches.match('/login_offline')),
 				fetch('/login', {
 					credentials: 'include'
 				})
@@ -77,7 +119,7 @@ self.addEventListener('fetch', (event) => {
 		case '/dashboard':
 			if (navigator.onLine) {
 				event.respondWith(race(
-					caches.match('/dashboard_offline'),
+					renderTheme(caches.match('/dashboard_offline')),
 					fetch('/dasboard', {
 						credentials: 'include'
 					})
