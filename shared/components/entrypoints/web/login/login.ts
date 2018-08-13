@@ -10,7 +10,7 @@ import { LoginData, VALID_THEMES_T } from '../../../../types/shared-types';
 import { ConfigurableWebComponent } from "../../../../lib/webcomponents";
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
-import { API_ERRS, APIReturns } from '../../../../types/api';
+import { API_ERRS, APIReturns, JSONResponse } from '../../../../types/api';
 import { bindToClass } from '../../../../lib/decorators';
 import { LoginIDMap } from './login-querymap';
 import { LoginHTML } from './login.html';
@@ -48,14 +48,40 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 			if (cookieTheme && cookieTheme !== currentTheme) {
 				this.setGlobalProperty('theme', cookieTheme as VALID_THEMES_T);
 			}
+
+			this._fetchData();
 		}
 	}
 
-	getData(): LoginData {
+	private _fetchData() {
+		//Try to get the data now
+		return new Promise((resolve, reject) => {
+			fetch('/api/dashboard/get_comm').then((res) => {
+				return res.json();
+			}).then((data: JSONResponse<{
+				comm_token: string;
+				server_public_key: string;	
+			}>) => {
+				if (!data.success) return;
+				this.setGlobalProperty('comm_token', data.data.comm_token);
+				this.setGlobalProperty('server_public_key', data.data.server_public_key);
+				resolve();
+			}).catch(reject);
+		});
+	}
+
+	async getData(): Promise<LoginData|null> {
 		if (this._globalProperties.page !== 'login') {
 			throw new Error('Failed to get login data');
 		}
-		return this._globalProperties as LoginData;;
+
+		await this._fetchData().catch(() => {});
+		if (!this._globalProperties.comm_token ||
+			!this._globalProperties.server_public_key) {
+				return null;
+			}
+
+		return this._globalProperties as LoginData;
 	}
 
 	private async _doLoginRequest({
@@ -69,7 +95,7 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 		privateKey: string|null;
 		response: ServerLoginResponse
 	}> {
-		const serverData = this.getData();
+		const serverData = await this.getData();
 		if (serverData === null) {
 			return {
 				privateKey: null,

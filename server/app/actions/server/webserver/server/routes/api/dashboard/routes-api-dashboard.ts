@@ -146,4 +146,18 @@ export class RoutesAPIDashboard {
 			});
 		})(req, res, next);
 	}
+
+	public get_comm(_req: express.Request, res: ServerResponse) {
+		const {
+			token, publicKey
+		} = this.server.Auth.genDashboardCommToken();
+		res.status(200);
+		res.json({
+			success: true,
+			data: {
+				comm_token: token,
+				server_public_key: publicKey
+			}
+		});
+	}
 }

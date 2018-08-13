@@ -423,6 +423,9 @@ export class WebserverRouter {
 		this.parent.app.post('/api/dashboard/login', bruteforceLimiter,
 			instanceCreateLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Dashboard, 'login')));
+		this.parent.app.post('/api/dashboard/get_comm', bruteforceLimiter,
+			instanceCreateLimiter, this._wrapInErrorHandler(
+				this._doBind(this.parent.Routes.API.Dashboard, 'get_comm')));
 
 		//External API
 		this.parent.app.post('/api/instance/register', bruteforceLimiter,
