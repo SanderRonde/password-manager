@@ -60,15 +60,14 @@ export class Webserver {
 		}));
 		if (this.config.development) {
 			initDevelopmentMiddleware(this);
-		} else {
-			this.app.use(serveStatic(PRODUCTION_SERVE_PATH, {
-				maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
-				dotfiles: this.config.development ? 'allow' : 'ignore',
-				fallthrough: true,
-				index: false,
-				redirect: false
-			}));
-		}
+		} 
+		this.app.use(serveStatic(PRODUCTION_SERVE_PATH, {
+			maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
+			dotfiles: this.config.development ? 'allow' : 'ignore',
+			fallthrough: true,
+			index: false,
+			redirect: false
+		}));
 		this.app.use(bodyParser.urlencoded({ extended: false }));
 	}
 
