@@ -56,7 +56,9 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 	private _fetchData() {
 		//Try to get the data now
 		return new Promise((resolve, reject) => {
-			fetch('/api/dashboard/get_comm').then((res) => {
+			fetch('/api/dashboard/get_comm', {
+				method: 'POST'
+			}).then((res) => {
 				return res.json();
 			}).then((data: JSONResponse<{
 				comm_token: string;
