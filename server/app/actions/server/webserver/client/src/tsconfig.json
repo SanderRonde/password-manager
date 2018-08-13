@@ -25,7 +25,8 @@
     "allowJs": true,
     "compileOnSave": true,
     "include": [
-        "./"
+        "./",
+        "../static"
     ],
     "references": [{
         "path": "../../../../../../../shared"
