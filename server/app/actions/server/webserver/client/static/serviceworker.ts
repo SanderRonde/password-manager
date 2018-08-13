@@ -48,6 +48,11 @@ async function fastest(req: Request) {
 
 self.addEventListener('fetch', (event) => {
 	const { pathname, hostname } = new URL(event.request.url);
+	if (pathname.startsWith('/api')) {
+		event.respondWith(fetch(event.request));
+		return;
+	}
+
 	switch (pathname) {
 		case '/':
 		case '/login':
