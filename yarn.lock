@@ -3383,9 +3383,9 @@ isobject@^3.0.0, isobject@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
 
-js-sha512@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/js-sha512/-/js-sha512-0.7.1.tgz#854f027afe1c940b93bef7bc357ec33b05c13685"
+js-sha512@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/js-sha512/-/js-sha512-0.8.0.tgz#dd22db8d02756faccf19f218e3ed61ec8249f7d4"
 
 js-string-escape@^1.0.1:
   version "1.0.1"
