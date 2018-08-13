@@ -9,7 +9,8 @@ if ('serviceWorker' in navigator) {
 		});
 	});
 
-	navigator.serviceWorker.controller.postMessage({
-		type: 'checkVersions'
-	});
+	navigator.serviceWorker.controller &&
+		navigator.serviceWorker.controller.postMessage({
+			type: 'checkVersions'
+		});
 }
