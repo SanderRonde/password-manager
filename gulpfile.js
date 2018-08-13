@@ -1,3 +1,4 @@
+const { RoutesDashboard }  = require('./server/app/actions/server/webserver/server/routes/dashboard/routes-dashboard');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonJs = require('rollup-plugin-commonjs');
 const htmlMinifier = require('html-minifier');
@@ -9,6 +10,7 @@ const fs = require('fs-extra');
 const gulp = require('gulp');
 const path = require('path');
 const glob = require('glob');
+const md5 = require('md5');
 
 /**
  * Generates a task with given description
@@ -189,8 +191,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 (() => {
 	const SRC_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/src/');
 	const BUILD_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/build/');
-	//TODO: add dashboard route when work started on it
-	const ROUTES = ['login'];
+	const ROUTES = ['login', 'dashboard'];
 
 	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
 		gulp.series(
@@ -305,7 +306,78 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		'dashboard.bundle.js'
 	));
 
-	gulp.task('dashboard', gulp.parallel(
-		'dashboard.bundle'
+	const CACHE_STATIC = [
+		'/js/sw.js',
+		'/css/offline_fonts.css'
+	];
+	
+	const CACHE_PAGES = [
+		'/login_offline',
+		'/dashboard_offline'
+	];
+	
+	const CACHE_COMPONENTS = [
+		'/entrypoints/login/login-page.js',
+		'/entrypoints/dashboard/dashboard-page.js'
+	];
+
+	function fakeRender(fn) {
+		return new Promise((resolve) => {
+			let content = '';
+			fn({ cookies: {} }, {
+				write(data) {
+					content += data;
+				},
+				end() {
+					resolve(content);
+				}
+			})
+		});
+	}
+
+	gulp.task('dashboard.meta.versions', genTask('Generates the hashes for all ' +
+		'cached files', async () => {
+			const versions = {};
+			await Promise.all([
+				Promise.all(CACHE_STATIC.map(async (static) => {
+					const filePath = path.join(__dirname, 
+						'server/app/actions/server/webserver/client/static/',
+						static.slice(1));
+					const content = await fs.readFile(filePath, {
+						encoding: 'utf8'
+					});
+					versions[static] = md5(content);
+				})),
+				Promise.all(CACHE_PAGES.map(async (page) => {
+					const route = new RoutesDashboard({
+						config: {}
+					});
+					const content = await fakeRender(route[page.slice(1)].bind(route))
+					versions[page] = md5(content);
+				})),
+				Promise.all(CACHE_COMPONENTS.map(async (component) => {
+					const filePath = path.join(__dirname, 
+						'server/app/actions/server/webserver/client/build/',
+						component.slice(1));
+					const content = await fs.readFile(filePath, {
+						encoding: 'utf8'
+					});
+					versions[component] = md5(content);
+				}))
+			]);
+			await fs.writeFile(path.join(__dirname, 
+				'server/app/actions/server/webserver/client/build/',
+				'versions.json'), JSON.stringify(versions), {
+					encoding: 'utf8'
+				});
+		}));
+
+	gulp.task('dashboard.meta', gulp.parallel(
+		'dashboard.meta.versions'
+	));
+
+	gulp.task('dashboard', gulp.series(
+		'dashboard.bundle',
+		'dashboard.meta'
 	));
 })();
