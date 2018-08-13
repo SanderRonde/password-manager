@@ -121,6 +121,10 @@ async function checkVersions() {
 	await cache.put('/versions.json', remoteVersionsFile);
 }
 
+function setIDBValue(key: string, value: any) {
+	
+}
+
 interface TypedServiceWorker extends ServiceWorker {
 	postMessage(message: ServiceworkerMessages, transfer?: any[]): void;
 }
@@ -135,6 +139,11 @@ export interface TypedNavigator extends Navigator {
 
 export type ServiceworkerMessages = {
 	type: 'checkVersions';
+}|{
+	type: 'setCookie';
+	data: {
+		cookie: string;
+	}
 };
 self.addEventListener<ServiceworkerMessages>('message', (event) => {
 	event.waitUntil((async () => {
@@ -142,6 +151,8 @@ self.addEventListener<ServiceworkerMessages>('message', (event) => {
 			case 'checkVersions':
 				await checkVersions();
 				break;
+			case 'setCookie':
+				
 		}
 	})());
 });
