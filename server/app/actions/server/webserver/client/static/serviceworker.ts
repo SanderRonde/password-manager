@@ -43,13 +43,17 @@ function race<T>(...promises: Promise<T>[]): Promise<T> {
 }
 
 async function fastest(req: Request) {
-	return race(caches.match(req), fetch(req));
+	return race(caches.match(req), fetch(req, {
+		credentials: 'include'
+	}));
 }
 
 self.addEventListener('fetch', (event) => {
 	const { pathname, hostname } = new URL(event.request.url);
 	if (pathname.startsWith('/api')) {
-		event.respondWith(fetch(event.request));
+		event.respondWith(fetch(event.request, {
+			credentials: 'include'
+		}));
 		return;
 	}
 
@@ -59,14 +63,18 @@ self.addEventListener('fetch', (event) => {
 			//Redirect to /login anyway
 			event.respondWith(race(
 				caches.match('/login_offline'),
-				fetch('/login')
+				fetch('/login', {
+					credentials: 'include'
+				})
 			));
 			break;
 		case '/dashboard':
 			if (navigator.onLine) {
 				event.respondWith(race(
 					caches.match('/dashboard_offline'),
-					fetch('/dasboard')
+					fetch('/dasboard', {
+						credentials: 'include'
+					})
 				));
 			} else {
 				event.respondWith(caches.match('/dashboard_offline'));
@@ -76,7 +84,9 @@ self.addEventListener('fetch', (event) => {
 			if (hostname === location.origin) {
 				event.respondWith(fastest(event.request));
 			} else {
-				event.respondWith(fetch(event.request));
+				event.respondWith(fetch(event.request, {
+					credentials: 'include'
+				}));
 			}
 	}
 });
