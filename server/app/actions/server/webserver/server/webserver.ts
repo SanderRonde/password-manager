@@ -27,7 +27,7 @@ export const DEVELOPMENT_SERVE_PATHS = [
 ];
 export const PRODUCTION_SERVE_PATH = path.join(base, 'build/');
 export const PRODUCTION_SERVE_PATHS = [
-	DEVELOPMENT_SERVE_PATH,
+	STATIC_SERVE_PATH,
 	PRODUCTION_SERVE_PATH
 ]
 
