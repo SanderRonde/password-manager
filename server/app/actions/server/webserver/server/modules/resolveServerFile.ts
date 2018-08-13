@@ -18,6 +18,9 @@ export function setBasePath(isDevelopment: boolean) {
 const fileCache: Map<string, string> = new Map();
 export const resolvedPaths: Map<string, string | null> = new Map();
 async function resolveFile(file: string, paths: string[]): Promise<string | null> {
+	if (file.startsWith('/')) {
+		file = file.slice(1);
+	}
 	const result = (await Promise.all(paths.map((possiblePrefix) => {
 		return new Promise<string | null>((resolve) => {
 			const fullPath = path.join(possiblePrefix, file);
