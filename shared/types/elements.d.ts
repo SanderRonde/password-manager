@@ -4,11 +4,13 @@ import { AnimatedButton } from "../components/util/animated-button/animated-butt
 import { MaterialInput } from "../components/util/material-input/material-input";
 import { IconButton } from "../components/util/icon-button/icon-button";
 import { Login } from "../components/entrypoints/web/login/login";
+import { ThemeSelector } from "../components/util/theme-selector/theme-selector";
 
 declare global {
 	type HTMLLoginElement = Login;
 	type HTMLIconButtonElement = IconButton;
 	type HTMLMaterialInputElement = MaterialInput;
+	type HTMLThemeSelectorElement = ThemeSelector;
 	type HTMLAnimatedButtonElement = AnimatedButton;
 	type HTMLVerticalCentererElement = VerticalCenterer;
 	type HTMLHorizontalCentererElement = HorizontalCenterer;
