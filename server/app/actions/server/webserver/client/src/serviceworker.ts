@@ -156,7 +156,7 @@ self.addEventListener<ServiceworkerMessages>('message', (event) => {
 				await checkVersions();
 				break;
 			case 'setCookie':
-				set('theme', event.data.theme);
+				await set('theme', event.data.theme);
 				break;
 		}
 	})());
