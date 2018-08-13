@@ -238,7 +238,55 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 					}));
 				}
 			),
-			gulp.parallel(...ROUTES.map((route) => {
+			gulp.parallel(gulp.series(
+				async function rolupServiceWorker() {
+					const input = path.join(SRC_DIR, `serviceworker.js`);
+					const output = path.join(BUILD_DIR, `serviceworker.js`);	
+
+					const bundle = await rollup.rollup({
+						input,
+						onwarn(warning) {
+							if (typeof warning !== 'string' && warning.loc) {
+								const line = warning.loc.line;
+								if (line === 1 || line === 7) {
+									//Typescript inserted helper method, ignore it
+									return;
+								}
+							}
+							console.log(warning);
+						},
+						plugins: [
+							rollupResolve({
+								module: true,
+								browser: true
+							}),
+							rollupCommonJs()
+						]
+					});
+
+					await bundle.write({
+						format: 'iife',
+						file: output
+					});
+				}, 
+				async function minifyServiceWorker() {
+					const file = await fs.readFile(
+						path.join(BUILD_DIR, `serviceworker.js`), {
+							encoding: 'utf8'
+						});
+					const result = uglify.minify(file, {
+						keep_classnames: true,
+						ecma: 6
+					});
+					if (result.error) {
+						throw result.error;
+					}
+					await fs.writeFile(path.join(BUILD_DIR, `serviceworker.js`), 
+						result.code, {
+							encoding: 'utf8'
+						});
+				}
+			}, ...ROUTES.map((route) => {
 				const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-page.js`);
 				const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}-page.js`);
 
