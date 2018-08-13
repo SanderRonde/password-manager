@@ -316,7 +316,7 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 		for (const otherTheme of VALID_THEMES) {
 			this.classList.remove(otherTheme);
 		}
-		this.classList.add(theme);
+		this.classList.add(theme!);
 	}
 }
 
