@@ -187,10 +187,8 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 }> {
 	private _children: Set<WebComponentHierarchyManager<any>> = new Set();
 	private _parent: WebComponentHierarchyManager<any>|null = null;
-	private _isRoot: boolean = this.hasAttribute('_root');
-	protected _globalProperties: GlobalProperties = {...{
-		theme: 'light',
-	}, ...this._getGlobalProperties()}
+	private _isRoot!: boolean;
+	protected _globalProperties!: GlobalProperties;
 
 	private _getGlobalProperties() {
 		if (!this._isRoot) {
@@ -210,6 +208,10 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 	}
 
 	connectedCallback() {
+		this._globalProperties = {...{
+			theme: 'light',
+		}, ...this._getGlobalProperties()};
+		this._isRoot = this.hasAttribute('_root');
 		this._registerToParent();
 	}
 
@@ -304,12 +306,16 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 	constructor() {
 		super();
 
-		this._setTheme(this._globalProperties.theme);
 		this.listen('globalPropChange', (prop, value): any => {
 			if (prop === 'theme') {
 				this._setTheme(value as GlobalProperties['theme']);
 			}
 		});
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
+		this._setTheme(this._globalProperties.theme);
 	}
 
 	private _setTheme(theme: GlobalProperties['theme']) {
@@ -384,7 +390,13 @@ export abstract class WebComponent<IDS extends {
 	connectedCallback() {
 		super.connectedCallback();
 		this.renderToDOM();
+		this.mounted();
 	}
+
+	/**
+	 * Called when the component is mounted to the dom
+	 */
+	mounted() {}
 }
 
 export class ConfigurableWebComponent<IDS extends {
