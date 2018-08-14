@@ -1,6 +1,9 @@
+import { ServiceworkerSelf } from '../../../../../../../shared/types/serviceworker';
 import { theme } from '../../../../../../../shared/components/theming/theme/theme';
 import { VALID_THEMES_T } from '../../../../../../../shared/types/shared-types';
 import { set, get } from 'idb-keyval';
+
+declare const self: ServiceworkerSelf;
 
 const CACHE_NAME = 'password-manager';
 
@@ -40,10 +43,14 @@ self.addEventListener('activate', (event) => {
 	event.waitUntil(self.clients.claim());
 });
 
-function race<T>(...promises: Promise<T>[]): Promise<T> {
+function race<T>(...promises: Promise<T|undefined>[]): Promise<T> {
 	return new Promise<T>((resolve, reject) => {
 		promises.forEach((promise) => {
-			promise.then(resolve);
+			promise.then((result) => {
+				if (result !== undefined) {
+					resolve(result);
+				}
+			});
 		});
 		promises.reduce((a, b) => a.catch(() => b))
 			.catch(() => reject(new Error('All requests failed')));
@@ -54,6 +61,20 @@ async function fastest(req: Request) {
 	return race(caches.match(req), fetch(req, {
 		credentials: 'include'
 	}));
+}
+
+function cacheFirst(req: Request|string): Promise<Response> {
+	return new Promise((resolve, reject) => {
+		caches.match(req).then((res) => {
+			if (res) {
+				resolve(res);
+			} else {
+				fetch(req, {
+					credentials: 'include'
+				}).then(resolve, reject);
+			}
+		}).catch(reject);
+	});
 }
 
 function arrToObj<T>(arr: [string, T][]): {
@@ -125,7 +146,7 @@ self.addEventListener('fetch', (event) => {
 					})
 				));
 			} else {
-				event.respondWith(caches.match('/dashboard_offline'));
+				event.respondWith(cacheFirst('/dashboard_offline'));
 			}
 			break;
 		default:
@@ -198,7 +219,7 @@ self.addEventListener<ServiceworkerMessages>('message', (event) => {
 				await checkVersions();
 				break;
 			case 'setCookie':
-				await set('theme', event.data.theme);
+				await set('theme', event.data.data.theme);
 				break;
 		}
 	})());
