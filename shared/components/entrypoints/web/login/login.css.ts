@@ -1,24 +1,27 @@
-import { createThemedRules } from '../../../../lib/webcomponent-util';
+import { Theme } from '../../../../types/shared-types';
 import { html } from "lit-html";
+import { Login } from './login';
 
-export const LoginCSS = html`<style>
-	#formContainer {
-		width: 400px;
-	}
+export function LoginCSS(this: Login, theme: Theme, _props: Login['props']) {
+	return html`<style>
+		#formContainer {
+			width: 400px;
+		}
 
-	#buttonPositioner {
-		display: flex;
-		flex-direction: row;
-		justify-content: flex-end;
-	}
+		#buttonPositioner {
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-end;
+		}
 
-	${createThemedRules('#pageContainer', {
-		backgroundColor: ['background']
-	})}
+		#pageContainer {
+			background-color: ${theme.background};
+		}
 
-	#themeSelector {
-		position: absolute;
-		top: 5px;
-		right: 5px;
-	}
-</style>`;
+		#themeSelector {
+			position: absolute;
+			top: 5px;
+			right: 5px;
+		}
+	</style>`
+}

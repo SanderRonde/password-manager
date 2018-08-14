@@ -323,6 +323,7 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 			this.classList.remove(otherTheme);
 		}
 		this.classList.add(theme!);
+		this.renderToDOM();
 	}
 }
 

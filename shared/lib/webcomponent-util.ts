@@ -1,6 +1,6 @@
 import { WebComponentBase, EventListenerObj, WebComponent } from './webcomponents';
-import { VALID_THEMES_T, Theme, DEFAULT_THEME } from '../types/shared-types';
 import { theme } from '../components/theming/theme/theme';
+import { Theme, DEFAULT_THEME } from '../types/shared-types';
 import { TemplateResult } from "lit-html";
 
 // From https://github.com/JedWatson/classnames
@@ -372,7 +372,7 @@ export function genIsAccessor(name: string, component: () => typeof WebComponent
 
 export interface WebComponentConfiguration {
 	is: string;
-	css: TemplateResult|null;
+	css: ((this: any, theme: Theme, props: any) => TemplateResult)|null;
 	dependencies?: typeof WebComponentBase[];
 	html: (this: any, props: any) => TemplateResult;
 }
@@ -385,15 +385,18 @@ export function config(config: WebComponentConfiguration) {
 		[key: string]: HTMLElement;
 	}, T, E extends EventListenerObj = {}>(target: T): T => {
 		const targetComponent = <any>target as typeof WebComponent;
+		const defaultTheme: DEFAULT_THEME = 'light';
 		class WebComponentConfig extends targetComponent<I, E> implements WebComponentBase {
 			static is = genIs(is, WebComponentConfig);
 			static dependencies = dependencies
 			static config: WebComponentConfiguration = config;
 			renderer = html;
 
-			private _templateCSS = config.css || html``;
 			get css() {
-				return this._templateCSS;
+				return !config.css ? html`` :
+					config.css(theme[(this._globalProperties && 
+						this._globalProperties.theme) || defaultTheme], 
+						this.props);
 			}
 		}
 		return <any>WebComponentConfig as T;
@@ -507,67 +510,6 @@ export function getCookie(name: string) {
     }
     return "";
 }
-
-function createProperty(property: string, value: string) {
-	return `${property}: ${value};`
-}
-
-function createRule(rule: string, properties: string) {
-	return `${rule} { ${properties} }`;
-}
-
-function getArrColor(themeName: VALID_THEMES_T, arr: [
-	'primary'|'accent',
-	keyof Theme['primary'|'accent']
-]|[
-	Exclude<keyof Theme, 'primary'|'accent'>
-]): string {
-	if (arr[0] === 'primary' || arr[0] === 'accent') {
-		return theme[themeName][arr[0] as 'primary'|'accent'][arr[1] as keyof Theme['primary'|'accent']];
-	}
-	return theme[themeName][arr[0] as Exclude<keyof Theme, 'primary'|'accent'>];
-}
-
-function createRulesForTheme(themeName: VALID_THEMES_T, rules: string|string[], 
-	props: Partial<{
-		[P in keyof CSSStyleDeclaration]: [
-			'primary'|'accent',
-			keyof Theme['primary'|'accent']
-		]|[
-			Exclude<keyof Theme, 'primary'|'accent'>
-		]
-	}>, hostCSS: string, themePrefix: string = `:host(.${themeName}${hostCSS}) `): string {
-		return (Array.isArray(rules) ? rules : [rules]).map((rule) => {
-			return createRule(`${themePrefix}${rule}`,
-				Object.getOwnPropertyNames(props).map((property) => {
-					const colorArr = props[property as keyof typeof props]!;
-					const color = getArrColor(themeName as VALID_THEMES_T, colorArr)
-					return createProperty(casingToDashes(property), color);
-				}).join(' '));
-		}).join('');
-	}
-
-const defaultTheme: DEFAULT_THEME = 'light';
-export function createThemedRules(rules: string|string[], props: Partial<{
-	[P in keyof CSSStyleDeclaration]: [
-		'primary'|'accent',
-		keyof Theme['primary'|'accent']
-	]|[
-		Exclude<keyof Theme, 'primary'|'accent'>
-	]
-}>, host: string = ''): string {
-	return [createRulesForTheme(defaultTheme, rules, props, host, ''),
-		...Object.getOwnPropertyNames(theme).map((themeName: VALID_THEMES_T) => {
-			return createRulesForTheme(themeName, rules, props, host);	
-		})].join('');
-}
-
-export function forEachTheme(callback: (themeName: VALID_THEMES_T, themePrefix: string) => string): string {
-	return [callback(defaultTheme, ''),
-		...Object.getOwnPropertyNames(theme).map((themeName: VALID_THEMES_T) => {
-			return callback(themeName, `:host(.${themeName}) `);
-		})].join('\n');
-};
 
 interface ColorRepresentation {
 	r: number;
