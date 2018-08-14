@@ -105,7 +105,7 @@ export class RoutesAPIDashboard {
 				email: decrypted.email,
 				password: decrypted.password,
 				public_key: keyPair.publicKey,
-				expires: COMM_TOKEN_DEFAULT_EXPIRE_TIME
+				expires: Date.now() + COMM_TOKEN_DEFAULT_EXPIRE_TIME
 			}, res);
 			if (!instanceData) return;
 
