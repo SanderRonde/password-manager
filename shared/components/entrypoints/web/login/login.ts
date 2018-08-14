@@ -9,6 +9,7 @@ import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { LoginData, VALID_THEMES_T } from '../../../../types/shared-types';
 import { API_ERRS, APIReturns, JSONResponse } from '../../../../types/api';
 import { ConfigurableWebComponent } from "../../../../lib/webcomponents";
+import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { bindToClass } from '../../../../lib/decorators';
@@ -28,7 +29,8 @@ type ServerLoginResponse = APIReturns['/api/dashboard/login'];
 		MaterialInput,
 		IconButton,
 		AnimatedButton,
-		ThemeSelector
+		ThemeSelector,
+		PaperToast
 	]
 })
 export class Login extends ConfigurableWebComponent<LoginIDMap> {
@@ -102,6 +104,10 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 	}> {
 		const serverData = await this.getData();
 		if (serverData === null) {
+			PaperToast.create({
+				content: 'Could not establish connection to server',
+				buttons: [PaperToast.BUTTONS.HIDE]
+			});
 			return {
 				privateKey: null,
 				response: {
@@ -118,7 +124,7 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 
 		const { comm_token, server_public_key } = serverData;
 		try {
-			return {
+			const res = {
 				privateKey: keyPair.privateKey,
 				response: await doClientAPIRequest({},
 					'/api/dashboard/login', {
@@ -130,8 +136,49 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 							password: hash(pad(password, 'masterpwverify')),
 						}, server_public_key)
 					})
+			};
+			if (res.response.success === false) {
+				switch (res.response.ERR) {
+					case API_ERRS.CLIENT_ERR:
+						PaperToast.create({
+							content: 'Failed to send request',
+							buttons: [PaperToast.BUTTONS.HIDE]
+						});
+						break;
+					case API_ERRS.INVALID_CREDENTIALS:
+						PaperToast.create({
+							content: 'Invalid credentials',
+							buttons: [PaperToast.BUTTONS.HIDE]
+						});
+						break;
+					case API_ERRS.INVALID_PARAM_TYPES:
+					case API_ERRS.MISSING_PARAMS:
+					case API_ERRS.NO_REQUEST_BODY:
+						PaperToast.create({
+							content: 'Invalid request',
+							buttons: [PaperToast.BUTTONS.HIDE]
+						});
+						break;
+					case API_ERRS.SERVER_ERROR:
+						PaperToast.create({
+							content: 'Server error',
+							buttons: [PaperToast.BUTTONS.HIDE]
+						});
+						break;
+					case API_ERRS.TOO_MANY_REQUESTS:
+						PaperToast.create({
+							content: 'Too many requests',
+							buttons: [PaperToast.BUTTONS.HIDE]
+						});
+						break;
+				}
 			}
+			return res;
 		} catch(e) {
+			PaperToast.create({
+				content: 'Could not establish connection to server',
+				buttons: [PaperToast.BUTTONS.HIDE]
+			});
 			return {
 				privateKey: keyPair.privateKey,
 				response: {
@@ -217,6 +264,11 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 				localStorage.setItem('rememberedEmail', email || '');
 			}
 			this.$.button.setState('success');
+			PaperToast.create({
+				content: 'Loading dashboard...',
+				duration: PaperToast.DURATION.FOREVER,
+				buttons: [PaperToast.BUTTONS.HIDE]
+			});
 			await this._proceedToDashboard({ privateKey, response });
 		} else {
 			this.$.button.setState('failure');
