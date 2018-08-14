@@ -20,7 +20,7 @@ script:
 - gulp defs
 - tsc --build --force && tsc -p shared/tsconfig.commonjs.json
 - ava --verbose shared/**/*.test.js
-- ava --verbose server/**/*.test.js
+- ava --verbose server/**/*.test.js -c 2
 notifications:
   email:
     on_success: change
