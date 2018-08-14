@@ -193,6 +193,54 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 	const BUILD_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/build/');
 	const ROUTES = ['login', 'dashboard'];
 
+	gulp.task('dashboard.bundle.serviceworker', genTask('Bundles the serviceworker',
+		gulp.series(
+			async function rolupServiceWorker() {
+				const input = path.join(SRC_DIR, `serviceworker.js`);
+				const output = path.join(BUILD_DIR, `serviceworker.js`);	
+
+				const bundle = await rollup.rollup({
+					input,
+					onwarn(warning) {
+						if (typeof warning !== 'string' && warning.code === 'THIS_IS_UNDEFINED') {
+							//Typescript inserted helper method, ignore it
+							return;
+						}
+						console.log(warning);
+					},
+					plugins: [
+						rollupResolve({
+							module: true,
+							browser: true
+						}),
+						rollupCommonJs()
+					]
+				});
+
+				await bundle.write({
+					format: 'iife',
+					file: output
+				});
+			}, 
+			async function minifyServiceWorker() {
+				const file = await fs.readFile(
+					path.join(BUILD_DIR, `serviceworker.js`), {
+						encoding: 'utf8'
+					});
+				const result = uglify.minify(file, {
+					keep_classnames: true,
+					ecma: 6
+				});
+				if (result.error) {
+					throw result.error;
+				}
+				await fs.writeFile(path.join(BUILD_DIR, `serviceworker.js`), 
+					result.code, {
+						encoding: 'utf8'
+					});
+			}
+		)));
+
 	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
 		gulp.series(
 			gulp.parallel(
@@ -238,55 +286,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 					}));
 				}
 			),
-			gulp.parallel(gulp.series(
-				async function rolupServiceWorker() {
-					const input = path.join(SRC_DIR, `serviceworker.js`);
-					const output = path.join(BUILD_DIR, `serviceworker.js`);	
-
-					const bundle = await rollup.rollup({
-						input,
-						onwarn(warning) {
-							if (typeof warning !== 'string' && warning.loc) {
-								const line = warning.loc.line;
-								if (line === 1 || line === 7) {
-									//Typescript inserted helper method, ignore it
-									return;
-								}
-							}
-							console.log(warning);
-						},
-						plugins: [
-							rollupResolve({
-								module: true,
-								browser: true
-							}),
-							rollupCommonJs()
-						]
-					});
-
-					await bundle.write({
-						format: 'iife',
-						file: output
-					});
-				}, 
-				async function minifyServiceWorker() {
-					const file = await fs.readFile(
-						path.join(BUILD_DIR, `serviceworker.js`), {
-							encoding: 'utf8'
-						});
-					const result = uglify.minify(file, {
-						keep_classnames: true,
-						ecma: 6
-					});
-					if (result.error) {
-						throw result.error;
-					}
-					await fs.writeFile(path.join(BUILD_DIR, `serviceworker.js`), 
-						result.code, {
-							encoding: 'utf8'
-						});
-				}
-			), ...ROUTES.map((route) => {
+			gulp.parallel('dashboard.bundle.serviceworker', ...ROUTES.map((route) => {
 				const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-page.js`);
 				const output = path.join(BUILD_DIR, 'entrypoints/', route, `${route}-page.js`);
 
@@ -295,12 +295,9 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 						const bundle = await rollup.rollup({
 							input,
 							onwarn(warning) {
-								if (typeof warning !== 'string' && warning.loc) {
-									const line = warning.loc.line;
-									if (line === 1 || line === 7) {
-										//Typescript inserted helper method, ignore it
-										return;
-									}
+								if (typeof warning !== 'string' && warning.code === 'THIS_IS_UNDEFINED') {
+									//Typescript inserted helper method, ignore it
+									return;
 								}
 								console.log(warning);
 							},
