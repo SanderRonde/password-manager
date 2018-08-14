@@ -58,3 +58,14 @@ test('data hybrid encrypted by the browser can be decrypted by the server', t =>
 	const decrypted = serverCrypto.hybdridDecrypt(encrypted, privateKey);
 	t.is(decrypted, input, 'decrypted value is the same as input');
 });
+
+function somePromise() {
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			resolve();
+		}, 15000);
+	});
+}
+test('something async', async t => {
+	await somePromise();
+});
