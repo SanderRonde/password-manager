@@ -1,8 +1,8 @@
 import { GlobalProperties } from '../../../../../../../shared/types/shared-types'
+import { requireES6File, optionalArrayItem } from '../../../../../lib/util';
 import { preAppHTML, postAppHTML, DEFAULT_FILES } from '../../client/html';
 import { getFileContent, setBasePath } from "./resolveServerFile";
 import { PROJECT_ROOT } from '../../../../../lib/constants';
-import { requireES6File, optionalArrayItem } from '../../../../../lib/util';
 import { ServerResponse } from './ratelimit';
 import mime = require('mime');
 import * as path from 'path';
@@ -32,9 +32,11 @@ async function push(res: ServerResponse, file: string) {
 	} catch(e) { }
 }
 
-function pushAll(res: ServerResponse, arr: string[]): Promise<void[]> {
+function pushAll(res: ServerResponse, arr: {
+	name: string;
+}[]): Promise<void[]> {
 	return Promise.all(arr.map((item) => {
-		return push(res, item);
+		return push(res, item.name);
 	}));
 }
 
