@@ -790,7 +790,7 @@ export declare namespace APIRoutes {
 			/**
 			 * The public key of the server, used to encrypt data sent to it
 			 */
-			server_key: PublicKeyEncrypted<ServerPublicKey, InstancePublicKey>;
+			server_public_key: PublicKeyEncrypted<ServerPublicKey, InstancePublicKey>;
 			/**
 			 * The auth token that can be used to make API requests. Encrypted with instance key
 			 */

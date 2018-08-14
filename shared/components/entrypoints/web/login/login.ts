@@ -205,7 +205,7 @@ export class Login extends ConfigurableWebComponent<LoginIDMap> {
 			instance_id: decryptWithPrivateKey(
 				response.data.id, privateKey),
 			server_public_key: decryptWithPrivateKey(
-				response.data.server_key, privateKey),
+				response.data.server_public_key, privateKey),
 			auth_token: decryptWithPrivateKey(
 				response.data.auth_token, privateKey)
 		}
