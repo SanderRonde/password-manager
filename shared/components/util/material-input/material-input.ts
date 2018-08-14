@@ -77,6 +77,7 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 
 	set(value: string) {
 		this.$.input!.value = value || '';
+		this.props.value = value || '';
 		this._updateClasses();
 	}
 
