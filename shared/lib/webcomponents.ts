@@ -208,10 +208,10 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 	}
 
 	connectedCallback() {
+		this._isRoot = this.hasAttribute('_root');
 		this._globalProperties = {...{
 			theme: 'light',
 		}, ...this._getGlobalProperties()};
-		this._isRoot = this.hasAttribute('_root');
 		this._registerToParent();
 	}
 
