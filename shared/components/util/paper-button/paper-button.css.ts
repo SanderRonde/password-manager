@@ -271,7 +271,7 @@ export const PaperButtonCSS = html`<style>
 		overflow: hidden;
 	}
 	${createThemedRules('.mdl-ripple', {
-		color: ['textOnBackground']
+		backgroundColor: ['textOnNonbackground']
 	})}
 	.mdl-ripple.is-animating {
 		transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1), 
