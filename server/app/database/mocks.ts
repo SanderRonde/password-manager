@@ -346,7 +346,10 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 	insertOne(docs: Object, options: CollectionInsertOneOptions, callback: MongoCallback<InsertOneWriteOpResult>): void;
 	insertOne(docs: Object, optionsOrCallback?: CollectionInsertOneOptions|MongoCallback<InsertOneWriteOpResult>, callback?: MongoCallback<InsertOneWriteOpResult>): void|Promise<InsertOneWriteOpResult> {
 		const id = (docs as any)._id || new mongo.ObjectId()
-		this._records.push(docs);
+		this._records.push({
+			...docs,
+			_id: id
+		});
 		if (callback) {
 			callback(null!, {
 				result: {
