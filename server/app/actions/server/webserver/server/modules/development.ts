@@ -23,9 +23,10 @@ prefix?: string;
 			return next();
 		}
 
-		if (exclude.indexOf(path.basename(req.url)) !== -1) {
-			return next();
-		}
+		if (exclude.indexOf(path.basename(req.url)) !== -1 ||
+			exclude.indexOf(req.url) !== -1) {
+				return next();
+			}
 
 		const basePath = path.join(root, req.url.slice(prefix.length));
 		const filePaths = [basePath, ...extensions.map((extension) => {
@@ -182,7 +183,8 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 				return rewriteEsModuleImports(content);
 			}
 			return content;
-		}
+		},
+		exclude: ['/serviceworker.js']
 	}));
 	webserver.app.use(serve(STATIC_SERVE_PATH, {
 		prefix: '/static/',
