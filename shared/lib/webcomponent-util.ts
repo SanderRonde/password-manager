@@ -811,3 +811,16 @@ export function isDark(color: string) {
 	const { r, g, b, a } = getColorRepresentation(color);
 	return r * a < 100 && g * a < 100 && b * a < 100;
 }
+
+export function onMount(el: WebComponentBase) {
+	if (el.renderToDOM) {
+		return Promise.resolve(el);
+	}
+	return new Promise((resolve) => {
+		setInterval(() => {
+			if (el.renderToDOM) {
+				resolve(el);
+			}
+		}, 5);
+	});
+}
