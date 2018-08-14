@@ -19,7 +19,7 @@ before_script:
 script:
 - gulp defs
 - tsc --build --force && tsc -p shared/tsconfig.commonjs.json
-- cat server/test/tests/env.test.js
+- ava --verbose server/test/tests/env.test.js
 - yarn test
 notifications:
   email:
