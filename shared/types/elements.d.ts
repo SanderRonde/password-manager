@@ -6,11 +6,13 @@ import { IconButton } from "../components/util/icon-button/icon-button";
 import { Login } from "../components/entrypoints/web/login/login";
 import { ThemeSelector } from "../components/util/theme-selector/theme-selector";
 import { PaperToast } from "../components/util/paper-toast/paper-toast";
+import { PaperButton } from "../components/util/paper-button/paper-button";
 
 declare global {
 	type HTMLLoginElement = Login;
 	type HTMLIconButtonElement = IconButton;
 	type HTMLPaperToastElement = PaperToast;
+	type HTMLPaperButtonElement = PaperButton;
 	type HTMLMaterialInputElement = MaterialInput;
 	type HTMLThemeSelectorElement = ThemeSelector;
 	type HTMLAnimatedButtonElement = AnimatedButton;
