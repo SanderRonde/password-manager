@@ -290,4 +290,9 @@ export const PaperButtonCSS = html`<style>
 		border-radius: 5px;
 		height: auto;
 	}
+
+	:host([small]) #button {
+		padding: 0 20px;
+		border-radius: 0;
+	}
 </style>`;

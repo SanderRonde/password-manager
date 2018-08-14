@@ -1,11 +1,12 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, isNewElement } from '../../../lib/webcomponent-util';
+import { config, isNewElement, defineProps, PROP_TYPE, changeOpacity } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
 import { PaperButtonIDMap } from './paper-button-querymap';
 import { PaperButtonHTML } from './paper-button.html';
-import { PaperButtonCSS } from './paper-button.css';
 import { bindToClass } from '../../../lib/decorators';
+import { PaperButtonCSS } from './paper-button.css';
+import { html } from 'lit-html';
 
 @config({
 	is: 'paper-button',
@@ -13,7 +14,51 @@ import { bindToClass } from '../../../lib/decorators';
 	html: PaperButtonHTML
 })
 @rippleEffect
-export class AnimatedButton extends ConfigurableWebComponent<PaperButtonIDMap> {
+export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
+	click: {
+		args: [MouseEvent]
+	}	
+}> {
+	props = defineProps(this, {
+		reflect: {
+			flat: PROP_TYPE.BOOL,
+			color: PROP_TYPE.STRING,
+			background: PROP_TYPE.STRING,
+			rippleColor: PROP_TYPE.STRING,
+			noRipple: PROP_TYPE.BOOL,
+			small: PROP_TYPE.BOOL
+		}
+	});
+
+	get customCSS() {
+		if (this.props.color || this.props.background || this.props.rippleColor) {
+			return html`<style>
+				${this.props.color ? html`<style>
+					#button {
+						color: ${this.props.color};
+					}
+				</style>` : ''}
+				${this.props.background ? html`<style>
+					#button {
+						background: ${this.props.background};
+						background-color: ${this.props.background};
+					}
+				</style>` : ''}
+				${this.props.rippleColor ? html`<style>
+					#button .mdl-ripple {
+						background: ${this.props.rippleColor};
+						background-color: ${this.props.rippleColor};
+					}
+
+					:host #button:active {
+						background-color: ${changeOpacity(this.props.rippleColor, 30)}
+					}
+				</style>` : ''}
+			</style>`
+		}
+		return html`<style></style>`;
+	}
+
 	private rippleElement: HTMLElement|null = null;
 	get container() {
 		return this.$.button;
@@ -47,6 +92,10 @@ export class AnimatedButton extends ConfigurableWebComponent<PaperButtonIDMap> {
 			}
 			this.$.button.addEventListener('mouseup', this.blurHandler);
 			this.$.button.addEventListener('mouseleave', this.blurHandler);
+
+			this.$.button.addEventListener('click', (e) => {
+				this._fire('click', e);
+			});
 		}
 	}
 }
