@@ -447,6 +447,7 @@ export function listenAndBind<K extends keyof HTMLElementEventMap>(target: HTMLE
 
 const usedElements: WeakSet<HTMLElement> = new WeakSet();
 export function isNewElement(element: HTMLElement) {
+	if (!element) return false;
 	const has = usedElements.has(element);
 	if (!has) {
 		usedElements.add(element);
