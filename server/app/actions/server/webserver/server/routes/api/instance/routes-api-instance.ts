@@ -15,10 +15,11 @@ export class RoutesApiInstance {
 	constructor(public server: Webserver) { }
 
 	public async doRegister({
-		email, password, public_key, expires = Infinity
+		email, password, public_key, expires = Infinity, db_public_key = public_key
 	}: {
 		email: string;
 		public_key: string;
+		db_public_key?: string;
 		password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		expires?: number
 	}, res: ServerResponse) {
@@ -35,7 +36,7 @@ export class RoutesApiInstance {
 
 		const record: EncryptedInstance = {
 			twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
-			public_key: this.server.database.Crypto.dbEncrypt(public_key),
+			public_key: this.server.database.Crypto.dbEncrypt(db_public_key),
 			user_id: auth._id,
 			server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey),
 			expires: expires

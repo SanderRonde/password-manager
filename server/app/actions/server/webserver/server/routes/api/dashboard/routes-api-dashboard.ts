@@ -104,6 +104,7 @@ export class RoutesAPIDashboard {
 			const instanceData = await this.server.Routes.API.Instance.doRegister({ 
 				email: decrypted.email,
 				password: decrypted.password,
+				db_public_key: public_key,
 				public_key: keyPair.publicKey,
 				expires: Date.now() + COMM_TOKEN_DEFAULT_EXPIRE_TIME
 			}, res);
