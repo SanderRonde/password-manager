@@ -19,7 +19,8 @@ before_script:
 script:
 - gulp defs
 - tsc --build --force && tsc -p shared/tsconfig.commonjs.json
-- ava --verbose **/*.test.js
+- ava --verbose shared/**/*.test.js
+- ava --verbose app/**/*.test.js
 notifications:
   email:
     on_success: change
