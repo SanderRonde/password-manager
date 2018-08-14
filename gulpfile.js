@@ -1,4 +1,3 @@
-const { RoutesDashboard }  = require('./server/app/actions/server/webserver/server/routes/dashboard/routes-dashboard');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonJs = require('rollup-plugin-commonjs');
 const htmlMinifier = require('html-minifier');
@@ -394,6 +393,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 					versions[static] = md5(content);
 				})),
 				Promise.all(CACHE_PAGES.map(async (page) => {
+					const { RoutesDashboard } = require('./server/app/actions/server/webserver/server/routes/dashboard/routes-dashboard');
 					const route = new RoutesDashboard({
 						config: {}
 					});
