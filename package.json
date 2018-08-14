@@ -9,6 +9,7 @@
   "private": true,
   "ava": {
     "files": [
+      "shared/test/*.js",
       "server/test/tests/*.js",
       "server/test/tests/imports/*.js",
       "server/test/tests/cli/*.js",
