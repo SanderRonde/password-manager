@@ -165,7 +165,7 @@ export function MaterialInputCSS(this: MaterialInput, theme: Theme, _props: Mate
 		}
 
 		.mdl-textfield--floating-label.is-invalid .mdl-textfield__label {
-			background-color: ${theme.primary.main};
+			color: ${theme.primary.main};
 		}
 		.mdl-textfield.is-focused .mdl-textfield__label:after {
 			left: 0;
