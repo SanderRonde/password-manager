@@ -66,6 +66,6 @@ function somePromise() {
 		}, 15000);
 	});
 }
-test('something async', async t => {
+test('something async', async _ => {
 	await somePromise();
 });
