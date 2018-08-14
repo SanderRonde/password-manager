@@ -173,13 +173,49 @@ export type ${prefix}ClassMap = ${formatTypings(classes)}
 
 export type ${prefix}TagMap = ${formatTypings(tags)}`
 	}
+	
+	/**
+	 * Strips invalid values from a query map (such as ${classNames(...
+	 * 
+	 * @param {{[key: string]: string;}} queryObj - The query object
+	 * 
+	 * @returns {HTMLTypings.TypingsObj} The query map
+	 */
+	function stripInvalidValues(obj) {
+		const newObj = {};
+		for (const key in obj) {
+			if (obj[key].indexOf('${') === -1 &&
+				key.indexOf('${') === -1) {
+					newObj[key] = obj[key];
+				}
+		}
+		return newObj;
+	}
+
+	/**
+	 * Strips invalid values from a query map obj (such as ${classNames(...
+	 * 
+	 * @param {HTMLTypings.TypingsObj} queryObj - The query object
+	 * 
+	 * @returns {HTMLTypings.TypingsObj} The query map
+	 */
+	function stripInvalidValuesObj(queryObj) {
+		return {
+			classes: stripInvalidValues(queryObj.classes),
+			ids: stripInvalidValues(queryObj.ids),
+			selectors: stripInvalidValues(queryObj.selectors),
+			modules: queryObj.modules,
+			tags: stripInvalidValues(queryObj.tags || {})
+		}
+	}
 
 	gulp.task('defs.components', genTask('Generates ID definitions for components', async () => {
 		await Promise.all((await findWithGlob('shared/components/**/*.html.ts')).map(async (fileName) => {
 			const componentName = fileName.split('/').pop().split('.')[0];
 			const defs = await htmlTypings.extractFileTypes(fileName, true);
 			await fs.writeFile(path.join(path.dirname(fileName), `${componentName}-querymap.d.ts`),
-				createComponentQueryMap(componentName, defs));
+				createComponentQueryMap(componentName, 
+					stripInvalidValuesObj(defs)));
 		}));
 	}));
 
