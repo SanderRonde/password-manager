@@ -7,8 +7,8 @@ import { ProcRunner } from '../lib/procrunner';
 
 export function cliTest() {
 	describe('CLI', function() {
-		this.timeout(1000 * 60 * 5);
-		
+		this.timeout(1000 * 15);
+
 		it('display help information when called without args', async () => {
 			const proc = new ProcRunner([]);
 			for (const line of EXECUTABLE_SPECIFIC_HELP.split('\n').slice(0, -1)) {
