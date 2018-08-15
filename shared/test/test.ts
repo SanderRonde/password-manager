@@ -1,5 +1,7 @@
 import { cryptoServerBrowserTest } from "./crypto.server-browser.test";
 import { cryptoBrowserTest } from "./crypto.browser.test";
 
-cryptoServerBrowserTest();
-cryptoBrowserTest();
+describe('Shared', () => {
+	cryptoServerBrowserTest();
+	cryptoBrowserTest();
+});
