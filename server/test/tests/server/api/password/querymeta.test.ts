@@ -17,7 +17,7 @@ testParams(test, uris, '/api/password/querymeta', {
 	token: 'string',
 	url: 'string'
 }, {});
-test('can query a URL', async t => {
+test('can query a URL', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true
 	});
@@ -129,7 +129,7 @@ test('can query a URL', async t => {
 		}
 	}
 });
-test('fails if auth token is wrong', async t => {
+test('fails if auth token is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
@@ -156,7 +156,7 @@ test('fails if auth token is wrong', async t => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async t => {
+test('fails if instance id is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});

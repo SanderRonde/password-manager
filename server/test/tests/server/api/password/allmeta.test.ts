@@ -17,7 +17,7 @@ testParams(test, uris, '/api/password/allmeta', {
 	token: 'string',
 	password_hash: 'string',
 }, { });
-test('can get the password\'s metadata', async t => {
+test('can get the password\'s metadata', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true
 	});
@@ -100,7 +100,7 @@ test('can get the password\'s metadata', async t => {
 		assert.strictEqual(parsedValue.twofactor_enabled, expected.twofactorEnabled, 'twofactor enabled is the same');
 	}
 });
-test('fails if auth token is wrong', async t => {
+test('fails if auth token is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
@@ -127,7 +127,7 @@ test('fails if auth token is wrong', async t => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async t => {
+test('fails if instance id is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
@@ -156,7 +156,7 @@ test('fails if instance id is wrong', async t => {
 		err: API_ERRS.MISSING_PARAMS
 	});
 });
-test('fails if password is wrong', async t => {
+test('fails if password is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});

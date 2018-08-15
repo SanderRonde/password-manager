@@ -4,7 +4,7 @@ import http = require('http');
 import { assert } from 'chai';
 
 const uris = captureURIs(test);
-test('server can be started', async t => {
+test('server can be started', async () => {
 	const { dbpw, uri, http } = await genUserAndDb(t);
 	uris.push(uri);
 	const proc = new ProcRunner([
@@ -23,7 +23,7 @@ test('server can be started', async t => {
 
 	proc.check();
 });
-test('requests made over HTTP are redirected to HTTPS by default', async t => {
+test('requests made over HTTP are redirected to HTTPS by default', async () => {
 	const { dbpw, uri, http: httpPort } = await genUserAndDb(t);
 	uris.push(uri);
 	const proc = new ProcRunner([
@@ -77,7 +77,7 @@ test('requests made over HTTP are redirected to HTTPS by default', async t => {
 
 	proc.check();
 });
-test('requests made over HTTP are not redirected to HTTPS if disabled', async t => {
+test('requests made over HTTP are not redirected to HTTPS if disabled', async () => {
 	const { dbpw, uri, http: httpPort } = await genUserAndDb(t);
 	uris.push(uri);
 	const proc = new ProcRunner([

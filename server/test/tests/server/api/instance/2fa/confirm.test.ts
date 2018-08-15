@@ -11,7 +11,7 @@ testParams(test, uris, '/api/instance/2fa/confirm', {
 	instance_id: 'string',
 	twofactor_token: 'string'
 }, {}, {}, {});
-test('fails if account has no 2FA setup', async t => {
+test('fails if account has no 2FA setup', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false,
 		instance_twofactor_enabled: false,
@@ -36,7 +36,7 @@ test('fails if account has no 2FA setup', async t => {
 	if (response.success) return;
 	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
-test('fails if an invalid token is passed', async t => {
+test('fails if an invalid token is passed', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
@@ -66,7 +66,7 @@ test('fails if an invalid token is passed', async t => {
 	if (response.success) return;
 	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
-test('fails if instance id wrong', async t => {
+test('fails if instance id wrong', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,

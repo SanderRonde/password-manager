@@ -9,7 +9,7 @@ import { EncryptedPassword, MongoRecord, EncryptedInstance } from '../../../../.
 import { getDB, doSingleQuery } from '../../../../lib/db';
 
 const uris = captureURIs(test);
-test('can log in, set a password, update it and then remove a password', async t => {
+test('can log in, set a password, update it and then remove a password', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -247,7 +247,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		assert.strictEqual(password, null, 'password is gone');
 	})();
 });
-test('can log in, set a password, update, and get meta and non-meta data', async t => {
+test('can log in, set a password, update, and get meta and non-meta data', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -540,7 +540,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		assert.strictEqual(parsed.twofactor_enabled, updatedPassword.twofactorEnabled, 'twofactor enabled is the same');
 	})();
 });
-test('can log in, set a password and get all metadata', async t => {
+test('can log in, set a password and get all metadata', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -798,7 +798,7 @@ test('can log in, set a password and get all metadata', async t => {
 	})();
 });
 test('can log in, set and update a password, ' + 
-	'call querymeta and get metadata for given query result', async t => {
+	'call querymeta and get metadata for given query result', async () => {
 		const config = await genUserAndDb(t, {
 			account_twofactor_enabled: false
 		});

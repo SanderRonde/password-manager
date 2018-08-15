@@ -16,7 +16,7 @@ testParams(test, uris, '/api/user/genresetkey', {
 	reset_key: 'string',
 	master_password: 'string'
 }, {});
-test('fails if instance id is wrong', async t => {
+test('fails if instance id is wrong', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const config = await genUserAndDb(t, {
 		resetKey
@@ -44,7 +44,7 @@ test('fails if instance id is wrong', async t => {
 		err: API_ERRS.MISSING_PARAMS
 	});
 });
-test('rejects if password is wrong', async t => {
+test('rejects if password is wrong', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const config = await genUserAndDb(t, {
 		resetKey
@@ -72,7 +72,7 @@ test('rejects if password is wrong', async t => {
 		publicKey: server_public_key
 	});
 });
-test('rejects if reset key is wrong', async t => {
+test('rejects if reset key is wrong', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const config = await genUserAndDb(t, {
 		resetKey
@@ -101,7 +101,7 @@ test('rejects if reset key is wrong', async t => {
 		publicKey: server_public_key
 	});
 });
-test('works if params are correct', async t => {
+test('works if params are correct', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const config = await genUserAndDb(t, {
 		resetKey

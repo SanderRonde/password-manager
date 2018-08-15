@@ -6,7 +6,7 @@ import { ProcRunner } from '../../../lib/procrunner';
 import { assert } from 'chai';
 
 const uris = captureURIs(test);
-test('print an error when no account is passed', async t => {
+test('print an error when no account is passed', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -21,7 +21,7 @@ test('print an error when no account is passed', async t => {
 	await proc.run();
 	proc.check();
 });
-test('fail if the database password is wrong when passed', async t => {
+test('fail if the database password is wrong when passed', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -43,7 +43,7 @@ test('fail if the database password is wrong when passed', async t => {
 	await proc.run();
 	proc.check();
 });
-test('fail if the database password is wrong when entered', async t => {
+test('fail if the database password is wrong when entered', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -78,7 +78,7 @@ test('fail if the database password is wrong when entered', async t => {
 	await proc.run();
 	proc.check();
 });
-test('it is possible to enter the password manually', async t => {
+test('it is possible to enter the password manually', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(25);
 	uris.push(uri);
@@ -111,7 +111,7 @@ test('it is possible to enter the password manually', async t => {
 		dbpw, userpw, resetKey, uri
 	});
 });
-test('work when entering pasword correctly the third time', async t => {
+test('work when entering pasword correctly the third time', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);
@@ -152,7 +152,7 @@ test('work when entering pasword correctly the third time', async t => {
 		dbpw, userpw, resetKey, uri
 	})
 })
-test('it is possible to pass the password', async t => {
+test('it is possible to pass the password', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);
@@ -182,7 +182,7 @@ test('it is possible to pass the password', async t => {
 		dbpw, userpw, resetKey, uri
 	})
 });
-test('ask for a new database password if not set yet', async t => {
+test('ask for a new database password if not set yet', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	const dbpw = genRandomString(15);
@@ -218,7 +218,7 @@ test('ask for a new database password if not set yet', async t => {
 		dbpw, userpw, resetKey, uri
 	});
 });
-test('use the passed password to initialize the database if not set yet', async t => {
+test('use the passed password to initialize the database if not set yet', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);

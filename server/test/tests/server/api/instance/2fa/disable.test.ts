@@ -16,7 +16,7 @@ testParams(test, uris, '/api/instance/2fa/enable', {
 }, {}, {
 	password: 'string'
 }, {});
-test('can disable 2FA when given a valid 2FA token', async t => {
+test('can disable 2FA when given a valid 2FA token', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
@@ -78,7 +78,7 @@ assert.isFalse(!!(data as {
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decrypt, false, '2FA is now disabled');
 });
-test('state is unchanged if already disabled', async t => {
+test('state is unchanged if already disabled', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false,
 		instance_twofactor_enabled: false,
@@ -114,7 +114,7 @@ test('state is unchanged if already disabled', async t => {
 		message: 'state unchanged (was already set)'
 	}).message, 'state unchanged (was already set)', 'state is unchanged');
 });
-test('fails if an invalid token is passed', async t => {
+test('fails if an invalid token is passed', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
@@ -152,7 +152,7 @@ test('fails if an invalid token is passed', async t => {
 	if (response.success) return;
 	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
-test('fails if password is wrong', async t => {
+test('fails if password is wrong', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
@@ -182,7 +182,7 @@ test('fails if password is wrong', async t => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id wrong', async t => {
+test('fails if instance id wrong', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,

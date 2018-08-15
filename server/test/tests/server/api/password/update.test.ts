@@ -24,7 +24,7 @@ testParams(test, uris, '/api/password/update', {
 	encrypted: 'string',
 	twofactor_token: 'string'
 });
-test('password can be updated', async t => {
+test('password can be updated', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true
 	});
@@ -119,7 +119,7 @@ test('password can be updated', async t => {
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 });
-test('fails if it requires 2FA and no 2FA token is passed', async t => {
+test('fails if it requires 2FA and no 2FA token is passed', async () => {
 	const { base32 } = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
@@ -171,7 +171,7 @@ test('fails if it requires 2FA and no 2FA token is passed', async t => {
 	}
 	assert.strictEqual(response.ERR, API_ERRS.MISSING_PARAMS, 'failed with missing parameters');
 });
-test('password can be updated if 2FA is enabled', async t => {
+test('password can be updated if 2FA is enabled', async () => {
 	const { base32 } = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
@@ -273,7 +273,7 @@ test('password can be updated if 2FA is enabled', async t => {
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 });
-test('fails if token is wrong', async t => {
+test('fails if token is wrong', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 	});
@@ -307,7 +307,7 @@ test('fails if token is wrong', async t => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async t => {
+test('fails if instance id is wrong', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 	});
@@ -342,7 +342,7 @@ test('fails if instance id is wrong', async t => {
 		err: API_ERRS.MISSING_PARAMS
 	});
 });
-test('fails if password id is wrong', async t => {
+test('fails if password id is wrong', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 	});

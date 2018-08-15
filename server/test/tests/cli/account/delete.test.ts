@@ -6,7 +6,7 @@ import { ProcRunner } from '../../../lib/procrunner';
 import { assert } from 'chai';
 
 const uris = captureURIs(test);
-test('print an error when no account is passed', async t => {
+test('print an error when no account is passed', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -21,7 +21,7 @@ test('print an error when no account is passed', async t => {
 	await proc.run();
 	proc.check();
 });
-test('fail if the database password is wrong when passed', async t => {
+test('fail if the database password is wrong when passed', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -43,7 +43,7 @@ test('fail if the database password is wrong when passed', async t => {
 	await proc.run();
 	proc.check();
 });
-test('fail if the database password is wrong when entered', async t => {
+test('fail if the database password is wrong when entered', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -78,7 +78,7 @@ test('fail if the database password is wrong when entered', async t => {
 	await proc.run();
 	proc.check();
 });
-test('it is possible to enter the password manually', async t => {
+test('it is possible to enter the password manually', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(25);
 	uris.push(uri);
@@ -118,7 +118,7 @@ test('it is possible to enter the password manually', async t => {
 
 	await hasDeletedAccount(t, uri);
 });
-test('work when entering pasword correctly the third time', async t => {
+test('work when entering pasword correctly the third time', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);
@@ -166,7 +166,7 @@ test('work when entering pasword correctly the third time', async t => {
 
 	await hasDeletedAccount(t, uri);
 })
-test('it is possible to pass the password', async t => {
+test('it is possible to pass the password', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);
@@ -203,7 +203,7 @@ test('it is possible to pass the password', async t => {
 
 	await hasDeletedAccount(t, uri);
 });
-test('ask for a new database password if not set yet', async t => {
+test('ask for a new database password if not set yet', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	const dbpw = genRandomString(15);
@@ -246,7 +246,7 @@ test('ask for a new database password if not set yet', async t => {
 		'the database has been initialized with given password');
 	await hasDeletedAccount(t, uri);
 });
-test('use the passed password to initialize the database if not set yet', async t => {
+test('use the passed password to initialize the database if not set yet', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);
@@ -288,7 +288,7 @@ test('use the passed password to initialize the database if not set yet', async 
 		'the database has been initialized with given password');
 	await hasDeletedAccount(t, uri);
 });
-test('cancel the deletion and restore deleted items when instance changes fail', async t => {
+test('cancel the deletion and restore deleted items when instance changes fail', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);
@@ -336,7 +336,7 @@ test('cancel the deletion and restore deleted items when instance changes fail',
 		'hasn\'t deleted any users');
 	done();
 });
-test('cancel the deletion and restore deleted items when password changes fail', async t => {
+test('cancel the deletion and restore deleted items when password changes fail', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);
@@ -385,7 +385,7 @@ test('cancel the deletion and restore deleted items when password changes fail',
 		'hasn\'t deleted any users');
 	done();
 });
-test('cancel the deletion and restore deleted items when account changes fail', async t => {
+test('cancel the deletion and restore deleted items when account changes fail', async () => {
 	const uri = await genTempDatabase(t);
 	const userpw = genRandomString(15);
 	uris.push(uri);

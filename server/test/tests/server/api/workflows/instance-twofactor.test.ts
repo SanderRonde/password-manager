@@ -10,7 +10,7 @@ import * as url from 'url'
 import { assert } from 'chai';
 
 const uris = captureURIs(test);
-test('can enable 2FA after registering instance when 2FA is enabled for the user', async t => {
+test('can enable 2FA after registering instance when 2FA is enabled for the user', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
@@ -109,7 +109,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
 });
-test('can enable 2FA and then disable it', async t => {
+test('can enable 2FA and then disable it', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
@@ -216,7 +216,7 @@ test('can enable 2FA and then disable it', async t => {
 		assert.strictEqual(decrypt, false, '2FA is now disabled');
 	})();
 });
-test('can enable 2FA, disable 2FA and then enable it', async t => {
+test('can enable 2FA, disable 2FA and then enable it', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
@@ -366,7 +366,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
 });
-test('can verify a login requiring 2FA', async t => {
+test('can verify a login requiring 2FA', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
@@ -459,7 +459,7 @@ test('can verify a login requiring 2FA', async t => {
 		assert.strictEqual(typeof data.auth_token, 'string', 'new auth token was passed');
 	})();
 });
-test('can register an instance, enable 2FA, log in with it and disable 2FA', async t => {
+test('can register an instance, enable 2FA, log in with it and disable 2FA', async () => {
 	const twofactor = speakeasy.generateSecret();
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
@@ -677,7 +677,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 	})();
 });
 
-test('can register an instance, enable 2FA for the user and enable 2FA for the instance', async t => {
+test('can register an instance, enable 2FA for the user and enable 2FA for the instance', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});

@@ -16,7 +16,7 @@ testParams(test, uris, '/api/user/reset', {
 	email: 'string',
 	newmasterpassword: 'string'
 }, {});
-test('fails if email is wrong', async t => {
+test('fails if email is wrong', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const config = await genUserAndDb(t, {
 		resetKey
@@ -45,7 +45,7 @@ test('fails if email is wrong', async t => {
 		publicKey: server_public_key
 	});
 });
-test('works if params are correct', async t => {
+test('works if params are correct', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const newMasterPassword = genRandomString(25);
 	const config = await genUserAndDb(t, {
@@ -134,7 +134,7 @@ test('works if params are correct', async t => {
 	assert.isTrue(decryptedResetKey.integrity, 'integrity is true');
 	assert.strictEqual(decryptedResetKey.pw, newMasterPassword, 'new master password can be decrypted');
 });
-test('cancels if failing on password changes', async t => {
+test('cancels if failing on password changes', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const newMasterPassword = genRandomString(25);
 	const config = await genUserAndDb(t, {
@@ -219,7 +219,7 @@ test('cancels if failing on password changes', async t => {
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
 	assert.notStrictEqual(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
 });
-test('cancels if failing on instance changes', async t => {
+test('cancels if failing on instance changes', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const newMasterPassword = genRandomString(25);
 	const config = await genUserAndDb(t, {
@@ -304,7 +304,7 @@ test('cancels if failing on instance changes', async t => {
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
 	assert.notStrictEqual(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
 });
-test('cancels if failing on account changes', async t => {
+test('cancels if failing on account changes', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const newMasterPassword = genRandomString(25);
 	const config = await genUserAndDb(t, {

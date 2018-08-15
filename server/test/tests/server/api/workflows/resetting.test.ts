@@ -7,7 +7,7 @@ import { getDB } from '../../../../lib/db';
 import { assert } from 'chai';
 
 const uris = captureURIs(test);
-test('can generate a new key and then reset with it', async t => {
+test('can generate a new key and then reset with it', async () => {
 	const initialResetKey = genRandomString(RESET_KEY_LENGTH);
 	const config = await genUserAndDb(t, {
 		resetKey: initialResetKey

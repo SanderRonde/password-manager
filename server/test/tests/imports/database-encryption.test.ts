@@ -13,7 +13,7 @@ class DBEncryptionTest extends DatabaseEncryption {
 	}
 }
 
-test('obfuscated value can be deobfuscated', t => {
+test('obfuscated value can be deobfuscated', () => {
 	const enc = new DBEncryptionTest({} as any);
 	const lengths = [...Array(50).keys(), ...[...Array(10).keys()].map(val => val * 5)];
 	for (const length of lengths) {
@@ -23,7 +23,7 @@ test('obfuscated value can be deobfuscated', t => {
 			`deobfuscated key of length ${length} is the same as original`);
 	}
 });
-test('dbencrypted value can be decrypted', t => {
+test('dbencrypted value can be decrypted', () => {
 	const enc = new DBEncryptionTest({} as any);
 	const key = genRandomString(25);
 	enc.setKey(key);
@@ -32,7 +32,7 @@ test('dbencrypted value can be decrypted', t => {
 	assert.strictEqual(enc.dbDecrypt(enc.dbEncrypt(data)), data,
 		'decrypted data is the same as original');
 });
-test('salted and encrypted value can be decrypted', t => {
+test('salted and encrypted value can be decrypted', () => {
 	const enc = new DBEncryptionTest({} as any);
 	const key = genRandomString(25);
 	enc.setKey(key);

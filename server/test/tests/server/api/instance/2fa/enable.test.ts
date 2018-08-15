@@ -16,7 +16,7 @@ testParams(test, uris, '/api/instance/2fa/enable', {
 }, {}, {
 	password: 'string'
 }, {});
-test('can enable 2FA when no 2FA secret is set', async t => {
+test('can enable 2FA when no 2FA secret is set', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false,
 		instance_twofactor_enabled: false,
@@ -71,7 +71,7 @@ assert.isFalse(!!(data as {
 		/otpauth:\/\/totp\/(.*)\?secret=\w+/,
 		'url is an otp auth url');
 });
-test('can enable 2FA when a 2FA secret is already set', async t => {
+test('can enable 2FA when a 2FA secret is already set', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: false,
@@ -132,7 +132,7 @@ assert.isFalse(!!(data as {
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decrypt, true, '2FA is now enabled');
 });
-test('does not change it if 2FA was aleady enabled in this instance', async t => {
+test('does not change it if 2FA was aleady enabled in this instance', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
@@ -180,7 +180,7 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decrypt, true, '2FA is still enabled');
 });
-test('fails if password is wrong', async t => {
+test('fails if password is wrong', async () => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
 	const { http, userpw, uri, instance_id, server_public_key } = config;
@@ -200,7 +200,7 @@ test('fails if password is wrong', async t => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async t => {
+test('fails if instance id is wrong', async () => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
 	const { http, userpw, uri, server_public_key } = config;

@@ -8,7 +8,7 @@ import * as fs from 'fs'
 
 const uris = captureURIs(test);
 const files = captureCreatedFiles(test);
-test('print an error when no output is passed', async t => {
+test('print an error when no output is passed', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -23,7 +23,7 @@ test('print an error when no output is passed', async t => {
 	await proc.run();
 	proc.check();
 });
-test('creates dump with regular args', async t => {
+test('creates dump with regular args', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 	await genDBWithPW(uri);

@@ -15,7 +15,7 @@ testParams(test, uris, '/api/instance/login', {
 }, {}, {
 	password_hash: 'string'
 }, {});
-test('login token can be generated when 2FA is disabled', async t => {
+test('login token can be generated when 2FA is disabled', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -58,7 +58,7 @@ test('login token can be generated when 2FA is disabled', async t => {
 
 	assert.strictEqual(data.challenge, challenge, 'challenge matches');
 });
-test('login token can be generated when 2FA is enabled', async t => {
+test('login token can be generated when 2FA is enabled', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
@@ -105,7 +105,7 @@ test('login token can be generated when 2FA is enabled', async t => {
 
 	assert.strictEqual(data.challenge, challenge, 'challenge matches');
 });
-test('fails if instance id is wrong', async t => {
+test('fails if instance id is wrong', async () => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
 	const { http, uri, server_public_key, userpw } = config;

@@ -18,7 +18,7 @@ testParams(test, uris, '/api/password/get', {
 }, {
 	twofactor_token: 'string'
 });
-test('can get the password if 2FA is disabled', async t => {
+test('can get the password if 2FA is disabled', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true
 	});
@@ -81,7 +81,7 @@ test('can get the password if 2FA is disabled', async t => {
 		assert.strictEqual(actualNote, expectedNote, 'notes are the same');
 	}
 });
-test('fails if 2FA is enabled but no 2FA token is passed', async t => {
+test('fails if 2FA is enabled but no 2FA token is passed', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
@@ -123,7 +123,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 		'invalid credentials error was thrown');
 });
-test('can get the password if 2FA is enabled', async t => {
+test('can get the password if 2FA is enabled', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
@@ -195,7 +195,7 @@ test('can get the password if 2FA is enabled', async t => {
 		assert.strictEqual(actualNote, expectedNote, 'notes are the same');
 	}
 });
-test('fails if auth token is wrong', async t => {
+test('fails if auth token is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
@@ -231,7 +231,7 @@ test('fails if auth token is wrong', async t => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async t => {
+test('fails if instance id is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
@@ -268,7 +268,7 @@ test('fails if instance id is wrong', async t => {
 		err: API_ERRS.MISSING_PARAMS
 	});
 });
-test('fails if password id is wrong', async t => {
+test('fails if password id is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});

@@ -7,7 +7,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 const uris = captureURIs(test);
-test('can log in after registering instance', async t => {
+test('can log in after registering instance', async () => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
 	const { 
@@ -85,7 +85,7 @@ test('can log in after registering instance', async t => {
 		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 	})();
 });
-test('can log out after logging in', async t => {
+test('can log out after logging in', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -142,7 +142,7 @@ test('can log out after logging in', async t => {
 		assert.isTrue(response.success, 'API call succeeded')
 	})();
 });
-test('can log in and extend key', async t => {
+test('can log in and extend key', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -205,7 +205,7 @@ test('can log in and extend key', async t => {
 		assert.strictEqual(typeof data.auth_token, 'string', 'auth token was passed');
 	})();
 });
-test('can register an instance, log in, extend key and log out', async t => {
+test('can register an instance, log in, extend key and log out', async () => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
 	const { 

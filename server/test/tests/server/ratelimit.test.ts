@@ -117,7 +117,7 @@ function getSpedupTime(time: number) {
 }
 
 const uris = captureURIs(test);
-test('instance create ratelimiter ratelimits on quick requests', async t => {2
+test('instance create ratelimiter ratelimits on quick requests', async () => {2
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -155,7 +155,7 @@ test('instance create ratelimiter ratelimits on quick requests', async t => {2
 
 	server.kill();
 });
-test('instance create ratelimiter ratelimits on slow requests', async t => {
+test('instance create ratelimiter ratelimits on slow requests', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -185,7 +185,7 @@ test('instance create ratelimiter ratelimits on slow requests', async t => {
 
 	server.kill();
 });
-test('api use ratelimiter works', async t => {
+test('api use ratelimiter works', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -210,7 +210,7 @@ test('api use ratelimiter works', async t => {
 
 	server.kill();
 });
-test('succeeding requests are not ratelimited by the bruteforce ratelimiter', async t => {
+test('succeeding requests are not ratelimited by the bruteforce ratelimiter', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -228,7 +228,7 @@ test('succeeding requests are not ratelimited by the bruteforce ratelimiter', as
 	
 	server.kill();
 });
-test('failings requests are ratelimited by the bruteforce limiter', async t => {
+test('failings requests are ratelimited by the bruteforce limiter', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});

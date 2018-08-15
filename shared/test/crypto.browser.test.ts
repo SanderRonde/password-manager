@@ -15,34 +15,34 @@ requireHacker.resolver((path: string, srcModule: any) => {
 })
 import * as browserCrypto from '../lib/browser-crypto';
 
-test('padding works', t => {
+test('padding works', () => {
 	const base = genRandomString(25);
 	assert.strictEqual(browserCrypto.pad(base, 'masterpwverify'), base + 'masterpwverify',
 		'padding is the same as expected');
 });
-test('hashing works', t => {
+test('hashing works', () => {
 	assert.notStrictEqualThrows(() => {
 		browserCrypto.hash('somevalue');
 	}, 'encrypt can be called without error');
 });
-test('hashing produces the same values with the same input', t => {
+test('hashing produces the same values with the same input', () => {
 	const input = genRandomString(25);
 	assert.strictEqual(browserCrypto.hash(input), browserCrypto.hash(input),
 		'hashed values are the same');
 });
-test('hashing different values produces different results', t => {
+test('hashing different values produces different results', () => {
 	const input = genRandomString(25);
 	assert.notStrictEqual(browserCrypto.hash(input), browserCrypto.hash(input) + 'x',
 		'hashed values are not the same');
 });
-test('encrypting with public key works', t => {
+test('encrypting with public key works', () => {
 	const input  = genRandomString(25);
 	const { publicKey } = browserCrypto.genRSAKeyPair();
 	assert.notStrictEqualThrows(() => {
 		browserCrypto.encryptWithPublicKey(input, publicKey);
 	}, 'public key encrypt can be called without error');
 });
-test('values encrypted with a public key can be decrypted', t => {
+test('values encrypted with a public key can be decrypted', () => {
 	const input  = genRandomString(25);
 	const { publicKey, privateKey } = browserCrypto.genRSAKeyPair();
 
@@ -50,21 +50,21 @@ test('values encrypted with a public key can be decrypted', t => {
 	const decrypted = browserCrypto.decryptWithPrivateKey(encrypted, privateKey);
 	assert.strictEqual(decrypted, input, 'decrypted value is the same as input');
 });
-test('public/private key encryption returns error on invalid decrypt', t => {
+test('public/private key encryption returns error on invalid decrypt', () => {
 	const { privateKey } = browserCrypto.genRSAKeyPair();
 
 	const decrypted = browserCrypto.decryptWithPrivateKey('baddecrypt' as PublicKeyEncrypted<string, string>, 
 		privateKey);
 	assert.strictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is invalid decrypt');
 });
-test('hybrid encryption works', t => {
+test('hybrid encryption works', () => {
 	const input = genRandomString(25);
 	const { publicKey } = browserCrypto.genRSAKeyPair();
 	assert.notStrictEqualThrows(() => {
 		browserCrypto.hybridEncrypt(input, publicKey);
 	}, 'hybrid encryption can be done without error');
 });
-test('hybrid encrypted data can be decrypted', t => {
+test('hybrid encrypted data can be decrypted', () => {
 	const input = genRandomString(25);
 	const { publicKey, privateKey } = browserCrypto.genRSAKeyPair();
 

@@ -10,7 +10,7 @@ testParams(test, uris, '/api/instance/logout', {
 	instance_id: 'string',
 	token: 'string'
 }, {}, {}, {});
-test('throws an error if token is invalid', async t => {
+test('throws an error if token is invalid', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -35,7 +35,7 @@ test('throws an error if token is invalid', async t => {
 	}
 	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
-test('fails if instance id is wrong', async t => {
+test('fails if instance id is wrong', async () => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
 	const { http, uri, server_public_key } = config;

@@ -6,7 +6,7 @@ import { ProcRunner } from '../../lib/procrunner';
 import { assert } from 'chai';
 
 const uris = captureURIs(test);
-test('print an error when no command is passed', async t => {
+test('print an error when no command is passed', async () => {
 	const proc = new ProcRunner(['account']);
 	proc.expectWrite();
 	proc.expectWrite('\terror: missing required argument `create/delete\'');
@@ -16,7 +16,7 @@ test('print an error when no command is passed', async t => {
 	await proc.run();
 	proc.check();
 }); 
-test('print an error when a non-command is used', async t => {
+test('print an error when a non-command is used', async () => {
 	const proc = new ProcRunner(['account', 'noncommand']);
 	proc.expectWrite('Invalid account action, choose "create" or "delete"');
 	proc.expectExit(1);
@@ -24,7 +24,7 @@ test('print an error when a non-command is used', async t => {
 	await proc.run();
 	proc.check();
 });
-test('an added account can be deleted', async t => {
+test('an added account can be deleted', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 	const userpw = genRandomString(15);

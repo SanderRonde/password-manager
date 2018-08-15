@@ -8,7 +8,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 const uris = captureURIs(test);
-test('invalidates all account tokens if an old token is extended', async t => {
+test('invalidates all account tokens if an old token is extended', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -105,7 +105,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 
 	server.kill();
 });
-test('invalidates a token if its count is wrong', async t => {
+test('invalidates a token if its count is wrong', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});
@@ -202,7 +202,7 @@ test('invalidates a token if its count is wrong', async t => {
 
 	server.kill();
 });
-test('invalidates a token if the instance id is wrong', async t => {
+test('invalidates a token if the instance id is wrong', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: false
 	});

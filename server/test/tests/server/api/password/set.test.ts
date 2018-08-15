@@ -20,7 +20,7 @@ testParams(test, uris, '/api/password/set', {
 	twofactor_enabled: 'boolean',
 	encrypted: 'string'
 }, {});
-test('password can be created', async t => {
+test('password can be created', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true
 	});
@@ -108,7 +108,7 @@ test('password can be created', async t => {
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 });
-test('fails if token is wrong', async t => {
+test('fails if token is wrong', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 	});
@@ -141,7 +141,7 @@ test('fails if token is wrong', async t => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async t => {
+test('fails if instance id is wrong', async () => {
 	const config = await genUserAndDb(t, {
 		account_twofactor_enabled: true,
 	});

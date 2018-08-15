@@ -8,7 +8,7 @@ import * as fs from 'fs'
 
 const uris = captureURIs(test);
 const files = captureCreatedFiles(test);
-test('print an error when no command is passed', async t => {
+test('print an error when no command is passed', async () => {
 	const proc = new ProcRunner(['backup']);
 	proc.expectWrite();
 	proc.expectWrite('\terror: missing required argument `load/googledrive/local\'');
@@ -18,7 +18,7 @@ test('print an error when no command is passed', async t => {
 	await proc.run();
 	proc.check();
 }); 
-test('print an error when a non-command is used', async t => {
+test('print an error when a non-command is used', async () => {
 	const proc = new ProcRunner(['backup', 'noncommand']);
 	proc.expectWrite('Invalid backup method, choose "load", "drive" or "local"');
 	proc.expectExit(1);
@@ -26,7 +26,7 @@ test('print an error when a non-command is used', async t => {
 	await proc.run();
 	proc.check();
 });
-test('a backupped file can be used to restore', async t => {
+test('a backupped file can be used to restore', async () => {
 	const dumpName = genRandomString(10);
 	const dumpPath = path.join(__dirname, `../../../temp/mongodump${dumpName}.dump`);
 	const uri = await genTempDatabase(t);

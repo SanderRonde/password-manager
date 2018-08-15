@@ -21,7 +21,7 @@ async function createDummyDump(uri: string) {
 }
 
 const uris = captureURIs(test);
-test('print an error when no input is passed', async t => {
+test('print an error when no input is passed', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -36,7 +36,7 @@ test('print an error when no input is passed', async t => {
 	await proc.run();
 	proc.check();
 });
-test('print an error when a config file was passed', async t => {
+test('print an error when a config file was passed', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -54,7 +54,7 @@ test('print an error when a config file was passed', async t => {
 	await proc.run();
 	proc.check();
 });
-test('fail when input file does not exist', async t => {
+test('fail when input file does not exist', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
@@ -71,7 +71,7 @@ test('fail when input file does not exist', async t => {
 	await proc.run();
 	proc.check();
 });
-test('succeed when restoring a passwordless backup', async t => {
+test('succeed when restoring a passwordless backup', async () => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 	const { dumpPath, dbpw } = await createDummyDump(uri);

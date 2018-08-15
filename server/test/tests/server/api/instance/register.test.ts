@@ -12,7 +12,7 @@ testParams(test, uris, '/api/instance/register', {
 	password: 'string',
 	public_key: 'string'
 }, {}, {}, {});
-test('instance can be created', async t => {
+test('instance can be created', async () => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
 	const { http, userpw, uri } = config;
@@ -51,7 +51,7 @@ test('instance can be created', async t => {
 
 	assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 });
-test('fails if password is wrong', async t => {
+test('fails if password is wrong', async () => {
 	const config = await genUserAndDb(t);
 	const server = await createServer(config);
 	const { http, userpw, uri, server_public_key } = config;
