@@ -122,7 +122,7 @@ export function passwordUpdateTest() {
 			assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 		});
 		it('fails if it requires 2FA and no 2FA token is passed', async () => {
-			const { base32 } = speakeasy.generateSecretTest({
+			const { base32 } = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -174,7 +174,7 @@ export function passwordUpdateTest() {
 			assert.strictEqual(response.ERR, API_ERRS.MISSING_PARAMS, 'failed with missing parameters');
 		});
 		it('password can be updated if 2FA is enabled', async () => {
-			const { base32 } = speakeasy.generateSecretTest({
+			const { base32 } = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({

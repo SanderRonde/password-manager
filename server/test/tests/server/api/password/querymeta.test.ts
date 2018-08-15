@@ -132,7 +132,7 @@ export function passwordQueryMetaTest() {
 			}
 		});
 		it('fails if auth token is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -159,7 +159,7 @@ export function passwordQueryMetaTest() {
 			});
 		});
 		it('fails if instance id is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({

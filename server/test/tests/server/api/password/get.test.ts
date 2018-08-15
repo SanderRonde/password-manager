@@ -84,7 +84,7 @@ export function passwordGetTest() {
 			}
 		});
 		it('fails if 2FA is enabled but no 2FA token is passed', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -126,7 +126,7 @@ export function passwordGetTest() {
 				'invalid credentials error was thrown');
 		});
 		it('can get the password if 2FA is enabled', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -198,7 +198,7 @@ export function passwordGetTest() {
 			}
 		});
 		it('fails if auth token is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -234,7 +234,7 @@ export function passwordGetTest() {
 			});
 		});
 		it('fails if instance id is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -271,7 +271,7 @@ export function passwordGetTest() {
 			});
 		});
 		it('fails if password id is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({

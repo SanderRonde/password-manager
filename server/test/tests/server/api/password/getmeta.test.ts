@@ -82,7 +82,7 @@ export function passwordGetMetaTest() {
 			assert.strictEqual(parsed.twofactor_enabled, twofactorEnabled, 'twofactor enabled is the same');
 		});
 		it('fails if auth token is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -118,7 +118,7 @@ export function passwordGetMetaTest() {
 			});
 		});
 		it('fails if instance id is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -155,7 +155,7 @@ export function passwordGetMetaTest() {
 			});
 		});
 		it('fails if password id is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({

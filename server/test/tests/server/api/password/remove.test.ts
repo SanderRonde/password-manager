@@ -64,7 +64,7 @@ export function passwordRemoveTest() {
 			assert.strictEqual(password, null, 'password is gone');
 		});
 		it('fails if 2FA is enabled but no 2FA token is passed', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -114,7 +114,7 @@ export function passwordRemoveTest() {
 			assert.notStrictEqual(password, null, 'password is still there');
 		});
 		it('can be removed if 2FA is enabled', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -166,7 +166,7 @@ export function passwordRemoveTest() {
 			assert.strictEqual(password, null, 'password is gone');
 		});
 		it('fails if auth token is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -202,7 +202,7 @@ export function passwordRemoveTest() {
 			});
 		});
 		it('fails if instance id is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
@@ -239,7 +239,7 @@ export function passwordRemoveTest() {
 			});
 		});
 		it('fails if password id is wrong', async () => {
-			const secret = speakeasy.generateSecretTest({
+			const secret = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({

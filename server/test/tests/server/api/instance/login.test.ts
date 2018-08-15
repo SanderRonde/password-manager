@@ -64,7 +64,7 @@ export function loginTest() {
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
-				twofactor_secret: speakeasy.generateSecretTest({
+				twofactor_secret: speakeasy.generateSecret({
 					name: 'Password Manager'
 				}).base32
 			});
