@@ -4,7 +4,7 @@ import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { DEFAULT_EMAIL } from '../../../../../app/lib/constants';
 import { doSingleQuery } from '../../../../lib/db';
 import * as mongo from 'mongodb'
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const uris = captureURIs(test);
 testParams(test, uris, '/api/instance/register', {

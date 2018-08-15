@@ -4,7 +4,7 @@ import { ERRS, decrypt, decryptWithSalt, hash, pad } from '../../../../../app/li
 import { RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../../../../app/lib/constants';
 import { genRandomString } from '../../../../../app/lib/util';
 import { getDB } from '../../../../lib/db';
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const uris = captureURIs(test);
 test('can generate a new key and then reset with it', async t => {

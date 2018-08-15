@@ -3,7 +3,7 @@ import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/../..
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import * as mongo from 'mongodb'
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const uris = captureURIs(test);
 testParams(test, uris, '/api/instance/extend_key', {

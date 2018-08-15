@@ -3,7 +3,7 @@ import { PublicKeyEncrypted } from '../types/db-types';
 import * as requireHacker from 'require-hacker';
 import { ERRS } from '../types/crypto';
 import path = require('path');
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const commonjsJSEncrypt = path.join(__dirname, '../../server/app/libraries/jsencrypt.js');
 requireHacker.resolver((path: string, srcModule: any) => {

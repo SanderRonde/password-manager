@@ -7,7 +7,7 @@ import * as querystring from 'querystring'
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import * as url from 'url'
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const uris = captureURIs(test);
 test('can enable 2FA after registering instance when 2FA is enabled for the user', async t => {

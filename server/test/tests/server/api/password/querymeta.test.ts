@@ -6,7 +6,7 @@ import { genRandomString } from '../../../../../app/lib/util';
 import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
-import { test } from 'ava';
+import { assert } from 'chai';
 import * as url from 'url'
 
 const uris = captureURIs(test);

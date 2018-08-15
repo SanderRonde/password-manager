@@ -1,5 +1,5 @@
 import { DatabaseEncryption } from '../../../app/database/libs/db-encryption';
-import { test } from 'ava';
+import { assert } from 'chai';
 import { genRandomString } from '../../../app/lib/util';
 
 class DBEncryptionTest extends DatabaseEncryption {

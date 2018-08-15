@@ -9,7 +9,7 @@ import { getDB } from '../../../../lib/db';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import * as url from 'url'
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const uris = captureURIs(test);
 testParams(test, uris, '/api/password/update', {

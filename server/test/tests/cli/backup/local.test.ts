@@ -3,7 +3,7 @@ import { genRandomString } from '../../../../app/lib/util';
 import { ProcRunner } from '../../../lib/procrunner';
 import { genDBWithPW } from '../../../lib/db';
 import * as path from 'path'
-import { test } from 'ava';
+import { assert } from 'chai';
 import * as fs from 'fs'
 
 const uris = captureURIs(test);

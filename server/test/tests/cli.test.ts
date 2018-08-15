@@ -1,6 +1,6 @@
 import { EXECUTABLE_SPECIFIC_HELP } from '../lib/consts';
 import { ProcRunner } from '../lib/procrunner';
-import { test } from 'ava';
+import { assert } from 'chai';
 
 test('display help information when called without args', async t => {
 	const proc = new ProcRunner(t, []);

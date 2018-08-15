@@ -2,7 +2,7 @@ import { genRandomString } from '../../server/app/lib/util';
 import * as serverCrypto from '../../server/app/lib/crypto';
 import * as requireHacker from 'require-hacker';
 import path = require('path');
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const commonjsJSEncrypt = path.join(__dirname, '../../server/app/libraries/jsencrypt.js');
 requireHacker.resolver((path: string, srcModule: any) => {

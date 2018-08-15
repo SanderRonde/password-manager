@@ -8,7 +8,7 @@ import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import { getDB } from '../../../../lib/db';
 import * as mongo from 'mongodb'
 import * as url from 'url'
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const uris = captureURIs(test);
 testParams(test, uris, '/api/password/set', {

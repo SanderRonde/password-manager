@@ -3,7 +3,7 @@ import { captureCreatedFiles } from '../../lib/util';
 import { ProcRunner } from '../../lib/procrunner';
 import * as fs from 'fs-extra'
 import * as path from 'path'
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const files = captureCreatedFiles(test);
 test('print an error when no command is passed', async t => {

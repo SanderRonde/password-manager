@@ -1,6 +1,6 @@
-import { GenericTestContext, Context } from "ava";
-import { listenWithoutRef } from "./util";
 import { spawn, ChildProcess } from "child_process";
+import { listenWithoutRef } from "./util";
+import { assert } from 'chai';
 import * as path from 'path'
 
 export enum LOG_VALS {
@@ -32,8 +32,7 @@ export class ProcRunner {
 
 	private _capturedRegex: (RegExpExecArray|string[])[] = [];
 	
-	constructor(private _t: GenericTestContext<Context<any>>, 
-		private _args: string[], private _config: {
+	constructor(private _args: string[], private _config: {
 			printlogs?: boolean;
 			printifnomatch?: boolean;
 			env?: {
@@ -137,40 +136,40 @@ export class ProcRunner {
 			const expected = this._writtenExpected[i];
 
 			if (this._config.printifnomatch && !this._areEqual(written, expected)) {
-				this._t.log('written', writtenLines, 'expected', this._writtenExpected);
+				console.log('written', writtenLines, 'expected', this._writtenExpected);
 			}
 
-			this._t.not(written, undefined, 
+			assert.notEqual(written, undefined, 
 				`a value should be written (while expecting "${
 					expected && expected.content && expected.content.toString()}")`);
-			this._t.not(written, null, 
+			assert.notEqual(written, null, 
 				`a value should be written (while expecting "${
 					expected && expected.content && expected.content.toString()}")`);
-			this._t.not(expected, undefined, 
+			assert.notEqual(expected, undefined, 
 				`a value should be expected (while writing "${written && written.toString()}")`);
-			this._t.not(expected, null, 
+			assert.notEqual(expected, null, 
 				`a value should be expected (while writing "${written && written.toString()}")`);
 
 			switch (expected.type) {
 				case 'specials':
 					switch (expected.content) {
 						case LOG_VALS.ANY_STRING:
-							this._t.is(typeof written, 'string', 
+							assert.strictEqual(typeof written, 'string', 
 								'Written value is string');
 							break;
 					}
 					break;
 				case 'regular':
 					if (expected.content instanceof RegExp) {
-						this._t.regex(written.trim(), expected.content,
+						assert.match(written.trim(), expected.content,
 							'written is the same as expected');
 					} else if (typeof expected.content === 'string') {
-						this._t.is(written.trim(), expected.content.trim(),
+						assert.strictEqual(written.trim(), expected.content.trim(),
 							'written is the same as expected');
 					}
 					break;
 				case 'captureRegxp':
-					this._t.regex(written.trim(), expected.content,
+					assert.match(written.trim(), expected.content,
 						'written is the same as expected');
 					const captured = expected.content.exec(written.trim());
 					if (captured !== null) {
@@ -184,7 +183,7 @@ export class ProcRunner {
 	}
 
 	private _checkExitCode() {
-		this._t.is(this._exitCode, this._exitCodeExpected,
+		assert.strictEqual(this._exitCode, this._exitCodeExpected,
 			'exit code matches expected exit code');
 	}
 

@@ -3,7 +3,7 @@ import { genUserAndDb, createServer, doServerAPIRequest, captureURIs, genURL, do
 import { genRandomString } from '../../../../../app/lib/util';
 import * as url from 'url'
 import * as mongo from 'mongodb'
-import { test } from 'ava';
+import { assert } from 'chai';
 import { ENCRYPTION_ALGORITHM } from '../../../../../app/lib/constants';
 import { EncryptedPassword, MongoRecord, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
 import { getDB, doSingleQuery } from '../../../../lib/db';

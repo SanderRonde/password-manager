@@ -3,7 +3,7 @@ import { captureURIs, genTempDatabase } from '../../../lib/util';
 import { DEFAULT_EMAIL } from '../../../../app/lib/constants';
 import { genRandomString } from '../../../../app/lib/util';
 import { ProcRunner } from '../../../lib/procrunner';
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const uris = captureURIs(test);
 test('print an error when no account is passed', async t => {

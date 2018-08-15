@@ -4,7 +4,7 @@ import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
 import { API_ERRS } from '../../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const uris = captureURIs(test);
 testParams(test, uris, '/api/instance/2fa/confirm', {

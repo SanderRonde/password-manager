@@ -1,7 +1,7 @@
 import { captureURIs, genUserAndDb } from '../../lib/util';
 import { ProcRunner } from '../../lib/procrunner';
 import http = require('http');
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const uris = captureURIs(test);
 test('server can be started', async t => {

@@ -4,7 +4,7 @@ import { DEFAULT_EMAIL } from '../../../../../app/lib/constants';
 import { genRandomString } from '../../../../../app/lib/util';
 import { doSingleQuery } from '../../../../lib/db';
 import * as mongo from 'mongodb'
-import { test } from 'ava';
+import { assert } from 'chai';
 
 const uris = captureURIs(test);
 test('can log in after registering instance', async t => {

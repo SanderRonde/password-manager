@@ -1,5 +1,5 @@
 import { isMongoConnected } from '../lib/db';
-import { test } from 'ava';
+import { assert } from 'chai';
 
 console.log('Doing enviroment tests');
 test('has set up mongo', async t => {
