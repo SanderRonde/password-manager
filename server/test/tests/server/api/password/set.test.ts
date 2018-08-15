@@ -66,19 +66,19 @@ test('password can be created', async t => {
 	const password = await db.collection('passwords').findOne({
 		_id: new mongo.ObjectId(data.id)
 	}) as MongoRecord<EncryptedPassword>;
-	t.not(password, null, 'record was found');
+	assert.notStrictEqual(password, null, 'record was found');
 
 	const instance = await db.collection('instances').findOne({
 		_id: instance_id
 	}) as MongoRecord<EncryptedInstance>;
-	t.not(instance, null, 'instance was found');
+	assert.notStrictEqual(instance, null, 'instance was found');
 	done();
 
 	assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 		'user ids match');
 	const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 		dbpw);
-	t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 	const actualWebsites = password.websites.map(({ exact, host }) => {
@@ -88,8 +88,8 @@ test('password can be created', async t => {
 		}
 	});
 	for (const { host, exact } of actualWebsites) {
-		t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-		t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	}
 
 	for (let i = 0; i < expectedWebsites.length; i++) {
@@ -104,7 +104,7 @@ test('password can be created', async t => {
 	}
 
 	const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
-	t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 });

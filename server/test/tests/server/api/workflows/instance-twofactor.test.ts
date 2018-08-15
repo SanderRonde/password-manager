@@ -44,8 +44,8 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		const server_key = decryptWithPrivateKey(response.data.server_key, 
 			keyPair.privateKey)
 		
-		t.not(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
-		t.not(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
 		if (instance_id === ERRS.INVALID_DECRYPT || server_key === ERRS.INVALID_DECRYPT) {
 			return {};
 		}
@@ -104,7 +104,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
@@ -166,7 +166,7 @@ test('can enable 2FA and then disable it', async t => {
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
@@ -211,7 +211,7 @@ test('can enable 2FA and then disable it', async t => {
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, false, '2FA is now disabled');
 	})();
@@ -273,7 +273,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
@@ -316,7 +316,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, false, '2FA is now disabled');
 	})();
@@ -361,7 +361,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
@@ -406,7 +406,7 @@ test('can verify a login requiring 2FA', async t => {
 			return;
 		}
 		const token = decryptWithPrivateKey(data.twofactor_auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
@@ -434,7 +434,7 @@ test('can verify a login requiring 2FA', async t => {
 		const data = response.data;
 		assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 		const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypted === ERRS.INVALID_DECRYPT) return;
 		return decrypted;
 	})();
@@ -494,8 +494,8 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		const server_key = decryptWithPrivateKey(response.data.server_key, 
 			keyPair.privateKey)
 		
-		t.not(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
-		t.not(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
 		if (instance_id === ERRS.INVALID_DECRYPT || server_key === ERRS.INVALID_DECRYPT) {
 			return {};
 		}
@@ -553,7 +553,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
@@ -579,7 +579,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 			return;
 		}
 		const token = decryptWithPrivateKey(data.twofactor_auth_token, instance_private_key!);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
@@ -607,7 +607,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		const data = response.data;
 		assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 		const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key!);
-		t.not(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypted === ERRS.INVALID_DECRYPT) return;
 		return decrypted;
 	})();
@@ -671,7 +671,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, false, '2FA is now disabled');
 	})();
@@ -710,8 +710,8 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const server_key = decryptWithPrivateKey(response.data.server_key, 
 			keyPair.privateKey)
 		
-		t.not(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
-		t.not(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
 		if (instance_id === ERRS.INVALID_DECRYPT || server_key === ERRS.INVALID_DECRYPT) {
 			return {};
 		}
@@ -772,7 +772,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, false, '2FA is still disabled');
 
@@ -797,7 +797,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
@@ -823,7 +823,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 			return;
 		}
 		const token = decryptWithPrivateKey(data.twofactor_auth_token, instance_private_key!);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
@@ -851,7 +851,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const data = response.data;
 		assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 		const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key!);
-		t.not(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypted === ERRS.INVALID_DECRYPT) return;
 		return decrypted;
 	})();
@@ -915,7 +915,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		t.truthy(instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decrypt, false, '2FA is now disabled');
 	})();

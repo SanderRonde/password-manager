@@ -47,7 +47,7 @@ test('can log in, set a password, update it and then remove a password', async t
 			return;
 		}
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(typeof token, 'string', 'token is a string');
 
@@ -95,19 +95,19 @@ test('can log in, set a password, update it and then remove a password', async t
 		const password = await db.collection('passwords').findOne({
 			_id: new mongo.ObjectId(data.id)
 		}) as MongoRecord<EncryptedPassword>;
-		t.not(password, null, 'record was found');
+		assert.notStrictEqual(password, null, 'record was found');
 
 		const instance = await db.collection('instances').findOne({
 			_id: instance_id
 		}) as MongoRecord<EncryptedInstance>;
-		t.not(instance, null, 'instance was found');
+		assert.notStrictEqual(instance, null, 'instance was found');
 		done();
 
 		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
-		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
@@ -117,8 +117,8 @@ test('can log in, set a password, update it and then remove a password', async t
 			}
 		});
 		for (const { host, exact } of actualWebsites) {
-			t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		}
 
 		for (let i = 0; i < expectedWebsites.length; i++) {
@@ -133,7 +133,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
-		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 
@@ -177,19 +177,19 @@ test('can log in, set a password, update it and then remove a password', async t
 		const password = await db.collection('passwords').findOne({
 			_id: new mongo.ObjectId(passwordId!)
 		}) as MongoRecord<EncryptedPassword>;
-		t.not(password, null, 'record was found');
+		assert.notStrictEqual(password, null, 'record was found');
 
 		const instance = await db.collection('instances').findOne({
 			_id: instance_id
 		}) as MongoRecord<EncryptedInstance>;
-		t.not(instance, null, 'instance was found');
+		assert.notStrictEqual(instance, null, 'instance was found');
 		done();
 
 		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
-		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
@@ -199,8 +199,8 @@ test('can log in, set a password, update it and then remove a password', async t
 			}
 		});
 		for (const { host, exact } of actualWebsites) {
-			t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		}
 
 		for (let i = 0; i < expectedWebsites.length; i++) {
@@ -215,7 +215,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
-		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 	})();
@@ -285,7 +285,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			return;
 		}
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(typeof token, 'string', 'token is a string');
 
@@ -333,19 +333,19 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const password = await db.collection('passwords').findOne({
 			_id: new mongo.ObjectId(data.id)
 		}) as MongoRecord<EncryptedPassword>;
-		t.not(password, null, 'record was found');
+		assert.notStrictEqual(password, null, 'record was found');
 
 		const instance = await db.collection('instances').findOne({
 			_id: instance_id
 		}) as MongoRecord<EncryptedInstance>;
-		t.not(instance, null, 'instance was found');
+		assert.notStrictEqual(instance, null, 'instance was found');
 		done();
 
 		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
-		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
@@ -355,8 +355,8 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			}
 		});
 		for (const { host, exact } of actualWebsites) {
-			t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		}
 
 		for (let i = 0; i < expectedWebsites.length; i++) {
@@ -371,7 +371,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
-		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 
@@ -417,19 +417,19 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const password = await db.collection('passwords').findOne({
 			_id: new mongo.ObjectId(passwordId!)
 		}) as MongoRecord<EncryptedPassword>;
-		t.not(password, null, 'record was found');
+		assert.notStrictEqual(password, null, 'record was found');
 
 		const instance = await db.collection('instances').findOne({
 			_id: instance_id
 		}) as MongoRecord<EncryptedInstance>;
-		t.not(instance, null, 'instance was found');
+		assert.notStrictEqual(instance, null, 'instance was found');
 		done();
 
 		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
-		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
@@ -439,8 +439,8 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			}
 		});
 		for (const { host, exact } of actualWebsites) {
-			t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		}
 
 		for (let i = 0; i < expectedWebsites.length; i++) {
@@ -455,7 +455,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
-		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 	})();
@@ -477,7 +477,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		}
 		const data = response.data;
 		const decryptedData = decryptWithPrivateKey(data.encrypted, instance_private_key);
-		t.not(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedData === ERRS.INVALID_DECRYPT) return;
 	
 		const parsed = doesNotThrow(t, () => {
@@ -519,7 +519,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		}
 		const data = response.data;
 		const decryptedData = decryptWithPrivateKey(data.encrypted, instance_private_key);
-		t.not(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedData === ERRS.INVALID_DECRYPT) return;
 	
 		const parsed = doesNotThrow(t, () => {
@@ -578,7 +578,7 @@ test('can log in, set a password and get all metadata', async t => {
 			return;
 		}
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(typeof token, 'string', 'token is a string');
 
@@ -626,19 +626,19 @@ test('can log in, set a password and get all metadata', async t => {
 		const password = await db.collection('passwords').findOne({
 			_id: new mongo.ObjectId(data.id)
 		}) as MongoRecord<EncryptedPassword>;
-		t.not(password, null, 'record was found');
+		assert.notStrictEqual(password, null, 'record was found');
 
 		const instance = await db.collection('instances').findOne({
 			_id: instance_id
 		}) as MongoRecord<EncryptedInstance>;
-		t.not(instance, null, 'instance was found');
+		assert.notStrictEqual(instance, null, 'instance was found');
 		done();
 
 		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
-		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
@@ -648,8 +648,8 @@ test('can log in, set a password and get all metadata', async t => {
 			}
 		});
 		for (const { host, exact } of actualWebsites) {
-			t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		}
 
 		for (let i = 0; i < expectedWebsites.length; i++) {
@@ -664,7 +664,7 @@ test('can log in, set a password and get all metadata', async t => {
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
-		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 
@@ -708,19 +708,19 @@ test('can log in, set a password and get all metadata', async t => {
 		const password = await db.collection('passwords').findOne({
 			_id: new mongo.ObjectId(passwordId!)
 		}) as MongoRecord<EncryptedPassword>;
-		t.not(password, null, 'record was found');
+		assert.notStrictEqual(password, null, 'record was found');
 
 		const instance = await db.collection('instances').findOne({
 			_id: instance_id
 		}) as MongoRecord<EncryptedInstance>;
-		t.not(instance, null, 'instance was found');
+		assert.notStrictEqual(instance, null, 'instance was found');
 		done();
 
 		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
-		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
@@ -730,8 +730,8 @@ test('can log in, set a password and get all metadata', async t => {
 			}
 		});
 		for (const { host, exact } of actualWebsites) {
-			t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		}
 
 		for (let i = 0; i < expectedWebsites.length; i++) {
@@ -746,7 +746,7 @@ test('can log in, set a password and get all metadata', async t => {
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
-		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 	})();
@@ -770,7 +770,7 @@ test('can log in, set a password and get all metadata', async t => {
 		}
 		const data = response.data;
 		const decryptedData = decryptWithPrivateKey(data.encrypted, instance_private_key);
-		t.not(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedData === ERRS.INVALID_DECRYPT) return;
 	
 		const parsed = doesNotThrow(t, () => {
@@ -836,7 +836,7 @@ test('can log in, set and update a password, ' +
 				return;
 			}
 			const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-			t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+			assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 			if (token === ERRS.INVALID_DECRYPT) return;
 			assert.strictEqual(typeof token, 'string', 'token is a string');
 
@@ -885,19 +885,19 @@ test('can log in, set and update a password, ' +
 			const password = await db.collection('passwords').findOne({
 				_id: new mongo.ObjectId(data.id)
 			}) as MongoRecord<EncryptedPassword>;
-			t.not(password, null, 'record was found');
+			assert.notStrictEqual(password, null, 'record was found');
 
 			const instance = await db.collection('instances').findOne({
 				_id: instance_id
 			}) as MongoRecord<EncryptedInstance>;
-			t.not(instance, null, 'instance was found');
+			assert.notStrictEqual(instance, null, 'instance was found');
 			done();
 
 			assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 				'user ids match');
 			const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 				dbpw);
-			t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 			const actualWebsites = password.websites.map(({ exact, host }) => {
@@ -907,8 +907,8 @@ test('can log in, set and update a password, ' +
 				}
 			});
 			for (const { host, exact } of actualWebsites) {
-				t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-				t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+				assert.notStrictEqual(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+				assert.notStrictEqual(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			}
 
 			for (let i = 0; i < expectedWebsites.length; i++) {
@@ -923,7 +923,7 @@ test('can log in, set and update a password, ' +
 			}
 
 			const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
-			t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 			assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 
@@ -969,19 +969,19 @@ test('can log in, set and update a password, ' +
 			const password = await db.collection('passwords').findOne({
 				_id: new mongo.ObjectId(passwordId!)
 			}) as MongoRecord<EncryptedPassword>;
-			t.not(password, null, 'record was found');
+			assert.notStrictEqual(password, null, 'record was found');
 
 			const instance = await db.collection('instances').findOne({
 				_id: instance_id
 			}) as MongoRecord<EncryptedInstance>;
-			t.not(instance, null, 'instance was found');
+			assert.notStrictEqual(instance, null, 'instance was found');
 			done();
 
 			assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 				'user ids match');
 			const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 				dbpw);
-			t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 			const actualWebsites = password.websites.map(({ exact, host }) => {
@@ -991,8 +991,8 @@ test('can log in, set and update a password, ' +
 				}
 			});
 			for (const { host, exact } of actualWebsites) {
-				t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-				t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+				assert.notStrictEqual(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+				assert.notStrictEqual(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			}
 
 			for (let i = 0; i < expectedWebsites.length; i++) {
@@ -1007,7 +1007,7 @@ test('can log in, set and update a password, ' +
 			}
 
 			const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
-			t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 			assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 		})();
@@ -1029,7 +1029,7 @@ test('can log in, set and update a password, ' +
 			}
 			const data = response.data;
 			const decryptedData = decryptWithPrivateKey(data.encrypted, instance_private_key);
-			t.not(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedData === ERRS.INVALID_DECRYPT) return;
 		
 			const parsed = doesNotThrow(t, () => {
@@ -1077,7 +1077,7 @@ test('can log in, set and update a password, ' +
 			}
 			const data = response.data;
 			const decryptedData = decryptWithPrivateKey(data.encrypted, instance_private_key);
-			t.not(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedData === ERRS.INVALID_DECRYPT) return;
 		
 			const parsed = doesNotThrow(t, () => {
@@ -1141,7 +1141,7 @@ test('can log in, set and update a password, ' +
 			}
 			const data = response.data;
 			const decryptedData = decryptWithPrivateKey(data.encrypted, instance_private_key);
-			t.not(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+			assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedData === ERRS.INVALID_DECRYPT) return;
 		
 			const parsed = doesNotThrow(t, () => {

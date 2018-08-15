@@ -74,7 +74,7 @@ test('can disable 2FA when given a valid 2FA token', async t => {
 	t.truthy(instance, 'instance exists');
 	if (!instance) return;
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-	t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decrypt, false, '2FA is now disabled');
 });

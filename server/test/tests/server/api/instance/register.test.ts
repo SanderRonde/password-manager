@@ -35,8 +35,8 @@ test('instance can be created', async t => {
 	const server_key = decryptWithPrivateKey(response.data.server_key, 
 		keyPair.privateKey)
 	
-	t.not(id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
-	t.not(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+	assert.notStrictEqual(id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+	assert.notStrictEqual(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
 	if (id === ERRS.INVALID_DECRYPT || server_key === ERRS.INVALID_DECRYPT) {
 		return;
 	}

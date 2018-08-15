@@ -109,7 +109,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 			_id: new mongo.ObjectId(passwordId!)
 		});
 	});
-	t.not(password, null, 'password is still there');
+	assert.notStrictEqual(password, null, 'password is still there');
 });
 test('can be removed if 2FA is enabled', async t => {
 	const secret = speakeasy.generateSecret({

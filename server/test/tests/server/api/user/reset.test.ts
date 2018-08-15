@@ -85,39 +85,39 @@ test('works if params are correct', async t => {
 	const account = await db.collection('users').findOne({
 		email: DEFAULT_EMAIL
 	}) as MongoRecord<EncryptedAccount>|null;
-	t.not(account, null, 'account is not null');
+	assert.notStrictEqual(account, null, 'account is not null');
 	if (account === null) return;
 
 	const passwords = await db.collection('passwords').find({
 		user_id: account._id
 	}).toArray() as MongoRecord<EncryptedPassword>[]|null;
-	t.not(passwords, null, 'passwords are not null');
+	assert.notStrictEqual(passwords, null, 'passwords are not null');
 	if (passwords === null) return;
 
 	const instances = await db.collection('instances').find({
 		user_id: account._id
 	}).toArray() as MongoRecord<EncryptedInstance>[]|null;
-	t.not(instances, null, 'instances are not null');
+	assert.notStrictEqual(instances, null, 'instances are not null');
 	if (instances === null) return;
 	done();
 
 	//Can decrypt the password data
 	for (const { encrypted, twofactor_enabled } of passwords) {
 		const decryptedtwofactor = decryptWithSalt(twofactor_enabled, dbpw);
-		t.not(decryptedtwofactor, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedtwofactor, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		assert.strictEqual(decryptedtwofactor, false, '2FA was disabled');
 
 		const dbDecrypted = decrypt(encrypted, dbpw);
-		t.not(dbDecrypted, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(dbDecrypted, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (dbDecrypted === ERRS.INVALID_DECRYPT) return;
 
 		const pwDecrypted = decrypt(dbDecrypted, hash(pad(newMasterPassword, 'masterpwdecrypt')));
-		t.not(pwDecrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(pwDecrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	}
 
 	for (const { twofactor_enabled } of instances) {
 		const decryptedtwofactor = decryptWithSalt(twofactor_enabled, dbpw);
-		t.not(decryptedtwofactor, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decryptedtwofactor, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		assert.strictEqual(decryptedtwofactor, false, '2FA was disabled');
 	}
 
@@ -176,40 +176,40 @@ test('cancels if failing on password changes', async t => {
 	const account = await db.collection('users').findOne({
 		email: DEFAULT_EMAIL
 	}) as MongoRecord<EncryptedAccount>|null;
-	t.not(account, null, 'account is not null');
+	assert.notStrictEqual(account, null, 'account is not null');
 	if (account === null) return;
 
 	const passwords = await db.collection('passwords').find({
 		user_id: account._id
 	}).toArray() as MongoRecord<EncryptedPassword>[]|null;
-	t.not(passwords, null, 'passwords are not null');
+	assert.notStrictEqual(passwords, null, 'passwords are not null');
 	if (passwords === null) return;
 
 	const instances = await db.collection('instances').find({
 		user_id: account._id
 	}).toArray() as MongoRecord<EncryptedInstance>[]|null;
-	t.not(instances, null, 'instances are not null');
+	assert.notStrictEqual(instances, null, 'instances are not null');
 	if (instances === null) return;
 	done();
 
 	//Can decrypt the password data
 	for (const { encrypted } of passwords) {
 		const dbDecrypted = decrypt(encrypted, dbpw);
-		t.not(dbDecrypted, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(dbDecrypted, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (dbDecrypted === ERRS.INVALID_DECRYPT) return;
 
 		const pwDecrypted = decrypt(dbDecrypted, hash(pad(newMasterPassword, 'masterpwdecrypt')));
 		assert.strictEqual(pwDecrypted, ERRS.INVALID_DECRYPT, 'is an invalid decrypt');
 	}
 
-	t.not(instances.map((instance) => {
+	assert.notStrictEqual(instances.map((instance) => {
 		return decryptWithSalt(instance.twofactor_enabled, dbpw);
 	}).length, 0, 'not a single instance has 2FA enabled');
 
 	const decryptedPw = decrypt(account.pw, dbpw);
 	if (isErr(t, decryptedPw)) return;
 
-	t.not(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
+	assert.notStrictEqual(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted does not match new password');
 	assert.strictEqual(decryptedPw, hash(pad(userpw, 'masterpwverify')),
 		'decrypte password is the same as the old one')
@@ -217,7 +217,7 @@ test('cancels if failing on password changes', async t => {
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
 	if (isErr(t, dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
-	t.not(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
+	assert.notStrictEqual(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
 });
 test('cancels if failing on instance changes', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
@@ -261,40 +261,40 @@ test('cancels if failing on instance changes', async t => {
 	const account = await db.collection('users').findOne({
 		email: DEFAULT_EMAIL
 	}) as MongoRecord<EncryptedAccount>|null;
-	t.not(account, null, 'account is not null');
+	assert.notStrictEqual(account, null, 'account is not null');
 	if (account === null) return;
 
 	const passwords = await db.collection('passwords').find({
 		user_id: account._id
 	}).toArray() as MongoRecord<EncryptedPassword>[]|null;
-	t.not(passwords, null, 'passwords are not null');
+	assert.notStrictEqual(passwords, null, 'passwords are not null');
 	if (passwords === null) return;
 
 	const instances = await db.collection('instances').find({
 		user_id: account._id
 	}).toArray() as MongoRecord<EncryptedInstance>[]|null;
-	t.not(instances, null, 'instances are not null');
+	assert.notStrictEqual(instances, null, 'instances are not null');
 	if (instances === null) return;
 	done();
 
 	//Can decrypt the password data
 	for (const { encrypted } of passwords) {
 		const dbDecrypted = decrypt(encrypted, dbpw);
-		t.not(dbDecrypted, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(dbDecrypted, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (dbDecrypted === ERRS.INVALID_DECRYPT) return;
 
 		const pwDecrypted = decrypt(dbDecrypted, hash(pad(newMasterPassword, 'masterpwdecrypt')));
 		assert.strictEqual(pwDecrypted, ERRS.INVALID_DECRYPT, 'is an invalid decrypt');
 	}
 
-	t.not(instances.map((instance) => {
+	assert.notStrictEqual(instances.map((instance) => {
 		return decryptWithSalt(instance.twofactor_enabled, dbpw);
 	}).length, 0, 'not a single instance has 2FA enabled');
 
 	const decryptedPw = decrypt(account.pw, dbpw);
 	if (isErr(t, decryptedPw)) return;
 
-	t.not(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
+	assert.notStrictEqual(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted does not match new password');
 	assert.strictEqual(decryptedPw, hash(pad(userpw, 'masterpwverify')),
 		'decrypte password is the same as the old one')
@@ -302,7 +302,7 @@ test('cancels if failing on instance changes', async t => {
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
 	if (isErr(t, dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
-	t.not(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
+	assert.notStrictEqual(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
 });
 test('cancels if failing on account changes', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
@@ -346,40 +346,40 @@ test('cancels if failing on account changes', async t => {
 	const account = await db.collection('users').findOne({
 		email: DEFAULT_EMAIL
 	}) as MongoRecord<EncryptedAccount>|null;
-	t.not(account, null, 'account is not null');
+	assert.notStrictEqual(account, null, 'account is not null');
 	if (account === null) return;
 
 	const passwords = await db.collection('passwords').find({
 		user_id: account._id
 	}).toArray() as MongoRecord<EncryptedPassword>[]|null;
-	t.not(passwords, null, 'passwords are not null');
+	assert.notStrictEqual(passwords, null, 'passwords are not null');
 	if (passwords === null) return;
 
 	const instances = await db.collection('instances').find({
 		user_id: account._id
 	}).toArray() as MongoRecord<EncryptedInstance>[]|null;
-	t.not(instances, null, 'instances are not null');
+	assert.notStrictEqual(instances, null, 'instances are not null');
 	if (instances === null) return;
 	done();
 
 	//Can decrypt the password data
 	for (const { encrypted } of passwords) {
 		const dbDecrypted = decrypt(encrypted, dbpw);
-		t.not(dbDecrypted, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(dbDecrypted, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (dbDecrypted === ERRS.INVALID_DECRYPT) return;
 
 		const pwDecrypted = decrypt(dbDecrypted, hash(pad(newMasterPassword, 'masterpwdecrypt')));
 		assert.strictEqual(pwDecrypted, ERRS.INVALID_DECRYPT, 'is an invalid decrypt');
 	}
 
-	t.not(instances.map((instance) => {
+	assert.notStrictEqual(instances.map((instance) => {
 		return decryptWithSalt(instance.twofactor_enabled, dbpw);
 	}).length, 0, 'not a single instance has 2FA enabled');
 
 	const decryptedPw = decrypt(account.pw, dbpw);
 	if (isErr(t, decryptedPw)) return;
 
-	t.not(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
+	assert.notStrictEqual(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted does not match new password');
 	assert.strictEqual(decryptedPw, hash(pad(userpw, 'masterpwverify')),
 		'decrypte password is the same as the old one')
@@ -387,5 +387,5 @@ test('cancels if failing on account changes', async t => {
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
 	if (isErr(t, dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
-	t.not(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
+	assert.notStrictEqual(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
 });

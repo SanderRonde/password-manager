@@ -46,7 +46,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 			return;
 		}
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(typeof token, 'string', 'token is a string');
 
@@ -68,7 +68,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 		}
 		const data = response.data;
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(typeof token, 'string', 'token is a string');
 		return token;
@@ -143,7 +143,7 @@ test('invalidates a token if its count is wrong', async t => {
 			return;
 		}
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(typeof token, 'string', 'token is a string');
 
@@ -165,7 +165,7 @@ test('invalidates a token if its count is wrong', async t => {
 		}
 		const data = response.data;
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(typeof token, 'string', 'token is a string');
 		return token;
@@ -233,8 +233,8 @@ test('invalidates a token if the instance id is wrong', async t => {
 		const server_key = decryptWithPrivateKey(response.data.server_key, 
 			keyPair.privateKey)
 		
-		t.not(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
-		t.not(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
 		if (instance_id === ERRS.INVALID_DECRYPT || server_key === ERRS.INVALID_DECRYPT) {
 			return {};
 		}
@@ -277,7 +277,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 			return;
 		}
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(typeof token, 'string', 'token is a string');
 
@@ -299,7 +299,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 		}
 		const data = response.data;
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
 		assert.strictEqual(typeof token, 'string', 'token is a string');
 		return token;

@@ -35,8 +35,8 @@ test('can log in after registering instance', async t => {
 		const server_key = decryptWithPrivateKey(response.data.server_key, 
 			keyPair.privateKey)
 		
-		t.not(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
-		t.not(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
 		if (instance_id === ERRS.INVALID_DECRYPT || server_key === ERRS.INVALID_DECRYPT) {
 			return {};
 		}
@@ -79,7 +79,7 @@ test('can log in after registering instance', async t => {
 			return;
 		}
 		const token = decryptWithPrivateKey(data.auth_token, clientPrivateKey!);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		assert.strictEqual(typeof token, 'string', 'token is a string');
 
 		assert.strictEqual(data.challenge, challenge, 'challenge matches');
@@ -122,7 +122,7 @@ test('can log out after logging in', async t => {
 			return;
 		}
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
@@ -179,7 +179,7 @@ test('can log in and extend key', async t => {
 			return;
 		}
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
@@ -231,8 +231,8 @@ test('can register an instance, log in, extend key and log out', async t => {
 		const server_key = decryptWithPrivateKey(response.data.server_key, 
 			keyPair.privateKey)
 		
-		t.not(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
-		t.not(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(instance_id, ERRS.INVALID_DECRYPT, 'decryption was not successful');
+		assert.notStrictEqual(server_key, ERRS.INVALID_DECRYPT, 'decryption was not successful');
 		if (instance_id === ERRS.INVALID_DECRYPT || server_key === ERRS.INVALID_DECRYPT) {
 			return {};
 		}
@@ -273,7 +273,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 			return;
 		}
 		const token = decryptWithPrivateKey(data.auth_token, clientPrivateKey!);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+		assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
@@ -295,7 +295,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 		}
 		assert.strictEqual(typeof response.data.auth_token, 'string', 'auth token was passed');
 		const decrypted = decryptWithPrivateKey(response.data.auth_token, clientPrivateKey!);
-		t.not(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypted === ERRS.INVALID_DECRYPT) {
 			return;
 		}

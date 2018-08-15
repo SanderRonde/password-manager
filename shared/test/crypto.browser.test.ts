@@ -21,7 +21,7 @@ test('padding works', t => {
 		'padding is the same as expected');
 });
 test('hashing works', t => {
-	t.notThrows(() => {
+	assert.notStrictEqualThrows(() => {
 		browserCrypto.hash('somevalue');
 	}, 'encrypt can be called without error');
 });
@@ -32,13 +32,13 @@ test('hashing produces the same values with the same input', t => {
 });
 test('hashing different values produces different results', t => {
 	const input = genRandomString(25);
-	t.not(browserCrypto.hash(input), browserCrypto.hash(input) + 'x',
+	assert.notStrictEqual(browserCrypto.hash(input), browserCrypto.hash(input) + 'x',
 		'hashed values are not the same');
 });
 test('encrypting with public key works', t => {
 	const input  = genRandomString(25);
 	const { publicKey } = browserCrypto.genRSAKeyPair();
-	t.notThrows(() => {
+	assert.notStrictEqualThrows(() => {
 		browserCrypto.encryptWithPublicKey(input, publicKey);
 	}, 'public key encrypt can be called without error');
 });
@@ -60,7 +60,7 @@ test('public/private key encryption returns error on invalid decrypt', t => {
 test('hybrid encryption works', t => {
 	const input = genRandomString(25);
 	const { publicKey } = browserCrypto.genRSAKeyPair();
-	t.notThrows(() => {
+	assert.notStrictEqualThrows(() => {
 		browserCrypto.hybridEncrypt(input, publicKey);
 	}, 'hybrid encryption can be done without error');
 });

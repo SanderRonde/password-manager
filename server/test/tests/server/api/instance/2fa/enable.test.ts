@@ -128,7 +128,7 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 	t.truthy(instance, 'instance exists');
 	if (!instance) return;
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-	t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decrypt, true, '2FA is now enabled');
 });
@@ -176,7 +176,7 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 	t.truthy(instance, 'instance exists');
 	if (!instance) return;
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
-	t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decrypt, true, '2FA is still enabled');
 });

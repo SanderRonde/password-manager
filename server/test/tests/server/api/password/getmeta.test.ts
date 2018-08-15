@@ -59,7 +59,7 @@ test('can get the password\'s metadata', async t => {
 	}
 	const data = response.data;
 	const decryptedData = decryptWithPrivateKey(data.encrypted, instance_private_key);
-	t.not(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decryptedData === ERRS.INVALID_DECRYPT) return;
 
 	const parsed = doesNotThrow(t, () => {

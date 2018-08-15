@@ -5,12 +5,12 @@ import { genRandomString } from '../../../app/lib/util';
 import { assert } from 'chai';
 
 test('encryption works', t => {
-	t.notThrows(() => {
+	assert.notStrictEqualThrows(() => {
 		serverCrypto.encrypt('somevalue', 'somekey', ENCRYPTION_ALGORITHM);
 	}, 'encrypt can be called without error');
 });
 test('salt encryption works', t => {
-	t.notThrows(() => {
+	assert.notStrictEqualThrows(() => {
 		serverCrypto.encryptWithSalt('somevalue', 'somekey', ENCRYPTION_ALGORITHM);
 	}, 'encrypt can be called without error');
 });
@@ -21,7 +21,7 @@ test('encrypted value can be decrypted', t => {
 	const encrypted = serverCrypto.encrypt(startValue, key, ENCRYPTION_ALGORITHM);
 	const decrypted = serverCrypto.decrypt(encrypted, key);
 
-	t.not(decrypted, serverCrypto.ERRS.INVALID_DECRYPT,
+	assert.notStrictEqual(decrypted, serverCrypto.ERRS.INVALID_DECRYPT,
 		'is not an invalid decrypt');
 	assert.strictEqual(decrypted, startValue);
 });
@@ -44,7 +44,7 @@ test('salt-encrypted value can be decrypted', t => {
 	const encrypted = serverCrypto.encryptWithSalt(startValue, key, ENCRYPTION_ALGORITHM);
 	const decrypted = serverCrypto.decryptWithSalt(encrypted, key);
 
-	t.not(decrypted, serverCrypto.ERRS.INVALID_DECRYPT,
+	assert.notStrictEqual(decrypted, serverCrypto.ERRS.INVALID_DECRYPT,
 		'is not an invalid decrypt');
 	assert.strictEqual(decrypted, startValue);
 });
@@ -71,7 +71,7 @@ test('encrypted value can be decrypted with long key', t => {
 	const encrypted = serverCrypto.encrypt(startValue, key, ENCRYPTION_ALGORITHM);
 	const decrypted = serverCrypto.decrypt(encrypted, key);
 
-	t.not(decrypted, serverCrypto.ERRS.INVALID_DECRYPT,
+	assert.notStrictEqual(decrypted, serverCrypto.ERRS.INVALID_DECRYPT,
 		'is not an invalid decrypt');
 	assert.strictEqual(decrypted, startValue);
 });
@@ -82,7 +82,7 @@ test('salt-encrypted value can be decrypted with long key', t => {
 	const encrypted = serverCrypto.encryptWithSalt(startValue, key, ENCRYPTION_ALGORITHM);
 	const decrypted = serverCrypto.decryptWithSalt(encrypted, key);
 
-	t.not(decrypted, serverCrypto.ERRS.INVALID_DECRYPT,
+	assert.notStrictEqual(decrypted, serverCrypto.ERRS.INVALID_DECRYPT,
 		'is not an invalid decrypt');
 	assert.strictEqual(decrypted, startValue);
 });
@@ -92,7 +92,7 @@ test('padding works', t => {
 		'padding is the same as expected');
 });
 test('hashing works', t => {
-	t.notThrows(() => {
+	assert.notStrictEqualThrows(() => {
 		serverCrypto.hash('somevalue');
 	}, 'encrypt can be called without error');
 });
@@ -103,13 +103,13 @@ test('hashing produces the same values with the same input', t => {
 });
 test('hashing different values produces different results', t => {
 	const input = genRandomString(25);
-	t.not(serverCrypto.hash(input), serverCrypto.hash(input) + 'x',
+	assert.notStrictEqual(serverCrypto.hash(input), serverCrypto.hash(input) + 'x',
 		'hashed values are not the same');
 });
 test('encrypting with public key works', t => {
 	const input  = genRandomString(25);
 	const { publicKey } = serverCrypto.genRSAKeyPair();
-	t.notThrows(() => {
+	assert.notStrictEqualThrows(() => {
 		serverCrypto.encryptWithPublicKey(input, publicKey);
 	}, 'public key encrypt can be called without error');
 });
@@ -131,7 +131,7 @@ test('public/private key encryption returns error on invalid decrypt', t => {
 test('hybrid encryption works', t => {
 	const input = genRandomString(25);
 	const { publicKey } = serverCrypto.genRSAKeyPair();
-	t.notThrows(() => {
+	assert.notStrictEqualThrows(() => {
 		serverCrypto.hybridEncrypt(input, publicKey);
 	}, 'hybrid encryption can be done without error');
 });

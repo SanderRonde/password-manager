@@ -145,11 +145,11 @@ test('works if params are correct', async t => {
 	const dbDecryptedResetKey = decrypt(reset_key, dbpw);
 	done();
 
-	t.not(dbDecryptedResetKey, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	assert.notStrictEqual(dbDecryptedResetKey, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (dbDecryptedResetKey === ERRS.INVALID_DECRYPT) return;
 
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, data.new_reset_key);
-	t.not(decryptedResetKey, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	assert.notStrictEqual(decryptedResetKey, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decryptedResetKey === ERRS.INVALID_DECRYPT) return;
 
 	assert.isTrue(decryptedResetKey.integrity, 'integrity is preserved');
