@@ -57,7 +57,7 @@ export class RoutesAPIInstanceTwofactor {
 
 			if (!twofactor_secret) {
 				//Create a new one
-				const secret = speakeasy.generateSecretTest({
+				const secret = speakeasy.generateSecret({
 					name: 'Password Manager'
 				});
 	
