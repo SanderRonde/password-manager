@@ -48,7 +48,7 @@ test('can be removed if 2FA is disabled', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) {
 		return;
 	}
@@ -150,7 +150,7 @@ test('can be removed if 2FA is enabled', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) {
 		return;
 	}

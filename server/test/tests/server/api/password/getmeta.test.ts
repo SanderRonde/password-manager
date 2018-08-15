@@ -53,7 +53,7 @@ test('can get the password\'s metadata', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) {
 		return;
 	}

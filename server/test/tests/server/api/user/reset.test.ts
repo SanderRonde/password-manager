@@ -74,7 +74,7 @@ test('works if params are correct', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'request succeeded');
+	assert.isTrue(response.success, 'request succeeded');
 	if (response.success === false) return;
 	
 	const data = response.data;
@@ -131,7 +131,7 @@ test('works if params are correct', async t => {
 	if (isErr(t, dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, data.new_reset_key);
 	if (isErr(t, decryptedResetKey)) return;
-	t.true(decryptedResetKey.integrity, 'integrity is true');
+	assert.isTrue(decryptedResetKey.integrity, 'integrity is true');
 	t.is(decryptedResetKey.pw, newMasterPassword, 'new master password can be decrypted');
 });
 test('cancels if failing on password changes', async t => {

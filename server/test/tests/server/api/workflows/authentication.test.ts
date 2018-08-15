@@ -27,7 +27,7 @@ test('can log in after registering instance', async t => {
 			public_key: keyPair.publicKey
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return {};
 		}
@@ -69,7 +69,7 @@ test('can log in after registering instance', async t => {
 
 		server.kill();
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -112,7 +112,7 @@ test('can log out after logging in', async t => {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -139,7 +139,7 @@ test('can log out after logging in', async t => {
 	
 		server.kill();
 	
-		t.true(response.success, 'API call succeeded')
+		assert.isTrue(response.success, 'API call succeeded')
 	})();
 });
 test('can log in and extend key', async t => {
@@ -169,7 +169,7 @@ test('can log in and extend key', async t => {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -197,7 +197,7 @@ test('can log in and extend key', async t => {
 	
 		server.kill();
 	
-		t.true(response.success, 'API call succeeded')
+		assert.isTrue(response.success, 'API call succeeded')
 		if (!response.success) {
 			return;
 		}
@@ -223,7 +223,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 			public_key: keyPair.publicKey
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return {};
 		}
@@ -263,7 +263,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -289,7 +289,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 			oldToken: token!
 		}));
 	
-		t.true(response.success, 'API call succeeded')
+		assert.isTrue(response.success, 'API call succeeded')
 		if (!response.success) {
 			return;
 		}
@@ -309,6 +309,6 @@ test('can register an instance, log in, extend key and log out', async t => {
 	
 		server.kill();
 	
-		t.true(response.success, 'API call succeeded')
+		assert.isTrue(response.success, 'API call succeeded')
 	})();
 });

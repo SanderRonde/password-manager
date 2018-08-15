@@ -50,7 +50,7 @@ test('can disable 2FA when given a valid 2FA token', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
 	t.falsy((data as {
@@ -64,7 +64,7 @@ test('can disable 2FA when given a valid 2FA token', async t => {
 	const finalData = data as {
 		disabled: true;	
 	};
-	t.true(finalData.disabled, '2FA was disabled');
+	assert.isTrue(finalData.disabled, '2FA was disabled');
 
 	const instance = await doSingleQuery(uri, async (db) => {
 		return await db.collection('instances').findOne({
@@ -107,7 +107,7 @@ test('state is unchanged if already disabled', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
 	t.is((data as {

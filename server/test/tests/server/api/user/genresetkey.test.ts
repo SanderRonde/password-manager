@@ -129,7 +129,7 @@ test('works if params are correct', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'request succeeded');
+	assert.isTrue(response.success, 'request succeeded');
 	if (response.success === false) return;
 	
 	const data = response.data;
@@ -152,6 +152,6 @@ test('works if params are correct', async t => {
 	t.not(decryptedResetKey, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decryptedResetKey === ERRS.INVALID_DECRYPT) return;
 
-	t.true(decryptedResetKey.integrity, 'integrity is preserved');
+	assert.isTrue(decryptedResetKey.integrity, 'integrity is preserved');
 	t.is(decryptedResetKey.pw, userpw, 'passwords match');
 });

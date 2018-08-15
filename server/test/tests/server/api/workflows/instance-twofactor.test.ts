@@ -36,7 +36,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 			public_key: keyPair.publicKey
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return {};
 		}
@@ -76,7 +76,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 	
 		server.kill();
 	
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
 		t.falsy((data as {
@@ -94,7 +94,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		} | {
 			enabled: true;
 		};
-		t.true(finalData.enabled, '2FA was already enabled');
+		assert.isTrue(finalData.enabled, '2FA was already enabled');
 	
 		const instance = await doSingleQuery(uri, async (db) => {
 			return await db.collection('instances').findOne({
@@ -138,7 +138,7 @@ test('can enable 2FA and then disable it', async t => {
 			password: hash(pad(userpw, 'masterpwverify'))
 		}));
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
 		t.falsy((data as {
@@ -156,7 +156,7 @@ test('can enable 2FA and then disable it', async t => {
 		} | {
 			enabled: true;
 		};
-		t.true(finalData.enabled, '2FA was already enabled');
+		assert.isTrue(finalData.enabled, '2FA was already enabled');
 	
 		const instance = await doSingleQuery(uri, async (db) => {
 			return await db.collection('instances').findOne({
@@ -187,7 +187,7 @@ test('can enable 2FA and then disable it', async t => {
 
 		server.kill();
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
 		t.falsy((data as {
@@ -201,7 +201,7 @@ test('can enable 2FA and then disable it', async t => {
 		const finalData = data as {
 			disabled: true;	
 		};
-		t.true(finalData.disabled, '2FA was disabled');
+		assert.isTrue(finalData.disabled, '2FA was disabled');
 
 		const instance = await doSingleQuery(uri, async (db) => {
 			return await db.collection('instances').findOne({
@@ -245,7 +245,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 			password: hash(pad(userpw, 'masterpwverify'))
 		}));
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
 		t.falsy((data as {
@@ -263,7 +263,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		} | {
 			enabled: true;
 		};
-		t.true(finalData.enabled, '2FA was already enabled');
+		assert.isTrue(finalData.enabled, '2FA was already enabled');
 	
 		const instance = await doSingleQuery(uri, async (db) => {
 			return await db.collection('instances').findOne({
@@ -292,7 +292,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 			password: hash(pad(userpw, 'masterpwverify'))
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
 		t.falsy((data as {
@@ -306,7 +306,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		const finalData = data as {
 			disabled: true;	
 		};
-		t.true(finalData.disabled, '2FA was disabled');
+		assert.isTrue(finalData.disabled, '2FA was disabled');
 
 		const instance = await doSingleQuery(uri, async (db) => {
 			return await db.collection('instances').findOne({
@@ -333,7 +333,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 
 		server.kill();
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
 		t.falsy((data as {
@@ -351,7 +351,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		} | {
 			enabled: true;
 		};
-		t.true(finalData.enabled, '2FA was already enabled');
+		assert.isTrue(finalData.enabled, '2FA was already enabled');
 	
 		const instance = await doSingleQuery(uri, async (db) => {
 			return await db.collection('instances').findOne({
@@ -396,12 +396,12 @@ test('can verify a login requiring 2FA', async t => {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
 		const data = response.data;
-		t.true(data.twofactor_required, 'further authentication is required');
+		assert.isTrue(data.twofactor_required, 'further authentication is required');
 		if (data.twofactor_required === false) {
 			return;
 		}
@@ -428,7 +428,7 @@ test('can verify a login requiring 2FA', async t => {
 			})
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 
 		const data = response.data;
@@ -451,7 +451,7 @@ test('can verify a login requiring 2FA', async t => {
 	
 		server.kill();
 	
-		t.true(response.success, 'API call succeeded')
+		assert.isTrue(response.success, 'API call succeeded')
 		if (!response.success) {
 			return;
 		}
@@ -486,7 +486,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 			public_key: keyPair.publicKey
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return {};
 		}
@@ -525,7 +525,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 			password: hash(pad(userpw, 'masterpwverify'))
 		}));
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
 		t.falsy((data as {
@@ -543,7 +543,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		} | {
 			enabled: true;
 		};
-		t.true(finalData.enabled, '2FA was already enabled');
+		assert.isTrue(finalData.enabled, '2FA was already enabled');
 	
 		const instance = await doSingleQuery(uri, async (db) => {
 			return await db.collection('instances').findOne({
@@ -569,12 +569,12 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
 		const data = response.data;
-		t.true(data.twofactor_required, 'further authentication is required');
+		assert.isTrue(data.twofactor_required, 'further authentication is required');
 		if (data.twofactor_required === false) {
 			return;
 		}
@@ -601,7 +601,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 			})
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 
 		const data = response.data;
@@ -623,7 +623,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		}));
 		config.count = 0;
 		
-		t.true(response.success, 'API call succeeded')
+		assert.isTrue(response.success, 'API call succeeded')
 		if (!response.success) {
 			return;
 		}
@@ -647,7 +647,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 
 		server.kill();
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
 		t.falsy((data as {
@@ -661,7 +661,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		const finalData = data as {
 			disabled: true;	
 		};
-		t.true(finalData.disabled, '2FA was disabled');
+		assert.isTrue(finalData.disabled, '2FA was disabled');
 
 		const instance = await doSingleQuery(uri, async (db) => {
 			return await db.collection('instances').findOne({
@@ -702,7 +702,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 			public_key: keyPair.publicKey
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return {};
 		}
@@ -741,7 +741,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 			password: hash(pad(userpw, 'masterpwverify'))
 		}));
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
 		t.falsy((data as {
@@ -787,7 +787,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 			})
 		}));
 
-		t.true(response.success, 'API request succeeded');
+		assert.isTrue(response.success, 'API request succeeded');
 
 		const instance = await doSingleQuery(uri, async (db) => {
 			return await db.collection('instances').findOne({
@@ -813,12 +813,12 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
 		const data = response.data;
-		t.true(data.twofactor_required, 'further authentication is required');
+		assert.isTrue(data.twofactor_required, 'further authentication is required');
 		if (data.twofactor_required === false) {
 			return;
 		}
@@ -845,7 +845,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 			})
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 
 		const data = response.data;
@@ -867,7 +867,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		}));
 		config.count = 0;
 		
-		t.true(response.success, 'API call succeeded')
+		assert.isTrue(response.success, 'API call succeeded')
 		if (!response.success) {
 			return;
 		}
@@ -891,7 +891,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 
 		server.kill();
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
 		t.falsy((data as {
@@ -905,7 +905,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const finalData = data as {
 			disabled: true;	
 		};
-		t.true(finalData.disabled, '2FA was disabled');
+		assert.isTrue(finalData.disabled, '2FA was disabled');
 
 		const instance = await doSingleQuery(uri, async (db) => {
 			return await db.collection('instances').findOne({

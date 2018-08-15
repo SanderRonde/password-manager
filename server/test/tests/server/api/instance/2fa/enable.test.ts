@@ -44,7 +44,7 @@ test('can enable 2FA when no 2FA secret is set', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
 	t.falsy((data as {
@@ -64,7 +64,7 @@ test('can enable 2FA when no 2FA secret is set', async t => {
 	};
 	t.false(finalData.enabled, '2FA was not already enabled');
 	if (finalData.enabled) return;
-	t.true(finalData.verify_2fa_required, 
+	assert.isTrue(finalData.verify_2fa_required, 
 		'further verification is needed');
 	t.is(typeof finalData.auth_url, 'string', 'auth_url is a string');
 	t.regex(finalData.auth_url, 
@@ -100,7 +100,7 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
 	t.falsy((data as {
@@ -118,7 +118,7 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 	} | {
 		enabled: true;
 	};
-	t.true(finalData.enabled, '2FA was already enabled');
+	assert.isTrue(finalData.enabled, '2FA was already enabled');
 
 	const instance = await doSingleQuery(uri, async (db) => {
 		return await db.collection('instances').findOne({
@@ -161,7 +161,7 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
 	t.is((data as {

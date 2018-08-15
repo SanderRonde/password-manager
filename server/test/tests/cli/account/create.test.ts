@@ -211,7 +211,7 @@ test('ask for a new database password if not set yet', async t => {
 	await proc.run();
 	proc.check();
 
-	t.true(await hasCreatedDBWithPW(dbpw, uri),
+	assert.isTrue(await hasCreatedDBWithPW(dbpw, uri),
 		'the database has been initialized with given password');
 	const [ [, resetKey ] ] = proc.getRegexps();
 	await hasCreatedAccount(t, {
@@ -246,7 +246,7 @@ test('use the passed password to initialize the database if not set yet', async 
 	await proc.run();
 	proc.check();
 
-	t.true(await hasCreatedDBWithPW(dbpw, uri),
+	assert.isTrue(await hasCreatedDBWithPW(dbpw, uri),
 		'the database has been initialized with given password');
 
 	const [ [, resetKey ] ] = proc.getRegexps();

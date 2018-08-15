@@ -99,7 +99,7 @@ test('succeed when restoring a passwordless backup', async t => {
 	proc.check();
 
 	//Check if the database was actually created
-	t.true(await hasCreatedDBWithPW(dbpw, uri));
+	assert.isTrue(await hasCreatedDBWithPW(dbpw, uri));
 });
 test.after.always('delete dummy dumps', async () => {
 	await Promise.all(dumps.map((dump) => {

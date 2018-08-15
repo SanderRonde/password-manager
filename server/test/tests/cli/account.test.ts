@@ -54,7 +54,7 @@ test('an added account can be deleted', async t => {
 		await proc.run();
 		proc.check();
 
-		t.true(await hasCreatedDBWithPW(dbpw, uri),
+		assert.isTrue(await hasCreatedDBWithPW(dbpw, uri),
 			'the database has been initialized with given password');
 		const [ [, resetKey ] ] = proc.getRegexps();
 		await hasCreatedAccount(t, {

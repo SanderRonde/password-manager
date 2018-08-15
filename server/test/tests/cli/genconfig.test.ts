@@ -34,7 +34,7 @@ test('a server config can generated', async t => {
 
 	const cfgPath = path.join(__dirname, '../../../cfg/server.json');
 	files.push(cfgPath);
-	t.true(fs.existsSync(cfgPath));
+	assert.isTrue(fs.existsSync(cfgPath));
 	const content = await fs.readFile(cfgPath, {
 		encoding: 'utf8'
 	});
@@ -59,7 +59,7 @@ test('a server config can generated to a custom path', async t => {
 	proc.check();
 
 	files.push(cfgPath);
-	t.true(fs.existsSync(cfgPath));
+	assert.isTrue(fs.existsSync(cfgPath));
 	const content = await fs.readFile(cfgPath, {
 		encoding: 'utf8'
 	});
@@ -80,7 +80,7 @@ test('a backup config can generated', async t => {
 
 	const cfgPath = path.join(__dirname, '../../../cfg/backup.json');
 	files.push(cfgPath);
-	t.true(fs.existsSync(cfgPath));
+	assert.isTrue(fs.existsSync(cfgPath));
 	const content = await fs.readFile(cfgPath, {
 		encoding: 'utf8'
 	});
@@ -105,7 +105,7 @@ test('a backup config can generated to a custom path', async t => {
 	proc.check();
 
 	files.push(cfgPath);
-	t.true(fs.existsSync(cfgPath));
+	assert.isTrue(fs.existsSync(cfgPath));
 	const content = await fs.readFile(cfgPath, {
 		encoding: 'utf8'
 	});

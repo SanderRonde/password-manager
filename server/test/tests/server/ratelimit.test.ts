@@ -56,7 +56,7 @@ function assertSucceedsAndIsNotRatelimited(t: GenericTestContext<Context<any>>, 
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(responseText);
 	}, 'response can be JSON parsed');
-	t.true(parsed.success, 'request was successful');
+	assert.isTrue(parsed.success, 'request was successful');
 	return {
 		response, responseText
 	}
@@ -108,8 +108,8 @@ async function assertMaxDuration(t: GenericTestContext<Context<any>>, fn: () => 
 	minDuration: number, maxDuration: number, message: string = `does not take less than ${
 		minDuration} and more than ${maxDuration}`) {
 			const time = await checkTiming(fn);
-			t.true(time > minDuration, message);
-			t.true(time < maxDuration, message);
+			assert.isTrue(time > minDuration, message);
+			assert.isTrue(time < maxDuration, message);
 		}
 
 function getSpedupTime(time: number) {

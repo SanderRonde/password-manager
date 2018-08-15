@@ -53,7 +53,7 @@ test('a backupped file can be used to restore', async t => {
 				resolve(exists);
 			});
 		});
-		t.true(exists, 'dump file exists');
+		assert.isTrue(exists, 'dump file exists');
 	})();
 	await (async () => {
 		await clearDB(uri);
@@ -78,6 +78,6 @@ test('a backupped file can be used to restore', async t => {
 		proc.check();
 
 		//Check if the database was actually created
-		t.true(await hasCreatedDBWithPW(dbpw, uri));
+		assert.isTrue(await hasCreatedDBWithPW(dbpw, uri));
 	})();
 });

@@ -43,7 +43,7 @@ test('login token can be generated when 2FA is disabled', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) {
 		return;
 	}
@@ -90,12 +90,12 @@ test('login token can be generated when 2FA is enabled', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) {
 		return;
 	}
 	const data = response.data;
-	t.true(data.twofactor_required, 'further authentication is required');
+	assert.isTrue(data.twofactor_required, 'further authentication is required');
 	if (data.twofactor_required === false) {
 		return;
 	}

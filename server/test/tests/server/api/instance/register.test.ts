@@ -27,7 +27,7 @@ test('instance can be created', async t => {
 
 	server.kill();
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) {
 		return;
 	}

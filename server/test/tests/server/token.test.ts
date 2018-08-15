@@ -36,7 +36,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -62,7 +62,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 			oldToken: initialToken!
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -133,7 +133,7 @@ test('invalidates a token if its count is wrong', async t => {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -159,7 +159,7 @@ test('invalidates a token if its count is wrong', async t => {
 			oldToken: initialToken!
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -225,7 +225,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 			public_key: keyPair.publicKey
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return {};
 		}
@@ -267,7 +267,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -293,7 +293,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 			oldToken: initialToken!
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}

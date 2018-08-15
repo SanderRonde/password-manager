@@ -37,7 +37,7 @@ test('can log in, set a password, update it and then remove a password', async t
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -82,7 +82,7 @@ test('can log in, set a password, update it and then remove a password', async t
 			encrypted: expectedEncrypted
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -167,7 +167,7 @@ test('can log in, set a password, update it and then remove a password', async t
 			encrypted: expectedEncrypted
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -233,7 +233,7 @@ test('can log in, set a password, update it and then remove a password', async t
 	
 		server.kill();
 	
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -275,7 +275,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -320,7 +320,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			encrypted: expectedEncrypted
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -407,7 +407,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			encrypted: expectedEncrypted
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -471,7 +471,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			password_id: passwordId!
 		}));
 		
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -513,7 +513,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 	
 		server.kill();
 	
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -568,7 +568,7 @@ test('can log in, set a password and get all metadata', async t => {
 			password_hash: hash(pad(userpw, 'masterpwverify'))
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -613,7 +613,7 @@ test('can log in, set a password and get all metadata', async t => {
 			encrypted: expectedEncrypted
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -698,7 +698,7 @@ test('can log in, set a password and get all metadata', async t => {
 			encrypted: expectedEncrypted
 		}));
 
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -764,7 +764,7 @@ test('can log in, set a password and get all metadata', async t => {
 	
 		server.kill();
 	
-		t.true(response.success, 'API call succeeded');
+		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) {
 			return;
 		}
@@ -826,7 +826,7 @@ test('can log in, set and update a password, ' +
 				password_hash: hash(pad(userpw, 'masterpwverify'))
 			}));
 
-			t.true(response.success, 'API call succeeded');
+			assert.isTrue(response.success, 'API call succeeded');
 			if (!response.success) {
 				return;
 			}
@@ -872,7 +872,7 @@ test('can log in, set and update a password, ' +
 				encrypted: expectedEncrypted
 			}));
 
-			t.true(response.success, 'API call succeeded');
+			assert.isTrue(response.success, 'API call succeeded');
 			if (!response.success) {
 				return;
 			}
@@ -959,7 +959,7 @@ test('can log in, set and update a password, ' +
 				encrypted: expectedEncrypted
 			}));
 
-			t.true(response.success, 'API call succeeded');
+			assert.isTrue(response.success, 'API call succeeded');
 			if (!response.success) {
 				return;
 			}
@@ -1023,7 +1023,7 @@ test('can log in, set and update a password, ' +
 				password_hash: hash(pad(userpw, 'masterpwverify'))
 			}));
 				
-			t.true(response.success, 'API call succeeded');
+			assert.isTrue(response.success, 'API call succeeded');
 			if (!response.success) {
 				return;
 			}
@@ -1071,7 +1071,7 @@ test('can log in, set and update a password, ' +
 				}/some/path/to/something.html`
 			}));
 			
-			t.true(response.success, 'API call succeeded');
+			assert.isTrue(response.success, 'API call succeeded');
 			if (!response.success) {
 				return;
 			}
@@ -1135,7 +1135,7 @@ test('can log in, set and update a password, ' +
 		
 			server.kill();
 		
-			t.true(response.success, 'API call succeeded');
+			assert.isTrue(response.success, 'API call succeeded');
 			if (!response.success) {
 				return;
 			}

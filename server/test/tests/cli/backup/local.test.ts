@@ -50,5 +50,5 @@ test('creates dump with regular args', async t => {
 			resolve(exists);
 		});
 	});
-	t.true(exists, 'dump file exists');
+	assert.isTrue(exists, 'dump file exists');
 });
