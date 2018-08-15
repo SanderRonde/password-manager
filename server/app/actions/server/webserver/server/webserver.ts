@@ -48,7 +48,9 @@ export class Webserver {
 	}
 
 	private _initMiddleware() {
-		this.app.use(morgan(this.config.development ? 'dev' : 'short'));
+		if (!this.debug) {
+			this.app.use(morgan(this.config.development ? 'dev' : 'short'));
+		}
 		this.app.use(cookieParser());
 		this.app.use(bodyParser.json());
 		this.app.use(serveStatic(STATIC_SERVE_PATH, {
