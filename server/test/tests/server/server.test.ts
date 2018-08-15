@@ -7,7 +7,10 @@ import { assert } from 'chai';
 import http = require('http');
 
 export function serverTest() {
-	describe('Webserver', () => {
+	describe('Webserver', function() {
+		this.timeout(1000 * 60 * 5);
+		this.slow(1000 * 60 * 5);
+
 		const uris = captureURIs();
 		it('server can be started', async () => {
 			const { dbpw, uri, http } = await genUserAndDb();
