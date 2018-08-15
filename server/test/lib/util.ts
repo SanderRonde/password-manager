@@ -53,7 +53,10 @@ export async function genTempDatabase(): Promise<string> {
 
 export function captureCreatedFiles(): string[] {
 	const arr: string[] = [];
-	after('Delete files', async () => {
+	after('Delete files', async function() {
+		this.timeout(10000);
+		this.slow(10000);
+		
 		await Promise.all(arr.map(async (filepath) => {
 			await fs.unlink(filepath).catch(() => {});
 		}));
@@ -63,7 +66,10 @@ export function captureCreatedFiles(): string[] {
 
 export function captureURIs(): string[] {
 	const arr: string[] = [];
-	after('Clear databases', async () => {
+	after('Clear databases', async function() {
+		this.timeout(10000);
+		this.slow(10000);
+
 		await Promise.all(arr.map(clearDB));
 	});
 	return arr;
@@ -445,4 +451,12 @@ export async function setPasword(toSet: {
 	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 
 	return data.id;
+}
+
+export function mochaTest(duration: number, callback: () => (void|Promise<any>)) {
+	return function(this: Mocha.Context) {
+		this.timeout(duration);
+		this.slow(duration * 1.5);
+		return callback();
+	}
 }
