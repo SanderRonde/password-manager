@@ -79,7 +79,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
-		t.falsy((data as {
+	assert.isFalse(!!(data as {
 			message: 'state unchanged (was already set)'
 		}).message, 'state is not unchanged');
 		if ((data as {
@@ -141,7 +141,7 @@ test('can enable 2FA and then disable it', async t => {
 		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
-		t.falsy((data as {
+	assert.isFalse(!!(data as {
 			message: 'state unchanged (was already set)'
 		}).message, 'state is not unchanged');
 		if ((data as {
@@ -190,7 +190,7 @@ test('can enable 2FA and then disable it', async t => {
 		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
-		t.falsy((data as {
+	assert.isFalse(!!(data as {
 			message: 'state unchanged (was already set)'
 		}).message, 'state is not unchanged');
 		if ((data as {
@@ -248,7 +248,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
-		t.falsy((data as {
+	assert.isFalse(!!(data as {
 			message: 'state unchanged (was already set)'
 		}).message, 'state is not unchanged');
 		if ((data as {
@@ -295,7 +295,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
-		t.falsy((data as {
+	assert.isFalse(!!(data as {
 			message: 'state unchanged (was already set)'
 		}).message, 'state is not unchanged');
 		if ((data as {
@@ -336,7 +336,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
-		t.falsy((data as {
+	assert.isFalse(!!(data as {
 			message: 'state unchanged (was already set)'
 		}).message, 'state is not unchanged');
 		if ((data as {
@@ -528,7 +528,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
-		t.falsy((data as {
+	assert.isFalse(!!(data as {
 			message: 'state unchanged (was already set)'
 		}).message, 'state is not unchanged');
 		if ((data as {
@@ -650,7 +650,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
-		t.falsy((data as {
+	assert.isFalse(!!(data as {
 			message: 'state unchanged (was already set)'
 		}).message, 'state is not unchanged');
 		if ((data as {
@@ -744,7 +744,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
-		t.falsy((data as {
+	assert.isFalse(!!(data as {
 			message: 'state unchanged (was already set)'
 		}).message, 'state is not unchanged');
 		if ((data as {
@@ -894,7 +894,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		assert.isTrue(response.success, 'API call succeeded');
 		if (!response.success) return;
 		const data = response.data;
-		t.falsy((data as {
+	assert.isFalse(!!(data as {
 			message: 'state unchanged (was already set)'
 		}).message, 'state is not unchanged');
 		if ((data as {

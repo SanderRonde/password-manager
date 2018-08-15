@@ -53,7 +53,7 @@ test('can disable 2FA when given a valid 2FA token', async t => {
 	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
-	t.falsy((data as {
+assert.isFalse(!!(data as {
 		message: 'state unchanged (was already set)'
 	}).message, 'state is not unchanged');
 	if ((data as {

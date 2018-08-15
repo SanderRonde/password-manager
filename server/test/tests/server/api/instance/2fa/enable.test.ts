@@ -47,7 +47,7 @@ test('can enable 2FA when no 2FA secret is set', async t => {
 	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
-	t.falsy((data as {
+assert.isFalse(!!(data as {
 		message: 'state unchanged (was already set)'
 	}).message, 'state is not unchanged');
 	if ((data as {
@@ -103,7 +103,7 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
-	t.falsy((data as {
+assert.isFalse(!!(data as {
 		message: 'state unchanged (was already set)'
 	}).message, 'state is not unchanged');
 	if ((data as {
