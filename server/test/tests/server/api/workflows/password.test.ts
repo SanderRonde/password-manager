@@ -127,7 +127,7 @@ test('can log in, set a password, update it and then remove a password', async t
 
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
-			t.truthy(actualWebsite, 'a website exists at given index');
+			assert.isTrue(!!actualWebsite, 'a website exists at given index');
 			assert.strictEqual(actualWebsite.host, host, 'hosts match');
 			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
@@ -209,7 +209,7 @@ test('can log in, set a password, update it and then remove a password', async t
 
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
-			t.truthy(actualWebsite, 'a website exists at given index');
+			assert.isTrue(!!actualWebsite, 'a website exists at given index');
 			assert.strictEqual(actualWebsite.host, host, 'hosts match');
 			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
@@ -365,7 +365,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
-			t.truthy(actualWebsite, 'a website exists at given index');
+			assert.isTrue(!!actualWebsite, 'a website exists at given index');
 			assert.strictEqual(actualWebsite.host, host, 'hosts match');
 			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
@@ -449,7 +449,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
-			t.truthy(actualWebsite, 'a website exists at given index');
+			assert.isTrue(!!actualWebsite, 'a website exists at given index');
 			assert.strictEqual(actualWebsite.host, host, 'hosts match');
 			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
@@ -495,7 +495,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			const expectedNote = updatedPassword.notes[i];
 			const actualNote = decryptedEncrypted.notes[i];
 	
-			t.truthy(actualNote, 'note exists');
+			assert.isTrue(!!actualNote, 'note exists');
 			assert.strictEqual(actualNote, expectedNote, 'notes are the same');
 		}
 	})();
@@ -531,7 +531,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			const expectedNote = updatedPassword.websites[i];
 			const actualNote = parsed.websites[i];
 	
-			t.truthy(actualNote, 'note exists');
+			assert.isTrue(!!actualNote, 'note exists');
 			const hostname = url.parse(expectedNote).hostname || 
 				url.parse(expectedNote).host || expectedNote
 			assert.strictEqual(actualNote.host, hostname, 'host names match');
@@ -658,7 +658,7 @@ test('can log in, set a password and get all metadata', async t => {
 
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
-			t.truthy(actualWebsite, 'a website exists at given index');
+			assert.isTrue(!!actualWebsite, 'a website exists at given index');
 			assert.strictEqual(actualWebsite.host, host, 'hosts match');
 			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
@@ -740,7 +740,7 @@ test('can log in, set a password and get all metadata', async t => {
 
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
-			t.truthy(actualWebsite, 'a website exists at given index');
+			assert.isTrue(!!actualWebsite, 'a website exists at given index');
 			assert.strictEqual(actualWebsite.host, host, 'hosts match');
 			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
@@ -787,7 +787,7 @@ test('can log in, set a password and get all metadata', async t => {
 				const expectedWebsite = expected.websites[i];
 				const actualWebsite = parsedValue.websites[i];
 		
-				t.truthy(actualWebsite, 'note exists');
+				assert.isTrue(!!actualWebsite, 'note exists');
 				const hostname = url.parse(expectedWebsite).hostname || 
 					url.parse(expectedWebsite).host || expectedWebsite
 				assert.strictEqual(actualWebsite.host, hostname, 'host names match');
@@ -917,7 +917,7 @@ test('can log in, set and update a password, ' +
 
 				const host = url.parse(expectedWebsite).hostname ||
 					url.parse(expectedWebsite).host || expectedWebsite;
-				t.truthy(actualWebsite, 'a website exists at given index');
+				assert.isTrue(!!actualWebsite, 'a website exists at given index');
 				assert.strictEqual(actualWebsite.host, host, 'hosts match');
 				assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 			}
@@ -1001,7 +1001,7 @@ test('can log in, set and update a password, ' +
 
 				const host = url.parse(expectedWebsite).hostname ||
 					url.parse(expectedWebsite).host || expectedWebsite;
-				t.truthy(actualWebsite, 'a website exists at given index');
+				assert.isTrue(!!actualWebsite, 'a website exists at given index');
 				assert.strictEqual(actualWebsite.host, host, 'hosts match');
 				assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 			}
@@ -1046,7 +1046,7 @@ test('can log in, set and update a password, ' +
 					const expectedWebsite = expected.websites[i];
 					const actualWebsite = parsedValue.websites[i];
 			
-					t.truthy(actualWebsite, 'note exists');
+					assert.isTrue(!!actualWebsite, 'note exists');
 					const hostname = url.parse(expectedWebsite).hostname || 
 						url.parse(expectedWebsite).host || expectedWebsite
 					assert.strictEqual(actualWebsite.host, hostname, 'host names match');
@@ -1111,7 +1111,7 @@ test('can log in, set and update a password, ' +
 					const expectedWebsite = expected.websites[i];
 					const actualWebsite = actual.websites[i];
 			
-					t.truthy(actualWebsite, 'note exists');
+					assert.isTrue(!!actualWebsite, 'note exists');
 					const hostname = url.parse(expectedWebsite).hostname || 
 						url.parse(expectedWebsite).host || expectedWebsite
 					assert.strictEqual(actualWebsite.host, hostname, 'host names match');
@@ -1159,7 +1159,7 @@ test('can log in, set and update a password, ' +
 				const expectedNote = updatedPassword.notes[i];
 				const actualNote = decryptedEncrypted.notes[i];
 		
-				t.truthy(actualNote, 'note exists');
+				assert.isTrue(!!actualNote, 'note exists');
 				assert.strictEqual(actualNote, expectedNote, 'notes are the same');
 			}
 		})();

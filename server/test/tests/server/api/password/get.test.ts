@@ -77,7 +77,7 @@ test('can get the password if 2FA is disabled', async t => {
 		const expectedNote = notes[i];
 		const actualNote = decryptedEncrypted.notes[i];
 
-		t.truthy(actualNote, 'note exists');
+		assert.isTrue(!!actualNote, 'note exists');
 		assert.strictEqual(actualNote, expectedNote, 'notes are the same');
 	}
 });
@@ -191,7 +191,7 @@ test('can get the password if 2FA is enabled', async t => {
 		const expectedNote = notes[i];
 		const actualNote = decryptedEncrypted.notes[i];
 
-		t.truthy(actualNote, 'note exists');
+		assert.isTrue(!!actualNote, 'note exists');
 		assert.strictEqual(actualNote, expectedNote, 'notes are the same');
 	}
 });

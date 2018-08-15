@@ -125,7 +125,7 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 			_id: new mongo.ObjectId(instance_id)
 		});
 	});
-	t.truthy(instance, 'instance exists');
+	assert.isTrue(!!instance, 'instance exists');
 	if (!instance) return;
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 	assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -173,7 +173,7 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 			_id: instance_id
 		}) as EncryptedInstance;
 	});
-	t.truthy(instance, 'instance exists');
+	assert.isTrue(!!instance, 'instance exists');
 	if (!instance) return;
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 	assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');

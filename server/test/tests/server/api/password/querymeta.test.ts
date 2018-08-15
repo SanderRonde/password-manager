@@ -121,7 +121,7 @@ test('can query a URL', async t => {
 			const expectedWebsite = expected.websites[i];
 			const actualWebsite = actual.websites[i];
 	
-			t.truthy(actualWebsite, 'note exists');
+			assert.isTrue(!!actualWebsite, 'note exists');
 			const hostname = url.parse(expectedWebsite).hostname || 
 				url.parse(expectedWebsite).host || expectedWebsite
 			assert.strictEqual(actualWebsite.host, hostname, 'host names match');

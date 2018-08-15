@@ -109,7 +109,7 @@ test('password can be updated', async t => {
 
 		const host = url.parse(expectedWebsite).hostname ||
 			url.parse(expectedWebsite).host || expectedWebsite;
-		t.truthy(actualWebsite, 'a website exists at given index');
+		assert.isTrue(!!actualWebsite, 'a website exists at given index');
 		assert.strictEqual(actualWebsite.host, host, 'hosts match');
 		assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 	}
@@ -263,7 +263,7 @@ test('password can be updated if 2FA is enabled', async t => {
 
 		const host = url.parse(expectedWebsite).hostname ||
 			url.parse(expectedWebsite).host || expectedWebsite;
-		t.truthy(actualWebsite, 'a website exists at given index');
+		assert.isTrue(!!actualWebsite, 'a website exists at given index');
 		assert.strictEqual(actualWebsite.host, host, 'hosts match');
 		assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 	}

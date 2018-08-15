@@ -71,7 +71,7 @@ test('can disable 2FA when given a valid 2FA token', async t => {
 			_id: new mongo.ObjectId(instance_id)
 		});
 	});
-	t.truthy(instance, 'instance exists');
+	assert.isTrue(!!instance, 'instance exists');
 	if (!instance) return;
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 	assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');

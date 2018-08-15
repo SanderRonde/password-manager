@@ -91,7 +91,7 @@ test('can get the password\'s metadata', async t => {
 			const expectedWebsite = expected.websites[i];
 			const actualWebsite = parsedValue.websites[i];
 	
-			t.truthy(actualWebsite, 'note exists');
+			assert.isTrue(!!actualWebsite, 'note exists');
 			const hostname = url.parse(expectedWebsite).hostname || 
 				url.parse(expectedWebsite).host || expectedWebsite
 			assert.strictEqual(actualWebsite.host, hostname, 'host names match');

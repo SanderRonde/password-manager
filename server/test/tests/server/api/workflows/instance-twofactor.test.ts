@@ -55,7 +55,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance was created and ID is correct');
+		assert.isTrue(!!instance, 'instance was created and ID is correct');
 
 		assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 		return {
@@ -101,7 +101,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -163,7 +163,7 @@ test('can enable 2FA and then disable it', async t => {
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -208,7 +208,7 @@ test('can enable 2FA and then disable it', async t => {
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -270,7 +270,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -313,7 +313,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -358,7 +358,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -505,7 +505,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance was created and ID is correct');
+		assert.isTrue(!!instance, 'instance was created and ID is correct');
 
 		assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 		return {
@@ -550,7 +550,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -668,7 +668,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -721,7 +721,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance was created and ID is correct');
+		assert.isTrue(!!instance, 'instance was created and ID is correct');
 
 		assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 		return {
@@ -769,7 +769,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -794,7 +794,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -912,7 +912,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance exists');
+		assert.isTrue(!!instance, 'instance exists');
 		if (!instance) return;
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		assert.notStrictEqual(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');

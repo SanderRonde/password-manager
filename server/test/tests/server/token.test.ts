@@ -244,7 +244,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 				_id: new mongo.ObjectId(instance_id)
 			});
 		});
-		t.truthy(instance, 'instance was created and ID is correct');
+		assert.isTrue(!!instance, 'instance was created and ID is correct');
 
 		assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 		return {

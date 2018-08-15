@@ -47,7 +47,7 @@ test('instance can be created', async t => {
 			_id: new mongo.ObjectId(id)
 		});
 	})
-	t.truthy(instance, 'instance was created and ID is correct');
+	assert.isTrue(!!instance, 'instance was created and ID is correct');
 
 	assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 });
