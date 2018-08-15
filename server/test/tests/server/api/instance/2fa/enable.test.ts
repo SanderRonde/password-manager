@@ -8,16 +8,18 @@ import { API_ERRS } from '../../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/2fa/enable', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/instance/2fa/enable', {
 	instance_id: 'string',
 	email: 'string'
 }, {}, {
 	password: 'string'
 }, {});
-test('can enable 2FA when no 2FA secret is set', async () => {
-	const config = await genUserAndDb(t, {
+it('can enable 2FA when no 2FA secret is set', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false,
 		instance_twofactor_enabled: false,
 		twofactor_secret: null!
@@ -47,7 +49,7 @@ test('can enable 2FA when no 2FA secret is set', async () => {
 	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
-assert.isFalse(!!(data as {
+	assert.isFalse(!!(data as {
 		message: 'state unchanged (was already set)'
 	}).message, 'state is not unchanged');
 	if ((data as {
@@ -67,12 +69,12 @@ assert.isFalse(!!(data as {
 	assert.isTrue(finalData.verify_2fa_required, 
 		'further verification is needed');
 	assert.strictEqual(typeof finalData.auth_url, 'string', 'auth_url is a string');
-	t.regex(finalData.auth_url, 
+	assert.match(finalData.auth_url, 
 		/otpauth:\/\/totp\/(.*)\?secret=\w+/,
 		'url is an otp auth url');
 });
-test('can enable 2FA when a 2FA secret is already set', async () => {
-	const config = await genUserAndDb(t, {
+it('can enable 2FA when a 2FA secret is already set', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: false,
 		twofactor_secret: speakeasy.generateSecret().base32
@@ -132,8 +134,8 @@ assert.isFalse(!!(data as {
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decrypt, true, '2FA is now enabled');
 });
-test('does not change it if 2FA was aleady enabled in this instance', async () => {
-	const config = await genUserAndDb(t, {
+it('does not change it if 2FA was aleady enabled in this instance', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
 		twofactor_secret: speakeasy.generateSecret().base32
@@ -180,13 +182,13 @@ test('does not change it if 2FA was aleady enabled in this instance', async () =
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decrypt, true, '2FA is still enabled');
 });
-test('fails if password is wrong', async () => {
-	const config = await genUserAndDb(t);
+it('fails if password is wrong', async () => {
+	const config = await genUserAndDb();
 	const server = await createServer(config);
 	const { http, userpw, uri, instance_id, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/instance/2fa/enable',
 		port: http,
 		encrypted: {
@@ -200,13 +202,13 @@ test('fails if password is wrong', async () => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async () => {
-	const config = await genUserAndDb(t);
+it('fails if instance id is wrong', async () => {
+	const config = await genUserAndDb();
 	const server = await createServer(config);
 	const { http, userpw, uri, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/instance/2fa/enable',
 		port: http,
 		encrypted: {

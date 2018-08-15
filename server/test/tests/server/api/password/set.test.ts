@@ -9,9 +9,11 @@ import { getDB } from '../../../../lib/db';
 import * as mongo from 'mongodb'
 import * as url from 'url'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/password/set', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/password/set', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
@@ -20,15 +22,15 @@ testParams(test, uris, '/api/password/set', {
 	twofactor_enabled: 'boolean',
 	encrypted: 'string'
 }, {});
-test('password can be created', async () => {
-	const config = await genUserAndDb(t, {
+it('password can be created', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true
 	});
 	const server = await createServer(config);
 	const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 
 	const expectedWebsites = [genURL(), genURL(), genURL()];
 	const expected2FAEnabled = Math.random() > 0.5;
@@ -108,16 +110,16 @@ test('password can be created', async () => {
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 });
-test('fails if token is wrong', async () => {
-	const config = await genUserAndDb(t, {
+it('fails if token is wrong', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 	});
 	const server = await createServer(config);
-	await getLoginToken(t, config);
+	await getLoginToken(config);
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/set',
 		port: http,
 		unencrypted: {
@@ -141,16 +143,16 @@ test('fails if token is wrong', async () => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async () => {
-	const config = await genUserAndDb(t, {
+it('fails if instance id is wrong', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 	});
 	const server = await createServer(config);
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/set',
 		port: http,
 		unencrypted: {

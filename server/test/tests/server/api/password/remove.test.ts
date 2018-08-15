@@ -6,9 +6,11 @@ import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/password/remove', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/password/remove', {
 	instance_id: 'string'
 }, {}, {
 	count: 'number',
@@ -17,17 +19,17 @@ testParams(test, uris, '/api/password/remove', {
 }, {
 	twofactor_token: 'string'
 });
-test('can be removed if 2FA is disabled', async () => {
-	const config = await genUserAndDb(t, {
+it('can be removed if 2FA is disabled', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true
 	});
 	const server = await createServer(config);
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 
-	const passwordId = await setPasword(t, {
+	const passwordId = await setPasword({
 		websites: [],
 		twofactor_enabled: false,
 		username: 'username',
@@ -61,11 +63,11 @@ test('can be removed if 2FA is disabled', async () => {
 	});
 	assert.strictEqual(password, null, 'password is gone');
 });
-test('fails if 2FA is enabled but no 2FA token is passed', async () => {
+it('fails if 2FA is enabled but no 2FA token is passed', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: secret.base32
 	});
@@ -73,9 +75,9 @@ test('fails if 2FA is enabled but no 2FA token is passed', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 
-	const passwordId = await setPasword(t, {
+	const passwordId = await setPasword({
 		websites: [],
 		twofactor_enabled: true,
 		username: 'username',
@@ -111,11 +113,11 @@ test('fails if 2FA is enabled but no 2FA token is passed', async () => {
 	});
 	assert.notStrictEqual(password, null, 'password is still there');
 });
-test('can be removed if 2FA is enabled', async () => {
+it('can be removed if 2FA is enabled', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: secret.base32
 	});
@@ -123,9 +125,9 @@ test('can be removed if 2FA is enabled', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 
-	const passwordId = await setPasword(t, {
+	const passwordId = await setPasword({
 		websites: [],
 		twofactor_enabled: false,
 		username: 'username',
@@ -163,11 +165,11 @@ test('can be removed if 2FA is enabled', async () => {
 	});
 	assert.strictEqual(password, null, 'password is gone');
 });
-test('fails if auth token is wrong', async () => {
+it('fails if auth token is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: secret.base32
 	});
@@ -175,8 +177,8 @@ test('fails if auth token is wrong', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
-	const passwordId = await setPasword(t, {
+	const token = await getLoginToken(config);
+	const passwordId = await setPasword({
 		websites: [],
 		twofactor_enabled: false,
 		username: 'username',
@@ -184,7 +186,7 @@ test('fails if auth token is wrong', async () => {
 		notes: []		
 	}, token!, config);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/remove',
 		port: http,
 		unencrypted: {
@@ -199,11 +201,11 @@ test('fails if auth token is wrong', async () => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async () => {
+it('fails if instance id is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: secret.base32
 	});
@@ -211,8 +213,8 @@ test('fails if instance id is wrong', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
-	const passwordId = await setPasword(t, {
+	const token = await getLoginToken(config);
+	const passwordId = await setPasword({
 		websites: [],
 		twofactor_enabled: false,
 		username: 'username',
@@ -220,7 +222,7 @@ test('fails if instance id is wrong', async () => {
 		notes: []		
 	}, token!, config);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/remove',
 		port: http,
 		unencrypted: {
@@ -236,11 +238,11 @@ test('fails if instance id is wrong', async () => {
 		err: API_ERRS.MISSING_PARAMS
 	});
 });
-test('fails if password id is wrong', async () => {
+it('fails if password id is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: secret.base32
 	});
@@ -248,8 +250,8 @@ test('fails if password id is wrong', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
-	await setPasword(t, {
+	const token = await getLoginToken(config);
+	await setPasword({
 		websites: [],
 		twofactor_enabled: false,
 		username: 'username',
@@ -257,7 +259,7 @@ test('fails if password id is wrong', async () => {
 		notes: []		
 	}, token!, config);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/remove',
 		port: http,
 		unencrypted: {

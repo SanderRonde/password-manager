@@ -5,11 +5,12 @@ import { genDBWithPW } from '../../../lib/db';
 import * as path from 'path'
 import { assert } from 'chai';
 import * as fs from 'fs'
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-const files = captureCreatedFiles(test);
-test('print an error when no output is passed', async () => {
-	const uri = await genTempDatabase(t);
+const uris = captureURIs(after);
+const files = captureCreatedFiles(after);
+it('print an error when no output is passed', async () => {
+	const uri = await genTempDatabase();
 	uris.push(uri);
 
 	const proc = new ProcRunner([
@@ -23,8 +24,8 @@ test('print an error when no output is passed', async () => {
 	await proc.run();
 	proc.check();
 });
-test('creates dump with regular args', async () => {
-	const uri = await genTempDatabase(t);
+it('creates dump with regular args', async () => {
+	const uri = await genTempDatabase();
 	uris.push(uri);
 	await genDBWithPW(uri);
 

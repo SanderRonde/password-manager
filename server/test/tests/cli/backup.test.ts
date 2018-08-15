@@ -2,13 +2,14 @@ import { genTempDatabase, captureURIs, captureCreatedFiles } from '../../lib/uti
 import { genRandomString } from '../../../app/lib/util';
 import { ProcRunner } from '../../lib/procrunner';
 import { genDBWithPW, clearDB, getDB, hasCreatedDBWithPW } from '../../lib/db';
-import * as path from 'path'
 import { assert } from 'chai';
+import * as path from 'path'
 import * as fs from 'fs'
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-const files = captureCreatedFiles(test);
-test('print an error when no command is passed', async () => {
+const uris = captureURIs(after);
+const files = captureCreatedFiles(after);
+it('print an error when no command is passed', async () => {
 	const proc = new ProcRunner(['backup']);
 	proc.expectWrite();
 	proc.expectWrite('\terror: missing required argument `load/googledrive/local\'');
@@ -18,7 +19,7 @@ test('print an error when no command is passed', async () => {
 	await proc.run();
 	proc.check();
 }); 
-test('print an error when a non-command is used', async () => {
+it('print an error when a non-command is used', async () => {
 	const proc = new ProcRunner(['backup', 'noncommand']);
 	proc.expectWrite('Invalid backup method, choose "load", "drive" or "local"');
 	proc.expectExit(1);
@@ -26,10 +27,10 @@ test('print an error when a non-command is used', async () => {
 	await proc.run();
 	proc.check();
 });
-test('a backupped file can be used to restore', async () => {
+it('a backupped file can be used to restore', async () => {
 	const dumpName = genRandomString(10);
 	const dumpPath = path.join(__dirname, `../../../temp/mongodump${dumpName}.dump`);
-	const uri = await genTempDatabase(t);
+	const uri = await genTempDatabase();
 	uris.push(uri);
 	const dbpw = await genDBWithPW(uri);
 	await (async () => {

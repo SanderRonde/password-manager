@@ -7,18 +7,20 @@ import { genRandomString } from '../../../../../app/lib/util';
 import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import { getDB } from '../../../../lib/db';
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/user/reset', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/user/reset', {
 	instance_id: 'string',
 }, {}, {
 	reset_key: 'string',
 	email: 'string',
 	newmasterpassword: 'string'
 }, {});
-test('fails if email is wrong', async () => {
+it('fails if email is wrong', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		resetKey
 	});
 	const server = await createServer(config);
@@ -30,7 +32,7 @@ test('fails if email is wrong', async () => {
 	} = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/user/reset',
 		port: http,
 		unencrypted: {
@@ -45,10 +47,10 @@ test('fails if email is wrong', async () => {
 		publicKey: server_public_key
 	});
 });
-test('works if params are correct', async () => {
+it('works if params are correct', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const newMasterPassword = genRandomString(25);
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		resetKey
 	});
 	const server = await createServer(config);
@@ -122,22 +124,22 @@ test('works if params are correct', async () => {
 	}
 
 	const decryptedPw = decrypt(account.pw, dbpw);
-	if (isErr(t, decryptedPw)) return;
+	if (isErr(decryptedPw)) return;
 
 	assert.strictEqual(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted password matches new password');
 	
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
-	if (isErr(t, dbDecryptedResetKey)) return;
+	if (isErr(dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, data.new_reset_key);
-	if (isErr(t, decryptedResetKey)) return;
+	if (isErr(decryptedResetKey)) return;
 	assert.isTrue(decryptedResetKey.integrity, 'integrity is true');
 	assert.strictEqual(decryptedResetKey.pw, newMasterPassword, 'new master password can be decrypted');
 });
-test('cancels if failing on password changes', async () => {
+it('cancels if failing on password changes', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const newMasterPassword = genRandomString(25);
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		resetKey
 	});
 	const server = await createServer(config, {
@@ -207,7 +209,7 @@ test('cancels if failing on password changes', async () => {
 	}).length, 0, 'not a single instance has 2FA enabled');
 
 	const decryptedPw = decrypt(account.pw, dbpw);
-	if (isErr(t, decryptedPw)) return;
+	if (isErr(decryptedPw)) return;
 
 	assert.notStrictEqual(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted does not match new password');
@@ -215,14 +217,14 @@ test('cancels if failing on password changes', async () => {
 		'decrypte password is the same as the old one')
 	
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
-	if (isErr(t, dbDecryptedResetKey)) return;
+	if (isErr(dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
 	assert.notStrictEqual(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
 });
-test('cancels if failing on instance changes', async () => {
+it('cancels if failing on instance changes', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const newMasterPassword = genRandomString(25);
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		resetKey
 	});
 	const server = await createServer(config, {
@@ -292,7 +294,7 @@ test('cancels if failing on instance changes', async () => {
 	}).length, 0, 'not a single instance has 2FA enabled');
 
 	const decryptedPw = decrypt(account.pw, dbpw);
-	if (isErr(t, decryptedPw)) return;
+	if (isErr(decryptedPw)) return;
 
 	assert.notStrictEqual(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted does not match new password');
@@ -300,14 +302,14 @@ test('cancels if failing on instance changes', async () => {
 		'decrypte password is the same as the old one')
 	
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
-	if (isErr(t, dbDecryptedResetKey)) return;
+	if (isErr(dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
 	assert.notStrictEqual(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
 });
-test('cancels if failing on account changes', async () => {
+it('cancels if failing on account changes', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
 	const newMasterPassword = genRandomString(25);
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		resetKey
 	});
 	const server = await createServer(config, {
@@ -377,7 +379,7 @@ test('cancels if failing on account changes', async () => {
 	}).length, 0, 'not a single instance has 2FA enabled');
 
 	const decryptedPw = decrypt(account.pw, dbpw);
-	if (isErr(t, decryptedPw)) return;
+	if (isErr(decryptedPw)) return;
 
 	assert.notStrictEqual(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted does not match new password');
@@ -385,7 +387,7 @@ test('cancels if failing on account changes', async () => {
 		'decrypte password is the same as the old one')
 	
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
-	if (isErr(t, dbDecryptedResetKey)) return;
+	if (isErr(dbDecryptedResetKey)) return;
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, resetKey);
 	assert.notStrictEqual(decryptedResetKey, ERRS.INVALID_DECRYPT, 'old reset key can still be used');
 });

@@ -5,6 +5,8 @@ import { wait, genRandomString } from '../../../app/lib/util';
 import { APIToken } from '../../../../shared/types/crypto';
 import { assert } from 'chai';
 import * as http from 'http'
+import { after } from 'mocha';
+
 
 async function doInstanceCreateRequest(config: UserAndDbData) {
 	const challenge = genRandomString(25);
@@ -45,7 +47,7 @@ async function doFailingInstanceCreateRequest(config: UserAndDbData) {
 	});
 }
 
-function assertSucceedsAndIsNotRatelimited(t: GenericTestContext<Context<any>>, {
+function assertSucceedsAndIsNotRatelimited({
 	response, responseText
 }: {
 	response: http.IncomingMessage;
@@ -53,7 +55,7 @@ function assertSucceedsAndIsNotRatelimited(t: GenericTestContext<Context<any>>, 
 }, message: string = 'is not TOO_MANY_REQUESTS') {
 	assert.notStrictEqual(response.statusCode, 429, message);
 	assert.strictEqual(response.statusCode, 200, 'has success status code');
-	const parsed = doesNotThrow(t, () => {
+	const parsed = doesNotThrow(() => {
 		return JSON.parse(responseText);
 	}, 'response can be JSON parsed');
 	assert.isTrue(parsed.success, 'request was successful');
@@ -62,14 +64,14 @@ function assertSucceedsAndIsNotRatelimited(t: GenericTestContext<Context<any>>, 
 	}
 }
 
-function assertIsRateLimited(t: GenericTestContext<Context<any>>, {
+function assertIsRateLimited({
 	response, responseText
 }: {
 	response: http.IncomingMessage;
 	responseText: EncodedString<APIReturns[keyof APIReturns]>
 }, message: string = 'is TOO_MANY_REQUESTS') {
 	assert.strictEqual(response.statusCode, 429, message);
-	const parsed = doesNotThrow(t, () => {
+	const parsed = doesNotThrow(() => {
 		return JSON.parse(responseText);
 	}, 'response can be JSON parsed');
 	assert.isFalse(parsed.success, 'request was successful');
@@ -81,7 +83,7 @@ function assertIsRateLimited(t: GenericTestContext<Context<any>>, {
 	}
 }
 
-function assertFailsAndIsNotRatelimited(t: GenericTestContext<Context<any>>, {
+function assertFailsAndIsNotRatelimited({
 	response, responseText
 }: {
 	response: http.IncomingMessage;
@@ -89,7 +91,7 @@ function assertFailsAndIsNotRatelimited(t: GenericTestContext<Context<any>>, {
 }, message: string = 'is not TOO_MANY_REQUESTS') {
 	assert.notStrictEqual(response.statusCode, 429, message);
 	assert.strictEqual(response.statusCode, 200, 'has success status code');
-	const parsed = doesNotThrow(t, () => {
+	const parsed = doesNotThrow(() => {
 		return JSON.parse(responseText);
 	}, 'response can be JSON parsed');
 	assert.isFalse(parsed.success, 'request failed');
@@ -104,7 +106,7 @@ async function checkTiming(fn: () => Promise<void>) {
 	return Date.now() - before;
 }
 
-async function assertMaxDuration(t: GenericTestContext<Context<any>>, fn: () => Promise<void>,
+async function assertMaxDuration(fn: () => Promise<void>,
 	minDuration: number, maxDuration: number, message: string = `does not take less than ${
 		minDuration} and more than ${maxDuration}`) {
 			const time = await checkTiming(fn);
@@ -116,9 +118,9 @@ function getSpedupTime(time: number) {
 	return time / 4;
 }
 
-const uris = captureURIs(test);
-test('instance create ratelimiter ratelimits on quick requests', async () => {2
-	const config = await genUserAndDb(t, {
+const uris = captureURIs(after);
+it('instance create ratelimiter ratelimits on quick requests', async () => {2
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer({...config, ...{
@@ -128,35 +130,35 @@ test('instance create ratelimiter ratelimits on quick requests', async () => {2
 	});
 	uris.push(config.uri);
 	
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
 	
-	assertIsRateLimited(t, await doInstanceCreateRequest(config),
+	assertIsRateLimited(await doInstanceCreateRequest(config),
 		'ratelimits after 5 requests');
-	assertIsRateLimited(t, await doInstanceCreateRequest(config),
+	assertIsRateLimited(await doInstanceCreateRequest(config),
 		'later requests are also ratelimited');
-	assertIsRateLimited(t, await doInstanceCreateRequest(config),
+	assertIsRateLimited(await doInstanceCreateRequest(config),
 		'later requests are also ratelimited');
-	assertIsRateLimited(t, await doInstanceCreateRequest(config),
+	assertIsRateLimited(await doInstanceCreateRequest(config),
 		'later requests are also ratelimited');
 
 	await wait(getSpedupTime(10000));
 
-	assertIsRateLimited(t, await doInstanceCreateRequest(config),
+	assertIsRateLimited(await doInstanceCreateRequest(config),
 		'waiting 10 seconds does not clear the ratelimit');
 	
 	await wait(getSpedupTime(50000));
 
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config),
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config),
 		'ratelimit is lifted after 60 seconds');
 
 	server.kill();
 });
-test('instance create ratelimiter ratelimits on slow requests', async () => {
-	const config = await genUserAndDb(t, {
+it('instance create ratelimiter ratelimits on slow requests', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer({...config, enableRateLimit: true }, {
@@ -164,29 +166,29 @@ test('instance create ratelimiter ratelimits on slow requests', async () => {
 	});
 	uris.push(config.uri);
 	
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
 	await wait(getSpedupTime(10000));
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
 	await wait(getSpedupTime(10000));
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
 	await wait(getSpedupTime(10000));
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
 	await wait(getSpedupTime(10000));
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
 	await wait(getSpedupTime(10000));
 
-	assertIsRateLimited(t, await doInstanceCreateRequest(config),
+	assertIsRateLimited(await doInstanceCreateRequest(config),
 		'ratelimits after 5 requests');
 
 	await wait(getSpedupTime(20000));
 
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config),
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config),
 		'waiting 20 seconds clears the ratelimit');
 
 	server.kill();
 });
-test('api use ratelimiter works', async () => {
-	const config = await genUserAndDb(t, {
+it('api use ratelimiter works', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer({...config, enableRateLimit: true }, {
@@ -194,24 +196,24 @@ test('api use ratelimiter works', async () => {
 	});
 	uris.push(config.uri);
 
-	const token = (await getLoginToken(t, config))!;
+	const token = (await getLoginToken(config))!;
 
 	const startTime = Date.now();
 	for (let i = 0; i < 10; i++) {
-		await assertMaxDuration(t, async () => {
-			assertSucceedsAndIsNotRatelimited(t, await doAPIRequest(token, config));
+		await assertMaxDuration(async () => {
+			assertSucceedsAndIsNotRatelimited(await doAPIRequest(token, config));
 		}, 0, 250, 'first 10 requests are still fast');
 	}
 	for (let i = 0; i < 10 && Date.now() - startTime < getSpedupTime(20000); i++) {
-		await assertMaxDuration(t, async () => {
-			assertSucceedsAndIsNotRatelimited(t, await doAPIRequest(token, config));
+		await assertMaxDuration(async () => {
+			assertSucceedsAndIsNotRatelimited(await doAPIRequest(token, config));
 		}, 800, Infinity, 'later requests are ratelimited');
 	}	
 
 	server.kill();
 });
-test('succeeding requests are not ratelimited by the bruteforce ratelimiter', async () => {
-	const config = await genUserAndDb(t, {
+it('succeeding requests are not ratelimited by the bruteforce ratelimiter', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer({...config, enableRateLimit: true }, {
@@ -220,16 +222,16 @@ test('succeeding requests are not ratelimited by the bruteforce ratelimiter', as
 	uris.push(config.uri);
 	
 	
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
-	assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
-	await assertMaxDuration(t, async () => {
-		assertSucceedsAndIsNotRatelimited(t, await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
+	assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
+	await assertMaxDuration(async () => {
+		assertSucceedsAndIsNotRatelimited(await doInstanceCreateRequest(config));
 	}, 0, 250, 'succeeding requests are not ratelimited');
 	
 	server.kill();
 });
-test('failings requests are ratelimited by the bruteforce limiter', async () => {
-	const config = await genUserAndDb(t, {
+it('failings requests are ratelimited by the bruteforce limiter', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer({...config, enableRateLimit: true }, {
@@ -238,25 +240,25 @@ test('failings requests are ratelimited by the bruteforce limiter', async () => 
 	uris.push(config.uri);
 	
 
-	assertFailsAndIsNotRatelimited(t, await doFailingInstanceCreateRequest(config));
-	assertFailsAndIsNotRatelimited(t, await doFailingInstanceCreateRequest(config));
-	assertFailsAndIsNotRatelimited(t, await doFailingInstanceCreateRequest(config));
-	assertFailsAndIsNotRatelimited(t, await doFailingInstanceCreateRequest(config));
-	assertFailsAndIsNotRatelimited(t, await doFailingInstanceCreateRequest(config));
+	assertFailsAndIsNotRatelimited(await doFailingInstanceCreateRequest(config));
+	assertFailsAndIsNotRatelimited(await doFailingInstanceCreateRequest(config));
+	assertFailsAndIsNotRatelimited(await doFailingInstanceCreateRequest(config));
+	assertFailsAndIsNotRatelimited(await doFailingInstanceCreateRequest(config));
+	assertFailsAndIsNotRatelimited(await doFailingInstanceCreateRequest(config));
 
-	assertIsRateLimited(t, await doFailingInstanceCreateRequest(config),
+	assertIsRateLimited(await doFailingInstanceCreateRequest(config),
 		'requests are rate limited after 4 failing requests');
-	assertIsRateLimited(t, await doFailingInstanceCreateRequest(config),
+	assertIsRateLimited(await doFailingInstanceCreateRequest(config),
 		'further requests are ratelimited');
 
 	await wait(getSpedupTime(10000));
 
-	assertIsRateLimited(t, await doFailingInstanceCreateRequest(config),
+	assertIsRateLimited(await doFailingInstanceCreateRequest(config),
 		'requests are still ratelimited 10 seconds later');
 
 	await wait(getSpedupTime(60000));
 
-	assertFailsAndIsNotRatelimited(t, await doFailingInstanceCreateRequest(config),
+	assertFailsAndIsNotRatelimited(await doFailingInstanceCreateRequest(config),
 		'rate limiting is lifted after 60 seconds');
 	
 	server.kill();

@@ -1,8 +1,7 @@
 import { VERSION } from '../../../app/lib/constants';
 import { ProcRunner } from '../../lib/procrunner';
-import { assert } from 'chai';
 
-test('display the version when calling it with -v', async () => {
+it('display the version when calling it with -v', async () => {
 	const proc = new ProcRunner(['-v']);
 	proc.expectWrite(VERSION);
 	proc.expectExit(0);

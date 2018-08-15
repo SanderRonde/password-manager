@@ -8,17 +8,19 @@ import { API_ERRS } from '../../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/2fa/enable', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/instance/2fa/enable', {
 	instance_id: 'string',
 	email: 'string'
 }, {}, {
 	password: 'string'
 }, {});
-test('can disable 2FA when given a valid 2FA token', async () => {
+it('can disable 2FA when given a valid 2FA token', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
 		twofactor_secret: twofactor.base32
@@ -78,8 +80,8 @@ assert.isFalse(!!(data as {
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decrypt, false, '2FA is now disabled');
 });
-test('state is unchanged if already disabled', async () => {
-	const config = await genUserAndDb(t, {
+it('state is unchanged if already disabled', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false,
 		instance_twofactor_enabled: false,
 		twofactor_secret: null!
@@ -114,9 +116,9 @@ test('state is unchanged if already disabled', async () => {
 		message: 'state unchanged (was already set)'
 	}).message, 'state unchanged (was already set)', 'state is unchanged');
 });
-test('fails if an invalid token is passed', async () => {
+it('fails if an invalid token is passed', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
 		twofactor_secret: twofactor.base32
@@ -152,9 +154,9 @@ test('fails if an invalid token is passed', async () => {
 	if (response.success) return;
 	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
-test('fails if password is wrong', async () => {
+it('fails if password is wrong', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
 		twofactor_secret: twofactor.base32
@@ -163,7 +165,7 @@ test('fails if password is wrong', async () => {
 	const { http, userpw, uri, instance_id, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/instance/2fa/disable',
 		port: http,
 		encrypted: {
@@ -182,9 +184,9 @@ test('fails if password is wrong', async () => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id wrong', async () => {
+it('fails if instance id wrong', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
 		twofactor_secret: twofactor.base32
@@ -193,7 +195,7 @@ test('fails if instance id wrong', async () => {
 	const { http, userpw, uri, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/instance/2fa/disable',
 		port: http,
 		encrypted: {

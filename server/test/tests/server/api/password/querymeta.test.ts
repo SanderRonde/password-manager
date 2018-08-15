@@ -10,22 +10,22 @@ import { assert } from 'chai';
 import * as url from 'url'
 
 const uris = captureURIs(test);
-testParams(test, uris, '/api/password/querymeta', {
+testParams(it, uris, '/api/password/querymeta', {
 	instance_id: 'string'
 }, {}, {
 	count: 'number',
 	token: 'string',
 	url: 'string'
 }, {});
-test('can query a URL', async () => {
-	const config = await genUserAndDb(t, {
+it('can query a URL', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true
 	});
 	const server = await createServer(config);
 	const { http, uri, server_public_key, instance_private_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 
 	const matchingHost = `www.${genRandomString(20)}.${genRandomString(3)}`;
 	const expectedPasswords = [{
@@ -57,7 +57,7 @@ test('can query a URL', async () => {
 	});
 	const passwordIds = [];
 	for (const pw of expectedPasswords) {
-		passwordIds.push(await setPasword(t, {
+		passwordIds.push(await setPasword({
 			websites: pw.websites,
 			twofactor_enabled: pw.twofactorEnabled,
 			notes: pw.notes,
@@ -92,7 +92,7 @@ test('can query a URL', async () => {
 	assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decryptedData === ERRS.INVALID_DECRYPT) return;
 
-	const parsed = doesNotThrow(t, () => {
+	const parsed = doesNotThrow(() => {
 		return JSON.parse(decryptedData);
 	}, 'data can be parsed').sort((a, b) => {
 		if (a.id < b.id) return -1;
@@ -129,11 +129,11 @@ test('can query a URL', async () => {
 		}
 	}
 });
-test('fails if auth token is wrong', async () => {
+it('fails if auth token is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: secret.base32
 	});
@@ -141,7 +141,7 @@ test('fails if auth token is wrong', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/querymeta',
 		port: http,
 		unencrypted: {
@@ -156,11 +156,11 @@ test('fails if auth token is wrong', async () => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async () => {
+it('fails if instance id is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: secret.base32
 	});
@@ -168,8 +168,8 @@ test('fails if instance id is wrong', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
-	await testInvalidCredentials(t, {
+	const token = await getLoginToken(config);
+	await testInvalidCredentials({
 		route: '/api/password/querymeta',
 		port: http,
 		unencrypted: {

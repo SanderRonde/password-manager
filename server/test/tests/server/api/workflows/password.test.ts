@@ -7,10 +7,12 @@ import { assert } from 'chai';
 import { ENCRYPTION_ALGORITHM } from '../../../../../app/lib/constants';
 import { EncryptedPassword, MongoRecord, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
 import { getDB, doSingleQuery } from '../../../../lib/db';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-test('can log in, set a password, update it and then remove a password', async () => {
-	const config = await genUserAndDb(t, {
+
+const uris = captureURIs(after);
+it('can log in, set a password, update it and then remove a password', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
@@ -247,8 +249,8 @@ test('can log in, set a password, update it and then remove a password', async (
 		assert.strictEqual(password, null, 'password is gone');
 	})();
 });
-test('can log in, set a password, update, and get meta and non-meta data', async () => {
-	const config = await genUserAndDb(t, {
+it('can log in, set a password, update, and get meta and non-meta data', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
@@ -480,14 +482,14 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedData === ERRS.INVALID_DECRYPT) return;
 	
-		const parsed = doesNotThrow(t, () => {
+		const parsed = doesNotThrow(() => {
 			return JSON.parse(decryptedData);
 		}, 'data can be parsed');
 		assert.strictEqual(parsed.id, passwordId, 'password IDs are the same');
 	
 		const decryptedEncrypted = decrypt(parsed.encrypted, 
 			hash(pad(userpw, 'masterpwdecrypt')));
-		if (isErr(t, decryptedEncrypted)) return;
+		if (isErr(decryptedEncrypted)) return;
 	
 		assert.strictEqual(decryptedEncrypted.username, updatedPassword.username, 'username is the same');
 		assert.strictEqual(decryptedEncrypted.password, updatedPassword.password, 'password is the same');
@@ -522,7 +524,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedData === ERRS.INVALID_DECRYPT) return;
 	
-		const parsed = doesNotThrow(t, () => {
+		const parsed = doesNotThrow(() => {
 			return JSON.parse(decryptedData);
 		}, 'data can be parsed');
 		assert.strictEqual(parsed.id, passwordId, 'password IDs are the same');
@@ -540,8 +542,8 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		assert.strictEqual(parsed.twofactor_enabled, updatedPassword.twofactorEnabled, 'twofactor enabled is the same');
 	})();
 });
-test('can log in, set a password and get all metadata', async () => {
-	const config = await genUserAndDb(t, {
+it('can log in, set a password and get all metadata', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
@@ -773,7 +775,7 @@ test('can log in, set a password and get all metadata', async () => {
 		assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedData === ERRS.INVALID_DECRYPT) return;
 	
-		const parsed = doesNotThrow(t, () => {
+		const parsed = doesNotThrow(() => {
 			return JSON.parse(decryptedData);
 		}, 'data can be parsed');
 		const expectedPasswords = [updatedPassword];
@@ -797,9 +799,9 @@ test('can log in, set a password and get all metadata', async () => {
 		}
 	})();
 });
-test('can log in, set and update a password, ' + 
+it('can log in, set and update a password, ' + 
 	'call querymeta and get metadata for given query result', async () => {
-		const config = await genUserAndDb(t, {
+		const config = await genUserAndDb({
 			account_twofactor_enabled: false
 		});
 		const server = await createServer(config);
@@ -1032,7 +1034,7 @@ test('can log in, set and update a password, ' +
 			assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedData === ERRS.INVALID_DECRYPT) return;
 		
-			const parsed = doesNotThrow(t, () => {
+			const parsed = doesNotThrow(() => {
 				return JSON.parse(decryptedData);
 			}, 'data can be parsed');
 			const expectedPasswords = [updatedPassword];
@@ -1080,7 +1082,7 @@ test('can log in, set and update a password, ' +
 			assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedData === ERRS.INVALID_DECRYPT) return;
 		
-			const parsed = doesNotThrow(t, () => {
+			const parsed = doesNotThrow(() => {
 				return JSON.parse(decryptedData);
 			}, 'data can be parsed').sort((a, b) => {
 				if (a.id < b.id) return -1;
@@ -1144,14 +1146,14 @@ test('can log in, set and update a password, ' +
 			assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedData === ERRS.INVALID_DECRYPT) return;
 		
-			const parsed = doesNotThrow(t, () => {
+			const parsed = doesNotThrow(() => {
 				return JSON.parse(decryptedData);
 			}, 'data can be parsed');
 			assert.strictEqual(parsed.id, passwordId, 'password IDs are the same');
 		
 			const decryptedEncrypted = decrypt(parsed.encrypted, 
 				hash(pad(userpw, 'masterpwdecrypt')));
-			if (isErr(t, decryptedEncrypted)) return;
+			if (isErr(decryptedEncrypted)) return;
 		
 			assert.strictEqual(decryptedEncrypted.username, updatedPassword.username, 'username is the same');
 			assert.strictEqual(decryptedEncrypted.password, updatedPassword.password, 'password is the same');

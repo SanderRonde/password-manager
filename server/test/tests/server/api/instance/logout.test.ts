@@ -4,14 +4,16 @@ import { testParams, testInvalidCredentials } from '../../../../lib/macros';
 import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/logout', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/instance/logout', {
 	instance_id: 'string',
 	token: 'string'
 }, {}, {}, {});
-test('throws an error if token is invalid', async () => {
-	const config = await genUserAndDb(t, {
+it('throws an error if token is invalid', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
@@ -35,13 +37,13 @@ test('throws an error if token is invalid', async () => {
 	}
 	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
-test('fails if instance id is wrong', async () => {
-	const config = await genUserAndDb(t);
+it('fails if instance id is wrong', async () => {
+	const config = await genUserAndDb();
 	const server = await createServer(config);
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/instance/logout',
 		port: http,
 		encrypted: {},

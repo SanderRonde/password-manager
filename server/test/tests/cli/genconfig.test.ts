@@ -4,9 +4,11 @@ import { ProcRunner } from '../../lib/procrunner';
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const files = captureCreatedFiles(test);
-test('print an error when no command is passed', async () => {
+
+const files = captureCreatedFiles(after);
+it('print an error when no command is passed', async () => {
 	const proc = new ProcRunner(['genconfig']);
 	proc.expectWrite();
 	proc.expectWrite('\terror: missing required argument `server/backup\'');
@@ -16,7 +18,7 @@ test('print an error when no command is passed', async () => {
 	await proc.run();
 	proc.check();
 }); 
-test('print an error when a non-command is used', async () => {
+it('print an error when a non-command is used', async () => {
 	const proc = new ProcRunner(['genconfig', 'noncommand']);
 	proc.expectWrite('Given command has no config file, use "server" or "backup"');
 	proc.expectExit(1);
@@ -24,7 +26,7 @@ test('print an error when a non-command is used', async () => {
 	await proc.run();
 	proc.check();
 });
-test('a server config can generated', async () => {
+it('a server config can generated', async () => {
 	const proc = new ProcRunner(['genconfig', 'server']);
 	proc.expectWrite('Done!');
 	proc.expectExit(0);
@@ -45,7 +47,7 @@ test('a server config can generated', async () => {
 	assert.strictEqual(content, expected,
 		'config file matches expected');
 });
-test('a server config can generated to a custom path', async () => {
+it('a server config can generated to a custom path', async () => {
 	const cfgPath = path.join(__dirname, `../../../temp/${genRandomString(10)}/server.json`);
 	const proc = new ProcRunner([
 		'genconfig', 
@@ -70,7 +72,7 @@ test('a server config can generated to a custom path', async () => {
 	assert.strictEqual(content, expected,
 		'config file matches expected');
 });
-test('a backup config can generated', async () => {
+it('a backup config can generated', async () => {
 	const proc = new ProcRunner(['genconfig', 'backup']);
 	proc.expectWrite('Done!');
 	proc.expectExit(0);
@@ -91,7 +93,7 @@ test('a backup config can generated', async () => {
 	assert.strictEqual(content, expected,
 		'config file matches expected');
 });
-test('a backup config can generated to a custom path', async () => {
+it('a backup config can generated to a custom path', async () => {
 	const cfgPath = path.join(__dirname, `../../../temp/${genRandomString(10)}/backup.json`);
 	const proc = new ProcRunner([
 		'genconfig', 

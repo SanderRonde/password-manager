@@ -5,14 +5,16 @@ import { API_ERRS } from '../../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/2fa/confirm', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/instance/2fa/confirm', {
 	instance_id: 'string',
 	twofactor_token: 'string'
 }, {}, {}, {});
-test('fails if account has no 2FA setup', async () => {
-	const config = await genUserAndDb(t, {
+it('fails if account has no 2FA setup', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false,
 		instance_twofactor_enabled: false,
 		twofactor_secret: null!
@@ -36,9 +38,9 @@ test('fails if account has no 2FA setup', async () => {
 	if (response.success) return;
 	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
-test('fails if an invalid token is passed', async () => {
+it('fails if an invalid token is passed', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
 		twofactor_secret: twofactor.base32
@@ -66,9 +68,9 @@ test('fails if an invalid token is passed', async () => {
 	if (response.success) return;
 	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
-test('fails if instance id wrong', async () => {
+it('fails if instance id wrong', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
 		twofactor_secret: twofactor.base32
@@ -77,7 +79,7 @@ test('fails if instance id wrong', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/instance/2fa/confirm',
 		port: http,
 		encrypted: {},

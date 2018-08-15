@@ -8,17 +8,19 @@ import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import { getDB } from '../../../../lib/db';
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/user/genresetkey', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/user/genresetkey', {
 	instance_id: 'string',
 }, {}, {
 	reset_key: 'string',
 	master_password: 'string'
 }, {});
-test('fails if instance id is wrong', async () => {
+it('fails if instance id is wrong', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		resetKey
 	});
 	const server = await createServer(config);
@@ -29,7 +31,7 @@ test('fails if instance id is wrong', async () => {
 	} = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/user/genresetkey',
 		port: http,
 		unencrypted: {
@@ -44,9 +46,9 @@ test('fails if instance id is wrong', async () => {
 		err: API_ERRS.MISSING_PARAMS
 	});
 });
-test('rejects if password is wrong', async () => {
+it('rejects if password is wrong', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		resetKey
 	});
 	const server = await createServer(config);
@@ -58,7 +60,7 @@ test('rejects if password is wrong', async () => {
 	} = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/user/genresetkey',
 		port: http,
 		unencrypted: {
@@ -72,9 +74,9 @@ test('rejects if password is wrong', async () => {
 		publicKey: server_public_key
 	});
 });
-test('rejects if reset key is wrong', async () => {
+it('rejects if reset key is wrong', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		resetKey
 	});
 	const server = await createServer(config);
@@ -87,7 +89,7 @@ test('rejects if reset key is wrong', async () => {
 	} = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/user/genresetkey',
 		port: http,
 		unencrypted: {
@@ -101,9 +103,9 @@ test('rejects if reset key is wrong', async () => {
 		publicKey: server_public_key
 	});
 });
-test('works if params are correct', async () => {
+it('works if params are correct', async () => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		resetKey
 	});
 	const server = await createServer(config);

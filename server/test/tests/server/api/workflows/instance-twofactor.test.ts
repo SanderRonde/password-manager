@@ -8,11 +8,13 @@ import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import * as url from 'url'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-test('can enable 2FA after registering instance when 2FA is enabled for the user', async () => {
+
+const uris = captureURIs(after);
+it('can enable 2FA after registering instance when 2FA is enabled for the user', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: twofactor.base32
 	});
@@ -109,9 +111,9 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
 });
-test('can enable 2FA and then disable it', async () => {
+it('can enable 2FA and then disable it', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: false,
 		twofactor_secret: twofactor.base32
@@ -216,9 +218,9 @@ test('can enable 2FA and then disable it', async () => {
 		assert.strictEqual(decrypt, false, '2FA is now disabled');
 	})();
 });
-test('can enable 2FA, disable 2FA and then enable it', async () => {
+it('can enable 2FA, disable 2FA and then enable it', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: false,
 		twofactor_secret: twofactor.base32
@@ -366,9 +368,9 @@ test('can enable 2FA, disable 2FA and then enable it', async () => {
 		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
 });
-test('can verify a login requiring 2FA', async () => {
+it('can verify a login requiring 2FA', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
 		twofactor_secret: twofactor.base32
@@ -459,9 +461,9 @@ test('can verify a login requiring 2FA', async () => {
 		assert.strictEqual(typeof data.auth_token, 'string', 'new auth token was passed');
 	})();
 });
-test('can register an instance, enable 2FA, log in with it and disable 2FA', async () => {
+it('can register an instance, enable 2FA, log in with it and disable 2FA', async () => {
 	const twofactor = speakeasy.generateSecret();
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: twofactor.base32
 	});
@@ -677,8 +679,8 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 	})();
 });
 
-test('can register an instance, enable 2FA for the user and enable 2FA for the instance', async () => {
-	const config = await genUserAndDb(t, {
+it('can register an instance, enable 2FA for the user and enable 2FA for the instance', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);

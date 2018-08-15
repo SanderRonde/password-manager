@@ -10,9 +10,11 @@ import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import * as url from 'url'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/password/update', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/password/update', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
@@ -24,18 +26,18 @@ testParams(test, uris, '/api/password/update', {
 	encrypted: 'string',
 	twofactor_token: 'string'
 });
-test('password can be updated', async () => {
-	const config = await genUserAndDb(t, {
+it('password can be updated', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true
 	});
 	const server = await createServer(config);
 	const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 
 
-	const passwordId = await setPasword(t, {
+	const passwordId = await setPasword({
 		websites: [],
 		twofactor_enabled: false,
 		username: 'username',
@@ -119,11 +121,11 @@ test('password can be updated', async () => {
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 });
-test('fails if it requires 2FA and no 2FA token is passed', async () => {
+it('fails if it requires 2FA and no 2FA token is passed', async () => {
 	const { base32 } = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: base32
 	});
@@ -131,9 +133,9 @@ test('fails if it requires 2FA and no 2FA token is passed', async () => {
 	const { http, uri, server_public_key, userpw } = config;
 	uris.push(uri);
 
-	const loginToken = await getLoginToken(t, config);
+	const loginToken = await getLoginToken(config);
 
-	const passwordId = await setPasword(t, {
+	const passwordId = await setPasword({
 		websites: [],
 		twofactor_enabled: true,
 		username: 'username',
@@ -171,11 +173,11 @@ test('fails if it requires 2FA and no 2FA token is passed', async () => {
 	}
 	assert.strictEqual(response.ERR, API_ERRS.MISSING_PARAMS, 'failed with missing parameters');
 });
-test('password can be updated if 2FA is enabled', async () => {
+it('password can be updated if 2FA is enabled', async () => {
 	const { base32 } = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: base32
 	});
@@ -183,9 +185,9 @@ test('password can be updated if 2FA is enabled', async () => {
 	const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 
-	const passwordId = await setPasword(t, {
+	const passwordId = await setPasword({
 		websites: [],
 		twofactor_enabled: false,
 		username: 'username',
@@ -273,16 +275,16 @@ test('password can be updated if 2FA is enabled', async () => {
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 });
-test('fails if token is wrong', async () => {
-	const config = await genUserAndDb(t, {
+it('fails if token is wrong', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 	});
 	const server = await createServer(config);
-	await getLoginToken(t, config);
+	await getLoginToken(config);
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/update',
 		port: http,
 		unencrypted: {
@@ -307,16 +309,16 @@ test('fails if token is wrong', async () => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async () => {
-	const config = await genUserAndDb(t, {
+it('fails if instance id is wrong', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 	});
 	const server = await createServer(config);
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/update',
 		port: http,
 		unencrypted: {
@@ -342,16 +344,16 @@ test('fails if instance id is wrong', async () => {
 		err: API_ERRS.MISSING_PARAMS
 	});
 });
-test('fails if password id is wrong', async () => {
-	const config = await genUserAndDb(t, {
+it('fails if password id is wrong', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 	});
 	const server = await createServer(config);
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 	const { http, uri, server_public_key, instance_id } = config;
 	uris.push(uri);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/update',
 		port: http,
 		unencrypted: {

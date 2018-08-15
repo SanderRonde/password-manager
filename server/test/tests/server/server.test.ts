@@ -2,10 +2,12 @@ import { captureURIs, genUserAndDb } from '../../lib/util';
 import { ProcRunner } from '../../lib/procrunner';
 import http = require('http');
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-test('server can be started', async () => {
-	const { dbpw, uri, http } = await genUserAndDb(t);
+
+const uris = captureURIs(after);
+it('server can be started', async () => {
+	const { dbpw, uri, http } = await genUserAndDb();
 	uris.push(uri);
 	const proc = new ProcRunner([
 		'server',
@@ -23,8 +25,8 @@ test('server can be started', async () => {
 
 	proc.check();
 });
-test('requests made over HTTP are redirected to HTTPS by default', async () => {
-	const { dbpw, uri, http: httpPort } = await genUserAndDb(t);
+it('requests made over HTTP are redirected to HTTPS by default', async () => {
+	const { dbpw, uri, http: httpPort } = await genUserAndDb();
 	uris.push(uri);
 	const proc = new ProcRunner([
 		'server',
@@ -77,8 +79,8 @@ test('requests made over HTTP are redirected to HTTPS by default', async () => {
 
 	proc.check();
 });
-test('requests made over HTTP are not redirected to HTTPS if disabled', async () => {
-	const { dbpw, uri, http: httpPort } = await genUserAndDb(t);
+it('requests made over HTTP are not redirected to HTTPS if disabled', async () => {
+	const { dbpw, uri, http: httpPort } = await genUserAndDb();
 	uris.push(uri);
 	const proc = new ProcRunner([
 		'server',

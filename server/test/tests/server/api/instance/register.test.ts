@@ -5,15 +5,17 @@ import { DEFAULT_EMAIL } from '../../../../../app/lib/constants';
 import { doSingleQuery } from '../../../../lib/db';
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/register', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/instance/register', {
 	email: 'string',
 	password: 'string',
 	public_key: 'string'
 }, {}, {}, {});
-test('instance can be created', async () => {
-	const config = await genUserAndDb(t);
+it('instance can be created', async () => {
+	const config = await genUserAndDb();
 	const server = await createServer(config);
 	const { http, userpw, uri } = config;
 	uris.push(uri);
@@ -51,14 +53,14 @@ test('instance can be created', async () => {
 
 	assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 });
-test('fails if password is wrong', async () => {
-	const config = await genUserAndDb(t);
+it('fails if password is wrong', async () => {
+	const config = await genUserAndDb();
 	const server = await createServer(config);
 	const { http, userpw, uri, server_public_key } = config;
 	uris.push(uri);
 
 	const keyPair = genRSAKeyPair();
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/instance/register',
 		port: http,
 		encrypted: {},

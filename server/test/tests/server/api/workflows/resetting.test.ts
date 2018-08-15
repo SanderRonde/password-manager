@@ -5,11 +5,13 @@ import { RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../../../../app/lib/constant
 import { genRandomString } from '../../../../../app/lib/util';
 import { getDB } from '../../../../lib/db';
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-test('can generate a new key and then reset with it', async () => {
+
+const uris = captureURIs(after);
+it('can generate a new key and then reset with it', async () => {
 	const initialResetKey = genRandomString(RESET_KEY_LENGTH);
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		resetKey: initialResetKey
 	});
 	const server = await createServer(config);
@@ -126,15 +128,15 @@ test('can generate a new key and then reset with it', async () => {
 		}
 
 		const decryptedPw = decrypt(account.pw, dbpw);
-		if (isErr(t, decryptedPw)) return;
+		if (isErr(decryptedPw)) return;
 
 		assert.strictEqual(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 			'decrypted password matches new password');
 		
 		const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
-		if (isErr(t, dbDecryptedResetKey)) return;
+		if (isErr(dbDecryptedResetKey)) return;
 		const decryptedResetKey = decrypt(dbDecryptedResetKey, data.new_reset_key);
-		if (isErr(t, decryptedResetKey)) return;
+		if (isErr(decryptedResetKey)) return;
 		assert.isTrue(decryptedResetKey.integrity, 'integrity is true');
 		assert.strictEqual(decryptedResetKey.pw, newMasterPassword, 'new master password can be decrypted');
 	})();

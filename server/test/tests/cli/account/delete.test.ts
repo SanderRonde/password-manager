@@ -4,10 +4,12 @@ import { DEFAULT_EMAIL } from '../../../../app/lib/constants';
 import { genRandomString } from '../../../../app/lib/util';
 import { ProcRunner } from '../../../lib/procrunner';
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-test('print an error when no account is passed', async () => {
-	const uri = await genTempDatabase(t);
+
+const uris = captureURIs(after);
+it('print an error when no account is passed', async () => {
+	const uri = await genTempDatabase();
 	uris.push(uri);
 
 	const proc = new ProcRunner([
@@ -21,8 +23,8 @@ test('print an error when no account is passed', async () => {
 	await proc.run();
 	proc.check();
 });
-test('fail if the database password is wrong when passed', async () => {
-	const uri = await genTempDatabase(t);
+it('fail if the database password is wrong when passed', async () => {
+	const uri = await genTempDatabase();
 	uris.push(uri);
 
 	const dbpw = await genDBWithPW(uri);
@@ -43,8 +45,8 @@ test('fail if the database password is wrong when passed', async () => {
 	await proc.run();
 	proc.check();
 });
-test('fail if the database password is wrong when entered', async () => {
-	const uri = await genTempDatabase(t);
+it('fail if the database password is wrong when entered', async () => {
+	const uri = await genTempDatabase();
 	uris.push(uri);
 
 	const dbpw = await genDBWithPW(uri);
@@ -78,8 +80,8 @@ test('fail if the database password is wrong when entered', async () => {
 	await proc.run();
 	proc.check();
 });
-test('it is possible to enter the password manually', async () => {
-	const uri = await genTempDatabase(t);
+it('it is possible to enter the password manually', async () => {
+	const uri = await genTempDatabase();
 	const userpw = genRandomString(25);
 	uris.push(uri);
 
@@ -116,10 +118,10 @@ test('it is possible to enter the password manually', async () => {
 	await proc.run();
 	proc.check();
 
-	await hasDeletedAccount(t, uri);
+	await hasDeletedAccount(uri);
 });
-test('work when entering pasword correctly the third time', async () => {
-	const uri = await genTempDatabase(t);
+it('work when entering pasword correctly the third time', async () => {
+	const uri = await genTempDatabase();
 	const userpw = genRandomString(15);
 	uris.push(uri);
 
@@ -164,10 +166,10 @@ test('work when entering pasword correctly the third time', async () => {
 	await proc.run();
 	proc.check();
 
-	await hasDeletedAccount(t, uri);
+	await hasDeletedAccount(uri);
 })
-test('it is possible to pass the password', async () => {
-	const uri = await genTempDatabase(t);
+it('it is possible to pass the password', async () => {
+	const uri = await genTempDatabase();
 	const userpw = genRandomString(15);
 	uris.push(uri);
 
@@ -201,10 +203,10 @@ test('it is possible to pass the password', async () => {
 	await proc.run();
 	proc.check();
 
-	await hasDeletedAccount(t, uri);
+	await hasDeletedAccount(uri);
 });
-test('ask for a new database password if not set yet', async () => {
-	const uri = await genTempDatabase(t);
+it('ask for a new database password if not set yet', async () => {
+	const uri = await genTempDatabase();
 	const userpw = genRandomString(15);
 	const dbpw = genRandomString(15);
 	uris.push(uri);
@@ -244,10 +246,10 @@ test('ask for a new database password if not set yet', async () => {
 
 	assert.isTrue(await hasCreatedDBWithPW(dbpw, uri),
 		'the database has been initialized with given password');
-	await hasDeletedAccount(t, uri);
+	await hasDeletedAccount(uri);
 });
-test('use the passed password to initialize the database if not set yet', async () => {
-	const uri = await genTempDatabase(t);
+it('use the passed password to initialize the database if not set yet', async () => {
+	const uri = await genTempDatabase();
 	const userpw = genRandomString(15);
 	uris.push(uri);
 
@@ -286,10 +288,10 @@ test('use the passed password to initialize the database if not set yet', async 
 
 	assert.isTrue(await hasCreatedDBWithPW(dbpw, uri),
 		'the database has been initialized with given password');
-	await hasDeletedAccount(t, uri);
+	await hasDeletedAccount(uri);
 });
-test('cancel the deletion and restore deleted items when instance changes fail', async () => {
-	const uri = await genTempDatabase(t);
+it('cancel the deletion and restore deleted items when instance changes fail', async () => {
+	const uri = await genTempDatabase();
 	const userpw = genRandomString(15);
 	uris.push(uri);
 
@@ -336,8 +338,8 @@ test('cancel the deletion and restore deleted items when instance changes fail',
 		'hasn\'t deleted any users');
 	done();
 });
-test('cancel the deletion and restore deleted items when password changes fail', async () => {
-	const uri = await genTempDatabase(t);
+it('cancel the deletion and restore deleted items when password changes fail', async () => {
+	const uri = await genTempDatabase();
 	const userpw = genRandomString(15);
 	uris.push(uri);
 
@@ -385,8 +387,8 @@ test('cancel the deletion and restore deleted items when password changes fail',
 		'hasn\'t deleted any users');
 	done();
 });
-test('cancel the deletion and restore deleted items when account changes fail', async () => {
-	const uri = await genTempDatabase(t);
+it('cancel the deletion and restore deleted items when account changes fail', async () => {
+	const uri = await genTempDatabase();
 	const userpw = genRandomString(15);
 	uris.push(uri);
 

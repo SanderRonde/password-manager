@@ -1,10 +1,11 @@
 import { GetRequired, GetOptional, GetEncrypted, GetOptionalEncrypted, APIFns, API_ERRS, APIArgs, JSONResponse } from "../../../shared/types/../../shared/types/api";
-import { RegisterContextual, GenericTestContext, Context } from "ava";
 import { doServerAPIRequest, genUserAndDb, createServer } from "./util";
 import { ChildProcess } from "child_process";
+import { assert } from 'chai';
+import { it } from 'mocha';
 
-async function doServerSetupAndBreakdown(t: GenericTestContext<Context<any>>, uris: string[]) {
-	const config = await genUserAndDb(t);
+async function doServerSetupAndBreakdown(uris: string[]) {
+	const config = await genUserAndDb();
 	const server = await createServer({...config });
 	uris.push(config.uri);
 	return {
@@ -55,7 +56,7 @@ function mapObj<T extends Object, R>(obj: T, fn: (key: keyof T, val: T[keyof T])
 	};
 }
 
-export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>, uris: string[], route: R, required: {
+export function testParams<R extends keyof APIFns>(test: typeof it, uris: string[], route: R, required: {
 	[key in keyof GetRequired<APIFns[R]>]: 'string'|'boolean'|'number'|'array';
 }, optional: {
 	[key in keyof GetOptional<APIFns[R]>]: 'string'|'boolean'|'number'|'array';
@@ -65,8 +66,8 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 	[key in keyof GetOptionalEncrypted<APIFns[R]>]: 'string'|'boolean'|'number'|'array';
 }) {
 	// Test missing params
-	test(`no params for route "${route}"`, async t => {
-		const { config, done } = await doServerSetupAndBreakdown(t, uris);
+	test(`no params for route "${route}"`, async () => {
+		const { config, done } = await doServerSetupAndBreakdown(uris);
 		const response = JSON.parse(await doServerAPIRequest({
 			port: config.http,
 			publicKey: config.server_public_key
@@ -74,15 +75,15 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 			success: false;
 			ERR: API_ERRS;
 		};
-		t.false(response.success, 'request failed');
-		t.is(response.ERR, API_ERRS.MISSING_PARAMS, 'MISSING_PARAMS error is thrown');
+		assert.isFalse(response.success, 'request failed');
+		assert.strictEqual(response.ERR, API_ERRS.MISSING_PARAMS, 'MISSING_PARAMS error is thrown');
 		done();
 	});
 
 	//Missing a single unencrypted param
 	for (const missingKey in required) {
-		test(`missing unencrypted param "${missingKey}"`, async t => {
-			const { config, done } = await doServerSetupAndBreakdown(t, uris);
+		test(`missing unencrypted param "${missingKey}"`, async () => {
+			const { config, done } = await doServerSetupAndBreakdown(uris);
 			const unencryptedArgs: Partial<{
 				[key in keyof GetRequired<APIFns[R]>]: any;
 			}> = {};
@@ -103,16 +104,16 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 				success: false;
 				ERR: API_ERRS;
 			};
-			t.false(response.success, 'request failed');
-			t.is(response.ERR, API_ERRS.MISSING_PARAMS, 'MISSING_PARAMS error is thrown');
+			assert.isFalse(response.success, 'request failed');
+			assert.strictEqual(response.ERR, API_ERRS.MISSING_PARAMS, 'MISSING_PARAMS error is thrown');
 			done();
 		});
 	}
 
 	//Missing a single encrypted param
 	for (const missingKey in encrypted) {
-		test(`missing encrypted param "${missingKey}"`, async t => {
-			const { config, done } = await doServerSetupAndBreakdown(t, uris);
+		test(`missing encrypted param "${missingKey}"`, async () => {
+			const { config, done } = await doServerSetupAndBreakdown(uris);
 			const unencryptedArgs: {
 				[key in keyof GetRequired<APIFns[R]>]: any;
 			} = mapObj(required, (_, val) => getFillerType(val));
@@ -133,8 +134,8 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 				success: false;
 				ERR: API_ERRS;
 			};
-			t.false(response.success, 'request failed');
-			t.is(response.ERR, API_ERRS.MISSING_PARAMS, 'MISSING_PARAMS error is thrown');
+			assert.isFalse(response.success, 'request failed');
+			assert.strictEqual(response.ERR, API_ERRS.MISSING_PARAMS, 'MISSING_PARAMS error is thrown');
 			done();
 		});
 	}
@@ -142,8 +143,8 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 	//Wrong unencrypted required types
 	for (const wrongType in required) {
 		if (wrongType === 'instance_id') continue;
-		test(`wrong type for unencrypted required param "${wrongType}"`, async t => {
-			const { config, done } = await doServerSetupAndBreakdown(t, uris);
+		test(`wrong type for unencrypted required param "${wrongType}"`, async () => {
+			const { config, done } = await doServerSetupAndBreakdown(uris);
 			const unencryptedArgs = {
 				[wrongType]: getWrongType(required[wrongType])
 			} as Partial<{
@@ -166,16 +167,16 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 				success: false;
 				ERR: API_ERRS;
 			};
-			t.false(response.success, 'request failed');
-			t.is(response.ERR, API_ERRS.INVALID_PARAM_TYPES, 'INVALID_PARAM_TYPES error is thrown');
+			assert.isFalse(response.success, 'request failed');
+			assert.strictEqual(response.ERR, API_ERRS.INVALID_PARAM_TYPES, 'INVALID_PARAM_TYPES error is thrown');
 			done();
 		});
 	}
 
 	//Wrong encrypted required types
 	for (const wrongType in encrypted) {
-		test(`wrong type for encrypted required param "${wrongType}"`, async t => {
-			const { config, done } = await doServerSetupAndBreakdown(t, uris);
+		test(`wrong type for encrypted required param "${wrongType}"`, async () => {
+			const { config, done } = await doServerSetupAndBreakdown(uris);
 			const unencryptedArgs: {
 				[key in keyof GetRequired<APIFns[R]>]: any;
 			} = mapObj(required, (_, val) => getFillerType(val));
@@ -198,16 +199,16 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 				success: false;
 				ERR: API_ERRS;
 			};
-			t.false(response.success, 'request failed');
-			t.is(response.ERR, API_ERRS.INVALID_PARAM_TYPES, 'INVALID_PARAM_TYPES error is thrown');
+			assert.isFalse(response.success, 'request failed');
+			assert.strictEqual(response.ERR, API_ERRS.INVALID_PARAM_TYPES, 'INVALID_PARAM_TYPES error is thrown');
 			done();
 		});
 	}
 
 	//Wrong unencrypted optional types
 	for (const wrongType in optional) {
-		test(`wrong type for unencrypted optional param "${wrongType}"`, async t => {
-			const { config, done } = await doServerSetupAndBreakdown(t, uris);
+		test(`wrong type for unencrypted optional param "${wrongType}"`, async () => {
+			const { config, done } = await doServerSetupAndBreakdown(uris);
 			const unencryptedArgs = {...mapObj(required, (_, val) => getFillerType(val)) as object, ...{
 				[wrongType]: getWrongType(optional[wrongType])
 			}} as {
@@ -225,16 +226,16 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 				success: false;
 				ERR: API_ERRS;
 			};
-			t.false(response.success, 'request failed');
-			t.is(response.ERR, API_ERRS.INVALID_PARAM_TYPES, 'INVALID_PARAM_TYPES error is thrown');
+			assert.isFalse(response.success, 'request failed');
+			assert.strictEqual(response.ERR, API_ERRS.INVALID_PARAM_TYPES, 'INVALID_PARAM_TYPES error is thrown');
 			done();
 		});
 	}
 
 	//Wrong encrypted optional types
 	for (const wrongType in optionalEncrypted) {
-		test(`wrong type for encrypted optional param "${wrongType}"`, async t => {
-			const { config, done } = await doServerSetupAndBreakdown(t, uris);
+		test(`wrong type for encrypted optional param "${wrongType}"`, async () => {
+			const { config, done } = await doServerSetupAndBreakdown(uris);
 			const unencryptedArgs = mapObj(required, (_, val) => getFillerType(val)) as {
 				[key in keyof GetRequired<APIFns[R]>]: any;
 			};
@@ -252,15 +253,15 @@ export function testParams<R extends keyof APIFns>(test: RegisterContextual<any>
 				success: false;
 				ERR: API_ERRS;
 			};
-			t.false(response.success, 'request failed');
-			t.is(response.ERR, API_ERRS.INVALID_PARAM_TYPES, 'INVALID_PARAM_TYPES error is thrown');
+			assert.isFalse(response.success, 'request failed');
+			assert.strictEqual(response.ERR, API_ERRS.INVALID_PARAM_TYPES, 'INVALID_PARAM_TYPES error is thrown');
 			done();
 		});
 	}
 }
 
 export async function testInvalidCredentials<R extends keyof APIFns, 
-	U extends APIArgs[R][0], E extends APIArgs[R][1]>(t: GenericTestContext<Context<any>>, {
+	U extends APIArgs[R][0], E extends APIArgs[R][1]>({
 	port, unencrypted, encrypted, route, server, publicKey, err = API_ERRS.INVALID_CREDENTIALS
 }: {
 	publicKey: string;
@@ -279,10 +280,10 @@ export async function testInvalidCredentials<R extends keyof APIFns,
 
 	server.kill();
 
-	t.false(response.success, 'API call failed');
+	assert.isFalse(response.success, 'API call failed');
 	if (response.success) {
 		return;
 	}
-	t.is(response.ERR, err,
+	assert.strictEqual(response.ERR, err,
 		'got invalid credentials errors');
 }

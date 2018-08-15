@@ -3,7 +3,7 @@ import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, ge
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../app/lib/constants';
 import { getCollectionLength, MockConfig, doesNotThrowAsync } from './util';
 import { genRandomString, getDBFromURI, genID } from '../../app/lib/util';
-import { GenericTestContext, Context } from 'ava';
+import { assert } from 'chai';
 
 import * as mongo from 'mongodb'
 
@@ -315,7 +315,7 @@ export async function genMockAcount({
 	done();
 }
 
-export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
+export async function hasCreatedAccount({
 	dbpw, resetKey, userpw, uri	
 }: {
 	uri: string;
@@ -323,20 +323,20 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 	userpw: string;
 	resetKey: string;
 }): Promise<void> {
-	t.true(await hasCreatedDBWithPW(dbpw, uri), 'a database has been created');
+	assert.isTrue(await hasCreatedDBWithPW(dbpw, uri), 'a database has been created');
 
 	const { db, done } = await getDB(uri);
 
-	t.is(await getCollectionLength(db.collection('users')), 1,
+	assert.strictEqual(await getCollectionLength(db.collection('users')), 1,
 		'a single user was created');
 	
 	//Get record
 	const records: EncryptedAccount[] = await db.collection('users').find().toArray();
-	t.is(records.length, 1,
+	assert.strictEqual(records.length, 1,
 		'user record exists');
 	
 	const [ encrypted ] = records;
-	t.truthy(encrypted, 'record is truthy');
+	assert.isTrue(!!encrypted, 'record is truthy');
 
 	let decrypted = { 
 		email: encrypted.email
@@ -346,52 +346,52 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 
 	//Decrypt everything
 	await Promise.all([
-		doesNotThrowAsync(t, async () => {
+		doesNotThrowAsync(async () => {
 			const res = await doDbDecrypt(encrypted.pw, dbpw);
-			t.not(res, ERRS.INVALID_DECRYPT,
+			assert.notStrictEqual(res, ERRS.INVALID_DECRYPT,
 				'decrypting pw does not result in invalid decrypt');
 			if (res === ERRS.INVALID_DECRYPT) return;
 			decrypted.pw = res;
 		}, 'pw can be decrypted'),
-		doesNotThrowAsync(t, async () => {
+		doesNotThrowAsync(async () => {
 			const res = await doDbDecryptWithSalt(encrypted.twofactor_enabled, dbpw);
-			t.not(res, ERRS.INVALID_DECRYPT,
+			assert.notStrictEqual(res, ERRS.INVALID_DECRYPT,
 				'decrypting twofactor_enabled does not result in invalid decrypt');
 			if (res === ERRS.INVALID_DECRYPT) return;
 			decrypted.twofactor_enabled = res;
 		}, 'twofactor_enabled can be decrypted'),
-		doesNotThrowAsync(t, async () => {
+		doesNotThrowAsync(async () => {
 			const res = await doDbDecryptWithSalt(encrypted.twofactor_secret, dbpw);
-			t.not(res, ERRS.INVALID_DECRYPT,
+			assert.notStrictEqual(res, ERRS.INVALID_DECRYPT,
 				'decrypting twofactor_secret does not result in invalid decrypt');
 			if (res === ERRS.INVALID_DECRYPT) return;
 			decrypted.twofactor_secret = res;
 		}, 'twofactor_secret can be decrypted'),
-		doesNotThrowAsync(t, async () => {
+		doesNotThrowAsync(async () => {
 			const res = await doDbDecrypt(encrypted.reset_key, dbpw);
-			t.not(res, ERRS.INVALID_DECRYPT,
+			assert.notStrictEqual(res, ERRS.INVALID_DECRYPT,
 				'decrypting reset_key does not result in invalid decrypt');
 			if (res === ERRS.INVALID_DECRYPT) return;
 			decrypted.reset_key = res;
 		}, 'reset_key can be decrypted'),
 	]);
 	//Verify everything exists
-	t.truthy(decrypted.email, 'email is truthy');
-	t.truthy(decrypted.pw, 'pw is truthy');
-	t.truthy(decrypted.reset_key, 'reset_key is truthy');
+	assert.isTrue(!!decrypted.email, 'email is truthy');
+	assert.isTrue(!!decrypted.pw, 'pw is truthy');
+	assert.isTrue(!!decrypted.reset_key, 'reset_key is truthy');
 
 	//Verify types
-	t.is(typeof decrypted.email, 'string', 'type of email is string');
-	t.is(typeof decrypted.pw, 'string', 'type of password is string');
-	t.is(typeof decrypted.twofactor_enabled, 'boolean', 'type of 2FA_enabled is boolean');
-	t.is(typeof decrypted.reset_key, 'string', 'type of reset_key is string');
+	assert.strictEqual(typeof decrypted.email, 'string', 'type of email is string');
+	assert.strictEqual(typeof decrypted.pw, 'string', 'type of password is string');
+	assert.strictEqual(typeof decrypted.twofactor_enabled, 'boolean', 'type of 2FA_enabled is boolean');
+	assert.strictEqual(typeof decrypted.reset_key, 'string', 'type of reset_key is string');
 
 	//Verify values
-	t.is(decrypted.email, DEFAULT_EMAIL, 'emails match');
-	t.is(decrypted.pw, hash(pad(userpw, 'masterpwverify')), 
+	assert.strictEqual(decrypted.email, DEFAULT_EMAIL, 'emails match');
+	assert.strictEqual(decrypted.pw, hash(pad(userpw, 'masterpwverify')), 
 		'passwords match');
-	t.is(decrypted.twofactor_enabled, false, '2FA is disabled by default');
-	t.is(decrypted.twofactor_secret, null, 'twofactor secret is not set');
+	assert.strictEqual(decrypted.twofactor_enabled, false, '2FA is disabled by default');
+	assert.strictEqual(decrypted.twofactor_secret, null, 'twofactor secret is not set');
 
 	if (!decrypted.reset_key) {
 		return;
@@ -400,9 +400,9 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 	const decryptedResetKey: {
 		integrity: true;
 		pw: string;
-	} = await doesNotThrowAsync(t, async () => {
+	} = await doesNotThrowAsync(async () => {
 		const res = await decrypt(decrypted.reset_key!, resetKey);
-		t.not(res, ERRS.INVALID_DECRYPT,
+		assert.notStrictEqual(res, ERRS.INVALID_DECRYPT,
 			'is not an invalid decrypt');
 		return res as {
 			integrity: true;
@@ -410,29 +410,29 @@ export async function hasCreatedAccount(t: GenericTestContext<Context<any>>, {
 		};
 	}, 'reset_key can be decrypted even further');
 
-	t.truthy(decryptedResetKey, 'value was decrypted');
-	t.true(decryptedResetKey.integrity, 'integrity is true');
-	t.is(decryptedResetKey.pw, userpw, 'decrypted reset key holds password');
+	assert.isTrue(!!decryptedResetKey, 'value was decrypted');
+	assert.isTrue(decryptedResetKey.integrity, 'integrity is true');
+	assert.strictEqual(decryptedResetKey.pw, userpw, 'decrypted reset key holds password');
 	
 	done();
 }
 
-export async function hasDeletedAccount(t: GenericTestContext<Context<any>>, uri: string) {
+export async function hasDeletedAccount(uri: string) {
 	const { db, done } = await getDB(uri);
 
-	t.is(await getCollectionLength(db.collection('users')), 2,
+	assert.strictEqual(await getCollectionLength(db.collection('users')), 2,
 		'remaining users did not get deleted');
 	const [ firstAcc, secondAcc ] = await db.collection('users').find().toArray() as 
 		EncryptedAccount[];
 
-	t.not(firstAcc.email, DEFAULT_EMAIL,
+	assert.notStrictEqual(firstAcc.email, DEFAULT_EMAIL,
 		'only original account was deleted');
-	t.not(secondAcc.email, DEFAULT_EMAIL,
+		assert.notStrictEqual(secondAcc.email, DEFAULT_EMAIL,
 		'only original account was deleted');
 
-	t.is(await getCollectionLength(db.collection('instances')), 2,
+	assert.strictEqual(await getCollectionLength(db.collection('instances')), 2,
 		'remaining instances did not get deleted');
-	t.is(await getCollectionLength(db.collection('passwords')), 2,
+	assert.strictEqual(await getCollectionLength(db.collection('passwords')), 2,
 		'remaining passwords did not get deleted');
 
 	done();

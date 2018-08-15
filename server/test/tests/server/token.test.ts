@@ -6,10 +6,12 @@ import { genRandomString } from '../../../app/lib/util';
 import { doSingleQuery } from '../../lib/db';
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-test('invalidates all account tokens if an old token is extended', async () => {
-	const config = await genUserAndDb(t, {
+
+const uris = captureURIs(after);
+it('invalidates all account tokens if an old token is extended', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
@@ -105,8 +107,8 @@ test('invalidates all account tokens if an old token is extended', async () => {
 
 	server.kill();
 });
-test('invalidates a token if its count is wrong', async () => {
-	const config = await genUserAndDb(t, {
+it('invalidates a token if its count is wrong', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
@@ -202,8 +204,8 @@ test('invalidates a token if its count is wrong', async () => {
 
 	server.kill();
 });
-test('invalidates a token if the instance id is wrong', async () => {
-	const config = await genUserAndDb(t, {
+it('invalidates a token if the instance id is wrong', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);

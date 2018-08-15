@@ -3,8 +3,9 @@ import { genRandomString, writeBuffer } from '../../../../app/lib/util';
 import { genTempDatabase, captureURIs } from '../../../lib/util';
 import { Export } from '../../../../app/actions/backup/export';
 import { ProcRunner } from '../../../lib/procrunner';
-import * as path from 'path'
+import { after, it } from 'mocha';
 import { assert } from 'chai';
+import * as path from 'path'
 import * as fs from 'fs'
 
 const dumps: string[] = [];
@@ -20,9 +21,9 @@ async function createDummyDump(uri: string) {
 	};
 }
 
-const uris = captureURIs(test);
-test('print an error when no input is passed', async () => {
-	const uri = await genTempDatabase(t);
+const uris = captureURIs(after);
+it('print an error when no input is passed', async () => {
+	const uri = await genTempDatabase();
 	uris.push(uri);
 
 	const proc = new ProcRunner([
@@ -36,8 +37,8 @@ test('print an error when no input is passed', async () => {
 	await proc.run();
 	proc.check();
 });
-test('print an error when a config file was passed', async () => {
-	const uri = await genTempDatabase(t);
+it('print an error when a config file was passed', async () => {
+	const uri = await genTempDatabase();
 	uris.push(uri);
 
 	const proc = new ProcRunner([
@@ -54,8 +55,8 @@ test('print an error when a config file was passed', async () => {
 	await proc.run();
 	proc.check();
 });
-test('fail when input file does not exist', async () => {
-	const uri = await genTempDatabase(t);
+it('fail when input file does not exist', async () => {
+	const uri = await genTempDatabase();
 	uris.push(uri);
 
 	const proc = new ProcRunner([
@@ -71,8 +72,8 @@ test('fail when input file does not exist', async () => {
 	await proc.run();
 	proc.check();
 });
-test('succeed when restoring a passwordless backup', async () => {
-	const uri = await genTempDatabase(t);
+it('succeed when restoring a passwordless backup', async () => {
+	const uri = await genTempDatabase();
 	uris.push(uri);
 	const { dumpPath, dbpw } = await createDummyDump(uri);
 
@@ -101,7 +102,7 @@ test('succeed when restoring a passwordless backup', async () => {
 	//Check if the database was actually created
 	assert.isTrue(await hasCreatedDBWithPW(dbpw, uri));
 });
-test.after.always('delete dummy dumps', async () => {
+after('delete dummy dumps', async () => {
 	await Promise.all(dumps.map((dump) => {
 		return new Promise((resolve, reject) => {
 			fs.unlink(dump, (err) => {

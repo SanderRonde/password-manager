@@ -8,31 +8,33 @@ import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
 import * as url from 'url'
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/password/getmeta', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/password/getmeta', {
 	instance_id: 'string'
 }, {}, {
 	token: 'string',
 	count: 'number',
 	password_id: 'string',
 }, { });
-test('can get the password\'s metadata', async () => {
-	const config = await genUserAndDb(t, {
+it('can get the password\'s metadata', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true
 	});
 	const server = await createServer(config);
 	const { http, uri, server_public_key, instance_private_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
+	const token = await getLoginToken(config);
 
 	const websites = [genURL(), genURL()]
 	const username = genRandomString(20);
 	const password = genRandomString(2);
 	const notes = [genRandomString(10), genRandomString(10), genRandomString(10)]
 	const twofactorEnabled = false;
-	const passwordId = await setPasword(t, {
+	const passwordId = await setPasword({
 		websites,
 		twofactor_enabled: twofactorEnabled,
 		username,
@@ -62,7 +64,7 @@ test('can get the password\'s metadata', async () => {
 	assert.notStrictEqual(decryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decryptedData === ERRS.INVALID_DECRYPT) return;
 
-	const parsed = doesNotThrow(t, () => {
+	const parsed = doesNotThrow(() => {
 		return JSON.parse(decryptedData);
 	}, 'data can be parsed');
 	assert.strictEqual(parsed.id, passwordId, 'password IDs are the same');
@@ -79,11 +81,11 @@ test('can get the password\'s metadata', async () => {
 	}
 	assert.strictEqual(parsed.twofactor_enabled, twofactorEnabled, 'twofactor enabled is the same');
 });
-test('fails if auth token is wrong', async () => {
+it('fails if auth token is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: secret.base32
 	});
@@ -91,8 +93,8 @@ test('fails if auth token is wrong', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
-	const passwordId = await setPasword(t, {
+	const token = await getLoginToken(config);
+	const passwordId = await setPasword({
 		websites: [],
 		twofactor_enabled: false,
 		username: 'username',
@@ -100,7 +102,7 @@ test('fails if auth token is wrong', async () => {
 		notes: []		
 	}, token!, config);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/getmeta',
 		port: http,
 		unencrypted: {
@@ -115,11 +117,11 @@ test('fails if auth token is wrong', async () => {
 		publicKey: server_public_key
 	});
 });
-test('fails if instance id is wrong', async () => {
+it('fails if instance id is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: secret.base32
 	});
@@ -127,8 +129,8 @@ test('fails if instance id is wrong', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
-	const passwordId = await setPasword(t, {
+	const token = await getLoginToken(config);
+	const passwordId = await setPasword({
 		websites: [],
 		twofactor_enabled: false,
 		username: 'username',
@@ -136,7 +138,7 @@ test('fails if instance id is wrong', async () => {
 		notes: []		
 	}, token!, config);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/getmeta',
 		port: http,
 		unencrypted: {
@@ -152,11 +154,11 @@ test('fails if instance id is wrong', async () => {
 		err: API_ERRS.MISSING_PARAMS
 	});
 });
-test('fails if password id is wrong', async () => {
+it('fails if password id is wrong', async () => {
 	const secret = speakeasy.generateSecret({
 		name: 'Password manager server'
 	});
-	const config = await genUserAndDb(t, {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		twofactor_secret: secret.base32
 	});
@@ -164,8 +166,8 @@ test('fails if password id is wrong', async () => {
 	const { http, uri, server_public_key } = config;
 	uris.push(uri);
 
-	const token = await getLoginToken(t, config);
-	await setPasword(t, {
+	const token = await getLoginToken(config);
+	await setPasword({
 		websites: [],
 		twofactor_enabled: false,
 		username: 'username',
@@ -173,7 +175,7 @@ test('fails if password id is wrong', async () => {
 		notes: []		
 	}, token!, config);
 
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/password/getmeta',
 		port: http,
 		unencrypted: {

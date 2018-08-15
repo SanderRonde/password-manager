@@ -4,11 +4,12 @@ import { getDB, clearDB, genDBWithPW, genAccountOnly, genInstancesOnly } from ".
 import { APIFns, APIArgs, APIReturns } from "../../app/../../shared/types/api";
 import { TEST_DB_URI, ENCRYPTION_ALGORITHM } from "../../app/lib/constants";
 import { genRandomString, optionalArrayItem } from "../../app/lib/util";
-import { GenericTestContext, Context, RegisterContextual } from "ava";
 import { spawn, ChildProcess } from "child_process";
 import { EventEmitter } from "events";
 import { Readable } from "stream";
 import * as mongo from 'mongodb'
+import { assert } from 'chai';
+import { after } from 'mocha';
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as http from 'http'
@@ -31,7 +32,7 @@ export function listenWithoutRef(src: Readable, handler: (chunk: string) => void
 	unref(src);
 }
 
-export async function genTempDatabase(t: GenericTestContext<Context<any>>): Promise<string> {
+export async function genTempDatabase(): Promise<string> {
 	const suffix = genRandomString(25);
 
 	const uri = `${TEST_DB_URI}${suffix}`;
@@ -41,7 +42,7 @@ export async function genTempDatabase(t: GenericTestContext<Context<any>>): Prom
 	})) {
 		//Collission, create a new one
 		done();
-		return await genTempDatabase(t);
+		return await genTempDatabase();
 	}
 
 	await db.collection('meta').insertOne({
@@ -51,9 +52,9 @@ export async function genTempDatabase(t: GenericTestContext<Context<any>>): Prom
 	return uri;
 }
 
-export function captureCreatedFiles(t: RegisterContextual<any>): string[] {
+export function captureCreatedFiles(afterTest: typeof after): string[] {
 	const arr: string[] = [];
-	t.after.always('Delete files', async () => {
+	afterTest('Delete files', async () => {
 		await Promise.all(arr.map(async (filepath) => {
 			await fs.unlink(filepath).catch(() => {});
 		}));
@@ -61,9 +62,9 @@ export function captureCreatedFiles(t: RegisterContextual<any>): string[] {
 	return arr;
 }
 
-export function captureURIs(t: RegisterContextual<any>): string[] {
+export function captureURIs(afterTest: typeof after): string[] {
 	const arr: string[] = [];
-	t.after.always('Clear databases', async () => {
+	afterTest('Clear databases', async () => {
 		await Promise.all(arr.map(clearDB));
 	});
 	return arr;
@@ -111,35 +112,34 @@ export interface MockConfig {
 	instance_twofactor_enabled?: boolean;
 }
 
-export async function genUserAndDb(t: GenericTestContext<Context<any>>, 
-	config: MockConfig = {}): Promise<UserAndDbData> {
-		const uri = await genTempDatabase(t);
-		const userpw = genRandomString(25);
+export async function genUserAndDb(config: MockConfig = {}): Promise<UserAndDbData> {
+	const uri = await genTempDatabase();
+	const userpw = genRandomString(25);
 
-		const dbpw = await genDBWithPW(uri);
-		const id = await genAccountOnly(uri, {
-			dbpw,
-			userpw
+	const dbpw = await genDBWithPW(uri);
+	const id = await genAccountOnly(uri, {
+		dbpw,
+		userpw
+}, config);
+	const serverKeyPair = genRSAKeyPair();
+	const instanceKeyPair = genRSAKeyPair();
+	const instanceId = await genInstancesOnly(uri, id, {
+		dbpw
+	}, {
+		instance_public_key: instanceKeyPair.publicKey,
+		server_private_key: serverKeyPair.privateKey
 	}, config);
-		const serverKeyPair = genRSAKeyPair();
-		const instanceKeyPair = genRSAKeyPair();
-		const instanceId = await genInstancesOnly(uri, id, {
-			dbpw
-		}, {
-			instance_public_key: instanceKeyPair.publicKey,
-			server_private_key: serverKeyPair.privateKey
-		}, config);
-		return {
-			instance_private_key: instanceKeyPair.privateKey,
-			server_public_key: serverKeyPair.publicKey,
-			instance_id: instanceId,
-			userpw,
-			dbpw,
-			uri,
-			http: await getFreePort(30000, 50000),
-			count: 0
-		}
+	return {
+		instance_private_key: instanceKeyPair.privateKey,
+		server_public_key: serverKeyPair.publicKey,
+		instance_id: instanceId,
+		userpw,
+		dbpw,
+		uri,
+		http: await getFreePort(30000, 50000),
+		count: 0
 	}
+}
 
 export function createServer({ 
 	uri, 
@@ -282,19 +282,19 @@ export async function doServerPostRequest<K extends keyof APIFns>({ port, public
 	});
 }
 
-export function doesNotThrowAsync<R>(t: GenericTestContext<Context<any>>, 
-	callback: () => Promise<R>, message: string): Promise<R> {
+export function doesNotThrowAsync<R>(callback: () => Promise<R>, 
+	message: string): Promise<R> {
 		return new Promise<R>((resolve) => {
-			t.notThrows(async () => {
+			assert.doesNotThrow(async () => {
 				resolve(await callback());
 			}, message);
 		});
 	}
 
-export function doesNotThrow<R>(t: GenericTestContext<Context<any>>, callback: () => R, 
+export function doesNotThrow<R>(callback: () => R, 
 	message: string) {
 		let result: R;
-		t.notThrows(() => {
+		assert.doesNotThrow(() => {
 			result = callback();
 		}, message);
 		return result!;
@@ -308,50 +308,49 @@ export async function doTry<R>(fn: () => Promise<R>): Promise<R|null> {
 	}
 }
 
-export function isErr<O>(t: GenericTestContext<Context<any>>, data: ERRS|O): data is ERRS {
-	t.not(data, ERRS.INVALID_DECRYPT as ERRS, 'is not an invalid decrypt');
+export function isErr<O>(data: ERRS|O): data is ERRS {
+	assert.notStrictEqual(data, ERRS.INVALID_DECRYPT as ERRS, 'is not an invalid decrypt');
 	return data === ERRS.INVALID_DECRYPT;
 }
 
-export async function getLoginToken(t: GenericTestContext<Context<any>>, 
-	config: UserAndDbData) {
-		const { 
-			http, 
-			userpw, 
-			server_public_key, 
-			instance_id, 
-			instance_private_key
-		} = config;
+export async function getLoginToken(config: UserAndDbData) {
+	const { 
+		http, 
+		userpw, 
+		server_public_key, 
+		instance_id, 
+		instance_private_key
+	} = config;
 
-		const challenge = genRandomString(25);
-		const response = JSON.parse(await doServerAPIRequest({ 
-			port: http,
-			publicKey: server_public_key
-		}, '/api/instance/login', {
-			instance_id: instance_id.toHexString(),
-			challenge: encryptWithPublicKey(challenge, server_public_key)
-		}, {
-			password_hash: hash(pad(userpw, 'masterpwverify'))
-		}));
+	const challenge = genRandomString(25);
+	const response = JSON.parse(await doServerAPIRequest({ 
+		port: http,
+		publicKey: server_public_key
+	}, '/api/instance/login', {
+		instance_id: instance_id.toHexString(),
+		challenge: encryptWithPublicKey(challenge, server_public_key)
+	}, {
+		password_hash: hash(pad(userpw, 'masterpwverify'))
+	}));
 
-		t.true(response.success, 'API call succeeded');
-		if (!response.success) {
-			return;
-		}
-		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
-		if (data.twofactor_required === true) {
-			return;
-		}
-		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
-		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-		if (token === ERRS.INVALID_DECRYPT) return;
-		t.is(typeof token, 'string', 'token is a string');
-
-		t.is(data.challenge, challenge, 'challenge matches');
-
-		return token;
+	assert.isTrue(response.success, 'API call succeeded');
+	if (!response.success) {
+		return;
 	}
+	const data = response.data;
+	assert.isFalse(data.twofactor_required, 'further authentication is not required');
+	if (data.twofactor_required === true) {
+		return;
+	}
+	const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+	assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+	if (token === ERRS.INVALID_DECRYPT) return;
+	assert.strictEqual(typeof token, 'string', 'token is a string');
+
+	assert.strictEqual(data.challenge, challenge, 'challenge matches');
+
+	return token;
+}
 
 export function genURL(host: string = `www.${genRandomString(20)}.${genRandomString(3)}`) {
 	return `http${
@@ -361,7 +360,7 @@ export function genURL(host: string = `www.${genRandomString(20)}.${genRandomStr
 	}`;
 }
 
-export async function setPasword(t: GenericTestContext<Context<any>>, toSet: {
+export async function setPasword(toSet: {
 	websites: string[];
 	twofactor_enabled: boolean;
 	username: string;
@@ -391,33 +390,33 @@ export async function setPasword(t: GenericTestContext<Context<any>>, toSet: {
 		count: config.count++
 	}));
 
-	t.true(response.success, 'API call succeeded');
+	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) {
 		return;
 	}
 	
 	const data = response.data;
-	t.is(typeof data.id, 'string', 'passed id is a string');
+	assert.strictEqual(typeof data.id, 'string', 'passed id is a string');
 
 	//Check if it was actually created
 	const { db, done } = await getDB(uri);
 	const password = await db.collection('passwords').findOne({
 		_id: new mongo.ObjectId(data.id)
 	}) as MongoRecord<EncryptedPassword>;
-	t.not(password, null, 'record was found');
+	assert.notStrictEqual(password, null, 'record was found');
 
 	const instance = await db.collection('instances').findOne({
 		_id: instance_id
 	}) as MongoRecord<EncryptedInstance>;
-	t.not(instance, null, 'instance was found');
+	assert.notStrictEqual(instance, null, 'instance was found');
 	done();
 
-	t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+	assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 		'user ids match');
 	const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 		dbpw);
-	t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-	t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+	assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 	const actualWebsites = password.websites.map(({ exact, host }) => {
 		return {
@@ -426,8 +425,8 @@ export async function setPasword(t: GenericTestContext<Context<any>>, toSet: {
 		}
 	});
 	for (const { host, exact } of actualWebsites) {
-		t.not(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-		t.not(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(host, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+		assert.notStrictEqual(exact, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	}
 
 	for (let i = 0; i < expectedWebsites.length; i++) {
@@ -436,15 +435,15 @@ export async function setPasword(t: GenericTestContext<Context<any>>, toSet: {
 
 		const host = url.parse(expectedWebsite).hostname ||
 			url.parse(expectedWebsite).host || expectedWebsite;
-		t.truthy(actualWebsite, 'a website exists at given index');
-		t.is(actualWebsite.host, host, 'hosts match');
-		t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+		assert.isTrue(!!actualWebsite, 'a website exists at given index');
+		assert.strictEqual(actualWebsite.host, host, 'hosts match');
+		assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 	}
 
 	const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
-	t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+	assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-	t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 
 	return data.id;
 }

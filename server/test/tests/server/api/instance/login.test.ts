@@ -7,16 +7,18 @@ import { API_ERRS } from '../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-testParams(test, uris, '/api/instance/login', {
+
+const uris = captureURIs(after);
+testParams(it, uris, '/api/instance/login', {
 	instance_id: 'string',
 	challenge: 'string'
 }, {}, {
 	password_hash: 'string'
 }, {});
-test('login token can be generated when 2FA is disabled', async () => {
-	const config = await genUserAndDb(t, {
+it('login token can be generated when 2FA is disabled', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
@@ -58,8 +60,8 @@ test('login token can be generated when 2FA is disabled', async () => {
 
 	assert.strictEqual(data.challenge, challenge, 'challenge matches');
 });
-test('login token can be generated when 2FA is enabled', async () => {
-	const config = await genUserAndDb(t, {
+it('login token can be generated when 2FA is enabled', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: true,
 		instance_twofactor_enabled: true,
 		twofactor_secret: speakeasy.generateSecret({
@@ -105,14 +107,14 @@ test('login token can be generated when 2FA is enabled', async () => {
 
 	assert.strictEqual(data.challenge, challenge, 'challenge matches');
 });
-test('fails if instance id is wrong', async () => {
-	const config = await genUserAndDb(t);
+it('fails if instance id is wrong', async () => {
+	const config = await genUserAndDb();
 	const server = await createServer(config);
 	const { http, uri, server_public_key, userpw } = config;
 	uris.push(uri);
 
 	const challenge = genRandomString(25);
-	await testInvalidCredentials(t, {
+	await testInvalidCredentials({
 		route: '/api/instance/login',
 		port: http,
 		encrypted: {

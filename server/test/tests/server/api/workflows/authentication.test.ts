@@ -5,10 +5,12 @@ import { genRandomString } from '../../../../../app/lib/util';
 import { doSingleQuery } from '../../../../lib/db';
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
+import { after } from 'mocha';
 
-const uris = captureURIs(test);
-test('can log in after registering instance', async () => {
-	const config = await genUserAndDb(t);
+
+const uris = captureURIs(after);
+it('can log in after registering instance', async () => {
+	const config = await genUserAndDb();
 	const server = await createServer(config);
 	const { 
 		http, 
@@ -85,8 +87,8 @@ test('can log in after registering instance', async () => {
 		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 	})();
 });
-test('can log out after logging in', async () => {
-	const config = await genUserAndDb(t, {
+it('can log out after logging in', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
@@ -142,8 +144,8 @@ test('can log out after logging in', async () => {
 		assert.isTrue(response.success, 'API call succeeded')
 	})();
 });
-test('can log in and extend key', async () => {
-	const config = await genUserAndDb(t, {
+it('can log in and extend key', async () => {
+	const config = await genUserAndDb({
 		account_twofactor_enabled: false
 	});
 	const server = await createServer(config);
@@ -205,8 +207,8 @@ test('can log in and extend key', async () => {
 		assert.strictEqual(typeof data.auth_token, 'string', 'auth token was passed');
 	})();
 });
-test('can register an instance, log in, extend key and log out', async () => {
-	const config = await genUserAndDb(t);
+it('can register an instance, log in, extend key and log out', async () => {
+	const config = await genUserAndDb();
 	const server = await createServer(config);
 	const { 
 		http, 
