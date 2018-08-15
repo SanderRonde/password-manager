@@ -2,7 +2,6 @@ import { GetRequired, GetOptional, GetEncrypted, GetOptionalEncrypted, APIFns, A
 import { doServerAPIRequest, genUserAndDb, createServer } from "./util";
 import { ChildProcess } from "child_process";
 import { assert } from 'chai';
-import { it } from 'mocha';
 
 async function doServerSetupAndBreakdown(uris: string[]) {
 	const config = await genUserAndDb();

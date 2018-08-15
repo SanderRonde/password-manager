@@ -1,8 +1,10 @@
 import { isMongoConnected } from '../lib/db';
 import { assert } from 'chai';
 
-console.log('Doing enviroment tests');
-it('has set up mongo', async () => {
-	console.log('inside enviroment test');
-	assert.isTrue(await isMongoConnected())
-});
+export function enviromentTests() {
+	describe('Enviroment', () => {
+		it('has set up mongo', async () => {
+			assert.isTrue(await isMongoConnected())
+		});
+	});
+}

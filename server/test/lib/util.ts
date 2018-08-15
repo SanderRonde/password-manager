@@ -9,7 +9,6 @@ import { EventEmitter } from "events";
 import { Readable } from "stream";
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
-import { after } from 'mocha';
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as http from 'http'
@@ -52,9 +51,9 @@ export async function genTempDatabase(): Promise<string> {
 	return uri;
 }
 
-export function captureCreatedFiles(afterTest: typeof after): string[] {
+export function captureCreatedFiles(): string[] {
 	const arr: string[] = [];
-	afterTest('Delete files', async () => {
+	after('Delete files', async () => {
 		await Promise.all(arr.map(async (filepath) => {
 			await fs.unlink(filepath).catch(() => {});
 		}));
@@ -62,9 +61,9 @@ export function captureCreatedFiles(afterTest: typeof after): string[] {
 	return arr;
 }
 
-export function captureURIs(afterTest: typeof after): string[] {
+export function captureURIs(): string[] {
 	const arr: string[] = [];
-	afterTest('Clear databases', async () => {
+	after('Clear databases', async () => {
 		await Promise.all(arr.map(clearDB));
 	});
 	return arr;
