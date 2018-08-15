@@ -85,8 +85,7 @@ export function backupTest() {
 				assert.isTrue(await hasCreatedDBWithPW(dbpw, uri));
 			})();
 		});
+		backupLoadTest();
+		backupLocalTest();
 	});
-
-	backupLoadTest();
-	backupLocalTest();
 }

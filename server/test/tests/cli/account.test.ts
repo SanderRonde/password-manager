@@ -100,8 +100,7 @@ export function accountTest() {
 				done();
 			})();
 		});
+		accountCreateTest();
+		accountDeleteTest();
 	});
-
-	accountCreateTest();
-	accountDeleteTest();
 }

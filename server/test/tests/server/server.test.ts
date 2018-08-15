@@ -137,9 +137,8 @@ export function serverTest() {
 
 			proc.check();
 		});
+		tokenTest();
+		rateLimitTest();
+		APITest();
 	});
-
-	tokenTest();
-	rateLimitTest();
-	APITest();
 }

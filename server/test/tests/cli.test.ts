@@ -6,7 +6,9 @@ import { backupTest } from './cli/backup.test';
 import { ProcRunner } from '../lib/procrunner';
 
 export function cliTest() {
-	describe('CLI', () => {
+	describe('CLI', function() {
+		this.timeout(1000 * 60 * 5);
+		
 		it('display help information when called without args', async () => {
 			const proc = new ProcRunner([]);
 			for (const line of EXECUTABLE_SPECIFIC_HELP.split('\n').slice(0, -1)) {
@@ -17,10 +19,9 @@ export function cliTest() {
 			await proc.run();
 			proc.check();
 		});
+		cliVersionTest();
+		genConfigTest();
+		backupTest();
+		accountTest();
 	});
-
-	cliVersionTest();
-	genConfigTest();
-	backupTest();
-	accountTest();
 }
