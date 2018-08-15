@@ -21,7 +21,8 @@ export function serverTest() {
 				'--no-rate-limit',
 				'-p', dbpw,
 				'-d', uri,
-				'--no-https-only'
+				'--no-https-only',
+				'--debug'
 			]);
 
 			proc.expectWrite(`HTTP server listening on port ${http}`)
@@ -39,12 +40,13 @@ export function serverTest() {
 				'--http', httpPort + '',
 				'--no-rate-limit',
 				'-p', dbpw,
-				'-d', uri
+				'-d', uri,
+				'--debug'
 			]);
 
-			proc.expectWrite(`HTTP server listening on port ${httpPort}`)
 			proc.expectWrite('You enabled HTTPS only mode but haven\'t provided HTTPS certs,' + 
 				' this means all requests are redirected to a non-existent server');
+			proc.expectWrite(`HTTP server listening on port ${httpPort}`)
 			proc.expectExit(-1);
 
 			proc.run(Infinity);
@@ -68,10 +70,11 @@ export function serverTest() {
 					path: '/login',
 				}, (res) => {
 					res.setEncoding('utf8');
-					res.once('end', () => {
+					res.on('data', () => {});
+					res.on('end', () => {
 						resolve(res.statusCode);
 					});
-					res.once('error', (err) => {
+					res.on('error', (err) => {
 						reject(err);
 					});
 				});
@@ -94,12 +97,11 @@ export function serverTest() {
 				'--no-rate-limit',
 				'-p', dbpw,
 				'-d', uri,
-				'--no-https-only'
+				'--no-https-only',
+				'--debug'
 			]);
 
 			proc.expectWrite(`HTTP server listening on port ${httpPort}`)
-			proc.expectWrite('You enabled HTTPS only mode but haven\'t provided HTTPS certs,' + 
-				' this means all requests are redirected to a non-existent server');
 			proc.expectExit(-1);
 
 			proc.run(Infinity);
@@ -123,9 +125,10 @@ export function serverTest() {
 					path: '/login',
 				}, (res) => {
 					res.setEncoding('utf8');
-					res.once('end', () => {
+					res.on('end', () => {
 						resolve(res.statusCode);
 					});
+					res.on('data', () => {});
 					res.once('error', (err) => {
 						reject(err);
 					});
