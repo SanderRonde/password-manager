@@ -10,7 +10,7 @@ test('print an error when no account is passed', async t => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account',
 		'-d', uri,
 		'create'
@@ -30,7 +30,7 @@ test('fail if the database password is wrong when passed', async t => {
 		'otherwrongpwotherwrongpwotherwro' : 
 		'wrongpwwrongpwwrongpwwrongpwwron';
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account',
 		'create',
 		'-d', uri,
@@ -51,7 +51,7 @@ test('fail if the database password is wrong when entered', async t => {
 	const wrongPw = dbpw === 'wrongpwwrongpwwrongpwwrongpwwron' ? 
 		'otherwrongpwotherwrongpwotherwro' : 'wrongpwwrongpwwrongpwwrongpwwron';
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'create',
 		'-d', uri,
@@ -84,7 +84,7 @@ test('it is possible to enter the password manually', async t => {
 	uris.push(uri);
 
 	const dbpw = await genDBWithPW(uri);
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'create',
 		'-d', uri,
@@ -119,7 +119,7 @@ test('work when entering pasword correctly the third time', async t => {
 	const dbpw = await genDBWithPW(uri);
 	const wrongPw = dbpw === 'wrongpwwrongpwwrongpwwrongpwwron' ? 
 		'otherwrongpwotherwrongpwotherwro' : 'wrongpwwrongpwwrongpwwrongpwwron';
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'create',
 		'-d', uri,
@@ -158,7 +158,7 @@ test('it is possible to pass the password', async t => {
 	uris.push(uri);
 
 	const dbpw = await genDBWithPW(uri);
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'create',
 		'-d', uri,
@@ -188,7 +188,7 @@ test('ask for a new database password if not set yet', async t => {
 	const dbpw = genRandomString(15);
 	uris.push(uri);
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'create',
 		'-d', uri,
@@ -225,7 +225,7 @@ test('use the passed password to initialize the database if not set yet', async 
 
 	const dbpw = genRandomString(25);
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'create',
 		'-d', uri,

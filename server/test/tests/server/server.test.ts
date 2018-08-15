@@ -7,7 +7,7 @@ const uris = captureURIs(test);
 test('server can be started', async t => {
 	const { dbpw, uri, http } = await genUserAndDb(t);
 	uris.push(uri);
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'server',
 		'--http', http + '',
 		'--no-rate-limit',
@@ -26,7 +26,7 @@ test('server can be started', async t => {
 test('requests made over HTTP are redirected to HTTPS by default', async t => {
 	const { dbpw, uri, http: httpPort } = await genUserAndDb(t);
 	uris.push(uri);
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'server',
 		'--http', httpPort + '',
 		'--no-rate-limit',
@@ -80,7 +80,7 @@ test('requests made over HTTP are redirected to HTTPS by default', async t => {
 test('requests made over HTTP are not redirected to HTTPS if disabled', async t => {
 	const { dbpw, uri, http: httpPort } = await genUserAndDb(t);
 	uris.push(uri);
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'server',
 		'--http', httpPort + '',
 		'--no-rate-limit',

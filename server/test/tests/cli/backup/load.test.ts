@@ -25,7 +25,7 @@ test('print an error when no input is passed', async t => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'backup',
 		'load',
 		'-d', uri
@@ -40,7 +40,7 @@ test('print an error when a config file was passed', async t => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'backup',
 		'load',
 		'-c', path.join(__dirname, '../../../dummies/load.config.json'),
@@ -58,7 +58,7 @@ test('fail when input file does not exist', async t => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'backup',
 		'load',
 		'-i', path.join(__dirname, '../../../dummies/empty.file'),
@@ -84,7 +84,7 @@ test('succeed when restoring a passwordless backup', async t => {
 		'meta collection is empty');
 	done();
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'backup',
 		'load',
 		'-i', dumpPath,

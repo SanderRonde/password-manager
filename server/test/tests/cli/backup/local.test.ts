@@ -12,7 +12,7 @@ test('print an error when no output is passed', async t => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'backup',
 		'local',
 		'-d', uri
@@ -31,7 +31,7 @@ test('creates dump with regular args', async t => {
 	const dumpName = genRandomString(10);
 	const dumpPath = path.join(__dirname, `../../../temp/mongodump${dumpName}.dump`);
 	files.push(dumpPath);
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'backup',
 		'local',
 		'-d', uri,

@@ -7,7 +7,7 @@ import { assert } from 'chai';
 
 const uris = captureURIs(test);
 test('print an error when no command is passed', async t => {
-	const proc = new ProcRunner(t, ['account']);
+	const proc = new ProcRunner(['account']);
 	proc.expectWrite();
 	proc.expectWrite('\terror: missing required argument `create/delete\'');
 	proc.expectWrite();
@@ -17,7 +17,7 @@ test('print an error when no command is passed', async t => {
 	proc.check();
 }); 
 test('print an error when a non-command is used', async t => {
-	const proc = new ProcRunner(t, ['account', 'noncommand']);
+	const proc = new ProcRunner(['account', 'noncommand']);
 	proc.expectWrite('Invalid account action, choose "create" or "delete"');
 	proc.expectExit(1);
 
@@ -31,7 +31,7 @@ test('an added account can be deleted', async t => {
 	const dbpw = genRandomString(15);
 
 	await (async () => {
-		const proc = new ProcRunner(t, [
+		const proc = new ProcRunner([
 			'account', 
 			'create',
 			'-d', uri,
@@ -62,7 +62,7 @@ test('an added account can be deleted', async t => {
 		});
 	})();
 	await (async () => {
-		const proc = new ProcRunner(t, [
+		const proc = new ProcRunner([
 			'account', 
 			'delete',
 			'-d', uri,

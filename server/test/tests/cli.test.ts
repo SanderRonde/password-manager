@@ -3,7 +3,7 @@ import { ProcRunner } from '../lib/procrunner';
 import { assert } from 'chai';
 
 test('display help information when called without args', async t => {
-	const proc = new ProcRunner(t, []);
+	const proc = new ProcRunner([]);
 	for (const line of EXECUTABLE_SPECIFIC_HELP.split('\n').slice(0, -1)) {
 		proc.expectWrite(line);
 	}

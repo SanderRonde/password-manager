@@ -9,7 +9,7 @@ import * as fs from 'fs'
 const uris = captureURIs(test);
 const files = captureCreatedFiles(test);
 test('print an error when no command is passed', async t => {
-	const proc = new ProcRunner(t, ['backup']);
+	const proc = new ProcRunner(['backup']);
 	proc.expectWrite();
 	proc.expectWrite('\terror: missing required argument `load/googledrive/local\'');
 	proc.expectWrite();
@@ -19,7 +19,7 @@ test('print an error when no command is passed', async t => {
 	proc.check();
 }); 
 test('print an error when a non-command is used', async t => {
-	const proc = new ProcRunner(t, ['backup', 'noncommand']);
+	const proc = new ProcRunner(['backup', 'noncommand']);
 	proc.expectWrite('Invalid backup method, choose "load", "drive" or "local"');
 	proc.expectExit(1);
 
@@ -34,7 +34,7 @@ test('a backupped file can be used to restore', async t => {
 	const dbpw = await genDBWithPW(uri);
 	await (async () => {
 		files.push(dumpPath);
-		const proc = new ProcRunner(t, [
+		const proc = new ProcRunner([
 			'backup',
 			'local',
 			'-d', uri,
@@ -63,7 +63,7 @@ test('a backupped file can be used to restore', async t => {
 			'meta collection is empty');
 		done();
 
-		const proc = new ProcRunner(t, [
+		const proc = new ProcRunner([
 			'backup',
 			'load',
 			'-i', dumpPath,

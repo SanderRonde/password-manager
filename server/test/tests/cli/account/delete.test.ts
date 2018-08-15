@@ -10,7 +10,7 @@ test('print an error when no account is passed', async t => {
 	const uri = await genTempDatabase(t);
 	uris.push(uri);
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account',
 		'-d', uri,
 		'delete'
@@ -30,7 +30,7 @@ test('fail if the database password is wrong when passed', async t => {
 		'otherwrongpwotherwrongpwotherwro' : 
 		'wrongpwwrongpwwrongpwwrongpwwron';
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account',
 		'delete',
 		'-d', uri,
@@ -51,7 +51,7 @@ test('fail if the database password is wrong when entered', async t => {
 	const wrongPw = dbpw === 'wrongpwwrongpwwrongpwwrongpwwron' ? 
 		'otherwrongpwotherwrongpwotherwro' : 'wrongpwwrongpwwrongpwwrongpwwron';
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'delete',
 		'-d', uri,
@@ -89,7 +89,7 @@ test('it is possible to enter the password manually', async t => {
 		dbpw,
 		uri
 	});
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'delete',
 		'-d', uri,
@@ -131,7 +131,7 @@ test('work when entering pasword correctly the third time', async t => {
 	});
 	const wrongPw = dbpw === 'wrongpwwrongpwwrongpwwrongpwwron' ? 
 		'otherwrongpwotherwrongpwotherwro' : 'wrongpwwrongpwwrongpwwrongpwwron';
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'delete',
 		'-d', uri,
@@ -177,7 +177,7 @@ test('it is possible to pass the password', async t => {
 		dbpw,
 		uri
 	});
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'delete',
 		'-d', uri,
@@ -214,7 +214,7 @@ test('ask for a new database password if not set yet', async t => {
 		uri
 	});
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'delete',
 		'-d', uri,
@@ -258,7 +258,7 @@ test('use the passed password to initialize the database if not set yet', async 
 		uri
 	});
 
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'delete',
 		'-d', uri,
@@ -299,7 +299,7 @@ test('cancel the deletion and restore deleted items when instance changes fail',
 		dbpw,
 		uri
 	});
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'delete',
 		'-d', uri,
@@ -347,7 +347,7 @@ test('cancel the deletion and restore deleted items when password changes fail',
 		dbpw,
 		uri
 	});
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'delete',
 		'-d', uri,
@@ -396,7 +396,7 @@ test('cancel the deletion and restore deleted items when account changes fail', 
 		dbpw,
 		uri
 	});
-	const proc = new ProcRunner(t, [
+	const proc = new ProcRunner([
 		'account', 
 		'delete',
 		'-d', uri,
