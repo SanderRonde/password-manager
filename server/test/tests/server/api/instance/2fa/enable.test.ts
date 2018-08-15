@@ -66,7 +66,7 @@ test('can enable 2FA when no 2FA secret is set', async t => {
 	if (finalData.enabled) return;
 	assert.isTrue(finalData.verify_2fa_required, 
 		'further verification is needed');
-	t.is(typeof finalData.auth_url, 'string', 'auth_url is a string');
+	assert.strictEqual(typeof finalData.auth_url, 'string', 'auth_url is a string');
 	t.regex(finalData.auth_url, 
 		/otpauth:\/\/totp\/(.*)\?secret=\w+/,
 		'url is an otp auth url');
@@ -130,7 +130,7 @@ test('can enable 2FA when a 2FA secret is already set', async t => {
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 	t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
-	t.is(decrypt, true, '2FA is now enabled');
+	assert.strictEqual(decrypt, true, '2FA is now enabled');
 });
 test('does not change it if 2FA was aleady enabled in this instance', async t => {
 	const config = await genUserAndDb(t, {
@@ -164,7 +164,7 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
-	t.is((data as {
+	assert.strictEqual((data as {
 		message: 'state unchanged (was already set)'
 	}).message, 'state unchanged (was already set)', 'state is unchanged');
 
@@ -178,7 +178,7 @@ test('does not change it if 2FA was aleady enabled in this instance', async t =>
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 	t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
-	t.is(decrypt, true, '2FA is still enabled');
+	assert.strictEqual(decrypt, true, '2FA is still enabled');
 });
 test('fails if password is wrong', async t => {
 	const config = await genUserAndDb(t);

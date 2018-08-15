@@ -76,7 +76,7 @@ test('can disable 2FA when given a valid 2FA token', async t => {
 	const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 	t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decrypt === ERRS.INVALID_DECRYPT) return;
-	t.is(decrypt, false, '2FA is now disabled');
+	assert.strictEqual(decrypt, false, '2FA is now disabled');
 });
 test('state is unchanged if already disabled', async t => {
 	const config = await genUserAndDb(t, {
@@ -110,7 +110,7 @@ test('state is unchanged if already disabled', async t => {
 	assert.isTrue(response.success, 'API call succeeded');
 	if (!response.success) return;
 	const data = response.data;
-	t.is((data as {
+	assert.strictEqual((data as {
 		message: 'state unchanged (was already set)'
 	}).message, 'state unchanged (was already set)', 'state is unchanged');
 });
@@ -150,7 +150,7 @@ test('fails if an invalid token is passed', async t => {
 
 	assert.isFalse(response.success, 'API call failed');
 	if (response.success) return;
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
+	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
 test('fails if password is wrong', async t => {
 	const twofactor = speakeasy.generateSecret();

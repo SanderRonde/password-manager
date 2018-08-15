@@ -78,7 +78,7 @@ test('works if params are correct', async t => {
 	if (response.success === false) return;
 	
 	const data = response.data;
-	t.is(typeof data.new_reset_key, 'string', 'reset key is a string');
+	assert.strictEqual(typeof data.new_reset_key, 'string', 'reset key is a string');
 
 	//Check if those changes were actually made
 	const { db, done } = await getDB(uri);
@@ -105,7 +105,7 @@ test('works if params are correct', async t => {
 	for (const { encrypted, twofactor_enabled } of passwords) {
 		const decryptedtwofactor = decryptWithSalt(twofactor_enabled, dbpw);
 		t.not(decryptedtwofactor, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-		t.is(decryptedtwofactor, false, '2FA was disabled');
+		assert.strictEqual(decryptedtwofactor, false, '2FA was disabled');
 
 		const dbDecrypted = decrypt(encrypted, dbpw);
 		t.not(dbDecrypted, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
@@ -118,13 +118,13 @@ test('works if params are correct', async t => {
 	for (const { twofactor_enabled } of instances) {
 		const decryptedtwofactor = decryptWithSalt(twofactor_enabled, dbpw);
 		t.not(decryptedtwofactor, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-		t.is(decryptedtwofactor, false, '2FA was disabled');
+		assert.strictEqual(decryptedtwofactor, false, '2FA was disabled');
 	}
 
 	const decryptedPw = decrypt(account.pw, dbpw);
 	if (isErr(t, decryptedPw)) return;
 
-	t.is(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
+	assert.strictEqual(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted password matches new password');
 	
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
@@ -132,7 +132,7 @@ test('works if params are correct', async t => {
 	const decryptedResetKey = decrypt(dbDecryptedResetKey, data.new_reset_key);
 	if (isErr(t, decryptedResetKey)) return;
 	assert.isTrue(decryptedResetKey.integrity, 'integrity is true');
-	t.is(decryptedResetKey.pw, newMasterPassword, 'new master password can be decrypted');
+	assert.strictEqual(decryptedResetKey.pw, newMasterPassword, 'new master password can be decrypted');
 });
 test('cancels if failing on password changes', async t => {
 	const resetKey = genRandomString(RESET_KEY_LENGTH);
@@ -169,7 +169,7 @@ test('cancels if failing on password changes', async t => {
 	assert.isFalse(response.success, 'request failed');
 	if (response.success === true) return;
 	
-	t.is(response.ERR, API_ERRS.SERVER_ERROR, 'threw a server error');
+	assert.strictEqual(response.ERR, API_ERRS.SERVER_ERROR, 'threw a server error');
 
 	//Check if those changes were actually made
 	const { db, done } = await getDB(uri);
@@ -199,7 +199,7 @@ test('cancels if failing on password changes', async t => {
 		if (dbDecrypted === ERRS.INVALID_DECRYPT) return;
 
 		const pwDecrypted = decrypt(dbDecrypted, hash(pad(newMasterPassword, 'masterpwdecrypt')));
-		t.is(pwDecrypted, ERRS.INVALID_DECRYPT, 'is an invalid decrypt');
+		assert.strictEqual(pwDecrypted, ERRS.INVALID_DECRYPT, 'is an invalid decrypt');
 	}
 
 	t.not(instances.map((instance) => {
@@ -211,7 +211,7 @@ test('cancels if failing on password changes', async t => {
 
 	t.not(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted does not match new password');
-	t.is(decryptedPw, hash(pad(userpw, 'masterpwverify')),
+	assert.strictEqual(decryptedPw, hash(pad(userpw, 'masterpwverify')),
 		'decrypte password is the same as the old one')
 	
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
@@ -254,7 +254,7 @@ test('cancels if failing on instance changes', async t => {
 	assert.isFalse(response.success, 'request failed');
 	if (response.success === true) return;
 	
-	t.is(response.ERR, API_ERRS.SERVER_ERROR, 'threw a server error');
+	assert.strictEqual(response.ERR, API_ERRS.SERVER_ERROR, 'threw a server error');
 
 	//Check if those changes were actually made
 	const { db, done } = await getDB(uri);
@@ -284,7 +284,7 @@ test('cancels if failing on instance changes', async t => {
 		if (dbDecrypted === ERRS.INVALID_DECRYPT) return;
 
 		const pwDecrypted = decrypt(dbDecrypted, hash(pad(newMasterPassword, 'masterpwdecrypt')));
-		t.is(pwDecrypted, ERRS.INVALID_DECRYPT, 'is an invalid decrypt');
+		assert.strictEqual(pwDecrypted, ERRS.INVALID_DECRYPT, 'is an invalid decrypt');
 	}
 
 	t.not(instances.map((instance) => {
@@ -296,7 +296,7 @@ test('cancels if failing on instance changes', async t => {
 
 	t.not(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted does not match new password');
-	t.is(decryptedPw, hash(pad(userpw, 'masterpwverify')),
+	assert.strictEqual(decryptedPw, hash(pad(userpw, 'masterpwverify')),
 		'decrypte password is the same as the old one')
 	
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
@@ -339,7 +339,7 @@ test('cancels if failing on account changes', async t => {
 	assert.isFalse(response.success, 'request failed');
 	if (response.success === true) return;
 	
-	t.is(response.ERR, API_ERRS.SERVER_ERROR, 'threw a server error');
+	assert.strictEqual(response.ERR, API_ERRS.SERVER_ERROR, 'threw a server error');
 
 	//Check if those changes were actually made
 	const { db, done } = await getDB(uri);
@@ -369,7 +369,7 @@ test('cancels if failing on account changes', async t => {
 		if (dbDecrypted === ERRS.INVALID_DECRYPT) return;
 
 		const pwDecrypted = decrypt(dbDecrypted, hash(pad(newMasterPassword, 'masterpwdecrypt')));
-		t.is(pwDecrypted, ERRS.INVALID_DECRYPT, 'is an invalid decrypt');
+		assert.strictEqual(pwDecrypted, ERRS.INVALID_DECRYPT, 'is an invalid decrypt');
 	}
 
 	t.not(instances.map((instance) => {
@@ -381,7 +381,7 @@ test('cancels if failing on account changes', async t => {
 
 	t.not(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 		'decrypted does not match new password');
-	t.is(decryptedPw, hash(pad(userpw, 'masterpwverify')),
+	assert.strictEqual(decryptedPw, hash(pad(userpw, 'masterpwverify')),
 		'decrypte password is the same as the old one')
 	
 	const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);

@@ -52,7 +52,7 @@ test('requests made over HTTP are redirected to HTTPS by default', async t => {
 			}
 		});
 	});
-	t.is(await new Promise<number>((resolve, reject) => {
+	assert.strictEqual(await new Promise<number>((resolve, reject) => {
 		const req = http.request({
 			port: httpPort,
 			hostname: '127.0.0.1',
@@ -107,7 +107,7 @@ test('requests made over HTTP are not redirected to HTTPS if disabled', async t 
 			}
 		});
 	});
-	t.is(await new Promise<number>((resolve, reject) => {
+	assert.strictEqual(await new Promise<number>((resolve, reject) => {
 		const req = http.request({
 			port: httpPort,
 			hostname: '127.0.0.1',

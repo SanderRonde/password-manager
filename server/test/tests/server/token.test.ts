@@ -48,9 +48,9 @@ test('invalidates all account tokens if an old token is extended', async t => {
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 
@@ -70,7 +70,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 		return token;
 	})();
 
@@ -86,7 +86,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 		if (response.success) {
 			return;
 		}
-		t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+		assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 			'invalid credentials error is thrown');
 	})();
 
@@ -99,7 +99,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 
 		assert.isFalse(response.success, 'API call failed');
 		if (response.success) return;
-		t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+		assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 			'invalid credentials error is thrown');
 	})();
 
@@ -145,9 +145,9 @@ test('invalidates a token if its count is wrong', async t => {
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 
@@ -167,7 +167,7 @@ test('invalidates a token if its count is wrong', async t => {
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 		return token;
 	})();
 
@@ -183,7 +183,7 @@ test('invalidates a token if its count is wrong', async t => {
 		if (response.success) {
 			return;
 		}
-		t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+		assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 			'invalid credentials error is thrown');
 	})();
 
@@ -196,7 +196,7 @@ test('invalidates a token if its count is wrong', async t => {
 
 		assert.isFalse(response.success, 'API call failed');
 		if (response.success) return;
-		t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+		assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 			'invalid credentials error is thrown');
 	})();
 
@@ -246,7 +246,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 		});
 		t.truthy(instance, 'instance was created and ID is correct');
 
-		t.is(typeof server_key, 'string', 'type of serverkey is string');
+		assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 		return {
 			instanceId: instance_id,
 			clientPrivateKey: keyPair.privateKey,
@@ -279,9 +279,9 @@ test('invalidates a token if the instance id is wrong', async t => {
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 
@@ -301,7 +301,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 		return token;
 	})();
 
@@ -317,7 +317,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 		if (response.success) {
 			return;
 		}
-		t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+		assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 			'invalid credentials error is thrown');
 	})();
 
@@ -330,7 +330,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 
 		assert.isFalse(response.success, 'API call failed');
 		if (response.success) return;
-		t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+		assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 			'invalid credentials error is thrown');
 	})();
 

@@ -42,7 +42,7 @@ test('a server config can generated', async t => {
 		path.join(__dirname, '../../../app/actions/server/config.json'), {
 			encoding: 'utf8'
 		});
-	t.is(content, expected,
+	assert.strictEqual(content, expected,
 		'config file matches expected');
 });
 test('a server config can generated to a custom path', async t => {
@@ -67,7 +67,7 @@ test('a server config can generated to a custom path', async t => {
 		path.join(__dirname, '../../../app/actions/server/config.json'), {
 			encoding: 'utf8'
 		});
-	t.is(content, expected,
+	assert.strictEqual(content, expected,
 		'config file matches expected');
 });
 test('a backup config can generated', async t => {
@@ -88,7 +88,7 @@ test('a backup config can generated', async t => {
 		path.join(__dirname, '../../../app/actions/backup/config.json'), {
 			encoding: 'utf8'
 		});
-	t.is(content, expected,
+	assert.strictEqual(content, expected,
 		'config file matches expected');
 });
 test('a backup config can generated to a custom path', async t => {
@@ -113,6 +113,6 @@ test('a backup config can generated to a custom path', async t => {
 		path.join(__dirname, '../../../app/actions/backup/config.json'), {
 			encoding: 'utf8'
 		});
-	t.is(content, expected,
+	assert.strictEqual(content, expected,
 		'config file matches expected');
 });

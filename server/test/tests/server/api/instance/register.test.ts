@@ -49,7 +49,7 @@ test('instance can be created', async t => {
 	})
 	t.truthy(instance, 'instance was created and ID is correct');
 
-	t.is(typeof server_key, 'string', 'type of serverkey is string');
+	assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 });
 test('fails if password is wrong', async t => {
 	const config = await genUserAndDb(t);

@@ -54,9 +54,9 @@ test('login token can be generated when 2FA is disabled', async t => {
 	}
 	const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 	t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-	t.is(typeof token, 'string', 'token is a string');
+	assert.strictEqual(typeof token, 'string', 'token is a string');
 
-	t.is(data.challenge, challenge, 'challenge matches');
+	assert.strictEqual(data.challenge, challenge, 'challenge matches');
 });
 test('login token can be generated when 2FA is enabled', async t => {
 	const config = await genUserAndDb(t, {
@@ -101,9 +101,9 @@ test('login token can be generated when 2FA is enabled', async t => {
 	}
 	const token = decryptWithPrivateKey(data.twofactor_auth_token, instance_private_key);
 	t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-	t.is(typeof token, 'string', 'token is a string');
+	assert.strictEqual(typeof token, 'string', 'token is a string');
 
-	t.is(data.challenge, challenge, 'challenge matches');
+	assert.strictEqual(data.challenge, challenge, 'challenge matches');
 });
 test('fails if instance id is wrong', async t => {
 	const config = await genUserAndDb(t);

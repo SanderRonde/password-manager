@@ -80,7 +80,7 @@ test('succeed when restoring a passwordless backup', async t => {
 	await clearDB(uri);
 
 	const { db, done } = await getDB(uri);
-	t.is((await db.collection('meta').find().toArray()).length, 0,
+	assert.strictEqual((await db.collection('meta').find().toArray()).length, 0,
 		'meta collection is empty');
 	done();
 

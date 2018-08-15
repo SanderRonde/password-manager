@@ -133,7 +133,7 @@ test('works if params are correct', async t => {
 	if (response.success === false) return;
 	
 	const data = response.data;
-	t.is(typeof data.new_reset_key, 'string', 'reset key is a string');
+	assert.strictEqual(typeof data.new_reset_key, 'string', 'reset key is a string');
 
 	const { db, done } = await getDB(uri);
 	const instance = await db.collection('instances').findOne({
@@ -153,5 +153,5 @@ test('works if params are correct', async t => {
 	if (decryptedResetKey === ERRS.INVALID_DECRYPT) return;
 
 	assert.isTrue(decryptedResetKey.integrity, 'integrity is preserved');
-	t.is(decryptedResetKey.pw, userpw, 'passwords match');
+	assert.strictEqual(decryptedResetKey.pw, userpw, 'passwords match');
 });

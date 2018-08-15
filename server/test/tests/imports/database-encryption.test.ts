@@ -19,7 +19,7 @@ test('obfuscated value can be deobfuscated', t => {
 	for (const length of lengths) {
 		const key = genRandomString(length);
 
-		t.is(enc.deObfuscateKey(enc.obfuscateKey(key)), key,
+		assert.strictEqual(enc.deObfuscateKey(enc.obfuscateKey(key)), key,
 			`deobfuscated key of length ${length} is the same as original`);
 	}
 });
@@ -29,7 +29,7 @@ test('dbencrypted value can be decrypted', t => {
 	enc.setKey(key);
 
 	const data = genRandomString(50);
-	t.is(enc.dbDecrypt(enc.dbEncrypt(data)), data,
+	assert.strictEqual(enc.dbDecrypt(enc.dbEncrypt(data)), data,
 		'decrypted data is the same as original');
 });
 test('salted and encrypted value can be decrypted', t => {
@@ -38,6 +38,6 @@ test('salted and encrypted value can be decrypted', t => {
 	enc.setKey(key);
 
 	const data = genRandomString(50);
-	t.is(enc.dbDecryptWithSalt(enc.dbEncryptWithSalt(data)), data,
+	assert.strictEqual(enc.dbDecryptWithSalt(enc.dbEncryptWithSalt(data)), data,
 		'decrypted data is the same as original');
 });

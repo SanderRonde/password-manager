@@ -38,7 +38,7 @@ test('can generate a new key and then reset with it', async t => {
 		if (response.success === false) return;
 		
 		const data = response.data;
-		t.is(typeof data.new_reset_key, 'string', 'reset key is a string');
+		assert.strictEqual(typeof data.new_reset_key, 'string', 'reset key is a string');
 
 		const { db, done } = await getDB(uri);
 		const instance = await db.collection('instances').findOne({
@@ -58,7 +58,7 @@ test('can generate a new key and then reset with it', async t => {
 		if (decryptedResetKey === ERRS.INVALID_DECRYPT) return;
 
 		assert.isTrue(decryptedResetKey.integrity, 'integrity is preserved');
-		t.is(decryptedResetKey.pw, userpw, 'passwords match');
+		assert.strictEqual(decryptedResetKey.pw, userpw, 'passwords match');
 
 		return data.new_reset_key;
 	})();
@@ -82,7 +82,7 @@ test('can generate a new key and then reset with it', async t => {
 		if (response.success === false) return;
 		
 		const data = response.data;
-		t.is(typeof data.new_reset_key, 'string', 'reset key is a string');
+		assert.strictEqual(typeof data.new_reset_key, 'string', 'reset key is a string');
 
 		//Check if those changes were actually made
 		const { db, done } = await getDB(uri);
@@ -109,7 +109,7 @@ test('can generate a new key and then reset with it', async t => {
 		for (const { encrypted, twofactor_enabled } of passwords) {
 			const decryptedtwofactor = decryptWithSalt(twofactor_enabled, dbpw);
 			t.not(decryptedtwofactor, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			t.is(decryptedtwofactor, false, '2FA was disabled');
+			assert.strictEqual(decryptedtwofactor, false, '2FA was disabled');
 
 			const dbDecrypted = decrypt(encrypted, dbpw);
 			t.not(dbDecrypted, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
@@ -122,13 +122,13 @@ test('can generate a new key and then reset with it', async t => {
 		for (const { twofactor_enabled } of instances) {
 			const decryptedtwofactor = decryptWithSalt(twofactor_enabled, dbpw);
 			t.not(decryptedtwofactor, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			t.is(decryptedtwofactor, false, '2FA was disabled');
+			assert.strictEqual(decryptedtwofactor, false, '2FA was disabled');
 		}
 
 		const decryptedPw = decrypt(account.pw, dbpw);
 		if (isErr(t, decryptedPw)) return;
 
-		t.is(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
+		assert.strictEqual(decryptedPw, hash(pad(newMasterPassword, 'masterpwverify')),
 			'decrypted password matches new password');
 		
 		const dbDecryptedResetKey = decrypt(account.reset_key, dbpw);
@@ -136,6 +136,6 @@ test('can generate a new key and then reset with it', async t => {
 		const decryptedResetKey = decrypt(dbDecryptedResetKey, data.new_reset_key);
 		if (isErr(t, decryptedResetKey)) return;
 		assert.isTrue(decryptedResetKey.integrity, 'integrity is true');
-		t.is(decryptedResetKey.pw, newMasterPassword, 'new master password can be decrypted');
+		assert.strictEqual(decryptedResetKey.pw, newMasterPassword, 'new master password can be decrypted');
 	})();
 });

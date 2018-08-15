@@ -59,7 +59,7 @@ test('can be removed if 2FA is disabled', async t => {
 			_id: new mongo.ObjectId(passwordId!)
 		});
 	});
-	t.is(password, null, 'password is gone');
+	assert.strictEqual(password, null, 'password is gone');
 });
 test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 	const secret = speakeasy.generateSecret({
@@ -100,7 +100,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 	if (response.success) {
 		return;
 	}
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 		'invalid credentials error was thrown');
 	
 	//Check if the password is gone
@@ -161,7 +161,7 @@ test('can be removed if 2FA is enabled', async t => {
 			_id: new mongo.ObjectId(passwordId!)
 		});
 	});
-	t.is(password, null, 'password is gone');
+	assert.strictEqual(password, null, 'password is gone');
 });
 test('fails if auth token is wrong', async t => {
 	const secret = speakeasy.generateSecret({

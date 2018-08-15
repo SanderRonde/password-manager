@@ -85,12 +85,12 @@ test('password can be updated', async t => {
 	t.not(instance, null, 'instance was found');
 	done();
 
-	t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+	assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 		'user ids match');
 	const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 		dbpw);
 	t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-	t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+	assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 	const actualWebsites = password.websites.map(({ exact, host }) => {
 		return {
@@ -110,14 +110,14 @@ test('password can be updated', async t => {
 		const host = url.parse(expectedWebsite).hostname ||
 			url.parse(expectedWebsite).host || expectedWebsite;
 		t.truthy(actualWebsite, 'a website exists at given index');
-		t.is(actualWebsite.host, host, 'hosts match');
-		t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+		assert.strictEqual(actualWebsite.host, host, 'hosts match');
+		assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 	}
 
 	const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
 	t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-	t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 });
 test('fails if it requires 2FA and no 2FA token is passed', async t => {
 	const { base32 } = speakeasy.generateSecret({
@@ -169,7 +169,7 @@ test('fails if it requires 2FA and no 2FA token is passed', async t => {
 	if (response.success) {
 		return;
 	}
-	t.is(response.ERR, API_ERRS.MISSING_PARAMS, 'failed with missing parameters');
+	assert.strictEqual(response.ERR, API_ERRS.MISSING_PARAMS, 'failed with missing parameters');
 });
 test('password can be updated if 2FA is enabled', async t => {
 	const { base32 } = speakeasy.generateSecret({
@@ -239,12 +239,12 @@ test('password can be updated if 2FA is enabled', async t => {
 	t.not(instance, null, 'instance was found');
 	done();
 
-	t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+	assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 		'user ids match');
 	const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 		dbpw);
 	t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-	t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+	assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 	const actualWebsites = password.websites.map(({ exact, host }) => {
 		return {
@@ -264,14 +264,14 @@ test('password can be updated if 2FA is enabled', async t => {
 		const host = url.parse(expectedWebsite).hostname ||
 			url.parse(expectedWebsite).host || expectedWebsite;
 		t.truthy(actualWebsite, 'a website exists at given index');
-		t.is(actualWebsite.host, host, 'hosts match');
-		t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+		assert.strictEqual(actualWebsite.host, host, 'hosts match');
+		assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 	}
 
 	const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
 	t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-	t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 });
 test('fails if token is wrong', async t => {
 	const config = await genUserAndDb(t, {

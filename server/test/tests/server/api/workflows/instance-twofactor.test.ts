@@ -57,7 +57,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		});
 		t.truthy(instance, 'instance was created and ID is correct');
 
-		t.is(typeof server_key, 'string', 'type of serverkey is string');
+		assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 		return {
 			instance_id: instance_id,
 			server_key: server_key
@@ -106,7 +106,7 @@ test('can enable 2FA after registering instance when 2FA is enabled for the user
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, true, '2FA is now enabled');
+		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
 });
 test('can enable 2FA and then disable it', async t => {
@@ -168,7 +168,7 @@ test('can enable 2FA and then disable it', async t => {
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, true, '2FA is now enabled');
+		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
 	await (async () => {
 		const response = JSON.parse(await doServerAPIRequest({ 
@@ -213,7 +213,7 @@ test('can enable 2FA and then disable it', async t => {
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, false, '2FA is now disabled');
+		assert.strictEqual(decrypt, false, '2FA is now disabled');
 	})();
 });
 test('can enable 2FA, disable 2FA and then enable it', async t => {
@@ -275,7 +275,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, true, '2FA is now enabled');
+		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
 	await (async () => {
 		const response = JSON.parse(await doServerAPIRequest({ 
@@ -318,7 +318,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, false, '2FA is now disabled');
+		assert.strictEqual(decrypt, false, '2FA is now disabled');
 	})();
 	await (async () => {	
 		const response = JSON.parse(await doServerAPIRequest({ 
@@ -363,7 +363,7 @@ test('can enable 2FA, disable 2FA and then enable it', async t => {
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, true, '2FA is now enabled');
+		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
 });
 test('can verify a login requiring 2FA', async t => {
@@ -410,9 +410,9 @@ test('can verify a login requiring 2FA', async t => {
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 	
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 	const authToken = await (async () => {
@@ -432,7 +432,7 @@ test('can verify a login requiring 2FA', async t => {
 		if (!response.success) return;
 
 		const data = response.data;
-		t.is(typeof data.auth_token, 'string', 'auth token is a string');
+		assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 		const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key);
 		t.not(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypted === ERRS.INVALID_DECRYPT) return;
@@ -456,7 +456,7 @@ test('can verify a login requiring 2FA', async t => {
 			return;
 		}
 		const data = response.data;
-		t.is(typeof data.auth_token, 'string', 'new auth token was passed');
+		assert.strictEqual(typeof data.auth_token, 'string', 'new auth token was passed');
 	})();
 });
 test('can register an instance, enable 2FA, log in with it and disable 2FA', async t => {
@@ -507,7 +507,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		});
 		t.truthy(instance, 'instance was created and ID is correct');
 
-		t.is(typeof server_key, 'string', 'type of serverkey is string');
+		assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 		return {
 			instance_id: instance_id,
 			server_public_key: server_key,
@@ -555,7 +555,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, true, '2FA is now enabled');
+		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
 	const pw_verification_token = await (async () => {	
 		const challenge = genRandomString(25);
@@ -583,9 +583,9 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 	
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 	const authToken = await (async () => {
@@ -605,7 +605,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		if (!response.success) return;
 
 		const data = response.data;
-		t.is(typeof data.auth_token, 'string', 'auth token is a string');
+		assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 		const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key!);
 		t.not(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypted === ERRS.INVALID_DECRYPT) return;
@@ -628,7 +628,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 			return;
 		}
 		const data = response.data;
-		t.is(typeof data.auth_token, 'string', 'new auth token was passed');
+		assert.strictEqual(typeof data.auth_token, 'string', 'new auth token was passed');
 	})();
 	await (async () => {
 		const response = JSON.parse(await doServerAPIRequest({ 
@@ -673,7 +673,7 @@ test('can register an instance, enable 2FA, log in with it and disable 2FA', asy
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, false, '2FA is now disabled');
+		assert.strictEqual(decrypt, false, '2FA is now disabled');
 	})();
 });
 
@@ -723,7 +723,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		});
 		t.truthy(instance, 'instance was created and ID is correct');
 
-		t.is(typeof server_key, 'string', 'type of serverkey is string');
+		assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 		return {
 			instance_id: instance_id,
 			server_public_key: server_key,
@@ -774,7 +774,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, false, '2FA is still disabled');
+		assert.strictEqual(decrypt, false, '2FA is still disabled');
 
 		return secret as string;
 	})();
@@ -799,7 +799,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, true, '2FA is now enabled');
+		assert.strictEqual(decrypt, true, '2FA is now enabled');
 	})();
 	const pw_verification_token = await (async () => {
 		const challenge = genRandomString(25);
@@ -827,9 +827,9 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 	
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 	const authToken = await (async () => {
@@ -849,7 +849,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		if (!response.success) return;
 
 		const data = response.data;
-		t.is(typeof data.auth_token, 'string', 'auth token is a string');
+		assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 		const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key!);
 		t.not(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypted === ERRS.INVALID_DECRYPT) return;
@@ -872,7 +872,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 			return;
 		}
 		const data = response.data;
-		t.is(typeof data.auth_token, 'string', 'new auth token was passed');
+		assert.strictEqual(typeof data.auth_token, 'string', 'new auth token was passed');
 	})();
 	await (async () => {
 		const response = JSON.parse(await doServerAPIRequest({ 
@@ -917,6 +917,6 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		const decrypt = decryptWithSalt(instance.twofactor_enabled, dbpw);
 		t.not(decrypt, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypt === ERRS.INVALID_DECRYPT) return;
-		t.is(decrypt, false, '2FA is now disabled');
+		assert.strictEqual(decrypt, false, '2FA is now disabled');
 	})();
 });

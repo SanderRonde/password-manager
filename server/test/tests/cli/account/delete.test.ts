@@ -328,11 +328,11 @@ test('cancel the deletion and restore deleted items when instance changes fail',
 	proc.check();
 
 	const { db, done } = await getDB(uri);
-	t.is(await getCollectionLength(db.collection('passwords')), 5,
+	assert.strictEqual(await getCollectionLength(db.collection('passwords')), 5,
 		'hasn\'t deleted any passwords');
-	t.is(await getCollectionLength(db.collection('instances')), 5,
+	assert.strictEqual(await getCollectionLength(db.collection('instances')), 5,
 		'hasn\'t deleted any instances');
-	t.is(await getCollectionLength(db.collection('users')), 3,
+	assert.strictEqual(await getCollectionLength(db.collection('users')), 3,
 		'hasn\'t deleted any users');
 	done();
 });
@@ -377,11 +377,11 @@ test('cancel the deletion and restore deleted items when password changes fail',
 	proc.check();
 
 	const { db, done } = await getDB(uri);
-	t.is(await getCollectionLength(db.collection('passwords')), 5,
+	assert.strictEqual(await getCollectionLength(db.collection('passwords')), 5,
 		'hasn\'t deleted any passwords');
-	t.is(await getCollectionLength(db.collection('instances')), 5,
+	assert.strictEqual(await getCollectionLength(db.collection('instances')), 5,
 		'hasn\'t deleted any instances');
-	t.is(await getCollectionLength(db.collection('users')), 3,
+	assert.strictEqual(await getCollectionLength(db.collection('users')), 3,
 		'hasn\'t deleted any users');
 	done();
 });
@@ -427,11 +427,11 @@ test('cancel the deletion and restore deleted items when account changes fail', 
 	proc.check();
 
 	const { db, done } = await getDB(uri);
-	t.is(await getCollectionLength(db.collection('passwords')), 5,
+	assert.strictEqual(await getCollectionLength(db.collection('passwords')), 5,
 		'hasn\'t deleted any passwords');
-	t.is(await getCollectionLength(db.collection('instances')), 5,
+	assert.strictEqual(await getCollectionLength(db.collection('instances')), 5,
 		'hasn\'t deleted any instances');
-	t.is(await getCollectionLength(db.collection('users')), 3,
+	assert.strictEqual(await getCollectionLength(db.collection('users')), 3,
 		'hasn\'t deleted any users');
 	done();
 });

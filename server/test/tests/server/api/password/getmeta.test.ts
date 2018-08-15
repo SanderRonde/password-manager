@@ -65,7 +65,7 @@ test('can get the password\'s metadata', async t => {
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(decryptedData);
 	}, 'data can be parsed');
-	t.is(parsed.id, passwordId, 'password IDs are the same');
+	assert.strictEqual(parsed.id, passwordId, 'password IDs are the same');
 
 	for (let i = 0; i < websites.length; i++) {
 		const expectedNote = websites[i];
@@ -74,10 +74,10 @@ test('can get the password\'s metadata', async t => {
 		t.truthy(actualNote, 'note exists');
 		const hostname = url.parse(expectedNote).hostname || 
 			url.parse(expectedNote).host || expectedNote
-		t.is(actualNote.host, hostname, 'host names match');
-		t.is(actualNote.exact, expectedNote, 'exact urls match');
+		assert.strictEqual(actualNote.host, hostname, 'host names match');
+		assert.strictEqual(actualNote.exact, expectedNote, 'exact urls match');
 	}
-	t.is(parsed.twofactor_enabled, twofactorEnabled, 'twofactor enabled is the same');
+	assert.strictEqual(parsed.twofactor_enabled, twofactorEnabled, 'twofactor enabled is the same');
 });
 test('fails if auth token is wrong', async t => {
 	const secret = speakeasy.generateSecret({

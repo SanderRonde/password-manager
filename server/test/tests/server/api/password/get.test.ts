@@ -65,20 +65,20 @@ test('can get the password if 2FA is disabled', async t => {
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(decryptedData);
 	}, 'data can be parsed');
-	t.is(parsed.id, passwordId, 'password IDs are the same');
+	assert.strictEqual(parsed.id, passwordId, 'password IDs are the same');
 
 	const decryptedEncrypted = decrypt(parsed.encrypted, 
 		hash(pad(userpw, 'masterpwdecrypt')));
 	if (isErr(t, decryptedEncrypted)) return;
 
-	t.is(decryptedEncrypted.username, username, 'username is the same');
-	t.is(decryptedEncrypted.password, password, 'password is the same');
+	assert.strictEqual(decryptedEncrypted.username, username, 'username is the same');
+	assert.strictEqual(decryptedEncrypted.password, password, 'password is the same');
 	for (let i = 0; i < notes.length; i++) {
 		const expectedNote = notes[i];
 		const actualNote = decryptedEncrypted.notes[i];
 
 		t.truthy(actualNote, 'note exists');
-		t.is(actualNote, expectedNote, 'notes are the same');
+		assert.strictEqual(actualNote, expectedNote, 'notes are the same');
 	}
 });
 test('fails if 2FA is enabled but no 2FA token is passed', async t => {
@@ -120,7 +120,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 	if (response.success) {
 		return;
 	}
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
+	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 		'invalid credentials error was thrown');
 });
 test('can get the password if 2FA is enabled', async t => {
@@ -179,20 +179,20 @@ test('can get the password if 2FA is enabled', async t => {
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(decryptedData);
 	}, 'data can be parsed');
-	t.is(parsed.id, passwordId, 'password IDs are the same');
+	assert.strictEqual(parsed.id, passwordId, 'password IDs are the same');
 
 	const decryptedEncrypted = decrypt(parsed.encrypted, 
 		hash(pad(userpw, 'masterpwdecrypt')));
 	if (isErr(t, decryptedEncrypted)) return;
 
-	t.is(decryptedEncrypted.username, username, 'username is the same');
-	t.is(decryptedEncrypted.password, password, 'password is the same');
+	assert.strictEqual(decryptedEncrypted.username, username, 'username is the same');
+	assert.strictEqual(decryptedEncrypted.password, password, 'password is the same');
 	for (let i = 0; i < notes.length; i++) {
 		const expectedNote = notes[i];
 		const actualNote = decryptedEncrypted.notes[i];
 
 		t.truthy(actualNote, 'note exists');
-		t.is(actualNote, expectedNote, 'notes are the same');
+		assert.strictEqual(actualNote, expectedNote, 'notes are the same');
 	}
 });
 test('fails if auth token is wrong', async t => {

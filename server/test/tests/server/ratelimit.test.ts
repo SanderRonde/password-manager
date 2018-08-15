@@ -52,7 +52,7 @@ function assertSucceedsAndIsNotRatelimited(t: GenericTestContext<Context<any>>, 
 	responseText: EncodedString<APIReturns[keyof APIReturns]>
 }, message: string = 'is not TOO_MANY_REQUESTS') {
 	t.not(response.statusCode, 429, message);
-	t.is(response.statusCode, 200, 'has success status code');
+	assert.strictEqual(response.statusCode, 200, 'has success status code');
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(responseText);
 	}, 'response can be JSON parsed');
@@ -68,13 +68,13 @@ function assertIsRateLimited(t: GenericTestContext<Context<any>>, {
 	response: http.IncomingMessage;
 	responseText: EncodedString<APIReturns[keyof APIReturns]>
 }, message: string = 'is TOO_MANY_REQUESTS') {
-	t.is(response.statusCode, 429, message);
+	assert.strictEqual(response.statusCode, 429, message);
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(responseText);
 	}, 'response can be JSON parsed');
 	assert.isFalse(parsed.success, 'request was successful');
 	if (parsed.success === true) return;
-	t.is(parsed.ERR, API_ERRS.TOO_MANY_REQUESTS, 
+	assert.strictEqual(parsed.ERR, API_ERRS.TOO_MANY_REQUESTS, 
 		'responded with TOO_MANY_REQUESTS');
 	return {
 		response, responseText
@@ -88,7 +88,7 @@ function assertFailsAndIsNotRatelimited(t: GenericTestContext<Context<any>>, {
 	responseText: EncodedString<APIReturns[keyof APIReturns]>
 }, message: string = 'is not TOO_MANY_REQUESTS') {
 	t.not(response.statusCode, 429, message);
-	t.is(response.statusCode, 200, 'has success status code');
+	assert.strictEqual(response.statusCode, 200, 'has success status code');
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(responseText);
 	}, 'response can be JSON parsed');

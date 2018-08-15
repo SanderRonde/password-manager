@@ -36,7 +36,7 @@ test('fails if account has no 2FA setup', async t => {
 
 	assert.isFalse(response.success, 'API call failed');
 	if (response.success) return;
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
+	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
 test('fails if an invalid 2FA token is passed', async t => {
 	const twofactor = speakeasy.generateSecret();
@@ -67,7 +67,7 @@ test('fails if an invalid 2FA token is passed', async t => {
 
 	assert.isFalse(response.success, 'API call failed');
 	if (response.success) return;
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
+	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
 test('fails if an invalid password verification token is passed', async t => {
 	const twofactor = speakeasy.generateSecret();
@@ -97,7 +97,7 @@ test('fails if an invalid password verification token is passed', async t => {
 
 	assert.isFalse(response.success, 'API call failed');
 	if (response.success) return;
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
+	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
 test('fails if instance id wrong', async t => {
 	const twofactor = speakeasy.generateSecret();

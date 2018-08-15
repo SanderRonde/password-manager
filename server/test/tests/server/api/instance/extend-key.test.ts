@@ -35,7 +35,7 @@ test('throws an error if token is invalid', async t => {
 	if (response.success) {
 		return;
 	}
-	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
+	assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
 test('fails if instance id is wrong', async t => {
 	const config = await genUserAndDb(t);

@@ -59,7 +59,7 @@ test('a backupped file can be used to restore', async t => {
 		await clearDB(uri);
 
 		const { db, done } = await getDB(uri);
-		t.is((await db.collection('meta').find().toArray()).length, 0,
+		assert.strictEqual((await db.collection('meta').find().toArray()).length, 0,
 			'meta collection is empty');
 		done();
 

@@ -82,11 +82,11 @@ test('can get the password\'s metadata', async t => {
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(decryptedData);
 	}, 'data can be parsed');
-	t.is(parsed.length, expectedPasswords.length, 'exactly 2 passwords are returned');
+	assert.strictEqual(parsed.length, expectedPasswords.length, 'exactly 2 passwords are returned');
 	for (let i = 0; i < expectedPasswords.length; i++) {
 		const parsedValue = parsed[i];
 		const expected = expectedPasswords[i];
-		t.is(parsedValue.id, passwordIds[i], 'password IDs are the same');
+		assert.strictEqual(parsedValue.id, passwordIds[i], 'password IDs are the same');
 		for (let i = 0; i < expected.websites.length; i++) {
 			const expectedWebsite = expected.websites[i];
 			const actualWebsite = parsedValue.websites[i];
@@ -94,10 +94,10 @@ test('can get the password\'s metadata', async t => {
 			t.truthy(actualWebsite, 'note exists');
 			const hostname = url.parse(expectedWebsite).hostname || 
 				url.parse(expectedWebsite).host || expectedWebsite
-			t.is(actualWebsite.host, hostname, 'host names match');
-			t.is(actualWebsite.exact, expectedWebsite, 'exact urls match');
+			assert.strictEqual(actualWebsite.host, hostname, 'host names match');
+			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'exact urls match');
 		}
-		t.is(parsedValue.twofactor_enabled, expected.twofactorEnabled, 'twofactor enabled is the same');
+		assert.strictEqual(parsedValue.twofactor_enabled, expected.twofactorEnabled, 'twofactor enabled is the same');
 	}
 });
 test('fails if auth token is wrong', async t => {

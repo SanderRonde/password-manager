@@ -17,7 +17,7 @@ import * as browserCrypto from '../lib/browser-crypto';
 
 test('padding works', t => {
 	const base = genRandomString(25);
-	t.is(browserCrypto.pad(base, 'masterpwverify'), base + 'masterpwverify',
+	assert.strictEqual(browserCrypto.pad(base, 'masterpwverify'), base + 'masterpwverify',
 		'padding is the same as expected');
 });
 test('hashing works', t => {
@@ -27,7 +27,7 @@ test('hashing works', t => {
 });
 test('hashing produces the same values with the same input', t => {
 	const input = genRandomString(25);
-	t.is(browserCrypto.hash(input), browserCrypto.hash(input),
+	assert.strictEqual(browserCrypto.hash(input), browserCrypto.hash(input),
 		'hashed values are the same');
 });
 test('hashing different values produces different results', t => {
@@ -48,14 +48,14 @@ test('values encrypted with a public key can be decrypted', t => {
 
 	const encrypted = browserCrypto.encryptWithPublicKey(input, publicKey);
 	const decrypted = browserCrypto.decryptWithPrivateKey(encrypted, privateKey);
-	t.is(decrypted, input, 'decrypted value is the same as input');
+	assert.strictEqual(decrypted, input, 'decrypted value is the same as input');
 });
 test('public/private key encryption returns error on invalid decrypt', t => {
 	const { privateKey } = browserCrypto.genRSAKeyPair();
 
 	const decrypted = browserCrypto.decryptWithPrivateKey('baddecrypt' as PublicKeyEncrypted<string, string>, 
 		privateKey);
-	t.is(decrypted, ERRS.INVALID_DECRYPT, 'is invalid decrypt');
+	assert.strictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is invalid decrypt');
 });
 test('hybrid encryption works', t => {
 	const input = genRandomString(25);
@@ -70,5 +70,5 @@ test('hybrid encrypted data can be decrypted', t => {
 
 	const encrypted = browserCrypto.hybridEncrypt(input, publicKey);
 	const decrypted = browserCrypto.hybdridDecrypt(encrypted, privateKey);
-	t.is(decrypted, input, 'decrypted value is the same as input');
+	assert.strictEqual(decrypted, input, 'decrypted value is the same as input');
 });

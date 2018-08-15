@@ -49,9 +49,9 @@ test('can log in, set a password, update it and then remove a password', async t
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 
@@ -88,7 +88,7 @@ test('can log in, set a password, update it and then remove a password', async t
 		}
 		
 		const data = response.data;
-		t.is(typeof data.id, 'string', 'passed id is a string');
+		assert.strictEqual(typeof data.id, 'string', 'passed id is a string');
 
 		//Check if it was actually created
 		const { db, done } = await getDB(uri);
@@ -103,12 +103,12 @@ test('can log in, set a password, update it and then remove a password', async t
 		t.not(instance, null, 'instance was found');
 		done();
 
-		t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
 		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-		t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
 			return {
@@ -128,14 +128,14 @@ test('can log in, set a password, update it and then remove a password', async t
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
 			t.truthy(actualWebsite, 'a website exists at given index');
-			t.is(actualWebsite.host, host, 'hosts match');
-			t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+			assert.strictEqual(actualWebsite.host, host, 'hosts match');
+			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
 		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-		t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 
 		return data.id;
 	})();
@@ -185,12 +185,12 @@ test('can log in, set a password, update it and then remove a password', async t
 		t.not(instance, null, 'instance was found');
 		done();
 
-		t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
 		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-		t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
 			return {
@@ -210,14 +210,14 @@ test('can log in, set a password, update it and then remove a password', async t
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
 			t.truthy(actualWebsite, 'a website exists at given index');
-			t.is(actualWebsite.host, host, 'hosts match');
-			t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+			assert.strictEqual(actualWebsite.host, host, 'hosts match');
+			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
 		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-		t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 	})();
 	await (async () => {
 		const response = JSON.parse(await doServerAPIRequest({ 
@@ -244,7 +244,7 @@ test('can log in, set a password, update it and then remove a password', async t
 				_id: new mongo.ObjectId(passwordId!)
 			});
 		});
-		t.is(password, null, 'password is gone');
+		assert.strictEqual(password, null, 'password is gone');
 	})();
 });
 test('can log in, set a password, update, and get meta and non-meta data', async t => {
@@ -287,9 +287,9 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 
@@ -326,7 +326,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		}
 		
 		const data = response.data;
-		t.is(typeof data.id, 'string', 'passed id is a string');
+		assert.strictEqual(typeof data.id, 'string', 'passed id is a string');
 
 		//Check if it was actually created
 		const { db, done } = await getDB(uri);
@@ -341,12 +341,12 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		t.not(instance, null, 'instance was found');
 		done();
 
-		t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
 		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-		t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
 			return {
@@ -366,14 +366,14 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
 			t.truthy(actualWebsite, 'a website exists at given index');
-			t.is(actualWebsite.host, host, 'hosts match');
-			t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+			assert.strictEqual(actualWebsite.host, host, 'hosts match');
+			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
 		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-		t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 
 		return data.id;
 	})();
@@ -425,12 +425,12 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		t.not(instance, null, 'instance was found');
 		done();
 
-		t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
 		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-		t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
 			return {
@@ -450,14 +450,14 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
 			t.truthy(actualWebsite, 'a website exists at given index');
-			t.is(actualWebsite.host, host, 'hosts match');
-			t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+			assert.strictEqual(actualWebsite.host, host, 'hosts match');
+			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
 		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-		t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 	})();
 	await (async () => {
 		const response = JSON.parse(await doServerAPIRequest({ 
@@ -483,20 +483,20 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const parsed = doesNotThrow(t, () => {
 			return JSON.parse(decryptedData);
 		}, 'data can be parsed');
-		t.is(parsed.id, passwordId, 'password IDs are the same');
+		assert.strictEqual(parsed.id, passwordId, 'password IDs are the same');
 	
 		const decryptedEncrypted = decrypt(parsed.encrypted, 
 			hash(pad(userpw, 'masterpwdecrypt')));
 		if (isErr(t, decryptedEncrypted)) return;
 	
-		t.is(decryptedEncrypted.username, updatedPassword.username, 'username is the same');
-		t.is(decryptedEncrypted.password, updatedPassword.password, 'password is the same');
+		assert.strictEqual(decryptedEncrypted.username, updatedPassword.username, 'username is the same');
+		assert.strictEqual(decryptedEncrypted.password, updatedPassword.password, 'password is the same');
 		for (let i = 0; i < updatedPassword.notes.length; i++) {
 			const expectedNote = updatedPassword.notes[i];
 			const actualNote = decryptedEncrypted.notes[i];
 	
 			t.truthy(actualNote, 'note exists');
-			t.is(actualNote, expectedNote, 'notes are the same');
+			assert.strictEqual(actualNote, expectedNote, 'notes are the same');
 		}
 	})();
 	await (async () => {
@@ -525,7 +525,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 		const parsed = doesNotThrow(t, () => {
 			return JSON.parse(decryptedData);
 		}, 'data can be parsed');
-		t.is(parsed.id, passwordId, 'password IDs are the same');
+		assert.strictEqual(parsed.id, passwordId, 'password IDs are the same');
 	
 		for (let i = 0; i < updatedPassword.websites.length; i++) {
 			const expectedNote = updatedPassword.websites[i];
@@ -534,10 +534,10 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			t.truthy(actualNote, 'note exists');
 			const hostname = url.parse(expectedNote).hostname || 
 				url.parse(expectedNote).host || expectedNote
-			t.is(actualNote.host, hostname, 'host names match');
-			t.is(actualNote.exact, expectedNote, 'exact urls match');
+			assert.strictEqual(actualNote.host, hostname, 'host names match');
+			assert.strictEqual(actualNote.exact, expectedNote, 'exact urls match');
 		}
-		t.is(parsed.twofactor_enabled, updatedPassword.twofactorEnabled, 'twofactor enabled is the same');
+		assert.strictEqual(parsed.twofactor_enabled, updatedPassword.twofactorEnabled, 'twofactor enabled is the same');
 	})();
 });
 test('can log in, set a password and get all metadata', async t => {
@@ -580,9 +580,9 @@ test('can log in, set a password and get all metadata', async t => {
 		const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 		if (token === ERRS.INVALID_DECRYPT) return;
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 
@@ -619,7 +619,7 @@ test('can log in, set a password and get all metadata', async t => {
 		}
 		
 		const data = response.data;
-		t.is(typeof data.id, 'string', 'passed id is a string');
+		assert.strictEqual(typeof data.id, 'string', 'passed id is a string');
 
 		//Check if it was actually created
 		const { db, done } = await getDB(uri);
@@ -634,12 +634,12 @@ test('can log in, set a password and get all metadata', async t => {
 		t.not(instance, null, 'instance was found');
 		done();
 
-		t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
 		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-		t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
 			return {
@@ -659,14 +659,14 @@ test('can log in, set a password and get all metadata', async t => {
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
 			t.truthy(actualWebsite, 'a website exists at given index');
-			t.is(actualWebsite.host, host, 'hosts match');
-			t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+			assert.strictEqual(actualWebsite.host, host, 'hosts match');
+			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
 		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-		t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 
 		return data.id;
 	})();
@@ -716,12 +716,12 @@ test('can log in, set a password and get all metadata', async t => {
 		t.not(instance, null, 'instance was found');
 		done();
 
-		t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+		assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 			'user ids match');
 		const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 			dbpw);
 		t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-		t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+		assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 		const actualWebsites = password.websites.map(({ exact, host }) => {
 			return {
@@ -741,14 +741,14 @@ test('can log in, set a password and get all metadata', async t => {
 			const host = url.parse(expectedWebsite).hostname ||
 				url.parse(expectedWebsite).host || expectedWebsite;
 			t.truthy(actualWebsite, 'a website exists at given index');
-			t.is(actualWebsite.host, host, 'hosts match');
-			t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+			assert.strictEqual(actualWebsite.host, host, 'hosts match');
+			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 		}
 
 		const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
 		t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-		t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+		assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 	})();
 	await (async () => {
 		const response = JSON.parse(await doServerAPIRequest({ 
@@ -778,11 +778,11 @@ test('can log in, set a password and get all metadata', async t => {
 		}, 'data can be parsed');
 		const expectedPasswords = [updatedPassword];
 		const passwordIds = [passwordId];
-		t.is(parsed.length, expectedPasswords.length, 'exactly 2 passwords are returned');
+		assert.strictEqual(parsed.length, expectedPasswords.length, 'exactly 2 passwords are returned');
 		for (let i = 0; i < expectedPasswords.length; i++) {
 			const parsedValue = parsed[i];
 			const expected = expectedPasswords[i];
-			t.is(parsedValue.id, passwordIds[i], 'password IDs are the same');
+			assert.strictEqual(parsedValue.id, passwordIds[i], 'password IDs are the same');
 			for (let i = 0; i < expected.websites.length; i++) {
 				const expectedWebsite = expected.websites[i];
 				const actualWebsite = parsedValue.websites[i];
@@ -790,10 +790,10 @@ test('can log in, set a password and get all metadata', async t => {
 				t.truthy(actualWebsite, 'note exists');
 				const hostname = url.parse(expectedWebsite).hostname || 
 					url.parse(expectedWebsite).host || expectedWebsite
-				t.is(actualWebsite.host, hostname, 'host names match');
-				t.is(actualWebsite.exact, expectedWebsite, 'exact urls match');
+				assert.strictEqual(actualWebsite.host, hostname, 'host names match');
+				assert.strictEqual(actualWebsite.exact, expectedWebsite, 'exact urls match');
 			}
-			t.is(parsedValue.twofactor_enabled, expected.twofactorEnabled, 'twofactor enabled is the same');
+			assert.strictEqual(parsedValue.twofactor_enabled, expected.twofactorEnabled, 'twofactor enabled is the same');
 		}
 	})();
 });
@@ -838,9 +838,9 @@ test('can log in, set and update a password, ' +
 			const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 			t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 			if (token === ERRS.INVALID_DECRYPT) return;
-			t.is(typeof token, 'string', 'token is a string');
+			assert.strictEqual(typeof token, 'string', 'token is a string');
 
-			t.is(data.challenge, challenge, 'challenge matches');
+			assert.strictEqual(data.challenge, challenge, 'challenge matches');
 			return token;
 		})();
 
@@ -878,7 +878,7 @@ test('can log in, set and update a password, ' +
 			}
 			
 			const data = response.data;
-			t.is(typeof data.id, 'string', 'passed id is a string');
+			assert.strictEqual(typeof data.id, 'string', 'passed id is a string');
 
 			//Check if it was actually created
 			const { db, done } = await getDB(uri);
@@ -893,12 +893,12 @@ test('can log in, set and update a password, ' +
 			t.not(instance, null, 'instance was found');
 			done();
 
-			t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+			assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 				'user ids match');
 			const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 				dbpw);
 			t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+			assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 			const actualWebsites = password.websites.map(({ exact, host }) => {
 				return {
@@ -918,14 +918,14 @@ test('can log in, set and update a password, ' +
 				const host = url.parse(expectedWebsite).hostname ||
 					url.parse(expectedWebsite).host || expectedWebsite;
 				t.truthy(actualWebsite, 'a website exists at given index');
-				t.is(actualWebsite.host, host, 'hosts match');
-				t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+				assert.strictEqual(actualWebsite.host, host, 'hosts match');
+				assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 			}
 
 			const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
 			t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-			t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+			assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 
 			return data.id;
 		})();
@@ -977,12 +977,12 @@ test('can log in, set and update a password, ' +
 			t.not(instance, null, 'instance was found');
 			done();
 
-			t.is(password.user_id.toHexString(), instance.user_id.toHexString(),
+			assert.strictEqual(password.user_id.toHexString(), instance.user_id.toHexString(),
 				'user ids match');
 			const decryptedTwofactorEnabled = decryptWithSalt(password.twofactor_enabled,
 				dbpw);
 			t.not(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			t.is(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+			assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
 			const actualWebsites = password.websites.map(({ exact, host }) => {
 				return {
@@ -1002,14 +1002,14 @@ test('can log in, set and update a password, ' +
 				const host = url.parse(expectedWebsite).hostname ||
 					url.parse(expectedWebsite).host || expectedWebsite;
 				t.truthy(actualWebsite, 'a website exists at given index');
-				t.is(actualWebsite.host, host, 'hosts match');
-				t.is(actualWebsite.exact, expectedWebsite, 'actual urls match');
+				assert.strictEqual(actualWebsite.host, host, 'hosts match');
+				assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
 			}
 
 			const decryptedEncryptedData = decrypt(password.encrypted, dbpw);
 			t.not(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
-			t.is(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+			assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
 		})();
 		await (async () => {
 			const response = JSON.parse(await doServerAPIRequest({ 
@@ -1037,11 +1037,11 @@ test('can log in, set and update a password, ' +
 			}, 'data can be parsed');
 			const expectedPasswords = [updatedPassword];
 			const passwordIds = [passwordId];
-			t.is(parsed.length, expectedPasswords.length, 'exactly 2 passwords are returned');
+			assert.strictEqual(parsed.length, expectedPasswords.length, 'exactly 2 passwords are returned');
 			for (let i = 0; i < expectedPasswords.length; i++) {
 				const parsedValue = parsed[i];
 				const expected = expectedPasswords[i];
-				t.is(parsedValue.id, passwordIds[i], 'password IDs are the same');
+				assert.strictEqual(parsedValue.id, passwordIds[i], 'password IDs are the same');
 				for (let i = 0; i < expected.websites.length; i++) {
 					const expectedWebsite = expected.websites[i];
 					const actualWebsite = parsedValue.websites[i];
@@ -1049,10 +1049,10 @@ test('can log in, set and update a password, ' +
 					t.truthy(actualWebsite, 'note exists');
 					const hostname = url.parse(expectedWebsite).hostname || 
 						url.parse(expectedWebsite).host || expectedWebsite
-					t.is(actualWebsite.host, hostname, 'host names match');
-					t.is(actualWebsite.exact, expectedWebsite, 'exact urls match');
+					assert.strictEqual(actualWebsite.host, hostname, 'host names match');
+					assert.strictEqual(actualWebsite.exact, expectedWebsite, 'exact urls match');
 				}
-				t.is(parsedValue.twofactor_enabled, expected.twofactorEnabled, 'twofactor enabled is the same');
+				assert.strictEqual(parsedValue.twofactor_enabled, expected.twofactorEnabled, 'twofactor enabled is the same');
 			}
 		})();
 		const queryResults = await (async () => {
@@ -1098,15 +1098,15 @@ test('can log in, set and update a password, ' +
 				}
 				return false;
 			});
-			t.is(parsed.length, matchingExpectedPasswords.length, 
+			assert.strictEqual(parsed.length, matchingExpectedPasswords.length, 
 				'amount of matches match');
 		
 			for (let i = 0; i < matchingExpectedPasswords.length; i++) {
 				const expected = matchingExpectedPasswords[i];
 				const actual = parsed[i];
 		
-				t.is(actual.id, passwordIds[expected.index], 'ids match');
-				t.is(actual.twofactor_enabled, expected.twofactorEnabled);
+				assert.strictEqual(actual.id, passwordIds[expected.index], 'ids match');
+				assert.strictEqual(actual.twofactor_enabled, expected.twofactorEnabled);
 				for (let i = 0; i < expected.websites.length; i++) {
 					const expectedWebsite = expected.websites[i];
 					const actualWebsite = actual.websites[i];
@@ -1114,8 +1114,8 @@ test('can log in, set and update a password, ' +
 					t.truthy(actualWebsite, 'note exists');
 					const hostname = url.parse(expectedWebsite).hostname || 
 						url.parse(expectedWebsite).host || expectedWebsite
-					t.is(actualWebsite.host, hostname, 'host names match');
-					t.is(actualWebsite.exact, expectedWebsite, 'exact urls match');
+					assert.strictEqual(actualWebsite.host, hostname, 'host names match');
+					assert.strictEqual(actualWebsite.exact, expectedWebsite, 'exact urls match');
 				}
 			}
 
@@ -1147,20 +1147,20 @@ test('can log in, set and update a password, ' +
 			const parsed = doesNotThrow(t, () => {
 				return JSON.parse(decryptedData);
 			}, 'data can be parsed');
-			t.is(parsed.id, passwordId, 'password IDs are the same');
+			assert.strictEqual(parsed.id, passwordId, 'password IDs are the same');
 		
 			const decryptedEncrypted = decrypt(parsed.encrypted, 
 				hash(pad(userpw, 'masterpwdecrypt')));
 			if (isErr(t, decryptedEncrypted)) return;
 		
-			t.is(decryptedEncrypted.username, updatedPassword.username, 'username is the same');
-			t.is(decryptedEncrypted.password, updatedPassword.password, 'password is the same');
+			assert.strictEqual(decryptedEncrypted.username, updatedPassword.username, 'username is the same');
+			assert.strictEqual(decryptedEncrypted.password, updatedPassword.password, 'password is the same');
 			for (let i = 0; i < updatedPassword.notes.length; i++) {
 				const expectedNote = updatedPassword.notes[i];
 				const actualNote = decryptedEncrypted.notes[i];
 		
 				t.truthy(actualNote, 'note exists');
-				t.is(actualNote, expectedNote, 'notes are the same');
+				assert.strictEqual(actualNote, expectedNote, 'notes are the same');
 			}
 		})();
 	});

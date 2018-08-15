@@ -91,7 +91,7 @@ test('an added account can be deleted', async t => {
 
 		//Check if all accounts are gone
 		const { db, done } = await getDB(uri);
-		t.is(await getCollectionLength(db.collection('users')), 0,
+		assert.strictEqual(await getCollectionLength(db.collection('users')), 0,
 			'there are no more accounts');
 		done();
 	})();

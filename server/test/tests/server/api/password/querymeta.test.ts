@@ -108,15 +108,15 @@ test('can query a URL', async t => {
 		}
 		return false;
 	});
-	t.is(parsed.length, matchingExpectedPasswords.length, 
+	assert.strictEqual(parsed.length, matchingExpectedPasswords.length, 
 		'amount of matches match');
 
 	for (let i = 0; i < matchingExpectedPasswords.length; i++) {
 		const expected = matchingExpectedPasswords[i];
 		const actual = parsed[i];
 
-		t.is(actual.id, passwordIds[expected.index], 'ids match');
-		t.is(actual.twofactor_enabled, expected.twofactorEnabled);
+		assert.strictEqual(actual.id, passwordIds[expected.index], 'ids match');
+		assert.strictEqual(actual.twofactor_enabled, expected.twofactorEnabled);
 		for (let i = 0; i < expected.websites.length; i++) {
 			const expectedWebsite = expected.websites[i];
 			const actualWebsite = actual.websites[i];
@@ -124,8 +124,8 @@ test('can query a URL', async t => {
 			t.truthy(actualWebsite, 'note exists');
 			const hostname = url.parse(expectedWebsite).hostname || 
 				url.parse(expectedWebsite).host || expectedWebsite
-			t.is(actualWebsite.host, hostname, 'host names match');
-			t.is(actualWebsite.exact, expectedWebsite, 'exact urls match');
+			assert.strictEqual(actualWebsite.host, hostname, 'host names match');
+			assert.strictEqual(actualWebsite.exact, expectedWebsite, 'exact urls match');
 		}
 	}
 });

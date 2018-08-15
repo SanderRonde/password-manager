@@ -48,7 +48,7 @@ test('can log in after registering instance', async t => {
 		});
 		t.truthy(instance, 'instance was created and ID is correct');
 
-		t.is(typeof server_key, 'string', 'type of serverkey is string');
+		assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 		return {
 			instance_id: instance_id,
 			clientPrivateKey: keyPair.privateKey,
@@ -80,9 +80,9 @@ test('can log in after registering instance', async t => {
 		}
 		const token = decryptWithPrivateKey(data.auth_token, clientPrivateKey!);
 		t.not(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 	})();
 });
 test('can log out after logging in', async t => {
@@ -126,9 +126,9 @@ test('can log out after logging in', async t => {
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 	
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 	await (async () => {	
@@ -183,9 +183,9 @@ test('can log in and extend key', async t => {
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 	
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 	await (async () => {	
@@ -202,7 +202,7 @@ test('can log in and extend key', async t => {
 			return;
 		}
 		const data = response.data;
-		t.is(typeof data.auth_token, 'string', 'auth token was passed');
+		assert.strictEqual(typeof data.auth_token, 'string', 'auth token was passed');
 	})();
 });
 test('can register an instance, log in, extend key and log out', async t => {
@@ -244,7 +244,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 		});
 		t.truthy(instance, 'instance was created and ID is correct');
 
-		t.is(typeof server_key, 'string', 'type of serverkey is string');
+		assert.strictEqual(typeof server_key, 'string', 'type of serverkey is string');
 		return {
 			instanceId: instance_id,
 			clientPrivateKey: keyPair.privateKey,
@@ -277,9 +277,9 @@ test('can register an instance, log in, extend key and log out', async t => {
 		if (token === ERRS.INVALID_DECRYPT) {
 			return;
 		}
-		t.is(typeof token, 'string', 'token is a string');
+		assert.strictEqual(typeof token, 'string', 'token is a string');
 
-		t.is(data.challenge, challenge, 'challenge matches');
+		assert.strictEqual(data.challenge, challenge, 'challenge matches');
 		return token;
 	})();
 	const newToken = await (async () => {	
@@ -293,7 +293,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 		if (!response.success) {
 			return;
 		}
-		t.is(typeof response.data.auth_token, 'string', 'auth token was passed');
+		assert.strictEqual(typeof response.data.auth_token, 'string', 'auth token was passed');
 		const decrypted = decryptWithPrivateKey(response.data.auth_token, clientPrivateKey!);
 		t.not(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 		if (decrypted === ERRS.INVALID_DECRYPT) {
