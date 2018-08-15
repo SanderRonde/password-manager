@@ -10,7 +10,7 @@ stages:
   
 install:
 - yarn --ignore-engines
-- npm install -g gulp ava typescript
+- npm install -g gulp mocha typescript
 - ./server/scripts/clone-mongo-tools.sh
 - ./server/scripts/alias-mongo-tools.sh
 before_script:
@@ -19,8 +19,8 @@ before_script:
 script:
 - gulp defs
 - tsc --build --force && tsc -p shared/tsconfig.commonjs.json
-- ava --verbose shared/**/*.test.js
-- ava --verbose server/**/*.test.js -c 1 --fail-fast --timeout 2m
+- mocha shared/test/test.js --exit
+- mocha server/test/test.js --exit
 notifications:
   email:
     on_success: change
