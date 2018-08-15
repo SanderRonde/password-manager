@@ -160,9 +160,9 @@ export function createServer({
 				'--http', http + '',
 				'--no-https-only',
 				'-p', dbpw,
-				'-d', uri	
+				'-d', uri,
+				'--debug'
 			], 
-			...optionalArrayItem('--debug', !!env),
 			...optionalArrayItem('--no-ratelimit-', !enableRateLimit)
 		], {
 			env: {...process.env, ...(env || {})}
@@ -210,10 +210,10 @@ export async function doServerAPIRequest<K extends keyof APIFns>({ port, publicK
 		}, (res) => {
 			let responseText: string = '';
 			res.setEncoding('utf8');
-			listenWithoutRef(res, (chunk) => {
-				responseText += chunk;
+			res.on('data', (chunk) => {
+				responseText += chunk.toString();
 			});
-			res.once('end', () => {
+			res.on('end', () => {
 				resolve(responseText as EncodedString<APIReturns[K]>);
 			});
 			res.once('error', (err) => {
@@ -269,10 +269,10 @@ export async function doServerPostRequest<K extends keyof APIFns>({ port, public
 		}, (res) => {
 			let responseText: string = '';
 			res.setEncoding('utf8');
-			listenWithoutRef(res, (chunk) => {
-				responseText += chunk;
+			res.on('data', (chunk) => {
+				responseText += chunk.toString();
 			});
-			res.once('end', () => {
+			res.on('end', () => {
 				resolve({
 					response: res,
 					responseText: responseText as EncodedString<APIReturns[K]>
