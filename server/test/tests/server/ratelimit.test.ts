@@ -3,7 +3,7 @@ import { APIReturns, API_ERRS } from '../../../app/../../shared/types/api';
 import { encryptWithPublicKey, pad, hash } from '../../../app/lib/crypto';
 import { wait, genRandomString } from '../../../app/lib/util';
 import { APIToken } from '../../../../shared/types/crypto';
-import { test, GenericTestContext, Context } from 'ava';
+import { assert } from 'chai';
 import * as http from 'http'
 
 async function doInstanceCreateRequest(config: UserAndDbData) {
