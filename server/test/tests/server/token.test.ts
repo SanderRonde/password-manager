@@ -41,7 +41,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 			return;
 		}
 		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
+		assert.isFalse(data.twofactor_required, 'further authentication is not required');
 		if (data.twofactor_required === true) {
 			return;
 		}
@@ -82,7 +82,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 			oldToken: initialToken!
 		}));
 
-		t.false(response.success, 'API call failed');
+		assert.isFalse(response.success, 'API call failed');
 		if (response.success) {
 			return;
 		}
@@ -97,7 +97,7 @@ test('invalidates all account tokens if an old token is extended', async t => {
 			token: extendedToken!
 		}));
 
-		t.false(response.success, 'API call failed');
+		assert.isFalse(response.success, 'API call failed');
 		if (response.success) return;
 		t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 			'invalid credentials error is thrown');
@@ -138,7 +138,7 @@ test('invalidates a token if its count is wrong', async t => {
 			return;
 		}
 		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
+		assert.isFalse(data.twofactor_required, 'further authentication is not required');
 		if (data.twofactor_required === true) {
 			return;
 		}
@@ -179,7 +179,7 @@ test('invalidates a token if its count is wrong', async t => {
 			oldToken: initialToken!
 		}));
 
-		t.false(response.success, 'API call failed');
+		assert.isFalse(response.success, 'API call failed');
 		if (response.success) {
 			return;
 		}
@@ -194,7 +194,7 @@ test('invalidates a token if its count is wrong', async t => {
 			token: extendedToken!
 		}));
 
-		t.false(response.success, 'API call failed');
+		assert.isFalse(response.success, 'API call failed');
 		if (response.success) return;
 		t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 			'invalid credentials error is thrown');
@@ -272,7 +272,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 			return;
 		}
 		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
+		assert.isFalse(data.twofactor_required, 'further authentication is not required');
 		if (data.twofactor_required === true) {
 			return;
 		}
@@ -313,7 +313,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 			oldToken: initialToken!
 		}));
 
-		t.false(response.success, 'API call failed');
+		assert.isFalse(response.success, 'API call failed');
 		if (response.success) {
 			return;
 		}
@@ -328,7 +328,7 @@ test('invalidates a token if the instance id is wrong', async t => {
 			token: extendedToken!
 		}));
 
-		t.false(response.success, 'API call failed');
+		assert.isFalse(response.success, 'API call failed');
 		if (response.success) return;
 		t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS,
 			'invalid credentials error is thrown');

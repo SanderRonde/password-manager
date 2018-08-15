@@ -42,7 +42,7 @@ test('can log in, set a password, update it and then remove a password', async t
 			return;
 		}
 		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
+		assert.isFalse(data.twofactor_required, 'further authentication is not required');
 		if (data.twofactor_required === true) {
 			return;
 		}
@@ -280,7 +280,7 @@ test('can log in, set a password, update, and get meta and non-meta data', async
 			return;
 		}
 		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
+		assert.isFalse(data.twofactor_required, 'further authentication is not required');
 		if (data.twofactor_required === true) {
 			return;
 		}
@@ -573,7 +573,7 @@ test('can log in, set a password and get all metadata', async t => {
 			return;
 		}
 		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
+		assert.isFalse(data.twofactor_required, 'further authentication is not required');
 		if (data.twofactor_required === true) {
 			return;
 		}
@@ -831,7 +831,7 @@ test('can log in, set and update a password, ' +
 				return;
 			}
 			const data = response.data;
-			t.false(data.twofactor_required, 'further authentication is not required');
+			assert.isFalse(data.twofactor_required, 'further authentication is not required');
 			if (data.twofactor_required === true) {
 				return;
 			}

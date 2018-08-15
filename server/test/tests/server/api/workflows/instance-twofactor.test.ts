@@ -759,7 +759,7 @@ test('can register an instance, enable 2FA for the user and enable 2FA for the i
 		} | {
 			enabled: true;
 		};
-		t.false(finalData.enabled, '2FA was not enabled yet');
+		assert.isFalse(finalData.enabled, '2FA was not enabled yet');
 		if (finalData.enabled) return;
 		const { query } = url.parse(finalData.auth_url);
 		const secret = querystring.parse(query!).secret;

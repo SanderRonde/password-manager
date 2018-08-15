@@ -166,7 +166,7 @@ test('cancels if failing on password changes', async t => {
 
 	server.kill();
 
-	t.false(response.success, 'request failed');
+	assert.isFalse(response.success, 'request failed');
 	if (response.success === true) return;
 	
 	t.is(response.ERR, API_ERRS.SERVER_ERROR, 'threw a server error');
@@ -251,7 +251,7 @@ test('cancels if failing on instance changes', async t => {
 
 	server.kill();
 
-	t.false(response.success, 'request failed');
+	assert.isFalse(response.success, 'request failed');
 	if (response.success === true) return;
 	
 	t.is(response.ERR, API_ERRS.SERVER_ERROR, 'threw a server error');
@@ -336,7 +336,7 @@ test('cancels if failing on account changes', async t => {
 
 	server.kill();
 
-	t.false(response.success, 'request failed');
+	assert.isFalse(response.success, 'request failed');
 	if (response.success === true) return;
 	
 	t.is(response.ERR, API_ERRS.SERVER_ERROR, 'threw a server error');

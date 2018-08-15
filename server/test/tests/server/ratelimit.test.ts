@@ -72,7 +72,7 @@ function assertIsRateLimited(t: GenericTestContext<Context<any>>, {
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(responseText);
 	}, 'response can be JSON parsed');
-	t.false(parsed.success, 'request was successful');
+	assert.isFalse(parsed.success, 'request was successful');
 	if (parsed.success === true) return;
 	t.is(parsed.ERR, API_ERRS.TOO_MANY_REQUESTS, 
 		'responded with TOO_MANY_REQUESTS');
@@ -92,7 +92,7 @@ function assertFailsAndIsNotRatelimited(t: GenericTestContext<Context<any>>, {
 	const parsed = doesNotThrow(t, () => {
 		return JSON.parse(responseText);
 	}, 'response can be JSON parsed');
-	t.false(parsed.success, 'request failed');
+	assert.isFalse(parsed.success, 'request failed');
 	return {
 		response, responseText
 	}

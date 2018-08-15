@@ -48,7 +48,7 @@ test('login token can be generated when 2FA is disabled', async t => {
 		return;
 	}
 	const data = response.data;
-	t.false(data.twofactor_required, 'further authentication is not required');
+	assert.isFalse(data.twofactor_required, 'further authentication is not required');
 	if (data.twofactor_required === true) {
 		return;
 	}

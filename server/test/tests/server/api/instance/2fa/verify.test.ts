@@ -34,7 +34,7 @@ test('fails if account has no 2FA setup', async t => {
 
 	server.kill();
 
-	t.false(response.success, 'API call failed');
+	assert.isFalse(response.success, 'API call failed');
 	if (response.success) return;
 	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
@@ -65,7 +65,7 @@ test('fails if an invalid 2FA token is passed', async t => {
 
 	server.kill();
 
-	t.false(response.success, 'API call failed');
+	assert.isFalse(response.success, 'API call failed');
 	if (response.success) return;
 	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });
@@ -95,7 +95,7 @@ test('fails if an invalid password verification token is passed', async t => {
 
 	server.kill();
 
-	t.false(response.success, 'API call failed');
+	assert.isFalse(response.success, 'API call failed');
 	if (response.success) return;
 	t.is(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 });

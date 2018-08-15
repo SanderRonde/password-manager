@@ -116,7 +116,7 @@ test('fails if 2FA is enabled but no 2FA token is passed', async t => {
 
 	server.kill();
 
-	t.false(response.success, 'API call failed');
+	assert.isFalse(response.success, 'API call failed');
 	if (response.success) {
 		return;
 	}

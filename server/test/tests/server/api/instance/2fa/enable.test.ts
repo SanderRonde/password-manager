@@ -62,7 +62,7 @@ test('can enable 2FA when no 2FA secret is set', async t => {
 	} | {
 		enabled: true;
 	};
-	t.false(finalData.enabled, '2FA was not already enabled');
+	assert.isFalse(finalData.enabled, '2FA was not already enabled');
 	if (finalData.enabled) return;
 	assert.isTrue(finalData.verify_2fa_required, 
 		'further verification is needed');

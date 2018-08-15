@@ -74,7 +74,7 @@ test('can log in after registering instance', async t => {
 			return;
 		}
 		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
+		assert.isFalse(data.twofactor_required, 'further authentication is not required');
 		if (data.twofactor_required === true) {
 			return;
 		}
@@ -117,7 +117,7 @@ test('can log out after logging in', async t => {
 			return;
 		}
 		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
+		assert.isFalse(data.twofactor_required, 'further authentication is not required');
 		if (data.twofactor_required === true) {
 			return;
 		}
@@ -174,7 +174,7 @@ test('can log in and extend key', async t => {
 			return;
 		}
 		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
+		assert.isFalse(data.twofactor_required, 'further authentication is not required');
 		if (data.twofactor_required === true) {
 			return;
 		}
@@ -268,7 +268,7 @@ test('can register an instance, log in, extend key and log out', async t => {
 			return;
 		}
 		const data = response.data;
-		t.false(data.twofactor_required, 'further authentication is not required');
+		assert.isFalse(data.twofactor_required, 'further authentication is not required');
 		if (data.twofactor_required === true) {
 			return;
 		}

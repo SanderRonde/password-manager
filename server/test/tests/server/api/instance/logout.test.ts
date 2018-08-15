@@ -29,7 +29,7 @@ test('throws an error if token is invalid', async t => {
 
 	server.kill();
 
-	t.false(response.success, 'API call failed');
+	assert.isFalse(response.success, 'API call failed');
 	if (response.success) {
 		return;
 	}
