@@ -142,6 +142,7 @@ export function initCommander(handledHolder: {
 		.option('--development', 'Whether to enable development mode')
 		.option('--databaseless', 'Don\'t use any database (for development)')
 		.option('--no-https-only', 'Disable only using HTTPS and redirecting HTTP requests')
+		.option('--no-ratelimit', 'Disables ratelimiting')
 		.action(async (settings: ServerSettings) => {
 			handledHolder.handled = true;
 			if (settings.config) {
