@@ -163,7 +163,7 @@ export function createServer({
 				'-d', uri,
 				'--debug'
 			], 
-			...optionalArrayItem('--no-ratelimit-', !enableRateLimit)
+			...optionalArrayItem('--no-ratelimit', !enableRateLimit)
 		], {
 			env: {...process.env, ...(env || {})}
 		});
