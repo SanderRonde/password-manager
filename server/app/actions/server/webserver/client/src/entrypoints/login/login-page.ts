@@ -1,5 +1,5 @@
-import { Login } from "../../../../../../../../../shared/components/entrypoints/web/login/login";
+import { LoginWeb } from "../../../../../../../../../shared/components/entrypoints/web/login/login-web";
 import { registerServiceWorker } from "../../../static/js/sw";
 
-Login.define();
+LoginWeb.define();
 registerServiceWorker();
