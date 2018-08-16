@@ -143,7 +143,7 @@ function noOp(_req: express.Request, _res: ServerResponse, next: express.NextFun
 }
 
 export function getStores(config: ServerConfig) {
-	if (config.rateLimit) {
+	if (config.ratelimit) {
 		const factor = getDebug(config.debug).SPEED_UP_TIME_BY_4 ? 0.25 : 1;
 		const instanceCreateLimiter = new RateLimit({
 			windowMs: 60 * 1000 * factor,

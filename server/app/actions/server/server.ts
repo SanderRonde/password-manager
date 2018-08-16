@@ -12,7 +12,7 @@ export interface ServerArgs {
 	dbpath: string;
 	password?: string;
 	database: string;
-	rateLimit: boolean;
+	ratelimit: boolean;
 	debug: boolean;
 	development: boolean;
 	databaseless: boolean;
