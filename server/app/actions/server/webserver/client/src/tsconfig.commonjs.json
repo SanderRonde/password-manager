@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
         "alwaysStrict": true,
-        "baseUrl": "../typings/",
+        "baseUrl": "../../../../../../../typings/",
         "forceConsistentCasingInFileNames": true,
-        "module": "commonjs",
+        "module": "esnext",
         "moduleResolution": "node",
         "noImplicitAny": true,
         "noImplicitThis": true,
@@ -19,16 +19,16 @@
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
         "strictNullChecks": true,
-        "declaration": true,
-        "sourceMap": true,
-        "composite": true
-	},
-    "compileOnSave": true,
+        "composite": true,
+        "declaration": true
+	}, 
     "allowJs": true,
+    "compileOnSave": true,
     "include": [
-        "./"
+        "./",
+        "../static"
     ],
     "references": [{
-        "path": "../server"
+        "path": "../../../../../../../shared/tsconfig.commonjs.json"
     }]
 }
