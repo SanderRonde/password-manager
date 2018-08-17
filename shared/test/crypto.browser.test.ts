@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { genRandomString } from '../../server/app/lib/util';
 import { PublicKeyEncrypted } from '../types/db-types';
 import * as requireHacker from 'require-hacker';
@@ -16,7 +17,7 @@ requireHacker.resolver((path: string, srcModule: any) => {
 import * as browserCrypto from '../lib/browser-crypto';
 
 export function cryptoBrowserTest() {
-	describe('Browser Crypto', () => {
+	parallel('Browser Crypto', () => {
 		it('padding works', () => {
 			const base = genRandomString(25);
 			assert.strictEqual(browserCrypto.pad(base, 'masterpwverify'), base + 'masterpwverify',
