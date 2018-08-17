@@ -1,0 +1,10 @@
+{
+  "projectId": "sftqst",
+  "baseUrl": "http://localhost:1256",
+  "fixturesFolder": false,
+  "integrationFolder": "test/ui/integration",
+  "pluginsFile": false,
+  "screenshotsFolder": "temp/screenshots",
+  "supportFile": false,
+  "videosFolder": "temp/videos"
+}
