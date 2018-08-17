@@ -70,6 +70,7 @@
     "html-typings": "1.1.2",
     "md5": "^2.2.1",
     "mocha": "^5.2.0",
+    "mocha.parallel": "^0.15.5",
     "require-hacker": "^3.0.1",
     "rollup": "^0.63.5",
     "rollup-plugin-commonjs": "^9.1.4",
