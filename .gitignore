@@ -81,3 +81,5 @@ certs/
 !shared/libraries/jsencrypt.*
 !server/app/libraries/jsencrypt.*
 test/**/*.js
+test/**/*.d.ts
+test/**/*.map
