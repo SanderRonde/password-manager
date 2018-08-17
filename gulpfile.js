@@ -635,10 +635,10 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 					file: outFile
 				});
 				const appendedFile = `${await fs.readFile(outFile)};
-				Object.getOwnPropertyNames(exported).filter((key) => {
+				exported[Object.getOwnPropertyNames(exported).filter((key) => {
 					return key !== '__esModule' &&
 						typeof exported[key] === 'function';
-				})[0].define();`;
+				})[0]].define();`;
 				await fs.writeFile(outFile, appendedFile, {
 					encoding: 'utf8'
 				})
