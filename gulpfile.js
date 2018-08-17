@@ -592,53 +592,85 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 
 	gulp.task('pretest.genbundles', genTask('Generates component bundles', 
 		async function genComponentBundles() {
-				const files = await getComponentFiles();
-				await Promise.all(files.map(async (file) => {
-					const bundle = await rollup.rollup({
-						input: file,
-						onwarn(warning) {
-							if (typeof warning !== 'string' && warning.code === 'THIS_IS_UNDEFINED') {
-								//Typescript inserted helper method, ignore it
-								return;
+			const files = await getComponentFiles();
+			await Promise.all(files.map(async (file) => {
+				const bundle = await rollup.rollup({
+					input: file,
+					onwarn(warning) {
+						if (typeof warning !== 'string' && warning.code === 'THIS_IS_UNDEFINED') {
+							//Typescript inserted helper method, ignore it
+							return;
+						}
+						console.log(warning);
+					},
+					plugins: [
+						rollupResolve({
+							module: true,
+							browser: true
+						}),
+						rollupCommonJs({
+							namedExports: {
+								'node_modules/js-sha512/src/sha512.js': [
+									'sha512', 
+									'sha512_256'
+								],
+								'node_modules/aes-js/index.js': [
+									'AES',
+									'Counter',
+									'ModeOfOperation',
+									'utils',
+									'padding',
+									'_arrayTest'
+								]
 							}
-							console.log(warning);
-						},
-						plugins: [
-							rollupResolve({
-								module: true,
-								browser: true
-							}),
-							rollupCommonJs({
-								namedExports: {
-									'node_modules/js-sha512/src/sha512.js': [
-										'sha512', 
-										'sha512_256'
-									],
-									'node_modules/aes-js/index.js': [
-										'AES',
-										'Counter',
-										'ModeOfOperation',
-										'utils',
-										'padding',
-										'_arrayTest'
-									]
-								}
-							})
-						]
-					});
-					const outDir = path.join(__dirname, 'test/ui/fixtures/bundles/');
-					await fs.mkdirp(outDir);
-					await bundle.write({
-						format: 'iife',
-						name: dashesToUppercase(path.basename(file)
-							.split('.').slice(0, -1).join('.')),
-						file: path.join(outDir, path.basename(file))
-					});
-				}));
-			}
-		));
+						})
+					]
+				});
+				const outDir = path.join(__dirname, 'test/ui/served/bundles/');
+				await fs.mkdirp(outDir);
+				const outFile = path.join(outDir, path.basename(file));
+				await bundle.write({
+					format: 'iife',
+					name: 'exported',
+					file: outFile
+				});
+				const appendedFile = `${await fs.readFile(outFile)};
+				Object.getOwnPropertyNames(exported).filter((key) => {
+					return key !== '__esModule' &&
+						typeof exported[key] === 'function';
+				})[0].define();`;
+				await fs.writeFile(outFile, appendedFile, {
+					encoding: 'utf8'
+				})
+			}));
+		}
+	));
 
-	gulp.task('pretest', gulp.parallel('pretest.genbundles'));
+	gulp.task('pretest.genhtml', genTask('Generates servable HTML files',
+		async function genWebPages() {
+			const files = await findWithGlob(`${
+				path.join(__dirname, 'test/ui/integration/components/')
+			}/**/*.json`);
+			await Promise.all(files.map(async (file) => {
+				const config = JSON.parse(await fs.readFile(file, {
+					encoding: 'utf8'
+				}));
+				const html = `${await fs.readFile(
+					path.join(path.dirname(file), config.html), {
+						encoding: 'utf8'
+					})}
+					<script src="bundles/${config.bundleName}.js"></script>`;
+				await fs.writeFile(path.join(__dirname, 
+					`test/ui/served/${config.name}.html`), html, {
+						encoding: 'utf8'
+					});
+			}));
+		}));
+
+	gulp.task('pretest', gulp.series(
+		'pretest.genbundles',
+		'pretest.genhtml'
+	));
 
 	// gulp.task('pretest.common', genTask('Task that has to be run before testing', 
 	// 	gulp.parallel(
