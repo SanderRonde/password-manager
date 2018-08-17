@@ -1,4 +1,3 @@
-const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { genTempDatabase, captureURIs, getCollectionLength } from '../../lib/util';
 import { hasCreatedDBWithPW, hasCreatedAccount, getDB } from '../../lib/db';
 import { DEFAULT_EMAIL } from '../../../app/lib/constants';
@@ -9,7 +8,7 @@ import { ProcRunner } from '../../lib/procrunner';
 import { assert } from 'chai';
 
 export function accountTest() {
-	parallel('Account', () => {
+	describe('Account', () => {
 		const uris = captureURIs();
 		it('print an error when no command is passed', async () => {
 			const proc = new ProcRunner(['account']);

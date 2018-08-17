@@ -1,4 +1,3 @@
-const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { genTempDatabase, captureURIs, captureCreatedFiles } from '../../lib/util';
 import { genDBWithPW, clearDB, getDB, hasCreatedDBWithPW } from '../../lib/db';
 import { genRandomString } from '../../../app/lib/util';
@@ -10,7 +9,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 
 export function backupTest() {
-	parallel('Backup', () => {
+	describe('Backup', () => {
 		const uris = captureURIs();
 		const files = captureCreatedFiles();
 		it('print an error when no command is passed', async () => {
