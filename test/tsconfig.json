@@ -20,11 +20,17 @@
         "strictPropertyInitialization": true,
         "strictNullChecks": true,
         "declaration": true,
-        "sourceMap": true
+		"sourceMap": true,
+		"composite": true
 	},
     "compileOnSave": true,
     "allowJs": true,
     "include": [
         "./"
-    ]
+	],
+	"references": [{
+		"path": "../server"	
+	}, {
+		"path": "../shared/tsconfig.commonjs.json"
+	}]
 }

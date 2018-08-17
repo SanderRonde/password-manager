@@ -18,7 +18,8 @@
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "composite": true
 	}, 
     "allowJs": true,
     "compileOnSave": true,
