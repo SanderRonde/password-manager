@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "alwaysStrict": true,
-        "baseUrl": "typings/",
+        "baseUrl": "../typings/",
         "forceConsistentCasingInFileNames": true,
         "module": "commonjs",
         "moduleResolution": "node",
@@ -14,20 +14,17 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "target": "es2015",
+        "target": "es6",
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
-        "strictNullChecks": true
-	}, 
+        "strictNullChecks": true,
+        "declaration": true,
+        "sourceMap": true
+	},
     "compileOnSave": true,
     "allowJs": true,
-	"include": [],
-	"references": [{
-		"path": "./server/tsconfig.ts3.json"
-	}, {
-		"path": "./server/app/actions/server/webserver/client/src"
-	}, {
-        "path": "./test/tsconfig.json"
-    }]
+    "include": [
+        "./"
+    ]
 }
