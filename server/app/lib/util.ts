@@ -6,10 +6,51 @@ import * as nodemailer from 'nodemailer'
 import { EventEmitter } from 'events';
 import * as babel from 'babel-core';
 import { Readable } from 'stream';
+import * as mkdirp from 'mkdirp';
 import { Stream } from 'stream';
 import * as mongo from 'mongodb'
-import * as fs from 'fs-extra'
 import * as path from 'path'
+import * as fs from 'fs'
+
+function readFile(src: string) {
+	return new Promise<string>((resolve, reject) => {
+		fs.readFile(src, {
+			encoding: 'utf8'
+		}, (err, data) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(data.toString());
+			}
+		})
+	});
+}
+
+function writeFile(dest: string, data: string) {
+	return new Promise<void>((resolve, reject) => {
+		fs.writeFile(dest, data, {
+			encoding: 'utf8'
+		}, (err) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve();
+			}
+		});
+	});
+}
+
+function unlink(file: string) {
+	return new Promise((resolve, reject) => {
+		fs.unlink(file, (err) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve();
+			}
+		})
+	});
+}
 
 //Prevent circular import
 function unref(...emitters: (EventEmitter|{
@@ -180,6 +221,7 @@ class StdinCapturer {
 	private _listeners: ((text: string) => void)[] = [];
 
 	constructor() {
+		if (!process.stdin) return;
 		listenWithoutRef(process.stdin, (chunk) => {
 			this._read += chunk.toString();
 			this._updateListeners();
@@ -223,11 +265,9 @@ class StdinCapturer {
 	}
 }
 
-const capturer = new StdinCapturer();
-
 export function assertDir(dirPath: string) {
 	return new Promise((resolve, reject) => {
-		fs.mkdirp(dirPath, (err) => {
+		mkdirp(dirPath, (err) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -253,9 +293,7 @@ export function writeBuffer(filePath: string, data: Buffer) {
 }
 
 export async function readJSON<T>(filePath: string): Promise<T> {
-	return commentJson.parse(await fs.readFile(filePath, {
-		encoding: 'utf8'
-	}) as EncodedString<T>);
+	return commentJson.parse(await readFile(filePath) as EncodedString<T>);
 }
 
 export function exitWith(err: string): never {
@@ -361,6 +399,7 @@ export function genRandomString(length: number = 50): string {
 	return str;
 }
 
+const capturer = new StdinCapturer();
 export function readPassword(text: string) {
 	console.log(text);
 	return new Promise<string>((resolve) => {
@@ -411,10 +450,8 @@ export function captureFileOutput() {
 		filePath,
 		fileName,
 		async check() {
-			const content = await fs.readFile(`${filePath}${fileName}`, {
-				encoding: 'utf8'
-			});
-			await fs.unlink(`${filePath}${fileName}`);
+			const content = await readFile(`${filePath}${fileName}`);
+			await unlink(`${filePath}${fileName}`);
 			return content;
 		}
 	}
@@ -477,18 +514,14 @@ export async function requireES6File<T>(filePath: string): Promise<T> {
 		return requireMap.get(filePath)!;
 	}
 
-	const content = await fs.readFile(filePath, {
-		encoding: 'utf8'
-	});
+	const content = await readFile(filePath);
 	const transformed = babel.transform(content, {
 		plugins: ['transform-es2015-modules-commonjs']
 	});
 	const outfile = path.join(__dirname, `../../temp/${genRandomString(25)}.js`);
-	await fs.writeFile(outfile, transformed.code, {
-		encoding: 'utf8'
-	});
+	await writeFile(outfile, transformed.code!);
 	const required = require(outfile);
-	await fs.unlink(outfile);
+	await unlink(outfile);
 	requireMap.set(filePath, required);
 	return required;
 }

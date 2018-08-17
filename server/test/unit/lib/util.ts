@@ -9,11 +9,11 @@ import { EventEmitter } from "events";
 import { Readable } from "stream";
 import * as mongo from 'mongodb'
 import { assert } from 'chai';
-import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as http from 'http'
 import * as net from 'net'
 import * as url from 'url'
+import * as fs from 'fs'
 
 export function unref(...emitters: (EventEmitter|{
 	unref(): void;
@@ -51,11 +51,23 @@ export async function genTempDatabase(): Promise<string> {
 	return uri;
 }
 
+function unlink(file: string) {
+	return new Promise((resolve, reject) => {
+		fs.unlink(file, (err) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve();
+			}
+		})
+	});
+}
+
 export function captureCreatedFiles(): string[] {
 	const arr: string[] = [];
 	after('Delete files', async function() {
 		await Promise.all(arr.map(async (filepath) => {
-			await fs.unlink(filepath).catch(() => {});
+			await unlink(filepath).catch(() => {});
 		}));
 	});
 	return arr;
