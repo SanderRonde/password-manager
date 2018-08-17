@@ -54,9 +54,6 @@ export async function genTempDatabase(): Promise<string> {
 export function captureCreatedFiles(): string[] {
 	const arr: string[] = [];
 	after('Delete files', async function() {
-		this.timeout(10000);
-		this.slow(10000);
-		
 		await Promise.all(arr.map(async (filepath) => {
 			await fs.unlink(filepath).catch(() => {});
 		}));
@@ -67,9 +64,6 @@ export function captureCreatedFiles(): string[] {
 export function captureURIs(): string[] {
 	const arr: string[] = [];
 	after('Clear databases', async function() {
-		this.timeout(10000);
-		this.slow(10000);
-
 		await Promise.all(arr.map(clearDB));
 	});
 	return arr;
