@@ -1,11 +1,11 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { captureURIs, doServerAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
-import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/../../shared/types/db-types';
-import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
+import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/../../../shared/types/db-types';
+import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
-import { DEFAULT_EMAIL } from '../../../../../../app/lib/constants';
+import { API_ERRS } from '../../../../../../app/../../../shared/types/api';
+import { DEFAULT_EMAIL } from '../../../../../../../app/lib/constants';
 import { doSingleQuery } from '../../../../../lib/db';
-import { API_ERRS } from '../../../../../../app/../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { assert } from 'chai';

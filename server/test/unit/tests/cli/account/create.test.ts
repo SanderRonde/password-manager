@@ -1,7 +1,7 @@
 import { genDBWithPW, hasCreatedDBWithPW, hasCreatedAccount } from '../../../lib/db';
 import { captureURIs, genTempDatabase } from '../../../lib/util';
-import { DEFAULT_EMAIL } from '../../../../app/lib/constants';
-import { genRandomString } from '../../../../app/lib/util';
+import { DEFAULT_EMAIL } from '../../../../../app/lib/constants';
+import { genRandomString } from '../../../../../app/lib/util';
 import { ProcRunner } from '../../../lib/procrunner';
 import { assert } from 'chai';
 

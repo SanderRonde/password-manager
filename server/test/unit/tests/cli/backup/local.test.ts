@@ -1,5 +1,5 @@
 import { captureURIs, genTempDatabase, captureCreatedFiles } from '../../../lib/util';
-import { genRandomString } from '../../../../app/lib/util';
+import { genRandomString } from '../../../../../app/lib/util';
 import { ProcRunner } from '../../../lib/procrunner';
 import { genDBWithPW } from '../../../lib/db';
 import * as path from 'path'

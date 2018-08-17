@@ -1,8 +1,8 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
-import { genRSAKeyPair, hash, pad, decryptWithPrivateKey, ERRS, decryptWithSalt, encryptWithPublicKey } from '../../../../../app/lib/crypto';
+import { genRSAKeyPair, hash, pad, decryptWithPrivateKey, ERRS, decryptWithSalt, encryptWithPublicKey } from '../../../../../../app/lib/crypto';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
-import { genRandomString } from '../../../../../app/lib/util';
-import { DEFAULT_EMAIL } from '../../../../../app/lib/constants';
+import { genRandomString } from '../../../../../../app/lib/util';
+import { DEFAULT_EMAIL } from '../../../../../../app/lib/constants';
 import { doSingleQuery } from '../../../../lib/db';
 import * as querystring from 'querystring'
 import * as speakeasy from 'speakeasy'

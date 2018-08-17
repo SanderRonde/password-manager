@@ -1,4 +1,4 @@
-import { GetRequired, GetOptional, GetEncrypted, GetOptionalEncrypted, APIFns, API_ERRS, APIArgs, JSONResponse } from "../../../shared/types/../../shared/types/api";
+import { GetRequired, GetOptional, GetEncrypted, GetOptionalEncrypted, APIFns, API_ERRS, APIArgs, JSONResponse } from "../../../shared/types/../../../shared/types/api";
 import { doServerAPIRequest, genUserAndDb, createServer } from "./util";
 import { ChildProcess } from "child_process";
 import { assert } from 'chai';

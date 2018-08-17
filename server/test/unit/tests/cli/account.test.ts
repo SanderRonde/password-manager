@@ -1,9 +1,9 @@
 import { genTempDatabase, captureURIs, getCollectionLength } from '../../lib/util';
 import { hasCreatedDBWithPW, hasCreatedAccount, getDB } from '../../lib/db';
-import { DEFAULT_EMAIL } from '../../../app/lib/constants';
+import { DEFAULT_EMAIL } from '../../../../app/lib/constants';
 import { accountDeleteTest } from './account/delete.test';
 import { accountCreateTest } from './account/create.test';
-import { genRandomString } from '../../../app/lib/util';
+import { genRandomString } from '../../../../app/lib/util';
 import { ProcRunner } from '../../lib/procrunner';
 import { assert } from 'chai';
 

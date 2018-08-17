@@ -1,8 +1,8 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
-import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
+import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
-import { DEFAULT_EMAIL } from '../../../../../app/lib/constants';
+import { DEFAULT_EMAIL } from '../../../../../../app/lib/constants';
 import { doSingleQuery } from '../../../../lib/db';
 import * as mongo from 'mongodb'
 import { assert } from 'chai';

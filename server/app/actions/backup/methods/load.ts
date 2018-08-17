@@ -1,4 +1,4 @@
-import { listenWithoutRef } from "../../../../test/lib/util";
+import { listenWithoutRef } from "../../../../test/unit/lib/util";
 import { exitWith } from "../../../lib/util";
 import { BackupSettings } from "../backup";
 import { exec } from "child_process";

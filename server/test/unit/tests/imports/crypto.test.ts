@@ -1,7 +1,7 @@
-import { PublicKeyEncrypted } from '../../../app/../../shared/types/db-types';
-import { ENCRYPTION_ALGORITHM } from '../../../app/lib/constants';
-import * as serverCrypto from '../../../app/lib/crypto';
-import { genRandomString } from '../../../app/lib/util';
+import { PublicKeyEncrypted } from '../../../app/../../../shared/types/db-types';
+import { ENCRYPTION_ALGORITHM } from '../../../../app/lib/constants';
+import * as serverCrypto from '../../../../app/lib/crypto';
+import { genRandomString } from '../../../../app/lib/util';
 import { assert } from 'chai';
 
 export function cryptoTest() {

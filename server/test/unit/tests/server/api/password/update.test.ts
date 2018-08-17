@@ -1,11 +1,11 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
+import { MongoRecord, EncryptedPassword, EncryptedInstance, StringifiedObjectId } from '../../../../../app/../../../shared/types/db-types';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, getLoginToken, genURL, setPasword } from '../../../../lib/util';
-import { MongoRecord, EncryptedPassword, EncryptedInstance, StringifiedObjectId } from '../../../../../app/../../shared/types/db-types';
-import { encrypt, hash, pad, decryptWithSalt, ERRS, decrypt, Encrypted, Hashed, Padded } from '../../../../../app/lib/crypto';
+import { encrypt, hash, pad, decryptWithSalt, ERRS, decrypt, Encrypted, Hashed, Padded } from '../../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
-import { ENCRYPTION_ALGORITHM } from '../../../../../app/lib/constants';
-import { genRandomString } from '../../../../../app/lib/util';
-import { API_ERRS } from '../../../../../app/../../shared/types/api';
+import { ENCRYPTION_ALGORITHM } from '../../../../../../app/lib/constants';
+import { API_ERRS } from '../../../../../app/../../../shared/types/api';
+import { genRandomString } from '../../../../../../app/lib/util';
 import { getDB } from '../../../../lib/db';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'

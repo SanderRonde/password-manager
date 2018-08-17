@@ -1,9 +1,9 @@
 import { captureURIs, createServer, genUserAndDb, doServerPostRequest, UserAndDbData, doesNotThrow, genURL, getLoginToken } from '../../lib/util';
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
-import { APIReturns, API_ERRS } from '../../../app/../../shared/types/api';
-import { encryptWithPublicKey, pad, hash } from '../../../app/lib/crypto';
-import { wait, genRandomString } from '../../../app/lib/util';
-import { APIToken } from '../../../../shared/types/crypto';
+import { APIReturns, API_ERRS } from '../../../app/../../../shared/types/api';
+import { encryptWithPublicKey, pad, hash } from '../../../../app/lib/crypto';
+import { wait, genRandomString } from '../../../../app/lib/util';
+import { APIToken } from '../../../../../shared/types/crypto';
 import { assert } from 'chai';
 import * as http from 'http'
 

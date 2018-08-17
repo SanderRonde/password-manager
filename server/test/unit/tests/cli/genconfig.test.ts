@@ -1,5 +1,5 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
-import { genRandomString } from '../../../app/lib/util';
+import { genRandomString } from '../../../../app/lib/util';
 import { captureCreatedFiles } from '../../lib/util';
 import { ProcRunner } from '../../lib/procrunner';
 import * as fs from 'fs-extra'

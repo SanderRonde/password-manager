@@ -1,9 +1,9 @@
 import { readPassword, readConfirm, exitWith } from "../../../lib/util";
 import { Database, COLLECTIONS } from "../../../database/database";
 import { EncryptedAccount } from "../../../../../shared/types/db-types";
+import { doTry } from "../../../../test/unit/lib/util";
 import { pad, hash } from "../../../lib/crypto";
 import { getDebug } from "../../../lib/debug";
-import { doTry } from "../../../../test/lib/util";
 
 export namespace DeleteAccount {
 	async function tryPasswordOnce(email: string, database: Database) {

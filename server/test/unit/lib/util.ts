@@ -1,9 +1,9 @@
-import { encryptWithPublicKey, genRSAKeyPair, ERRS, hash, pad, decryptWithPrivateKey, encrypt, decryptWithSalt, decrypt } from "../../app/lib/crypto";
-import { EncryptedInstance, TypedObjectID, MongoRecord, EncryptedPassword } from "../../app/../../shared/types/db-types";
+import { encryptWithPublicKey, genRSAKeyPair, ERRS, hash, pad, decryptWithPrivateKey, encrypt, decryptWithSalt, decrypt } from "../../../app/lib/crypto";
+import { EncryptedInstance, TypedObjectID, MongoRecord, EncryptedPassword } from "../../app/../../../shared/types/db-types";
 import { getDB, clearDB, genDBWithPW, genAccountOnly, genInstancesOnly } from "./db";
-import { APIFns, APIArgs, APIReturns } from "../../app/../../shared/types/api";
-import { TEST_DB_URI, ENCRYPTION_ALGORITHM } from "../../app/lib/constants";
-import { genRandomString, optionalArrayItem } from "../../app/lib/util";
+import { APIFns, APIArgs, APIReturns } from "../../app/../../../shared/types/api";
+import { TEST_DB_URI, ENCRYPTION_ALGORITHM } from "../../../app/lib/constants";
+import { genRandomString, optionalArrayItem } from "../../../app/lib/util";
 import { spawn, ChildProcess } from "child_process";
 import { EventEmitter } from "events";
 import { Readable } from "stream";

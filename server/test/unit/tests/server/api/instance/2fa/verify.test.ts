@@ -1,8 +1,8 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
+import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/../../../shared/types/db-types';
 import { captureURIs, doServerAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
-import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/../../shared/types/db-types';
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
-import { API_ERRS } from '../../../../../../app/../../shared/types/api';
+import { API_ERRS } from '../../../../../../app/../../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { assert } from 'chai';

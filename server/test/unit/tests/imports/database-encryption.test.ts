@@ -1,6 +1,6 @@
-import { DatabaseEncryption } from '../../../app/database/libs/db-encryption';
+import { DatabaseEncryption } from '../../../../app/database/libs/db-encryption';
+import { genRandomString } from '../../../../app/lib/util';
 import { assert } from 'chai';
-import { genRandomString } from '../../../app/lib/util';
 
 class DBEncryptionTest extends DatabaseEncryption {
 	public obfuscateKey(key: string) {

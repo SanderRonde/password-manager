@@ -1,10 +1,10 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
-import { hash, pad, decryptWithPrivateKey, ERRS, encryptWithPublicKey } from '../../../../../app/lib/crypto';
+import { hash, pad, decryptWithPrivateKey, ERRS, encryptWithPublicKey } from '../../../../../../app/lib/crypto';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
-import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
+import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/../../../shared/types/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
-import { genRandomString } from '../../../../../app/lib/util';
-import { API_ERRS } from '../../../../../app/../../shared/types/api';
+import { genRandomString } from '../../../../../../app/lib/util';
+import { API_ERRS } from '../../../../../app/../../../shared/types/api';
 import * as speakeasy from 'speakeasy'
 import * as mongo from 'mongodb'
 import { assert } from 'chai';

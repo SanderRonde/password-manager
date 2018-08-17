@@ -1,7 +1,7 @@
 import { genDBWithPW, hasCreatedDBWithPW, clearDB, getDB } from '../../../lib/db';
-import { genRandomString, writeBuffer } from '../../../../app/lib/util';
+import { genRandomString, writeBuffer } from '../../../../../app/lib/util';
+import { Export } from '../../../../../app/actions/backup/export';
 import { genTempDatabase, captureURIs } from '../../../lib/util';
-import { Export } from '../../../../app/actions/backup/export';
 import { ProcRunner } from '../../../lib/procrunner';
 import { assert } from 'chai';
 import * as path from 'path'

@@ -1,9 +1,9 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
-import { encryptWithPublicKey, hash, pad, decryptWithPrivateKey, ERRS, genRSAKeyPair } from '../../../app/lib/crypto';
+import { encryptWithPublicKey, hash, pad, decryptWithPrivateKey, ERRS, genRSAKeyPair } from '../../../../app/lib/crypto';
 import { genUserAndDb, createServer, captureURIs, doServerAPIRequest } from '../../lib/util';
-import { API_ERRS } from '../../../app/../../shared/types/api';
-import { DEFAULT_EMAIL } from '../../../app/lib/constants';
-import { genRandomString } from '../../../app/lib/util';
+import { API_ERRS } from '../../../app/../../../shared/types/api';
+import { DEFAULT_EMAIL } from '../../../../app/lib/constants';
+import { genRandomString } from '../../../../app/lib/util';
 import { doSingleQuery } from '../../lib/db';
 import * as mongo from 'mongodb'
 import { assert } from 'chai';

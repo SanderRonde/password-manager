@@ -1,5 +1,5 @@
 import { API_ERRS } from '../../../../../../../shared/types/api';
-import { unref } from '../../../../../../test/lib/util';
+import { unref } from '../../../../../../test/unit/lib/util';
 import { getDebug } from '../../../../../lib/debug';
 import { ServerConfig } from '../../../server';
 import * as RateLimit from 'express-rate-limit'

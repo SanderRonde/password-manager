@@ -1,9 +1,9 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
-import { encryptWithPublicKey, hash, pad, decryptWithPrivateKey, ERRS, encrypt, decryptWithSalt, decrypt } from '../../../../../app/lib/crypto';
+import { encryptWithPublicKey, hash, pad, decryptWithPrivateKey, ERRS, encrypt, decryptWithSalt, decrypt } from '../../../../../../app/lib/crypto';
 import { genUserAndDb, createServer, doServerAPIRequest, captureURIs, genURL, doesNotThrow, isErr } from '../../../../lib/util';
-import { EncryptedPassword, MongoRecord, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
-import { ENCRYPTION_ALGORITHM } from '../../../../../app/lib/constants';
-import { genRandomString } from '../../../../../app/lib/util';
+import { EncryptedPassword, MongoRecord, EncryptedInstance } from '../../../../../app/../../../shared/types/db-types';
+import { ENCRYPTION_ALGORITHM } from '../../../../../../app/lib/constants';
+import { genRandomString } from '../../../../../../app/lib/util';
 import { getDB, doSingleQuery } from '../../../../lib/db';
 import * as mongo from 'mongodb'
 import { assert } from 'chai';

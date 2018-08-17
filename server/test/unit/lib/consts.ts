@@ -1,4 +1,4 @@
-import { initCommander } from '../../app/main';
+import { initCommander } from '../../../app/main';
 
 function getDefaultHelp() {
 	let helpText: string = '';

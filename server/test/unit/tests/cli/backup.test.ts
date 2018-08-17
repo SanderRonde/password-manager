@@ -1,6 +1,6 @@
 import { genTempDatabase, captureURIs, captureCreatedFiles } from '../../lib/util';
 import { genDBWithPW, clearDB, getDB, hasCreatedDBWithPW } from '../../lib/db';
-import { genRandomString } from '../../../app/lib/util';
+import { genRandomString } from '../../../../app/lib/util';
 import { backupLocalTest } from './backup/local.test';
 import { backupLoadTest } from './backup/load.test';
 import { ProcRunner } from '../../lib/procrunner';

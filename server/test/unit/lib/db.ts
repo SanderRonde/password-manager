@@ -1,8 +1,8 @@
-import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, EncryptedPassword, TypedObjectID } from '../../app/../../shared/types/db-types';
-import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, genRSAKeyPair } from '../../app/lib/crypto';
-import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../app/lib/constants';
+import { EncryptedAccount, DecryptedAccount, DatabaseEncrypted, DatabaseEncryptedWithSalt, EncryptedInstance, MongoRecord, EncryptedPassword, TypedObjectID } from '../../app/../../../shared/types/db-types';
+import { encrypt, decrypt, decryptWithSalt, hash, pad, ERRS, encryptWithSalt, genRSAKeyPair } from '../../../app/lib/crypto';
+import { TEST_DB_URI, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../../app/lib/constants';
 import { getCollectionLength, MockConfig, doesNotThrowAsync } from './util';
-import { genRandomString, getDBFromURI, genID } from '../../app/lib/util';
+import { genRandomString, getDBFromURI, genID } from '../../../app/lib/util';
 import { assert } from 'chai';
 
 import * as mongo from 'mongodb'

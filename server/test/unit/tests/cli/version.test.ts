@@ -1,4 +1,4 @@
-import { VERSION } from '../../../app/lib/constants';
+import { VERSION } from '../../../../app/lib/constants';
 import { ProcRunner } from '../../lib/procrunner';
 
 export function cliVersionTest() {

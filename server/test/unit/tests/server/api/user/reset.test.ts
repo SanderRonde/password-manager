@@ -1,11 +1,11 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
-import { EncryptedAccount, MongoRecord, EncryptedPassword, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
+import { EncryptedAccount, MongoRecord, EncryptedPassword, EncryptedInstance } from '../../../../../../app/../../shared/types/db-types';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, isErr } from '../../../../lib/util';
-import { decryptWithSalt, ERRS, decrypt, hash, pad } from '../../../../../app/lib/crypto';
-import { RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../../../../app/lib/constants';
+import { decryptWithSalt, ERRS, decrypt, hash, pad } from '../../../../../../app/lib/crypto';
+import { RESET_KEY_LENGTH, DEFAULT_EMAIL } from '../../../../../../app/lib/constants';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
-import { genRandomString } from '../../../../../app/lib/util';
-import { API_ERRS } from '../../../../../app/../../shared/types/api';
+import { API_ERRS } from '../../../../../app/../../../shared/types/api';
+import { genRandomString } from '../../../../../../app/lib/util';
 import { getDB } from '../../../../lib/db';
 import { assert } from 'chai';
 

@@ -1,6 +1,6 @@
 const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
-import { genRandomString } from '../../server/app/lib/util';
-import * as serverCrypto from '../../server/app/lib/crypto';
+import { genRandomString } from '../../../server/app/lib/util';
+import * as serverCrypto from '../../../server/app/lib/crypto';
 import * as requireHacker from 'require-hacker';
 import path = require('path');
 import { assert } from 'chai';
@@ -13,7 +13,7 @@ requireHacker.resolver((path: string, srcModule: any) => {
 	}
 	return undefined;
 })
-import * as browserCrypto from '../lib/browser-crypto';
+import * as browserCrypto from '../../lib/browser-crypto';
 
 export function cryptoServerBrowserTest() {
 	parallel('Server-Browser Crypto', () => {
