@@ -20,7 +20,7 @@ script:
 - gulp defs
 - tsc --build --force && tsc -p shared/tsconfig.commonjs.json
 - mocha shared/test/test.js --exit
-- mocha server/test/test.js --exit
+- mocha server/test/unit/test.js --exit
 notifications:
   email:
     on_success: change
