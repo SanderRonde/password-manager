@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { genRSAKeyPair, hash, pad, decryptWithPrivateKey, ERRS, encryptWithPublicKey } from '../../../../../app/lib/crypto';
 import { genUserAndDb, createServer, captureURIs, doServerAPIRequest } from '../../../../lib/util';
 import { DEFAULT_EMAIL } from '../../../../../app/lib/constants';
@@ -7,7 +8,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 export function authenticationWorkflowTest() {
-	describe('Authentication', () => {
+	parallel('Authentication', () => {
 		const uris = captureURIs();
 		it('can log in after registering instance', async () => {
 			const config = await genUserAndDb();

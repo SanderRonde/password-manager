@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { genRandomString } from '../../../app/lib/util';
 import { captureCreatedFiles } from '../../lib/util';
 import { ProcRunner } from '../../lib/procrunner';
@@ -6,7 +7,7 @@ import * as path from 'path'
 import { assert } from 'chai';
 
 export function genConfigTest() {
-	describe('GenConfig', () => {
+	parallel('GenConfig', () => {
 		const files = captureCreatedFiles();
 		it('print an error when no command is passed', async () => {
 			const proc = new ProcRunner(['genconfig']);

@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { genRSAKeyPair, hash, pad, decryptWithPrivateKey, ERRS, decryptWithSalt, encryptWithPublicKey } from '../../../../../app/lib/crypto';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { genRandomString } from '../../../../../app/lib/util';
@@ -10,7 +11,7 @@ import { assert } from 'chai';
 import * as url from 'url'
 
 export function instanceTwofactorTest() {
-	describe('Instance Twofactor', () => {
+	parallel('Instance Twofactor', () => {
 		const uris = captureURIs();
 		it('can enable 2FA after registering instance when 2FA is enabled for the user', async () => {
 			const twofactor = speakeasy.generateSecret();

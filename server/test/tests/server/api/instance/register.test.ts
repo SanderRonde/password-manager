@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { hash, pad, genRSAKeyPair, decryptWithPrivateKey, ERRS } from '../../../../../app/lib/crypto';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
@@ -7,7 +8,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 export function registerTest() {
-	describe('Register', () => {
+	parallel('Register', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/instance/register', {
 			email: 'string',

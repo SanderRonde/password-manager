@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { hash, pad, decryptWithPrivateKey, ERRS, encryptWithPublicKey } from '../../../../../app/lib/crypto';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
@@ -9,7 +10,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 export function loginTest() {
-	describe('Login', () => {
+	parallel('Login', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/instance/login', {
 			instance_id: 'string',

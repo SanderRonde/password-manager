@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { encryptWithPublicKey, hash, pad, decryptWithPrivateKey, ERRS, encrypt, decryptWithSalt, decrypt } from '../../../../../app/lib/crypto';
 import { genUserAndDb, createServer, doServerAPIRequest, captureURIs, genURL, doesNotThrow, isErr } from '../../../../lib/util';
 import { EncryptedPassword, MongoRecord, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
@@ -9,7 +10,7 @@ import { assert } from 'chai';
 import * as url from 'url'
 
 export function workflowPasswordTest() {
-	describe('Password', () => {
+	parallel('Password', () => {
 		const uris = captureURIs();
 		it('can log in, set a password, update it and then remove a password', async () => {
 			const config = await genUserAndDb({

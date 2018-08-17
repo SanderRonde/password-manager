@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { authenticationWorkflowTest } from "./workflows/authentication.test";
 import { instanceTwofactorTest } from "./workflows/instance-twofactor.test";
 import { twofactorConfirmTest } from "./instance/2fa/confirm.test";
@@ -21,20 +22,20 @@ import { loginTest } from "./instance/login.test";
 import { userResetTest } from "./user/reset.test";
 
 export function APITest() {
-	describe('API', () => {
-		describe('Instance', () => {
+	parallel('API', () => {
+		parallel('Instance', () => {
 			extendKeyTest();
 			loginTest();
 			logoutTest();
 			registerTest();
-			describe('2FA', () => {
+			parallel('2FA', () => {
 				twofactorConfirmTest();
 				twofactorDisableTest();
 				twofactorEnableTest();
 				twofactorVerifyTest();
 			});
 		});
-		describe('Password', () => {
+		parallel('Password', () => {
 			passwordAllmetaTest();
 			passwordGetTest();
 			passwordGetMetaTest();
@@ -43,11 +44,11 @@ export function APITest() {
 			passwordSetTest();
 			passwordUpdateTest();
 		});	
-		describe('User', () => {
+		parallel('User', () => {
 			userGenResetKeyTest();
 			userResetTest();
 		});
-		describe('Workflows', () => {
+		parallel('Workflows', () => {
 			authenticationWorkflowTest();
 			instanceTwofactorTest();
 			workflowPasswordTest();

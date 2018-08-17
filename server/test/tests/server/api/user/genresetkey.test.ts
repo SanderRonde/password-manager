@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { EncryptedAccount, MongoRecord, EncryptedInstance, StringifiedObjectId } from '../../../../../app/../../shared/types/db-types';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
@@ -10,7 +11,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 export function userGenResetKeyTest() {
-	describe('Gen Resetkey', () => {
+	parallel('Gen Resetkey', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/user/genresetkey', {
 			instance_id: 'string',

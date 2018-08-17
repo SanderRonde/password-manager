@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { EncryptedInstance, MongoRecord, EncryptedAccount, EncryptedPassword } from '../../../../../app/../../shared/types/db-types';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, isErr } from '../../../../lib/util';
 import { ERRS, decrypt, decryptWithSalt, hash, pad } from '../../../../../app/lib/crypto';
@@ -7,7 +8,7 @@ import { getDB } from '../../../../lib/db';
 import { assert } from 'chai';
 
 export function workflowResettingTest() {
-	describe('Resetting', () => {
+	parallel('Resetting', () => {
 		const uris = captureURIs();
 		it('can generate a new key and then reset with it', async () => {
 			const initialResetKey = genRandomString(RESET_KEY_LENGTH);

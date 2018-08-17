@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { encryptWithPublicKey, hash, pad, decryptWithPrivateKey, ERRS, genRSAKeyPair } from '../../../app/lib/crypto';
 import { genUserAndDb, createServer, captureURIs, doServerAPIRequest } from '../../lib/util';
 import { API_ERRS } from '../../../app/../../shared/types/api';
@@ -8,7 +9,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 export function tokenTest() {
-	describe('Token', () => {
+	parallel('Token', () => {
 		const uris = captureURIs();
 		it('invalidates all account tokens if an old token is extended', async () => {
 			const config = await genUserAndDb({

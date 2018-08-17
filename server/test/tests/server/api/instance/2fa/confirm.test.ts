@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { captureURIs, doServerAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/../../shared/types/db-types';
 import { testParams, testInvalidCredentials } from '../../../../../lib/macros';
@@ -7,7 +8,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 export function twofactorConfirmTest() {
-	describe('Confirm', () => {
+	parallel('Confirm', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/instance/2fa/confirm', {
 			instance_id: 'string',

@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doServerAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance, EncryptedPassword } from '../../../../../app/../../shared/types/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
@@ -8,7 +9,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 export function passwordRemoveTest() {
-	describe('Remove', () => {
+	parallel('Remove', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/password/remove', {
 			instance_id: 'string'

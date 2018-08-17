@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { captureURIs, genUserAndDb, createServer, getLoginToken, setPasword, doServerAPIRequest, genURL, doesNotThrow } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
 import { decryptWithPrivateKey, ERRS, hash, pad } from '../../../../../app/lib/crypto';
@@ -10,7 +11,7 @@ import { assert } from 'chai';
 import * as url from 'url'
 
 export function passwordAllmetaTest() {
-	describe('Allmeta', () => {
+	parallel('Allmeta', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/password/allmeta', {
 			instance_id: 'string'

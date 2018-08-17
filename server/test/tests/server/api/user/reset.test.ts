@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { EncryptedAccount, MongoRecord, EncryptedPassword, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest, isErr } from '../../../../lib/util';
 import { decryptWithSalt, ERRS, decrypt, hash, pad } from '../../../../../app/lib/crypto';
@@ -9,7 +10,7 @@ import { getDB } from '../../../../lib/db';
 import { assert } from 'chai';
 
 export function userResetTest() {
-	describe('Reset', () => {
+	parallel('Reset', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/user/reset', {
 			instance_id: 'string',

@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { captureURIs, doServerAPIRequest, createServer, genUserAndDb } from '../../../../../lib/util';
 import { EncryptedInstance, StringifiedObjectId } from '../../../../../../app/../../shared/types/db-types';
 import { pad, hash, decryptWithSalt, ERRS } from '../../../../../../app/lib/crypto';
@@ -10,7 +11,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 export function twofactorDisableTest() {
-	describe('Disable', () => {
+	parallel('Disable', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/instance/2fa/enable', {
 			instance_id: 'string',

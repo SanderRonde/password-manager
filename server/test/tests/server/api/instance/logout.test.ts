@@ -1,3 +1,4 @@
+const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { captureURIs, genUserAndDb, createServer, doServerAPIRequest } from '../../../../lib/util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../../../app/../../shared/types/db-types';
 import { testParams, testInvalidCredentials } from '../../../../lib/macros';
@@ -6,7 +7,7 @@ import * as mongo from 'mongodb'
 import { assert } from 'chai';
 
 export function logoutTest() {
-	describe('Logout', () => {
+	parallel('Logout', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/instance/logout', {
 			instance_id: 'string',
