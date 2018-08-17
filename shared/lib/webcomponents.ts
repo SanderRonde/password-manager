@@ -15,7 +15,12 @@ type IDMapFn<IDS> = {
 	(selector: string): HTMLElement|null;
 } & IDS;
 
-abstract class WebComponentDefiner extends HTMLElement {
+interface ExtendedProcess extends NodeJS.Process {
+	HTMLElement: typeof HTMLElement;
+}
+const elementBase: typeof HTMLElement = typeof HTMLElement !== 'undefined' ? 
+	HTMLElement : (<ExtendedProcess>process).HTMLElement;
+abstract class WebComponentDefiner extends elementBase {
 	/**
 	 * Any dependencies this component depends on
 	 */
