@@ -1,9 +1,11 @@
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonJs = require('rollup-plugin-commonjs');
+const requireHacker = require('require-hacker');
 const htmlMinifier = require('html-minifier');
 const htmlTypings = require('html-typings');
 const uglifyCSS = require('uglifycss');
 const uglify = require('uglify-es');
+const babel = require('babel-core');
 const rollup = require('rollup');
 const fs = require('fs-extra');
 const gulp = require('gulp');
@@ -461,4 +463,268 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		'dashboard.bundle',
 		'dashboard.meta'
 	));
+})();
+
+/** Testing */
+(() => {
+	function synchronizePromise(prom) {
+		return new Promise((resolve) => {
+			prom.catch((err) => {
+				resolve({
+					err,
+					result: null
+				});
+			}).then((result) => {
+				resolve({
+					err: null,
+					result: result
+				});
+			});
+		});
+	}
+
+	async function transformToEs6(filePath, name) {
+		const outfile = path.join(__dirname, `temp/${name}.js`);
+		const { err } = await synchronizePromise(fs.readFile(outfile, {
+			encoding: 'utf8'
+		}));
+		if (!err) {
+			return;
+		}
+		const content = await fs.readFile(filePath, {
+			encoding: 'utf8'
+		});
+		const transformed = babel.transform(content, {
+			plugins: ['transform-es2015-modules-commonjs']
+		});
+		await fs.writeFile(outfile, transformed.code, {
+			encoding: 'utf8'
+		});
+	}
+
+	async function transformToCommonJS(filePath) {
+		const content = await fs.readFile(filePath, {
+			encoding: 'utf8'
+		});
+		const transformed = babel.transform(content, {
+			plugins: ['transform-commonjs-es2015-modules']
+		});
+		return transformed.code;
+	}
+
+	async function rollupComponent(filePath, componentName, bundleName) {
+		const outputFolder = path.join(__dirname, 
+			'test/ui/fixtures/components/bundles/');
+		await fs.mkdirp(outputFolder);
+		const outputLocation = path.join(outputFolder, `${bundleName}.js`);
+		const commonComponent = (await transformToCommonJS(filePath))
+			.replace(/export \w+ (\w+) = (\w+)/, 'export { $1 }');
+		const tempFile = filePath + '.temp';
+		await fs.writeFile(tempFile, commonComponent, {
+			encoding: 'utf8'
+		});
+		console.log(tempFile);
+		const bundle = await rollup.rollup({
+			input: tempFile,
+			onwarn(warning) {
+				if (typeof warning !== 'string' && warning.code === 'THIS_IS_UNDEFINED') {
+					//Typescript inserted helper method, ignore it
+					return;
+				}
+				console.log(warning);
+			},
+			plugins: [
+				rollupResolve({
+					module: true,
+					browser: true
+				}),
+				rollupCommonJs({
+					namedExports: {
+						'node_modules/js-sha512/src/sha512.js': [
+							'sha512', 
+							'sha512_256'
+						],
+						'node_modules/aes-js/index.js': [
+							'AES',
+							'Counter',
+							'ModeOfOperation',
+							'utils',
+							'padding',
+							'_arrayTest'
+						]
+					}
+				})
+			]
+		});
+		await bundle.write({
+			format: 'iife',
+			file: outputLocation,
+			name: componentName
+		});
+		await fs.unlink(tempFile);
+		return await fs.readFile(outputLocation, {
+			encoding: 'utf8'
+		});
+	}
+
+	async function requireES6File(filePath, name) {
+		await transformToEs6(filePath, name);
+		const outfile = path.join(__dirname, `temp/${name}.js`);
+		const required = require(outfile);
+		return required;
+	}
+
+	function getComponentFiles() {
+		return new Promise((resolve, reject) => {
+			glob(path.join(__dirname, 'shared/components') +
+				'/**/*.js', async (err, matches) => {
+					if (err) {
+						reject(err);
+						return;
+					}
+					matches = matches.filter((match) => {
+						return !match.endsWith('.html.js') &&
+							!match.endsWith('.css.js');
+					});
+					resolve(matches);
+				});
+		});
+	}
+
+	async function requireComponentFiles(files) {
+		const name = 'litHtml';
+		await requireES6File(path.join(__dirname, 'node_modules/lit-html/lit-html.js'), name);
+		const litHTMLPath = path.join(__dirname, 'temp/', `${name}.js`);
+		const commonjsJSEncrypt = path.join(__dirname, 'server/app/libraries/jsencrypt.js');
+		const resolver = requireHacker.resolver((reqPath, srcModule) => {
+			const resolvedPath = requireHacker.resolve(reqPath, srcModule);
+			if (reqPath === 'lit-html') {
+				return litHTMLPath;
+			}
+			if (/shared.libraries.jsencrypt\.js/.exec(resolvedPath)) {
+				return commonjsJSEncrypt;
+			}
+			return undefined;
+		});
+		process.HTMLElement = class HTMLElement {}
+		const required = files.map(file => ({
+			src: file,
+			content: require(file)
+		}));
+		resolver.unmount();
+		return required;
+	}
+
+	function filterComponents(candidates) {
+		return candidates.map(({ content, src }) => {
+			for (const key in content) {
+				const value = content[key];
+				if (!('config' in value))
+					continue;
+				if (!('is' in value))
+					continue;
+				return {
+					src,
+					content: value,
+					name: key
+				};
+			}
+			return null;
+		}).filter((val) => {
+			return val !== null;
+		});
+	}
+
+	async function generateComponentMap() {
+		const files = await getComponentFiles();
+		const required = await requireComponentFiles(files);
+		return filterComponents(required);
+	}
+
+	function dashesToUppercase(str) {
+		let newStr = '';
+		for (let i = 0; i < str.length; i++) {
+			const char = str[i];
+			if (char === '-') {
+				newStr += str[i + 1].toUpperCase();
+				i += 1;
+			} else {
+				newStr += char;
+			}
+		}
+		return newStr;
+	}
+
+	gulp.task('pretest.genbundles', genTask('Generates component bundles', 
+		async function genComponentBundles() {
+				const files = await getComponentFiles();
+				await Promise.all(files.map(async (file) => {
+					const bundle = await rollup.rollup({
+						input: file,
+						onwarn(warning) {
+							if (typeof warning !== 'string' && warning.code === 'THIS_IS_UNDEFINED') {
+								//Typescript inserted helper method, ignore it
+								return;
+							}
+							console.log(warning);
+						},
+						plugins: [
+							rollupResolve({
+								module: true,
+								browser: true
+							}),
+							rollupCommonJs({
+								namedExports: {
+									'node_modules/js-sha512/src/sha512.js': [
+										'sha512', 
+										'sha512_256'
+									],
+									'node_modules/aes-js/index.js': [
+										'AES',
+										'Counter',
+										'ModeOfOperation',
+										'utils',
+										'padding',
+										'_arrayTest'
+									]
+								}
+							})
+						]
+					});
+					const outDir = path.join(__dirname, 'test/ui/fixtures/bundles/');
+					await fs.mkdirp(outDir);
+					await bundle.write({
+						format: 'iife',
+						name: dashesToUppercase(path.basename(file)
+							.split('.').slice(0, -1).join('.')),
+						file: path.join(outDir, path.basename(file))
+					});
+				}));
+			}
+		));
+
+	gulp.task('pretest', gulp.parallel('pretest.genbundles'));
+
+	// gulp.task('pretest.common', genTask('Task that has to be run before testing', 
+	// 	gulp.parallel(
+	// 		async function getComponentMetadata() {
+	// 			const components = await generateComponentMap();
+	// 			const metadata = await Promise.all(components.map(async (component) => {
+	// 				return {
+	// 					src: component.src,
+	// 					bundleName: dashesToUppercase(component.content.config.is),
+	// 					component: {
+	// 						config: {
+	// 							is: component.content.config.is
+	// 						},
+	// 						is: component.content.config.is
+	// 					}
+	// 				}
+	// 			}));
+	// 			const outDir = path.join(__dirname,
+	// 				'test/ui/fixtures/config');
+	// 			await fs.mkdirp(outDir);
+	// 			await fs.writeFile(path.join(outDir, 'meta.json'));
+	// 		}
+	// 	)));
 })();
