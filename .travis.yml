@@ -1,6 +1,9 @@
 language: node_js
 node_js: "10"
-cache: yarn
+cache:
+  directories:
+    - ~/.npm
+    - ~/.cache
 
 branches:
   only:
@@ -19,8 +22,7 @@ before_script:
 script:
 - gulp defs
 - tsc --build --force && tsc -p shared/tsconfig.commonjs.json
-- mocha shared/test/test.js --exit
-- mocha server/test/unit/test.js --exit
+- mocha test/unit/unit.test.js --exit
 notifications:
   email:
     on_success: change

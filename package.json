@@ -63,6 +63,7 @@
     "@types/speakeasy": "^2.0.2",
     "@types/webpack": "^4.4.8",
     "chai": "^4.1.2",
+    "cypress": "^3.1.0",
     "glob": "^7.1.2",
     "gulp": "^4.0.0",
     "gulp-clean-css": "^3.9.4",
@@ -84,6 +85,6 @@
   "scripts": {
     "compile": "gulp defs && tsc --build tsconfig.json --force",
     "build": "yarn compile && yarn compile:server:modules && gulp dashboard",
-    "test": "tsc --build --force && tsc -p shared/tsconfig.commonjs.json && mocha shared/test/test.js --exit && mocha server/test/unit/test.js --exit"
+    "test": "tsc --build --force && tsc -p shared/tsconfig.commonjs.json && mocha test/unit/unit.test.js --exit"
   }
 }
