@@ -7,5 +7,5 @@
   "screenshotsFolder": "temp/screenshots",
   "supportFile": false,
   "videosFolder": "temp/videos",
-  "ignoreTestFiles": "*.js"
+  "ignoreTestFiles": "*.{ts,map}"
 }
