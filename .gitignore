@@ -83,3 +83,5 @@ certs/
 test/**/*.js
 test/**/*.d.ts
 test/**/*.map
+shared/**/*.temp
+test/ui/served/
