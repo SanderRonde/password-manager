@@ -2,7 +2,7 @@
 
 import { DEFAULT_THEME } from '../../../../../shared/types/shared-types';
 import { WebComponent } from '../../../../../shared/lib/webcomponents';
-import { iterateThemes, toRGB } from '../../../lib/ui-test-util';
+import { iterateThemes, toRGB, getContrast } from '../../../lib/ui-test-util';
 const DEFAULT_THEME: DEFAULT_THEME = 'light';
 
 context('Animated-Button', () => {
@@ -44,6 +44,23 @@ context('Animated-Button', () => {
 						color: color
 					}).should('have.property', 'color', 
 						toRGB(theme.primary.main));
+				})
+			});
+		});
+		it('should have proper contrasts in all themes', () => {
+			const el = cy.get('#main') as Cypress.Chainable<JQuery<WebComponent>>;
+
+			iterateThemes(el, (_theme, root, themeName) => {
+				cy.log(themeName);
+				return cy.window().then((win) => {
+					return [win.getComputedStyle(
+						root.querySelector('.mdl-button')!
+					).color, win.getComputedStyle(
+						root.querySelector('.mdl-button')!
+					).backgroundColor];
+				}).then(([color, backgroundColor]) => {
+					const contrast = getContrast(color!, backgroundColor!);
+					return expect(contrast).to.be.above(4.5);
 				})
 			});
 		});

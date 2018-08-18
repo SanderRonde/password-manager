@@ -28,6 +28,23 @@ export function iterateThemes(element: Cypress.Chainable<JQuery<WebComponent>>,
 		});
 	}
 
+function getsRGB(num: number) {
+	num = (num <= 0.03928) ? num / 12.92 : Math.pow(((num + 0.055) / 1.055), 2.4);
+	return num;
+}
+
+function getL(color: ColorRepresentation) {
+	return (0.2126 * getsRGB(color.r)) +
+		(0.7152 * getsRGB(color.g)) +
+		(0.0722 * getsRGB(color.b));
+}
+
+export function getContrast(color1: string, color2: string) {
+	const c1 = getL(getColorRepresentation(color1));
+	const c2 = getL(getColorRepresentation(color2));
+	return (Math.max(c1, c2) + 0.05) / (Math.min(c1, c2) + 0.05);
+}
+
 interface ColorRepresentation {
 	r: number;
 	g: number;
@@ -258,8 +275,6 @@ function colorNameToHex(name: string): string {
 
 export function toRGB(color: string) {
 	const { r, g, b, a } = getColorRepresentation(color);
-	console.log(color);
-	console.log(r, g, b, a);
 	if (a === 100) {
 		return `rgb(${r}, ${g}, ${b})`;
 	} else {
