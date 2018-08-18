@@ -2,7 +2,7 @@
 
 import { DEFAULT_THEME } from '../../../../../shared/types/shared-types';
 import { WebComponent } from '../../../../../shared/lib/webcomponents';
-import { iterateThemes } from '../../../lib/ui-test-util';
+import { iterateThemes, toRGB } from '../../../lib/ui-test-util';
 const DEFAULT_THEME: DEFAULT_THEME = 'light';
 
 context('Animated-Button', () => {
@@ -13,12 +13,38 @@ context('Animated-Button', () => {
 	});
 
 	context('Theme', () => {
-		it('text color changes when changing theme', () => {
-			const el = cy.find('#main') as Cypress.Chainable<JQuery<WebComponent>>;
+		it('text color matches theme', () => {
+			const el = cy.get('#main') as Cypress.Chainable<JQuery<WebComponent>>;
 
-			iterateThemes(el, (theme) => {
-				return expect(el.get('.mdl-button'))
-					.to.have.css('color', theme.textOnNonbackground)
+			iterateThemes(el, (theme, root, themeName) => {
+				cy.log(themeName);
+				return cy.window().then((win) => {
+					return win.getComputedStyle(
+						root.querySelector('.mdl-button')!
+					).color;
+				}).then((color) => {
+					return cy.wrap({
+						color: color
+					}).should('have.property', 'color', 
+						toRGB(theme.textOnNonbackground));
+				})
+			});
+		});
+		it('button color matches theme', () => {
+			const el = cy.get('#main') as Cypress.Chainable<JQuery<WebComponent>>;
+
+			iterateThemes(el, (theme, root, themeName) => {
+				cy.log(themeName);
+				return cy.window().then((win) => {
+					return win.getComputedStyle(
+						root.querySelector('.mdl-button')!
+					).backgroundColor;
+				}).then((color) => {
+					return cy.wrap({
+						color: color
+					}).should('have.property', 'color', 
+						toRGB(theme.primary.main));
+				})
 			});
 		});
 	});

@@ -528,6 +528,7 @@ const BLACK: ColorRepresentation = {
 	b: 0,
 	a: 100
 };
+
 function getColorRepresentation(color: string): ColorRepresentation {
 	if (color.startsWith('#') && HEX_ALPHA_REGEX.exec(color)) {
 		const match = HEX_ALPHA_REGEX.exec(color);
