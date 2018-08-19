@@ -340,6 +340,7 @@ export abstract class WebComponent<IDS extends {
 	 * 	cleared upon render
 	 */
 	private _idMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
+	public isMounted: boolean = false;
 
 	constructor() {
 		super();
@@ -396,6 +397,7 @@ export abstract class WebComponent<IDS extends {
 	connectedCallback() {
 		super.connectedCallback();
 		this.renderToDOM();
+		this.isMounted = true;
 		this.mounted();
 	}
 
