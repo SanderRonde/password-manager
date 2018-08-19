@@ -50,6 +50,8 @@ export async function render(res: ServerResponse, {
 	rootElement: string;
 	isDevelopment: boolean;
 }) {
+	res.contentType('.html');
+
 	setBasePath(isDevelopment);
 
 	if ('push' in res) {
