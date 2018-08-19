@@ -1,4 +1,5 @@
-export const UI_TEST_PORT = 1256;
+export const UI_TEST_PORT = 1258;
+export const MAIN_SERVER_PORT = 1256;
 export const COLOR_NAME_MAP = {
 	"aliceblue": "#f0f8ff",
 	"antiquewhite": "#faebd7",
