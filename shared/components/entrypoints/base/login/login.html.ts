@@ -19,7 +19,7 @@ export function LoginHTML(this: Login, props: Login['props']) {
 							<icon-button tabIndex="-1" slot="postIcon"
 								aria-label="Remember email"
 								title="Remember email"
-								id="lockButton" fill="nontext"
+								id="lockButton"
 							>
 								${props.emailRemembered ?
 									LockClosed : LockOpen

@@ -9,7 +9,7 @@ export function ThemeSelectorHTML(this: ThemeSelector) {
 	return html`
 		${this.css}
 		<div>
-			<icon-button id="button">${Color}</icon-button>
+			<icon-button id="button" fill="text">${Color}</icon-button>
 			<div id="themes">
 				${Object.getOwnPropertyNames(theme).map((themeName: keyof typeof theme) => {
 					const currentTheme = theme[themeName];

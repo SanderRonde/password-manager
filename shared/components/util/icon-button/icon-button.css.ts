@@ -252,13 +252,13 @@ export function IconButtonCSS(this: IconButton, theme: Theme, _props: IconButton
 		}
 
 		* {
-			fill: ${theme.textOnBackground};
+			fill: ${theme.textOnNonbackground};
 		}
 		:host([fill="text"]) * {
-			fill: ${theme.textOnNonbackground}
+			fill: ${theme.textOnBackground}
 		}
 		:host([fill="nontext"]) * {
-			fill: ${theme.textOnBackground}
+			fill: ${theme.textOnNonbackground}
 		}
 	</style>`
 }

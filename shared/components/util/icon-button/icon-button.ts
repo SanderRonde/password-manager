@@ -16,7 +16,7 @@ export class IconButton extends ConfigurableWebComponent<IconButtonIDMap> {
 			fill: {
 				type: PROP_TYPE.STRING,
 				exactType: '' as 'text'|'nontext',
-				value: 'nontext'
+				value: 'text'
 			}
 		}
 	})
