@@ -13,9 +13,7 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 		}
 	});
 
-	constructor() {
-		super();
-
+	mounted() {
 		if (!this.getAttribute('prop_theme')) {
 			//This is a non-server-served page
 			const currentTheme = this._globalProperties.theme;
