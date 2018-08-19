@@ -30,5 +30,7 @@
     ],
     "references": [{
         "path": "../server"
+    }, {
+        "path": "../shared/tsconfig.json"
     }]
 }
