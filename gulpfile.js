@@ -545,7 +545,8 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		}));
 
 	gulp.task('pretest', gulp.series(
+		'dashboard',
 		'pretest.genbundles',
 		'pretest.genhtml'
-	));
+	)));
 })();
