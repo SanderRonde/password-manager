@@ -43,8 +43,6 @@ export class Webserver {
 		this.debug = !!config.debug;
 		this.Routes = new WebserverRoutes(this);
 		this.Router = new WebserverRouter(this);
-
-		this._init();
 	}
 
 	private _initMiddleware() {
@@ -73,7 +71,7 @@ export class Webserver {
 		this.app.use(bodyParser.urlencoded({ extended: false }));
 	}
 
-	private async _init() {
+	async init() {
 		this._initMiddleware();
 		this.Router.init();
 		initPeriodicals(this);
