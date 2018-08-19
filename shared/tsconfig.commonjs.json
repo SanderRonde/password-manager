@@ -26,11 +26,9 @@
     "compileOnSave": true,
     "allowJs": true,
     "include": [
-        "./test"
+        "./",
     ],
     "references": [{
         "path": "../server"
-    }, {
-        "path": "../shared/tsconfig.json"
     }]
 }
