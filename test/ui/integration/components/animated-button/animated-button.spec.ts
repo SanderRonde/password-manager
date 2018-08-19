@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-import { iterateThemes, toRGB, getContrast, listenForEvent, getOriginalElement, GetFirstArg } from '../../../lib/ui-test-util';
+import { iterateThemes, toRGB, getContrast, listenForEvent, getOriginalElement, GetFirstArg, onMounted } from '../../../lib/ui-test-util';
 import { AnimatedButton } from '../../../../../shared/components/util/animated-button/animated-button';
 import { DEFAULT_THEME } from '../../../../../shared/types/shared-types';
 import { WebComponent } from '../../../../../shared/lib/webcomponents';
@@ -11,26 +11,14 @@ global.Promise = Cypress.Promise;
 context('Animated-Button', () => {
 	beforeEach(() => {
 		cy.visit(`http://localhost:${UI_TEST_PORT}/animated-button.html`);
-		cy.get('#main').then((el: JQuery<AnimatedButton>) => {
-			const component = el.get(0);
-			return new Cypress.Promise((resolve) => {
-				if (component.isMounted) {
-					resolve();
-				} else {
-					component.mounted = () => {
-						resolve();
-					}
-				}
-			});
-		})
+		onMounted('#main');
 	});
 
 	context('Theme', () => {
 		it('text color matches theme', () => {
 			const el = cy.get('#main') as Cypress.Chainable<JQuery<WebComponent>>;
 
-			iterateThemes(el, (theme, root, themeName) => {
-				cy.log(themeName);
+			iterateThemes(el, (theme, root) => {
 				return cy.window().then((win) => {
 					return win.getComputedStyle(
 						root.querySelector('.mdl-button')!
@@ -46,8 +34,7 @@ context('Animated-Button', () => {
 		it('button color matches theme', () => {
 			const el = cy.get('#main') as Cypress.Chainable<JQuery<WebComponent>>;
 
-			iterateThemes(el, (theme, root, themeName) => {
-				cy.log(themeName);
+			iterateThemes(el, (theme, root) => {
 				return cy.window().then((win) => {
 					return win.getComputedStyle(
 						root.querySelector('.mdl-button')!

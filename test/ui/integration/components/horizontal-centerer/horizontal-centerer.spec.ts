@@ -1,25 +1,13 @@
 /// <reference types="Cypress" />
 
-import { HorizontalCenterer } from "../../../../../shared/components/util/horizontal-centerer/horizontal-centerer";
+import { getOriginalElement, onMounted } from "../../../lib/ui-test-util";
 import { UI_TEST_PORT } from "../../../lib/ui-test-const";
-import { getOriginalElement } from "../../../lib/ui-test-util";
 
 global.Promise = Cypress.Promise;
 context('Horizontal-Centerer', () => {
 	beforeEach(() => {
 		cy.visit(`http://localhost:${UI_TEST_PORT}/horizontal-centerer.html`);
-		cy.get('#main').then((el: JQuery<HorizontalCenterer>) => {
-			const component = el.get(0);
-			return new Cypress.Promise((resolve) => {
-				if (component.isMounted) {
-					resolve();
-				} else {
-					component.mounted = () => {
-						resolve();
-					}
-				}
-			});
-		})
+		onMounted('#main');
 	});
 	
 	context('Behavior', () => {

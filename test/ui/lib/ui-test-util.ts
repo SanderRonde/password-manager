@@ -163,3 +163,20 @@ export function getOriginalElement<T extends HTMLElement>(selector: string|Cypre
 		});
 	}
 }
+
+export function onMounted(...selectors: string[]): Promise<any[]> {
+	return Cypress.Promise.all(selectors.map((selector) => {
+		return cy.get(selector).then((el: JQuery<WebComponent>) => {
+			const component = el.get(0);
+			return new Cypress.Promise((resolve) => {
+				if (component.isMounted) {
+					resolve();
+				} else {
+					component.mounted = () => {
+						resolve();
+					}
+				}
+			});
+		});
+	})) as any;
+}
