@@ -35,21 +35,21 @@ export function genConfigTest() {
 			await proc.run();
 			proc.check();
 
-			const cfgPath = path.join(__dirname, '../../../cfg/server.json');
+			const cfgPath = path.join(__dirname, '../../../../cfg/server.json');
 			files.push(cfgPath);
 			assert.isTrue(fs.existsSync(cfgPath));
 			const content = await fs.readFile(cfgPath, {
 				encoding: 'utf8'
 			});
 			const expected = await fs.readFile(
-				path.join(__dirname, '../../../app/actions/server/config.json'), {
+				path.join(__dirname, '../../../../app/actions/server/config.json'), {
 					encoding: 'utf8'
 				});
 			assert.strictEqual(content, expected,
 				'config file matches expected');
 		});
 		it('a server config can generated to a custom path', async () => {
-			const cfgPath = path.join(__dirname, `../../../temp/${genRandomString(10)}/server.json`);
+			const cfgPath = path.join(__dirname, `../../../../temp/${genRandomString(10)}/server.json`);
 			const proc = new ProcRunner([
 				'genconfig', 
 				'server',
@@ -67,7 +67,7 @@ export function genConfigTest() {
 				encoding: 'utf8'
 			});
 			const expected = await fs.readFile(
-				path.join(__dirname, '../../../app/actions/server/config.json'), {
+				path.join(__dirname, '../../../../app/actions/server/config.json'), {
 					encoding: 'utf8'
 				});
 			assert.strictEqual(content, expected,
@@ -81,21 +81,21 @@ export function genConfigTest() {
 			await proc.run();
 			proc.check();
 
-			const cfgPath = path.join(__dirname, '../../../cfg/backup.json');
+			const cfgPath = path.join(__dirname, '../../../../cfg/backup.json');
 			files.push(cfgPath);
 			assert.isTrue(fs.existsSync(cfgPath));
 			const content = await fs.readFile(cfgPath, {
 				encoding: 'utf8'
 			});
 			const expected = await fs.readFile(
-				path.join(__dirname, '../../../app/actions/backup/config.json'), {
+				path.join(__dirname, '../../../../app/actions/backup/config.json'), {
 					encoding: 'utf8'
 				});
 			assert.strictEqual(content, expected,
 				'config file matches expected');
 		});
 		it('a backup config can generated to a custom path', async () => {
-			const cfgPath = path.join(__dirname, `../../../temp/${genRandomString(10)}/backup.json`);
+			const cfgPath = path.join(__dirname, `../../../../temp/${genRandomString(10)}/backup.json`);
 			const proc = new ProcRunner([
 				'genconfig', 
 				'backup',
@@ -113,7 +113,7 @@ export function genConfigTest() {
 				encoding: 'utf8'
 			});
 			const expected = await fs.readFile(
-				path.join(__dirname, '../../../app/actions/backup/config.json'), {
+				path.join(__dirname, '../../../../app/actions/backup/config.json'), {
 					encoding: 'utf8'
 				});
 			assert.strictEqual(content, expected,

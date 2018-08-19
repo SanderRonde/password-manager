@@ -12,7 +12,7 @@ export function backupLoadTest() {
 		const dumps: string[] = [];
 		async function createDummyDump(uri: string) {
 			const dumpPath = path.join(__dirname,
-				`../../../temp/dummpydump${genRandomString(25)}.dump`);
+				`../../../../temp/dummpydump${genRandomString(25)}.dump`);
 			dumps.push(dumpPath);
 			const dbpw = await genDBWithPW(uri);
 			const data = await Export.exportDatabase(uri, true);
@@ -45,7 +45,7 @@ export function backupLoadTest() {
 			const proc = new ProcRunner([
 				'backup',
 				'load',
-				'-c', path.join(__dirname, '../../../dummies/load.config.json'),
+				'-c', path.join(__dirname, '../../../../dummies/load.config.json'),
 				'-d', uri
 			]);
 			proc.expectWrite('You specified a config file but you\'re using' + 
@@ -63,7 +63,7 @@ export function backupLoadTest() {
 			const proc = new ProcRunner([
 				'backup',
 				'load',
-				'-i', path.join(__dirname, '../../../dummies/empty.file'),
+				'-i', path.join(__dirname, '../../../../dummies/empty.file'),
 				'-d', uri,
 			]);
 			proc.expectWrite('Reading file...');

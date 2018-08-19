@@ -161,7 +161,7 @@ export function createServer({
 }: UserAndDbData, env?: {}): Promise<ChildProcess> {
 	return new Promise((resolve) => {
 		const proc = spawn('node', [...[
-				path.join(__dirname, './../../app/main.js'),
+				path.join(__dirname, './../../../app/main.js'),
 				'server',
 				'--http', http + '',
 				'--no-https-only',

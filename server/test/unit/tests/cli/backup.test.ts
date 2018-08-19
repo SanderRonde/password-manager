@@ -32,7 +32,7 @@ export function backupTest() {
 		});
 		it('a backupped file can be used to restore', async () => {
 			const dumpName = genRandomString(10);
-			const dumpPath = path.join(__dirname, `../../../temp/mongodump${dumpName}.dump`);
+			const dumpPath = path.join(__dirname, `../../../../temp/mongodump${dumpName}.dump`);
 			const uri = await genTempDatabase();
 			uris.push(uri);
 			const dbpw = await genDBWithPW(uri);

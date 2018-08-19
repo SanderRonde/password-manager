@@ -31,7 +31,7 @@ export function backupLocalTest() {
 			await genDBWithPW(uri);
 
 			const dumpName = genRandomString(10);
-			const dumpPath = path.join(__dirname, `../../../temp/mongodump${dumpName}.dump`);
+			const dumpPath = path.join(__dirname, `../../../../temp/mongodump${dumpName}.dump`);
 			files.push(dumpPath);
 			const proc = new ProcRunner([
 				'backup',
