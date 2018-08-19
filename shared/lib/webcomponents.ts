@@ -330,6 +330,10 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 		this.classList.add(theme!);
 		this.renderToDOM();
 	}
+
+	public getTheme() {
+		return this._globalProperties.theme!;
+	}
 }
 
 export abstract class WebComponent<IDS extends {
