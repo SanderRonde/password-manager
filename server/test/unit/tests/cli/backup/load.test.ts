@@ -45,7 +45,7 @@ export function backupLoadTest() {
 			const proc = new ProcRunner([
 				'backup',
 				'load',
-				'-c', path.join(__dirname, '../../../../dummies/load.config.json'),
+				'-c', path.join(__dirname, '../../../dummies/load.config.json'),
 				'-d', uri
 			]);
 			proc.expectWrite('You specified a config file but you\'re using' + 
@@ -63,7 +63,7 @@ export function backupLoadTest() {
 			const proc = new ProcRunner([
 				'backup',
 				'load',
-				'-i', path.join(__dirname, '../../../../dummies/empty.file'),
+				'-i', path.join(__dirname, '../../../dummies/empty.file'),
 				'-d', uri,
 			]);
 			proc.expectWrite('Reading file...');
