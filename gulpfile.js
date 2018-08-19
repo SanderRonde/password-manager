@@ -467,113 +467,17 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 
 /** Testing */
 (() => {
-	function synchronizePromise(prom) {
-		return new Promise((resolve) => {
-			prom.catch((err) => {
-				resolve({
-					err,
-					result: null
-				});
-			}).then((result) => {
-				resolve({
-					err: null,
-					result: result
-				});
-			});
-		});
-	}
-
-	async function transformToEs6(filePath, name) {
-		const outfile = path.join(__dirname, `temp/${name}.js`);
-		const { err } = await synchronizePromise(fs.readFile(outfile, {
-			encoding: 'utf8'
-		}));
-		if (!err) {
-			return;
-		}
-		const content = await fs.readFile(filePath, {
-			encoding: 'utf8'
-		});
-		const transformed = babel.transform(content, {
-			plugins: ['transform-es2015-modules-commonjs']
-		});
-		await fs.writeFile(outfile, transformed.code, {
-			encoding: 'utf8'
-		});
-	}
-
-	async function requireES6File(filePath, name) {
-		await transformToEs6(filePath, name);
-		const outfile = path.join(__dirname, `temp/${name}.js`);
-		const required = require(outfile);
-		return required;
-	}
-
 	function getComponentFiles() {
 		return new Promise((resolve, reject) => {
-			glob(path.join(__dirname, 'shared/components') +
-				'/**/*.js', async (err, matches) => {
+			glob(path.join(__dirname, 'test/ui/integration/components') +
+				'/**/*.bundled.js', async (err, matches) => {
 					if (err) {
 						reject(err);
 						return;
 					}
-					matches = matches.filter((match) => {
-						return !match.endsWith('.html.js') &&
-							!match.endsWith('.css.js');
-					});
 					resolve(matches);
 				});
 		});
-	}
-
-	async function requireComponentFiles(files) {
-		const name = 'litHtml';
-		await requireES6File(path.join(__dirname, 'node_modules/lit-html/lit-html.js'), name);
-		const litHTMLPath = path.join(__dirname, 'temp/', `${name}.js`);
-		const commonjsJSEncrypt = path.join(__dirname, 'server/app/libraries/jsencrypt.js');
-		const resolver = requireHacker.resolver((reqPath, srcModule) => {
-			const resolvedPath = requireHacker.resolve(reqPath, srcModule);
-			if (reqPath === 'lit-html') {
-				return litHTMLPath;
-			}
-			if (/shared.libraries.jsencrypt\.js/.exec(resolvedPath)) {
-				return commonjsJSEncrypt;
-			}
-			return undefined;
-		});
-		process.HTMLElement = class HTMLElement {}
-		const required = files.map(file => ({
-			src: file,
-			content: require(file)
-		}));
-		resolver.unmount();
-		return required;
-	}
-
-	function filterComponents(candidates) {
-		return candidates.map(({ content, src }) => {
-			for (const key in content) {
-				const value = content[key];
-				if (!('config' in value))
-					continue;
-				if (!('is' in value))
-					continue;
-				return {
-					src,
-					content: value,
-					name: key
-				};
-			}
-			return null;
-		}).filter((val) => {
-			return val !== null;
-		});
-	}
-
-	async function generateComponentMap() {
-		const files = await getComponentFiles();
-		const required = await requireComponentFiles(files);
-		return filterComponents(required);
 	}
 
 	function dashesToUppercase(str) {
@@ -628,20 +532,13 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 				});
 				const outDir = path.join(__dirname, 'test/ui/served/bundles/');
 				await fs.mkdirp(outDir);
-				const outFile = path.join(outDir, path.basename(file));
+				const base = path.basename(file).split('.');
+				const outFile = path.join(outDir, `${base[0]}.${base.slice(-1)[0]}`);
 				await bundle.write({
 					format: 'iife',
 					name: 'exported',
 					file: outFile
 				});
-				const appendedFile = `${await fs.readFile(outFile)};
-				exported[Object.getOwnPropertyNames(exported).filter((key) => {
-					return key !== '__esModule' &&
-						typeof exported[key] === 'function';
-				})[0]].define();`;
-				await fs.writeFile(outFile, appendedFile, {
-					encoding: 'utf8'
-				})
 			}));
 		}
 	));
@@ -671,27 +568,4 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		'pretest.genbundles',
 		'pretest.genhtml'
 	));
-
-	// gulp.task('pretest.common', genTask('Task that has to be run before testing', 
-	// 	gulp.parallel(
-	// 		async function getComponentMetadata() {
-	// 			const components = await generateComponentMap();
-	// 			const metadata = await Promise.all(components.map(async (component) => {
-	// 				return {
-	// 					src: component.src,
-	// 					bundleName: dashesToUppercase(component.content.config.is),
-	// 					component: {
-	// 						config: {
-	// 							is: component.content.config.is
-	// 						},
-	// 						is: component.content.config.is
-	// 					}
-	// 				}
-	// 			}));
-	// 			const outDir = path.join(__dirname,
-	// 				'test/ui/fixtures/config');
-	// 			await fs.mkdirp(outDir);
-	// 			await fs.writeFile(path.join(outDir, 'meta.json'));
-	// 		}
-	// 	)));
 })();
