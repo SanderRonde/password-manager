@@ -111,7 +111,7 @@ function renderTheme(prom: Promise<Response|undefined>): Promise<Response> {
 			}
 
 			resolve(new Response(body.replace(/<body/, 
-				`<body style="background-color: ${theme[themeName].background}"`), 
+				`<body style="background-color: ${theme[themeName || 'light'].background}"`), 
 				init));
 		}).catch(reject);
 	});
