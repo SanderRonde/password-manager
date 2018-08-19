@@ -22,6 +22,7 @@ script:
 - tsc --build --force
 - tsc --build --force test/tsconfig.json
 - mocha test/unit/unit.test.js --exit
+- http-server -p 1256 ./test/ui/served/ -s &
 - cypress run --record
 notifications:
   email:
