@@ -224,7 +224,7 @@ export class ProcRunner {
 			this.ondone = resolve;
 
 			this._proc = spawn('node', [
-				path.join(__dirname, './../../app/main.js'),
+				path.join(__dirname, './../../../app/main.js'),
 				...this._args
 			], {
 				env: {...process.env, ...(this._config.env || {})}
