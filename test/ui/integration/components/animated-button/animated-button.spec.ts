@@ -1,14 +1,15 @@
 /// <reference types="Cypress" />
 
+import { iterateThemes, toRGB, getContrast } from '../../../lib/ui-test-util';
 import { DEFAULT_THEME } from '../../../../../shared/types/shared-types';
 import { WebComponent } from '../../../../../shared/lib/webcomponents';
-import { iterateThemes, toRGB, getContrast } from '../../../lib/ui-test-util';
+import { UI_TEST_PORT } from '../../../lib/ui-test-const';
 const DEFAULT_THEME: DEFAULT_THEME = 'light';
 
 context('Animated-Button', () => {
 	beforeEach(() => {
 		cy.log('Doing pre')
-			.visit(`http://localhost:1256/animated-button.html`)
+			.visit(`http://localhost:${UI_TEST_PORT}/animated-button.html`)
 			.log('Done pre');
 	});
 
