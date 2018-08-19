@@ -10,9 +10,9 @@ export function AnimatedButtonHTML(this: AnimatedButton) {
 	return html`
 		${this.css}
 		<button id="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-			<slot></slot>
 			<div id="content">
 				<span id="regularContent" class="visible">
+					<slot></slot>
 					${this.props.content}
 				</span>
 				<span id="successContent">
