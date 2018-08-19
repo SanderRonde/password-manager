@@ -548,5 +548,5 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		'dashboard',
 		'pretest.genbundles',
 		'pretest.genhtml'
-	)));
+	));
 })();
