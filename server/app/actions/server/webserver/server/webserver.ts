@@ -114,5 +114,7 @@ export class Webserver {
 				});
 			})
 		]);
+
+		return this;
 	}
 }
