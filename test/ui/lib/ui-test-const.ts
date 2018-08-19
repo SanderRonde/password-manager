@@ -1,3 +1,5 @@
+export const DEFAULT_EMAIL = 'some@email.com';
+export const DEFAULT_PW = 'somepassword';
 export const UI_TEST_PORT = 1258;
 export const MAIN_SERVER_PORT = 1256;
 export const COLOR_NAME_MAP = {
