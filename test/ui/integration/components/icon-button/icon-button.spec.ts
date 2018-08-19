@@ -28,7 +28,7 @@ context('Icon-Button', () => {
 				return cy.get('#filledText').children().then((children) => {
 					return cy.window().then((win) => {
 						return win.getComputedStyle(
-							children[0]		
+						children[0]		
 						).fill;
 					}).then((fill) => {
 						cy.log(themeName);
