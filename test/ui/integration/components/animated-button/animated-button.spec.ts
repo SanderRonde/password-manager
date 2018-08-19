@@ -16,9 +16,7 @@ context('Animated-Button', () => {
 
 	context('Theme', () => {
 		it('text color matches theme', () => {
-			const el = cy.get('#main') as Cypress.Chainable<JQuery<WebComponent>>;
-
-			iterateThemes(el, (theme, root) => {
+			iterateThemes('#main', (theme, root) => {
 				return cy.window().then((win) => {
 					return win.getComputedStyle(
 						root.querySelector('.mdl-button')!
@@ -32,9 +30,7 @@ context('Animated-Button', () => {
 			}, 500);
 		});
 		it('button color matches theme', () => {
-			const el = cy.get('#main') as Cypress.Chainable<JQuery<WebComponent>>;
-
-			iterateThemes(el, (theme, root) => {
+			iterateThemes('#main', (theme, root) => {
 				return cy.window().then((win) => {
 					return win.getComputedStyle(
 						root.querySelector('.mdl-button')!
@@ -48,9 +44,7 @@ context('Animated-Button', () => {
 			}, 500);
 		});
 		it('should have proper contrasts in all themes', () => {
-			const el = cy.get('#main') as Cypress.Chainable<JQuery<WebComponent>>;
-
-			iterateThemes(el, (_theme, root) => {
+			iterateThemes('#main', (_theme, root) => {
 				return cy.window().then((win) => {
 					return [win.getComputedStyle(
 						root.querySelector('.mdl-button')!
@@ -122,7 +116,7 @@ context('Animated-Button', () => {
 			});
 			it('changes look when setting state to success', () => {
 				getOriginalElement<AnimatedButton>('#main', (el) => {
-					iterateThemes(cy.get('#main'), async (theme, root) => {
+					iterateThemes('#main', async (theme, root) => {
 						await el.setState('success');
 						expect(el.$.successContent).to.be.visible;
 						
@@ -148,7 +142,7 @@ context('Animated-Button', () => {
 			});
 			it('changes look when setting state to failure', () => {
 				getOriginalElement<AnimatedButton>('#main', (el) => {
-					iterateThemes(cy.get('#main'), async (theme, root) => {
+					iterateThemes('#main', async (theme, root) => {
 						await el.setState('failure');
 						expect(el.$.failureContent).to.be.visible;
 						

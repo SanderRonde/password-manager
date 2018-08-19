@@ -12,18 +12,21 @@ export function chainFunctions(fns: (() => Cypress.Chainable<any>)[]) {
 	return current;
 }
 
-export function iterateThemes(element: Cypress.Chainable<JQuery<WebComponent>>, 
+export function iterateThemes<T extends WebComponent>(selector: string, 
 	callback: (currentTheme: Theme, root: ShadowRoot, themeName: VALID_THEMES_T) => Cypress.Chainable<any>|Promise<Cypress.Chainable<any>>,
-	waitTime: number = 0) {
-		getOriginalElement(element, (srcEl) => {
+	waitTime: number = 0): Cypress.Chainable<any> {
+		return getOriginalElement(selector, (srcEl: T) => {
 			const keyNames = Object.getOwnPropertyNames(theme) as VALID_THEMES_T[];
 
 			return chainFunctions(keyNames.map((themeName) => {
 				return () => {
-					srcEl.setGlobalProperty('theme', themeName)
+					srcEl!.setGlobalProperty('theme', themeName)
 					return cy.wait(waitTime).then(() => {
 						const ret = callback(theme[themeName], srcEl.shadowRoot!, 
 							themeName);
+						if (waitTime === 0) {
+							return;
+						}
 						if ('wait' in ret) {
 							ret.wait(waitTime);
 						} else {
@@ -152,15 +155,15 @@ export function listenForEvent<T extends WebComponent>(el: T, event: GetFirstArg
 	expect(wasCalled, `listener for "${event}" was called`).to.be.true;
 }
 
-export function getOriginalElement<T extends HTMLElement>(selector: string|Cypress.Chainable<JQuery<T>>, callback: (el: T) => void) {
+export function getOriginalElement<T extends HTMLElement, R = void>(selector: string|Cypress.Chainable<JQuery<T>>, callback: (el: T) => R): R {
 	if (typeof selector === 'string') {
-		cy.get(selector).then((el: JQuery<T>) => {
-			callback(el.get(0));
-		});
+		return cy.get(selector).then((el: JQuery<T>) => {
+			return callback(el.get(0));
+		}) as any;
 	} else {
-		selector.then((el: JQuery<T>) => {
-			callback(el.get(0));
-		});
+		return selector.then((el: JQuery<T>) => {
+			return callback(el.get(0));
+		}) as any;
 	}
 }
 
