@@ -23,7 +23,7 @@ script:
 - gulp defs
 - tsc --build --force
 - tsc --build --force test/tsconfig.json
-- mocha test/unit/unit.test.js --exit --bail
+- mocha test/unit/unit.test.js --exit
 notifications:
   email:
     on_success: change
