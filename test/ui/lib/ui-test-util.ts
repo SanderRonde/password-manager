@@ -2,6 +2,7 @@
 import { Theme, VALID_THEMES_T } from "../../../shared/types/shared-types";
 import { theme } from '../../../shared/components/theming/theme/theme';
 import { WebComponent } from '../../../shared/lib/webcomponents';
+import { COLOR_NAME_MAP } from "./ui-test-const";
 
 export function chainFunctions(fns: (() => Cypress.Chainable<any>)[]) {
 	let current: Cypress.Chainable<any> = fns[0]();
@@ -12,16 +13,24 @@ export function chainFunctions(fns: (() => Cypress.Chainable<any>)[]) {
 }
 
 export function iterateThemes(element: Cypress.Chainable<JQuery<WebComponent>>, 
-	callback: (currentTheme: Theme, root: ShadowRoot, themeName: VALID_THEMES_T) => Cypress.Chainable<any>) {
-		element.then((srcEl) => {
+	callback: (currentTheme: Theme, root: ShadowRoot, themeName: VALID_THEMES_T) => Cypress.Chainable<any>|Promise<Cypress.Chainable<any>>,
+	waitTime: number = 0) {
+		getOriginalElement(element, (srcEl) => {
 			const keyNames = Object.getOwnPropertyNames(theme) as VALID_THEMES_T[];
 
 			return chainFunctions(keyNames.map((themeName) => {
 				return () => {
-					srcEl.get(0).setGlobalProperty('theme', themeName)
-					return cy.wait(500).then(() => {
-						callback(theme[themeName], srcEl.get(0).shadowRoot!, 
-							themeName).wait(500);
+					srcEl.setGlobalProperty('theme', themeName)
+					return cy.wait(waitTime).then(() => {
+						const ret = callback(theme[themeName], srcEl.shadowRoot!, 
+							themeName);
+						if ('wait' in ret) {
+							ret.wait(waitTime);
+						} else {
+							ret.then((chain) => {
+								chain.wait(waitTime);
+							})
+						}
 					});
 				}
 			}));
@@ -129,5 +138,28 @@ export function toRGB(color: string) {
 		return `rgb(${r}, ${g}, ${b})`;
 	} else {
 		return `rgba(${r}, ${g}, ${b}, ${a / 100})`;
+	}
+}
+
+export type GetFirstArg<T> = T extends (arg1: infer E, ...args: any[]) => void ? E : any;
+export function listenForEvent<T extends WebComponent>(el: T, event: GetFirstArg<T['listen']>, activator: () => void) {
+	let wasCalled: boolean = false;
+	el.listen(event, () => {
+		wasCalled = true;
+		return null as any;
+	});
+	activator();
+	expect(wasCalled, `listener for "${event}" was called`).to.be.true;
+}
+
+export function getOriginalElement<T extends HTMLElement>(selector: string|Cypress.Chainable<JQuery<T>>, callback: (el: T) => void) {
+	if (typeof selector === 'string') {
+		cy.get(selector).then((el: JQuery<T>) => {
+			callback(el.get(0));
+		});
+	} else {
+		selector.then((el: JQuery<T>) => {
+			callback(el.get(0));
+		});
 	}
 }
