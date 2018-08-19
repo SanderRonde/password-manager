@@ -79,12 +79,13 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 		this.$.input!.value = value || '';
 		this.props.value = value || '';
 
-		const prevValidState = this.valid;
+		const prevValidState = this._validityState;
 		this._updateClasses();
 
 		if (prevValidState !== this.valid) {
 			this._fire('valid', this.valid);
 		}
+		this._validityState = this.valid;
 	}
 
 	get input() {
