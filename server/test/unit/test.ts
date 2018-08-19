@@ -3,7 +3,9 @@ import { enviromentTests } from "./tests/env.test";
 import { cliTest } from "./tests/cli.test";
 
 export function allServerTest() {
-	describe('Server', () => {
+	describe('Server', function() {
+		this.retries(1);
+		
 		enviromentTests();
 		cliTest();
 		serverTest();
