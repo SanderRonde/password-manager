@@ -15,7 +15,11 @@ import { bindToClass } from '../../../lib/decorators';
 	dependencies: [ LoadingSpinner ]
 })
 @rippleEffect
-export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap> {
+export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap, {
+	click: {
+		args: [MouseEvent]
+	}
+}> {
 	props = defineProps(this, {
 		reflect: {
 			content: PROP_TYPE.STRING
@@ -135,6 +139,9 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 			}
 			this.$.button.addEventListener('mouseup', this.blurHandler);
 			this.$.button.addEventListener('mouseleave', this.blurHandler);
+			this.$.button.addEventListener('click', (e) => {
+				this._fire('click', e);
+			});
 		}
 	}
 }
