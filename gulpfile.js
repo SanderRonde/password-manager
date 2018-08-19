@@ -281,29 +281,6 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
 		gulp.series(
 			gulp.parallel(
-				async function minifyHTML() {
-					const files = await findWithGlob('shared/components/**/*.html.js');
-					await Promise.all(files.map(async (file) => {
-						const content = await fs.readFile(file, {
-							encoding: 'utf8'
-						});
-						const startIndex = content.indexOf('`') + 1;
-						const endIndex = content.lastIndexOf('`');
-						const html = content.slice(startIndex, endIndex);
-						const minified = htmlMinifier.minify(html, {
-							collapseWhitespace: true,
-							caseSensitive: true,
-							minifyCSS: true,
-							minifyJS: true
-						});
-
-						const replaced = content.slice(0, startIndex) +
-							minified + content.slice(endIndex);
-						await fs.writeFile(file, replaced, {
-							encoding: 'utf8'
-						});
-					}));
-				},
 				async function minifyCSS() {
 					const files = await findWithGlob('shared/components/**/*.css.js');
 					await Promise.all(files.map(async (file) => {
