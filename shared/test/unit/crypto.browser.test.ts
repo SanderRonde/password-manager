@@ -6,7 +6,7 @@ import { ERRS } from '../../types/crypto';
 import path = require('path');
 import { assert } from 'chai';
 
-const commonjsJSEncrypt = path.join(__dirname, '../../server/app/libraries/jsencrypt.js');
+const commonjsJSEncrypt = path.join(__dirname, '../../../server/app/libraries/jsencrypt.js');
 requireHacker.resolver((path: string, srcModule: any) => {
 	const resolvedPath: string = requireHacker.resolve(path, srcModule);
 	if (/shared.libraries.jsencrypt\.js/.exec(resolvedPath)) {
