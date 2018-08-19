@@ -410,6 +410,9 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 				write(data) {
 					content += data;
 				},
+				contentType() {
+
+				},
 				end() {
 					resolve(content);
 				}
