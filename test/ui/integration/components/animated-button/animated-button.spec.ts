@@ -3,7 +3,6 @@
 import { iterateThemes, toRGB, getContrast, listenForEvent, getOriginalElement, GetFirstArg, onMounted } from '../../../lib/ui-test-util';
 import { AnimatedButton } from '../../../../../shared/components/util/animated-button/animated-button';
 import { DEFAULT_THEME } from '../../../../../shared/types/shared-types';
-import { WebComponent } from '../../../../../shared/lib/webcomponents';
 import { UI_TEST_PORT } from '../../../lib/ui-test-const';
 const DEFAULT_THEME: DEFAULT_THEME = 'light';
 
