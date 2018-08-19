@@ -21,7 +21,8 @@ before_script:
   - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 script:
 - gulp defs
-- tsc --build --force && tsc -p shared/tsconfig.commonjs.json
+- tsc --build --force
+- tsc --build --force test/tsconfig.json
 - mocha test/unit/unit.test.js --exit
 notifications:
   email:
