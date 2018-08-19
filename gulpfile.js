@@ -537,8 +537,10 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 						encoding: 'utf8'
 					})}
 					<script src="bundles/${config.bundleName}.js"></script>`;
-				await fs.writeFile(path.join(__dirname, 
-					`test/ui/served/${config.name}.html`), html, {
+				const outPath = path.join(__dirname, 
+					`test/ui/served/${config.name}.html`);
+				await fs.mkdirp(path.dirname(outPath));
+				await fs.writeFile(outPath, html, {
 						encoding: 'utf8'
 					});
 			}));
