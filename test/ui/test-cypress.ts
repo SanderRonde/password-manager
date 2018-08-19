@@ -9,8 +9,8 @@ const server = createServer({
 server.listen(UI_TEST_PORT, () => {
 	cypress.run({
 		record: true
-	}).then(() => {
+	}).then((results) => {
 		server.close();
-		process.exit();
+		process.exit(results.totalFailed);
 	});
 });

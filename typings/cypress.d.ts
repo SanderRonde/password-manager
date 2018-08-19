@@ -20,5 +20,7 @@ declare module "cypress" {
 	}
 
 	export function open(options?: Options): Promise<any>;
-	export function run(options?: Options): Promise<any>;
+	export function run(options?: Options): Promise<{
+		totalFailed: number;	
+	}>;
 }
