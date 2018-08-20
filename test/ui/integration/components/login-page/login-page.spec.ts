@@ -9,7 +9,9 @@ import { onMounted } from "../../../lib/ui-test-util";
 
 global.Promise = Cypress.Promise;
 context('Login-Page', () => {
-	beforeEach(() => {
+	beforeEach(function() {
+		this.timeout(10000);
+		
 		cy.visit(`http://localhost:${MAIN_SERVER_PORT}/login`);
 		onMounted('login-page');
 	});
