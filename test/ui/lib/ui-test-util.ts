@@ -175,8 +175,10 @@ export function onMounted(...selectors: string[]): Promise<any[]> {
 				if (component.isMounted) {
 					resolve();
 				} else {
+					const originalMounted = component.mounted;
 					component.mounted = () => {
 						resolve();
+						originalMounted();
 					}
 				}
 			});
