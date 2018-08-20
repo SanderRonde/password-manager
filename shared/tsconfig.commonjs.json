@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "alwaysStrict": true,
-        "baseUrl": "../typings/",
         "forceConsistentCasingInFileNames": true,
         "module": "commonjs",
         "moduleResolution": "node",
@@ -27,6 +26,7 @@
     "allowJs": true,
     "include": [
         "./",
+        "../typings/"
     ],
     "references": [{
         "path": "../server"

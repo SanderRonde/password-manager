@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "alwaysStrict": true,
-        "baseUrl": "../../../../../../../typings/",
         "forceConsistentCasingInFileNames": true,
         "module": "esnext",
         "moduleResolution": "node",
@@ -26,7 +25,8 @@
     "compileOnSave": true,
     "include": [
         "./",
-        "../static"
+        "../static",
+        "../../../../../../../typings/"
     ],
     "references": [{
         "path": "../../../../../../../shared"

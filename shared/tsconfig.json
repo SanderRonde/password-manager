@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "alwaysStrict": true,
-        "baseUrl": "../typings/",
         "forceConsistentCasingInFileNames": true,
         "module": "esnext",
         "moduleResolution": "node",
@@ -27,7 +26,8 @@
     "compileOnSave": true,
     "allowJs": true,
     "include": [
-        "./"
+        "./",
+        "../typings/"
     ],
     "exclude": [
         "test/"

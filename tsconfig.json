@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "alwaysStrict": true,
-        "baseUrl": "typings/",
         "forceConsistentCasingInFileNames": true,
         "module": "commonjs",
         "moduleResolution": "node",
@@ -22,7 +21,9 @@
 	}, 
     "compileOnSave": true,
     "allowJs": true,
-	"include": [],
+	"include": [
+        "typings/"
+    ],
 	"references": [{
 		"path": "./server/tsconfig.ts3.json"
 	}, {
