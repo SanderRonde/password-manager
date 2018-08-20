@@ -75,7 +75,7 @@ export async function render(res: ServerResponse, {
 			}>(path.join(PROJECT_ROOT,
 				'shared/components/theming/theme/theme.js'));
 			const themeName = data.theme;
-			return `style="background-color:${theme[themeName!].background};`;
+			return `style="background-color:${theme[themeName!].background};"`;
 		})() : '',
 		css: [...optionalArrayItem('/css/offline_fonts.css', isOffline)]
 	}));
