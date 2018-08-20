@@ -77,6 +77,11 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 	}
 
 	private async _setContent(state: 'success'|'failure'|'loading'|'regular') {
+		const bcr = this.$.button.getBoundingClientRect();
+			
+		this.$.button.style.width = bcr.width + 'px';
+		this.$.button.style.height = bcr.height + 'px';
+
 		await this._fadeOutCurrentContent();
 		this._hideAll();
 		this._showIcon(state);
@@ -122,10 +127,6 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 
 	postRender() {
 		if (this.$.button && isNewElement(this.$.button)) {
-			const bcr = this.$.button.getBoundingClientRect();
-			
-			this.$.button.style.width = bcr.width + 'px';
-			this.$.button.style.height = bcr.height + 'px';
 			if (this.$.button.classList.contains('mdl-js-ripple-effect')) {
 				var rippleContainer = document.createElement('span');
 				rippleContainer.classList.add('mdl-button__ripple-container');
