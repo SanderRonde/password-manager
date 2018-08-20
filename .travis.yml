@@ -20,7 +20,6 @@ before_script:
 script:
 - gulp defs
 - tsc --build --force
-- tsc --build --force test/tsconfig.json
 - gulp pretest
 - mocha test/unit/unit.test.js --exit
 - node test/ui/test-cypress.js
