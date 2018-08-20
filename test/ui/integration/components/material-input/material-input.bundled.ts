@@ -18,6 +18,7 @@ render(html`
 		value="somevalue"
 		label="somelabel"
 		error="someerror"
+		pattern="\d{6}"
 	></material-input>
 	<material-input id="password"
 		type="password"
