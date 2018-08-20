@@ -20,7 +20,7 @@ before_script:
 script:
 - gulp defs
 - tsc --build --force
-- tsc --build --force test/tsconfig.json || echo 'got some compile errors'
+- tsc -p shared/tsconfig.commonjs.json || echo 'got more compile errors'
 - tsc -p test/tsconfig.json || echo 'got more compile errors'
 - gulp pretest
 - mocha test/unit/unit.test.js --exit
