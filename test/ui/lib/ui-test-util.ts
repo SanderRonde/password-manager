@@ -178,7 +178,7 @@ export function onMounted(...selectors: string[]): Promise<any[]> {
 					const originalMounted = component.mounted;
 					component.mounted = () => {
 						resolve();
-						originalMounted();
+						originalMounted && originalMounted();
 					}
 				}
 			});
