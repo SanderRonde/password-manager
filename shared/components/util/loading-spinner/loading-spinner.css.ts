@@ -2,7 +2,7 @@ import { Theme } from '../../../types/shared-types';
 import { LoadingSpinner } from './loading-spinner';
 import { html } from "lit-html";
 
-export function LoadingSpinnerCSS(this: LoadingSpinner, _theme: Theme, _props: LoadingSpinner['props']) {
+export function LoadingSpinnerCSS(this: LoadingSpinner, _theme: Theme, props: LoadingSpinner['props']) {
 	return html`<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.
@@ -22,8 +22,8 @@ export function LoadingSpinnerCSS(this: LoadingSpinner, _theme: Theme, _props: L
 		.mdl-spinner {
 			display: inline-block;
 			position: relative;
-			width: 28px;
-			height: 28px;
+			width: ${props.big ? 200 : 28}px;
+			height: ${props.big ? 200 : 28}px;
 		}
 		.mdl-spinner:not(.is-upgraded).is-active:after {
 			content: "Loading...";
