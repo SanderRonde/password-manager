@@ -1,5 +1,5 @@
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey } from '../../../../lib/browser-crypto';
-import { config, cancelTimeout, wait, createCancellableTimeout, setCookie } from '../../../../lib/webcomponent-util';
+import { config, cancelTimeout, wait, createCancellableTimeout } from '../../../../lib/webcomponent-util';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
@@ -131,10 +131,11 @@ export class LoginWeb extends Login {
 	}
 
 	private async _proceedToDashboard({
-		privateKey, response	
+		privateKey, response, password
 	}: {
 		privateKey: string;
 		response: ServerLoginResponse
+		password: string;
 	}) {
 		if (!response.success) return;
 
@@ -150,15 +151,14 @@ export class LoginWeb extends Login {
 				response.data.auth_token, privateKey)
 		}
 
-		//Set localstorage
-		localStorage.setItem('server_public_key', server_public_key);
-
-		//Set cookies
-		setCookie('login_auth', auth_token, 1000 * 60 * 18);
-		setCookie('instance_id', instance_id, 1000 * 60 * 60 * 24);
-		
-		//Do navigation
-		location.href = '/dashboard';
+		const root = this.getRoot();
+		root.storeData('loginData', {
+			password,
+			server_public_key,
+			login_auth: auth_token,
+			instance_id: instance_id
+		});
+		root.changePage('dashboard');
 	}
 
 	@bindToClass
@@ -187,7 +187,11 @@ export class LoginWeb extends Login {
 				duration: PaperToast.DURATION.FOREVER,
 				buttons: [PaperToast.BUTTONS.HIDE]
 			});
-			await this._proceedToDashboard({ privateKey, response });
+			await this._proceedToDashboard({ 
+				privateKey, 
+				response,
+				password: inputData.password
+			});
 		} else {
 			this.$.button.setState('failure');
 			createCancellableTimeout(this, 'failure-button', () => {
