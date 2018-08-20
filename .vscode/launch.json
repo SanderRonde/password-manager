@@ -93,6 +93,17 @@
 				"--databaseless",
 				"--no-https-only"
 			],
+		}, {
+			"type": "node",
+			"request": "launch",
+			"env": {
+				"NODE_ENV": "development"
+			},
+			"name": "Test Cypress",
+			"program": "${workspaceFolder}/test/ui/test-cypress.js",
+			"args": [
+				"--no-record"
+			]
 		}
 	]
 }
