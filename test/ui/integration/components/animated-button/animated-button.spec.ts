@@ -104,15 +104,6 @@ context('Animated-Button', () => {
 					}, 'setting an invalid state throws').to.throw;
 				});
 			});
-			it('shows a spinner when setting state to loading', () => {
-				getOriginalElement<AnimatedButton>('#main', async (el) => {
-					await el.setState('loading');
-					expect(el.shadowRoot!.querySelector('#loadingContent loading-spinner')).to.be.visible;
-
-					await el.setState('regular');
-					expect(el.shadowRoot!.querySelector('#loadingContent loading-spinner')).to.not.be.visible;
-				});
-			});
 			it('changes look when setting state to success', () => {
 				getOriginalElement<AnimatedButton>('#main', (el) => {
 					iterateThemes('#main', async (theme, root) => {
