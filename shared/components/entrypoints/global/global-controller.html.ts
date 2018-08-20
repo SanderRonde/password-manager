@@ -5,6 +5,7 @@ export function GlobalControllerHTML(this: GlobalController, _props: GlobalContr
 	return html`
 		<!-- no css -->
 		<div>
-			<slot id="content"></slot>
+			<slot id="slotContent"></slot>
+			<div id="content"></div>
 		</div>`;
 }

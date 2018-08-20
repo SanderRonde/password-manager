@@ -33,11 +33,13 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 	});
 
 	get content() {
-		return this.$.content.assignedNodes()
+		const slotContent = this.$.slotContent.assignedNodes()
 			.filter((node) => {
 				//HTMLElement.ELEMENT_NODE = 1
 				return node.nodeType === 1;
 			}) as HTMLElement[];
+		const regularContent = this.$.content.children
+		return [...slotContent, ...Array.prototype.slice.apply(regularContent)];
 	}
 
 	get currentContent(): Login|Dashboard|null {
