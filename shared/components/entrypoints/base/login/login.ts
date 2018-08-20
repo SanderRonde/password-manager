@@ -14,7 +14,7 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	});
 
 	mounted() {
-		if (!this.getAttribute('prop_theme')) {
+		if (!this.getRoot().getAttribute('prop_theme')) {
 			//This is a non-server-served page
 			const currentTheme = this._globalProperties.theme;
 			const cookieTheme = getCookie('theme');
