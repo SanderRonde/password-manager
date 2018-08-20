@@ -1,3 +1,5 @@
+/// <reference types="Cypress" />
+
 declare module "cypress" {
 	interface Options {
 		browser?: string;
