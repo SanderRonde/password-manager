@@ -85,7 +85,9 @@ export async function render(res: ServerResponse, {
 		const value = data[key as keyof typeof data];
 		propStr.push(`prop_${key}="${value}"`);
 	}
-	res.write(`<${rootElement} _root ${propStr.join(' ')}></${rootElement}>`);
+	res.write(`<global-controller _root ${propStr.join(' ')}>
+		<${rootElement}></${rootElement}>
+	</global-controller>`);
 
 	res.write(postAppHTML({
 		script, 
