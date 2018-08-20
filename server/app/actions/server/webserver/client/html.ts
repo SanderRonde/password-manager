@@ -63,15 +63,16 @@ export async function preAppHTML({
 }
 
 export function postAppHTML({
-	script
+	script, development = false
 }: {
 	script: string;
+	development?: boolean;
 }) {
 	return `</div>
 		${DEFAULT_FILES.scripts.map(({ name, isModule }) => {
 			return `<script ${isModule ? 'type="module"' : ''} src="${name}"></script>`;
 		}).join('\n')}
-		<script type="module" src="${script}"></script>
+		<script ${development ? 'type="module"' : ''} src="${script}"></script>
 	</body>
 	</html>`
 }
@@ -91,7 +92,7 @@ export const html = async ({
 			development, title, bodyStyles, stylesheets
 		}),
 		post: postAppHTML({
-			script
+			script, development
 		})
 	}
 }

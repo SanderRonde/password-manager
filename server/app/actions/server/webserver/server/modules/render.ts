@@ -88,7 +88,8 @@ export async function render(res: ServerResponse, {
 	res.write(`<${rootElement} _root ${propStr.join(' ')}></${rootElement}>`);
 
 	res.write(postAppHTML({
-		script
+		script, 
+		development: isDevelopment
 	}));
 
 	res.end();
