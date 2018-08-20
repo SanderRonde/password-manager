@@ -72,7 +72,7 @@ export function postAppHTML({
 		${DEFAULT_FILES.scripts.map(({ name, isModule }) => {
 			return `<script ${isModule ? 'type="module"' : ''} src="${name}"></script>`;
 		}).join('\n')}
-		<script ${development ? 'type="module"' : ''} src="${script}"></script>
+		<script ${development ? 'type="module"' : ''} src="${script}" defer async></script>
 	</body>
 	</html>`
 }
