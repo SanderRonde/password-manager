@@ -1,3 +1,4 @@
+import { GlobalController } from '../components/entrypoints/global/global-controller';
 import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
 import { VALID_THEMES } from '../components/theming/theme/theme';
 import { GlobalProperties } from '../types/shared-types';
@@ -305,6 +306,13 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 				console.warn(`Failed to propagate global property "${key}" since this element has no registered parent`);
 			}
 		}
+
+	public getRoot(): GlobalController {
+		if (this._isRoot) {
+			return <GlobalController><any>this;
+		}
+		return this._parent!.getRoot();
+	}
 }
 
 abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebComponentHierarchyManager<E> {
