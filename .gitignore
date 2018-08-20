@@ -85,3 +85,4 @@ test/**/*.d.ts
 test/**/*.map
 shared/**/*.temp
 test/ui/served/
+!test/ui/plugins/index.js

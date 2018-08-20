@@ -3,9 +3,10 @@
   "port": 1259,
   "fixturesFolder": "test/ui/fixtures",
   "integrationFolder": "test/ui/integration",
-  "pluginsFile": false,
+  "pluginsFile": "test/ui/plugins",
   "screenshotsFolder": "temp/screenshots",
   "supportFile": false,
   "videosFolder": "temp/videos",
-  "ignoreTestFiles": "*.{ts,map,html,json,bundled.js}"
+  "ignoreTestFiles": "*.{ts,map,html,json,bundled.js}",
+  "chromeWebSecurity": false
 }
