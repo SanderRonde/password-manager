@@ -11,7 +11,7 @@ httpServer.listen(UI_TEST_PORT, async () => {
 	await runCypressServer();	
 
 	cypress.run({
-		record: true
+		record: process.argv.indexOf('--no-record') ? false : true
 	}).then((results) => {
 		httpServer.close();
 		process.exit(results.totalFailed);
