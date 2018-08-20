@@ -6,12 +6,23 @@ import { GlobalControllerHTML } from './global-controller.html';
 import { Dashboard } from '../base/dashboard/dashboard';
 import { Login } from '../base/login/login';
 
+interface GlobalControllerData {
+	loginData: {
+		password: string;
+		login_auth: string;
+		instance_id: string;
+		server_public_key: string;
+	}
+}
+
 @config({
 	is: 'global-controller',
 	css: null,
 	html: GlobalControllerHTML
 })
 export abstract class GlobalController extends ConfigurableWebComponent<GlobalControllerIDMap> {
+	private _data: Map<keyof GlobalControllerData, GlobalControllerData[keyof GlobalControllerData]> =
+		new Map();
 	props = defineProps(this, {
 		reflect: {
 			page: {
@@ -38,6 +49,17 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 					this.props.page === 'dashboard')) {
 						return node as Login|Dashboard;
 					}
+		}
+		return null;
+	}
+
+	storeData<T extends keyof GlobalControllerData>(type: T, data: GlobalControllerData[T]) {
+		this._data.set(type, data);
+	}
+
+	getData<T extends keyof GlobalControllerData>(type: T): GlobalControllerData[T]|null {
+		if (this._data.has(type)) {
+			return this._data.get(type)!;
 		}
 		return null;
 	}
