@@ -157,7 +157,7 @@ export function initCommander(handledHolder: {
 					' this means all requests are redirected to a non-existent server');
 			}
 			Server.run(await getDatabase(settings.database, settings.password, false, 
-				settings.databaseless), settings as  ServerConfig);
+				settings.databaseless), settings as ServerConfig);
 		});
 
 	commander
