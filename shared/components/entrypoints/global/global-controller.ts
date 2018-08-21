@@ -143,6 +143,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 			wait(ANIMATE_TIME)
 		]);
 		this.props.page = page;
+		this.setGlobalProperty('page', page);
 		this._hideNonCurrent();
 		el.classList.remove('invisible', 'hidden');
 		this._fadeOutSpinner();
