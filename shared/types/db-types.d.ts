@@ -73,6 +73,13 @@ export type PublicKeyEncrypted<T, K extends string> = EncodedString<{
 	data: HybridEncrypted<T, K>;
 }>;
 
+type UnType<T> = T extends (string & {
+	__type: infer R
+}) ? R : T;
+
+export type PublicKeyDecrypted<T> = UnType<T extends PublicKeyEncrypted<infer D, string> ? 
+	D : void>
+
 /**
  * Data encrypted with a public key
  */
