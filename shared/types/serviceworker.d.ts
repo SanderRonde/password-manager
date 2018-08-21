@@ -2,7 +2,7 @@ interface ServiceWorkerEvent {
 	waitUntil(prom: Promise<any>): void;
 }
 
-type Remove<T, K> = {
+export type Remove<T, K> = {
 	[P in Exclude<keyof T, K>]: T[P];
 }
 
