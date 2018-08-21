@@ -86,3 +86,5 @@ test/**/*.map
 shared/**/*.temp
 test/ui/served/
 !test/ui/plugins/index.js
+database/
+data/
