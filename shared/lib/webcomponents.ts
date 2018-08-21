@@ -255,10 +255,12 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 	}
 
 	private _clearNonExistentChildren() {
+		const nodeChildren = Array.prototype.slice.apply(this.children) as HTMLElement[];
 		for (const child of this._children.values()) {
-			if (!this.shadowRoot!.contains(child)) {
-				this._children.delete(child);
-			}
+			if (!this.shadowRoot!.contains(child) && 
+				!nodeChildren.filter(nodeChild => nodeChild.contains(child)).length) {
+					this._children.delete(child);
+				}
 		}
 	}
 
