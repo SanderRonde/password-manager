@@ -1,7 +1,7 @@
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord } from "../../../../../../../../../shared/types/db-types";
 import { UnstringifyObjectIDs, APIToken } from "../../../../../../../../../shared/types/crypto";
-import { API_ERRS } from "../../../../../../../../../shared/types/api";
+import { API_ERRS, APIReturns } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ServerResponse } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
@@ -458,6 +458,100 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 
+	public async doGetAllMeta(instanceId: StringifiedObjectId<EncryptedInstance>, password: {
+		skip: true;
+	}|{
+		skip: false;
+		hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+		res: ServerResponse
+	}): Promise<{
+		code: number;
+		data: APIReturns['/api/password/allmeta']
+	}|null> {
+		const instance = await this.server.Router.getInstance(instanceId);
+		if (!instance) {
+			return {
+				code: 200,
+				data: {
+					success: false,
+					error: 'invalid instance ID',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				}
+			};
+		}
+		const decryptedInstance = this.server.database.Crypto
+			.dbDecryptInstanceRecord(instance);
+
+		if (!decryptedInstance) {
+			return {
+				code: 200,
+				data: {
+					success: false,
+					error: 'invalid instance ID',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				}
+			};
+		}
+
+		//Verify password
+		const account = await this.server.database.Manipulation.findOne(
+			COLLECTIONS.USERS, {
+				_id: decryptedInstance.user_id
+			});
+
+		if (!account) {
+			return {
+				code: 200,
+				data: {
+					success: false,
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				}
+			}
+		}
+
+		if (password.skip === false) {
+			if (!this.server.Router.checkPassword(password.res, 
+				password.hash, this.server.database.Crypto.dbDecrypt(account.pw))) {
+					return null;
+				}
+		}
+
+		const passwords = await this.server.database.Manipulation.findMany(
+			COLLECTIONS.PASSWORDS, {
+				user_id: account._id
+			});
+
+		if (passwords === null) {
+			return {
+				code: 500,
+				data: {
+					success: false,
+					error: 'failed to find passwords',
+					ERR: API_ERRS.SERVER_ERROR
+				}
+			}
+		}
+
+		return {
+			code: 200,
+			data: {
+				success: true,
+				data: {
+					encrypted: encryptWithPublicKey(JSON.stringify(passwords.map((password) => {
+						const decrypted = this.server.database.Crypto
+							.dbDecryptPasswordRecord(password);
+						return {
+							id: password._id.toHexString(),
+							websites: decrypted.websites,
+							twofactor_enabled: decrypted.twofactor_enabled
+						}
+					})), decryptedInstance.public_key)
+				}
+			}
+		}
+	}
+
 	public allmeta(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
@@ -485,61 +579,14 @@ export class RoutesApiPassword {
 
 			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
 
-			const { decryptedInstance } = 
-				await this.server.Router.verifyAndGetInstance(instance_id, res);
-			if (!decryptedInstance) return;
-
-			//Verify password
-			const account = await this.server.database.Manipulation.findOne(
-				COLLECTIONS.USERS, {
-					_id: decryptedInstance.user_id
-				});
-
-			if (!account) {
-				res.status(200);
-				res.json({
-					success: false,
-					error: 'invalid credentials',
-					ERR: API_ERRS.INVALID_CREDENTIALS
-				});
-				return;
-			}
-
-			if (!this.server.Router.checkPassword(res, 
-				password_hash, this.server.database.Crypto.dbDecrypt(account.pw))) {
-					return;
-				}
-
-			const passwords = await this.server.database.Manipulation.findMany(
-				COLLECTIONS.PASSWORDS, {
-					user_id: account._id
-				});
-
-			if (passwords === null) {
-				res.status(500);
-				res.json({
-					success: false,
-					error: 'failed to find passwords',
-					ERR: API_ERRS.SERVER_ERROR
-				});
-				return;
-			}
-
-			res.status(200);
-			res.json({
-				success: true,
-				data: {
-					encrypted: encryptWithPublicKey(JSON.stringify(passwords.map((password) => {
-						const decrypted = this.server.database.Crypto
-							.dbDecryptPasswordRecord(password);
-						return {
-							id: password._id.toHexString(),
-							websites: decrypted.websites,
-							twofactor_enabled: decrypted.twofactor_enabled
-						}
-					})), decryptedInstance.public_key)
-				}
+			const response = await this.doGetAllMeta(instance_id, {
+				skip: false,
+				hash: password_hash,
+				res
 			});
+			if (response === null) return;
+			res.status(response.code);
+			res.json(response.data);
 		})(req, res, next);
 	}
 
