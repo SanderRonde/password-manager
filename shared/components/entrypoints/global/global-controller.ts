@@ -120,11 +120,11 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		});
 	}
 
-	private _waitUntilVisible(el: EntrypointPage) {
+	private async _waitUntilVisible(el: EntrypointPage) {
 		if (el.isMounted) {
-			return Promise.resolve();
+			return
 		}
-		return new Promise((resolve) => {
+		await new Promise((resolve) => {
 			const originalMounted = el.mounted;
 			el.mounted = () => {
 				originalMounted && originalMounted();
