@@ -2,7 +2,7 @@ import { MongoCallback, FilterQuery, CommonOptions, DeleteWriteOpResultObject, F
 import { TypedObjectID, EncryptedAccount, MongoRecord, EncryptedInstance, EncryptedPassword, StringifiedObjectId } from './../../../shared/types/db-types';
 import { encrypt, hash, pad, encryptWithSalt, genRSAKeyPair, encryptWithPublicKey } from '../lib/crypto';
 import { DEFAULT_EMAIL, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../lib/constants';
-import { APIReturns } from '../../../shared/types/api';
+import { APISuccessfulReturns } from '../../../shared/types/api';
 import { genRandomString } from '../lib/util';
 import { Database } from './database';
 import * as mongo from 'mongodb'
@@ -417,55 +417,50 @@ export class MockMongoDb {
 	}
 }
 
-export function getMockPasswordMeta(): APIReturns['/api/password/allmeta'] {
-	return {
-		success: true,
-		data: {
-			encrypted: encryptWithPublicKey(JSON.stringify([{
-				id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
-				websites: [{
-					host: 'www.google.com',
-					exact: 'www.google.com/login'
-				}],
-				twofactor_enabled: false
-			}, {
-				id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
-				websites: [{
-					host: 'www.facebook.com',
-					exact: 'www.facebook.com/login'
-				}, {
-					host: 'www.instagram.com',
-					exact: 'www.instagram.com/login'
-				}, {
-					host: 'www.whatsapp.com',
-					exact: 'www.whatsapp.com/somelogin'
-				}],
-				twofactor_enabled: false
-			}, {
-				id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
-				websites: [{
-					host: 'www.google.com',
-					exact: 'www.google.com/login'
-				}],
-				twofactor_enabled: true
-			}, {
-				id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
-				websites: [{
-					host: 'www.reddit.com',
-					exact: 'www.reddit.com/login'
-				}],
-				twofactor_enabled: false
-			}, {
-				id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
-				websites: [{
-					host: 'www.somebigwebsite.com',
-					exact: `www.somebigwebsite.com/${
-						genRandomString(50)}/${
-							genRandomString(50)}/${
-								genRandomString(50)}`
-				}],
-				twofactor_enabled: false
-			}]), 'dev_public_key')
-		}
-	}
+export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allmeta']['encrypted'] {
+	return encryptWithPublicKey(JSON.stringify([{
+		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
+		websites: [{
+			host: 'www.google.com',
+			exact: 'www.google.com/login'
+		}],
+		twofactor_enabled: false
+	}, {
+		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
+		websites: [{
+			host: 'www.facebook.com',
+			exact: 'www.facebook.com/login'
+		}, {
+			host: 'www.instagram.com',
+			exact: 'www.instagram.com/login'
+		}, {
+			host: 'www.whatsapp.com',
+			exact: 'www.whatsapp.com/somelogin'
+		}],
+		twofactor_enabled: false
+	}, {
+		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
+		websites: [{
+			host: 'www.google.com',
+			exact: 'www.google.com/login'
+		}],
+		twofactor_enabled: true
+	}, {
+		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
+		websites: [{
+			host: 'www.reddit.com',
+			exact: 'www.reddit.com/login'
+		}],
+		twofactor_enabled: false
+	}, {
+		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
+		websites: [{
+			host: 'www.somebigwebsite.com',
+			exact: `www.somebigwebsite.com/${
+				genRandomString(50)}/${
+					genRandomString(50)}/${
+						genRandomString(50)}`
+		}],
+		twofactor_enabled: false
+	}]), 'dev_public_key');
 }

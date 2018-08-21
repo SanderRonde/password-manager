@@ -1,5 +1,5 @@
+import { APIReturns, APISuccessfulReturns } from "../../../../../../../../shared/types/api";
 import { getMockPasswordMeta } from "../../../../../../database/mocks";
-import { APIReturns } from "../../../../../../../../shared/types/api";
 import { ServerResponse } from "../../modules/ratelimit";
 import { render } from "../../modules/render";
 import { Webserver } from "../../webserver";
@@ -66,7 +66,7 @@ export class RoutesDashboard {
 		});
 	}
 
-	private async _getDashboarData(req: express.Request): Promise<APIReturns['/api/password/allmeta']|void> {
+	private async _getDashboarData(req: express.Request): Promise<APISuccessfulReturns['/api/password/allmeta']['encrypted']|void> {
 		if (this.server.config.development) {
 			return getMockPasswordMeta();
 		} else {
@@ -80,7 +80,7 @@ export class RoutesDashboard {
 			if (code !== 200 || data.success !== true) {
 				return undefined;
 			}
-			return data;
+			return data.data.encrypted;
 		}
 	}
 

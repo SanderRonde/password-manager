@@ -90,8 +90,12 @@ export type APIArgs = {
 export type APIReturns = {
 	[P in keyof APIFns]: ReturnType<APIFns[P]>;
 }
+export type APISuccessfulReturns = {
+	[P in keyof APIFns]: SuccessfulReturnType<APIFns[P]>;
+}
 
 export type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
+export type SuccessfulReturnType<T> = ReturnType<T> extends JSONResponse<infer R> ? R : void;
 export type GetRequired<T> = T extends (arg1: infer R, arg2: any, arg3: any, arg4: any) => void ? R : any;
 export type GetEncrypted<T> = T extends (arg1: any, arg2: infer R, arg3: any, arg4: any) => void ? R : void;
 export type GetOptional<T> = T extends (arg1: any, arg2: any, arg3: infer R, arg4: any) => void ? R : any;

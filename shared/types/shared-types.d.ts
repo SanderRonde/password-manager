@@ -1,4 +1,4 @@
-import { APIReturns } from "./api";
+import { APISuccessfulReturns } from "./api";
 
 export interface LoginData {
 	comm_token: string,
@@ -6,7 +6,7 @@ export interface LoginData {
 }
 
 export interface DashboardData {
-	password_meta: APIReturns['/api/password/allmeta'];
+	password_meta: APISuccessfulReturns['/api/password/allmeta']['encrypted'];
 }
 
 export type GlobalProperties = {
