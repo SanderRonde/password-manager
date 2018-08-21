@@ -223,10 +223,11 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 
 	@bindToClass
 	private _registerToParent() {
-		let element: HTMLElement|null = this;
+		let element: HTMLElement|null = this.parentElement;
 		while (element && !(element instanceof (window as any).ShadowRoot) && 
-			(element as any) !== document && !(element instanceof DocumentFragment)) {
-				element = element.parentNode as HTMLElement|null;
+			(element as any) !== document && !(element instanceof DocumentFragment) && 
+			!(element instanceof WebComponentHierarchyManager)) {
+				element = element.parentElement as HTMLElement|null;
 			}
 
 		if (!element) {
@@ -238,8 +239,8 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 			this._isRoot = true;
 			return;
 		}
-		const root = <ShadowRoot><any>element;
-		const host = root.host;
+		const host = element instanceof WebComponentHierarchyManager ?
+			element : (<ShadowRoot><any>element).host;
 
 		if (!(host instanceof WebComponentHierarchyManager)) {
 			return;
