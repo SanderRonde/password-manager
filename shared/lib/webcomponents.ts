@@ -227,7 +227,7 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		while (element && !(element instanceof (window as any).ShadowRoot) && 
 			(element as any) !== document && !(element instanceof DocumentFragment) && 
 			!(element instanceof WebComponentHierarchyManager)) {
-				element = element.parentElement as HTMLElement|null;
+				element = element.parentNode as HTMLElement|null;
 			}
 
 		if (!element) {
