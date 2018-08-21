@@ -2,6 +2,7 @@
 import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
 import { defineProps, PROP_TYPE, config, wait } from '../../../lib/webcomponent-util';
 import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
+import { StringifiedObjectId, EncryptedInstance } from '../../../types/db-types';
 import { GlobalControllerCSS, ANIMATE_TIME } from './global-controller.css';
 import { LoadingSpinner } from '../../util/loading-spinner/loading-spinner';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
@@ -14,7 +15,7 @@ export interface GlobalControllerData {
 	loginData: {
 		password: string;
 		login_auth: string;
-		instance_id: string;
+		instance_id: StringifiedObjectId<EncryptedInstance>;
 		private_key: string;
 		server_public_key: string;
 	}
