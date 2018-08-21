@@ -10,11 +10,12 @@ import { GlobalControllerHTML } from './global-controller.html';
 import { Dashboard } from '../base/dashboard/dashboard';
 import { Login } from '../base/login/login';
 
-interface GlobalControllerData {
+export interface GlobalControllerData {
 	loginData: {
 		password: string;
 		login_auth: string;
 		instance_id: string;
+		private_key: string;
 		server_public_key: string;
 	}
 }

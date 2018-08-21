@@ -156,6 +156,7 @@ export class LoginWeb extends Login {
 			password,
 			server_public_key,
 			login_auth: auth_token,
+			private_key: privateKey,
 			instance_id: instance_id
 		});
 		root.changePage('dashboard');
