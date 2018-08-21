@@ -1,13 +1,19 @@
+import { APIReturns } from "./api";
+
 export interface LoginData {
 	comm_token: string,
 	server_public_key: string
+}
+
+export interface DashboardData {
+	password_meta: APIReturns['/api/password/allmeta'];
 }
 
 export type GlobalProperties = {
 	theme?: 'dark'|'light';
 } & Partial<{
 	page: 'login'|'dashboard';
-} & LoginData>;
+} & LoginData & DashboardData>;
 
 export type VALID_THEMES_T = 'light'|'dark';
 export type DEFAULT_THEME = 'light';

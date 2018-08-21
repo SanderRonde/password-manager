@@ -1,3 +1,5 @@
+import { getMockPasswordMeta } from "../../../../../../database/mocks";
+import { APIReturns } from "../../../../../../../../shared/types/api";
 import { ServerResponse } from "../../modules/ratelimit";
 import { render } from "../../modules/render";
 import { Webserver } from "../../webserver";
@@ -64,15 +66,40 @@ export class RoutesDashboard {
 		});
 	}
 
-	public async dashboard(req: express.Request, res: ServerResponse) {
-		if (!this.checkDashboardAuthentication(req, res)) {
-			return;
+	private async _getDashboarData(req: express.Request): Promise<APIReturns['/api/password/allmeta']|void> {
+		if (this.server.config.development) {
+			return getMockPasswordMeta();
+		} else {
+			const { code, data } = await this.server.Routes.API.Password.doGetAllMeta(
+				req.cookies.instance_id, {
+					skip: true
+				}) as {
+					code: number;
+					data: APIReturns['/api/password/allmeta']
+				};
+			if (code !== 200 || data.success !== true) {
+				return undefined;
+			}
+			return data;
 		}
+	}
 
+	public async dashboard(req: express.Request, res: ServerResponse) {
+		if (!this.checkDashboardAuthentication(req, res) && 
+			!this.server.config.development) {
+				return;
+			}
+
+		const dashboardData = await this._getDashboarData(req);
 		await render(res, {
 			data: {
-				page: 'dashboard',
-				theme: this.server.Router.getTheme(req, res)
+				...dashboardData !== undefined ? {
+					password_meta: dashboardData
+				} : {},
+				...{
+					page: 'dashboard',
+					theme: this.server.Router.getTheme(req, res)
+				}
 			},
 			rootElement: 'dashboard-page',
 			script: 'entrypoints/dashboard/dashboard-page.js',
