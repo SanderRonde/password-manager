@@ -7,6 +7,7 @@ import { PaperButton } from "../components/util/paper-button/paper-button";
 import { LoginWeb } from "../components/entrypoints/web/login/login-web";
 import { PaperToast } from "../components/util/paper-toast/paper-toast";
 import { IconButton } from "../components/util/icon-button/icon-button";
+import { LoadingSpinner } from "../components/util/loading-spinner/loading-spinner";
 
 declare global {
 	type HTMLLoginElement = LoginWeb;
@@ -16,6 +17,7 @@ declare global {
 	type HTMLMaterialInputElement = MaterialInput;
 	type HTMLThemeSelectorElement = ThemeSelector;
 	type HTMLAnimatedButtonElement = AnimatedButton;
+	type HTMLLoadingSpinnerElement = LoadingSpinner;
 	type HTMLVerticalCentererElement = VerticalCenterer;
 	type HTMLHorizontalCentererElement = HorizontalCenterer;
 }
