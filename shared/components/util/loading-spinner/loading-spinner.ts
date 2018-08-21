@@ -14,7 +14,9 @@ import { LoadingSpinnerCSS } from "./loading-spinner.css";
 export class LoadingSpinner extends ConfigurableWebComponent<LoadingSpinnerIDMap> {
 	props = defineProps(this, {
 		reflect: {
-			big: PROP_TYPE.BOOL
+			big: PROP_TYPE.BOOL,
+			medium: PROP_TYPE.BOOL,
+			dimensions: PROP_TYPE.NUMBER
 		}
 	})
 

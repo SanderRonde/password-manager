@@ -2,6 +2,19 @@ import { Theme } from '../../../types/shared-types';
 import { LoadingSpinner } from './loading-spinner';
 import { html } from "lit-html";
 
+function getDimensions(props: LoadingSpinner['props']) {
+	if (props.dimensions) {
+		return ~~props.dimensions;
+	}
+	if (props.big) {
+		return 200;
+	}
+	if (props.medium) {
+		return 100;
+	}
+	return 28;
+}
+
 export function LoadingSpinnerCSS(this: LoadingSpinner, _theme: Theme, props: LoadingSpinner['props']) {
 	return html`<style>
 		/**
@@ -22,8 +35,8 @@ export function LoadingSpinnerCSS(this: LoadingSpinner, _theme: Theme, props: Lo
 		.mdl-spinner {
 			display: inline-block;
 			position: relative;
-			width: ${props.big ? 200 : 28}px;
-			height: ${props.big ? 200 : 28}px;
+			width: ${getDimensions(props)}px;
+			height: ${getDimensions(props)}px;
 		}
 		.mdl-spinner:not(.is-upgraded).is-active:after {
 			content: "Loading...";
