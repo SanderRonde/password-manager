@@ -128,7 +128,8 @@ type GetTSType<V extends PROP_TYPE|JSONType<any>|DefinePropTypeConfig> =
 								V extends Coerced ? number : number|undefined : 
 							V['type'] extends PROP_TYPE.STRING ? 
 								V extends Coerced ? string : string|undefined : 
-							void : void;
+							V['type'] extends JSONType<infer R> ? R :
+								void : void;
 
 export const enum PROP_TYPE {
 	STRING = 'string',
