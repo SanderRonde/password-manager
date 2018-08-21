@@ -12,6 +12,7 @@ import { API_ERRS, APIReturns } from '../../../../types/api';
 import { bindToClass } from '../../../../lib/decorators';
 import { LoginHTML } from '../../base/login/login.html';
 import { LoginCSS } from '../../base/login/login.css';
+import { ERRS } from '../../../../types/crypto';
 import { Login } from '../../base/login/login';
 
 type ServerLoginResponse = APIReturns['/api/dashboard/login'];
@@ -150,6 +151,16 @@ export class LoginWeb extends Login {
 			auth_token: decryptWithPrivateKey(
 				response.data.auth_token, privateKey)
 		}
+		if (instance_id === ERRS.INVALID_DECRYPT ||
+			server_public_key === ERRS.INVALID_DECRYPT ||
+			auth_token === ERRS.INVALID_DECRYPT) {
+				PaperToast.hideAll();
+				PaperToast.create({
+					content: 'Failed to decrypt data, please try again',
+					buttons: [PaperToast.BUTTONS.HIDE]
+				});
+				return;
+			}
 
 		const root = this.getRoot();
 		root.storeData('loginData', {
