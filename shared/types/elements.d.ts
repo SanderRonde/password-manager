@@ -8,12 +8,14 @@ import { LoginWeb } from "../components/entrypoints/web/login/login-web";
 import { PaperToast } from "../components/util/paper-toast/paper-toast";
 import { IconButton } from "../components/util/icon-button/icon-button";
 import { LoadingSpinner } from "../components/util/loading-spinner/loading-spinner";
+import { LoadableBlock } from "../components/util/loadable-block/loadable-block";
 
 declare global {
 	type HTMLLoginElement = LoginWeb;
 	type HTMLIconButtonElement = IconButton;
 	type HTMLPaperToastElement = PaperToast;
 	type HTMLPaperButtonElement = PaperButton;
+	type HTMLLoadableBlockElement = LoadableBlock;
 	type HTMLMaterialInputElement = MaterialInput;
 	type HTMLThemeSelectorElement = ThemeSelector;
 	type HTMLAnimatedButtonElement = AnimatedButton;

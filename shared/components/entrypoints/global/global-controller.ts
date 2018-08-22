@@ -1,15 +1,13 @@
-/// <reference path="../../../types/elements.d.ts" />
-import { HorizontalCenterer } from '../../util/horizontal-centerer/horizontal-centerer';
 import { defineProps, PROP_TYPE, config, wait } from '../../../lib/webcomponent-util';
-import { VerticalCenterer } from '../../util/vertical-centerer/vertical-centerer';
 import { StringifiedObjectId, EncryptedInstance } from '../../../types/db-types';
-import { GlobalControllerCSS, ANIMATE_TIME } from './global-controller.css';
-import { LoadingSpinner } from '../../util/loading-spinner/loading-spinner';
+import { LoadableBlock } from '../../util/loadable-block/loadable-block';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { GlobalControllerIDMap } from './global-controller-querymap';
 import { GlobalControllerHTML } from './global-controller.html';
+import { GlobalControllerCSS } from './global-controller.css';
 import { Dashboard } from '../base/dashboard/dashboard';
 import { Login } from '../base/login/login';
+import { ANIMATE_TIME } from '../../util/loadable-block/loadable-block.css';
 
 export interface GlobalControllerData {
 	loginData: {
@@ -29,9 +27,7 @@ export type EntrypointPage = Login|Dashboard;
 	css: GlobalControllerCSS,
 	html: GlobalControllerHTML,
 	dependencies: [
-		LoadingSpinner,
-		HorizontalCenterer,
-		VerticalCenterer
+		LoadableBlock
 	]
 })
 export abstract class GlobalController extends ConfigurableWebComponent<GlobalControllerIDMap> {
@@ -98,20 +94,6 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		return newEl as EntrypointPage;
 	}
 
-	private async _fadeInSpinner() {
-		this.$.spinner.start();
-		this.$.spinnerContainer.classList.add('visible');
-		await wait(0);
-		this.$.spinnerContainer.classList.add('animate');
-	}
-
-	private async _fadeOutSpinner() {
-		this.$.spinnerContainer.classList.remove('animate');
-		await wait(ANIMATE_TIME);
-		this.$.spinnerContainer.classList.remove('visible');
-		this.$.spinner.stop();
-	}
-
 	private _hideNonCurrent() {
 		//Remove everything that is not the current page first
 		const currentContent = this.currentContent;
@@ -139,7 +121,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		this._hideNonCurrent();
 		this._definePage(page);
 		const el = this._addNewPage(page);
-		this._fadeInSpinner();
+		this.$.loadable.load();
 		await Promise.all([
 			this._waitUntilVisible(el),
 			wait(ANIMATE_TIME)
@@ -148,11 +130,10 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		this.setGlobalProperty('page', page);
 		this._hideNonCurrent();
 		el.classList.remove('invisible', 'hidden');
-		this._fadeOutSpinner();
+		this.$.loadable.finish();
 	}
 	
 	mounted() {
-		this.$.spinner.stop();
 		this.props.page = this._globalProperties.page!;
 		this.listen('globalPropChange', (key, val) => {
 			if (key === 'page') {
