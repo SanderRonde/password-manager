@@ -1,5 +1,4 @@
 import { captureURIs, createServer, genUserAndDb, doServerPostRequest, UserAndDbData, doesNotThrow, genURL, getLoginToken } from '../../lib/util';
-const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Context) => any) => void;
 import { APIReturns, API_ERRS } from '../../../app/../../../shared/types/api';
 import { encryptWithPublicKey, pad, hash } from '../../../../app/lib/crypto';
 import { wait, genRandomString } from '../../../../app/lib/util';
@@ -119,7 +118,7 @@ function getSpedupTime(time: number) {
 }
 
 export function rateLimitTest() {
-	parallel('Ratelimit', function() {
+	describe('Ratelimit', function() {
 		const uris = captureURIs();
 		it('instance create ratelimiter ratelimits on quick requests', async () => {2
 			const config = await genUserAndDb({
