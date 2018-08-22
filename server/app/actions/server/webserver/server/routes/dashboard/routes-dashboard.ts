@@ -85,8 +85,8 @@ export class RoutesDashboard {
 	}
 
 	public async dashboard(req: express.Request, res: ServerResponse) {
-		if (!this.checkDashboardAuthentication(req, res) && 
-			!this.server.config.development) {
+		if (!this.server.config.development &&
+			!this.checkDashboardAuthentication(req, res)) {
 				return;
 			}
 
