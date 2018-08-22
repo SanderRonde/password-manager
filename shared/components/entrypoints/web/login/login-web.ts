@@ -1,11 +1,5 @@
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { config, cancelTimeout, wait, createCancellableTimeout } from '../../../../lib/webcomponent-util';
-import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
-import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
-import { AnimatedButton } from '../../../util/animated-button/animated-button';
-import { MaterialInput } from '../../../util/material-input/material-input';
-import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
-import { IconButton } from '../../../util/icon-button/icon-button';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { API_ERRS, APIReturns } from '../../../../types/api';
@@ -13,7 +7,7 @@ import { bindToClass } from '../../../../lib/decorators';
 import { LoginHTML } from '../../base/login/login.html';
 import { LoginCSS } from '../../base/login/login.css';
 import { ERRS } from '../../../../types/crypto';
-import { Login } from '../../base/login/login';
+import { Login, LoginDependencies } from '../../base/login/login';
 
 type ServerLoginResponse = APIReturns['/api/dashboard/login'];
 
@@ -21,15 +15,7 @@ type ServerLoginResponse = APIReturns['/api/dashboard/login'];
 	is: 'login-page',
 	css: LoginCSS,
 	html: LoginHTML,
-	dependencies: [
-		VerticalCenterer, 
-		HorizontalCenterer, 
-		MaterialInput,
-		IconButton,
-		AnimatedButton,
-		ThemeSelector,
-		PaperToast
-	]
+	dependencies: LoginDependencies
 })
 export class LoginWeb extends Login {
 	private async _doLoginRequest({

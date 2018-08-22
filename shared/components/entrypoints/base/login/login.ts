@@ -1,11 +1,27 @@
 /// <reference path="../../../../types/elements.d.ts" />
 import { defineProps, PROP_TYPE, isDefined, listen, isNewElement, getCookie } from '../../../../lib/webcomponent-util'
+import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
+import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
+import { AnimatedButton } from '../../../util/animated-button/animated-button';
+import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
+import { MaterialInput } from '../../../util/material-input/material-input';
 import { LoginData, VALID_THEMES_T } from '../../../../types/shared-types';
 import { ConfigurableWebComponent } from "../../../../lib/webcomponents";
+import { PaperToast } from '../../../util/paper-toast/paper-toast';
+import { IconButton } from '../../../util/icon-button/icon-button';
 import { bindToClass } from '../../../../lib/decorators';
 import { JSONResponse } from '../../../../types/api';
 import { LoginIDMap } from './login-querymap';
 
+export const LoginDependencies = [
+	VerticalCenterer, 
+	HorizontalCenterer, 
+	MaterialInput,
+	IconButton,
+	AnimatedButton,
+	ThemeSelector,
+	PaperToast
+];
 export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	props = defineProps(this, {
 		priv: {

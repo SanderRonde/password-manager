@@ -1,13 +1,12 @@
 import { ERRS, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../../types/crypto';
 import { decryptWithPrivateKey, hash, pad } from '../../../../lib/browser-crypto';
-import { MaterialInput } from '../../../util/material-input/material-input';
+import { Dashboard, DashboarDependencies } from '../../base/dashboard/dashboard';
 import { GlobalControllerData } from '../../global/global-controller';
 import { DashboardHTML } from '../../base/dashboard/dashboard.html';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { DashboardCSS } from '../../base/dashboard/dashboard.css';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { MasterPassword } from '../../../../types/db-types';
-import { Dashboard } from '../../base/dashboard/dashboard';
 import { config } from '../../../../lib/webcomponent-util';
 import { Remove } from '../../../../types/serviceworker';
 
@@ -15,10 +14,7 @@ import { Remove } from '../../../../types/serviceworker';
 	is: 'dashboard-page',
 	css: DashboardCSS,
 	html: DashboardHTML,
-	dependencies: [
-		MaterialInput,
-		PaperToast
-	]
+	dependencies: DashboarDependencies
 })
 export class DashboardWeb extends Dashboard { 
 	private _data!: Remove<GlobalControllerData['loginData'], 'password' & {
