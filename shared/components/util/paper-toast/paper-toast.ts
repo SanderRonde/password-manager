@@ -34,13 +34,13 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 		reflect: {
 			content: {
 				type: PROP_TYPE.STRING,
-				value: ''
+				defaultValue: ''
 			},
 			button1: PROP_TYPE.STRING,
 			button2: PROP_TYPE.STRING,
 			duration: {
 				type: PROP_TYPE.NUMBER,
-				value: 5000,
+				defaultValue: 5000,
 				coerce: true
 			}
 		}	

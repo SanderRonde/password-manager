@@ -17,7 +17,7 @@ export abstract class Dashboard extends ConfigurableWebComponent {
 		priv: {
 			metaPasswords: {
 				type: JSONType<MetaPasswords>(),
-				value: []
+				defaultValue: []
 			}
 		}
 	});
