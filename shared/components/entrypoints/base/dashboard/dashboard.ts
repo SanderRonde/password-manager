@@ -30,6 +30,6 @@ export abstract class Dashboard extends ConfigurableWebComponent {
 			//Redirecting to /login, just let this go
 			return;
 		}
-		this.props.metaPasswords = pwMeta;
+		this.props.metaPasswords = pwMeta || [];
 	}
 }
