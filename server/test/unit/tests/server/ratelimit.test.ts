@@ -119,7 +119,7 @@ function getSpedupTime(time: number) {
 }
 
 export function rateLimitTest() {
-	parallel('Ratelimit', () => {
+	parallel('Ratelimit', function() {
 		const uris = captureURIs();
 		it('instance create ratelimiter ratelimits on quick requests', async () => {2
 			const config = await genUserAndDb({
@@ -190,8 +190,6 @@ export function rateLimitTest() {
 			server.kill();
 		});
 		it('api use ratelimiter works', async function() {
-			this.retries(10);
-
 			const config = await genUserAndDb({
 				account_twofactor_enabled: false
 			});
