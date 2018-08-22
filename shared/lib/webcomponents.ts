@@ -206,7 +206,8 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 			const attr = this.attributes[i];
 			if (attr.name.startsWith('prop_')) {
 				props[attr.name.slice('prop_'.length) as keyof GlobalProperties] = 
-					attr.value as GlobalProperties[keyof GlobalProperties];
+					decodeURIComponent(
+						attr.value as GlobalProperties[keyof GlobalProperties] as string);
 			}
 		}
 

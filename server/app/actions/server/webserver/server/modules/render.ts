@@ -83,7 +83,7 @@ export async function render(res: ServerResponse, {
 	const propStr: string[] = [];
 	for (const key in data) {
 		const value = data[key as keyof typeof data];
-		propStr.push(`prop_${key}="${value}"`);
+		propStr.push(`prop_${key}="${encodeURIComponent(value!)}"`);
 	}
 	res.write(`<global-controller _root ${propStr.join(' ')}>
 		<${rootElement}></${rootElement}>
