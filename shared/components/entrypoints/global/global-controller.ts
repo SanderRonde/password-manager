@@ -1,5 +1,6 @@
-import { defineProps, PROP_TYPE, config, wait } from '../../../lib/webcomponent-util';
+import { defineProps, PROP_TYPE, config, wait, awaitMounted } from '../../../lib/webcomponent-util';
 import { StringifiedObjectId, EncryptedInstance } from '../../../types/db-types';
+import { ANIMATE_TIME } from '../../util/loadable-block/loadable-block.css';
 import { LoadableBlock } from '../../util/loadable-block/loadable-block';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { GlobalControllerIDMap } from './global-controller-querymap';
@@ -7,7 +8,6 @@ import { GlobalControllerHTML } from './global-controller.html';
 import { GlobalControllerCSS } from './global-controller.css';
 import { Dashboard } from '../base/dashboard/dashboard';
 import { Login } from '../base/login/login';
-import { ANIMATE_TIME } from '../../util/loadable-block/loadable-block.css';
 
 export interface GlobalControllerData {
 	loginData: {
@@ -104,26 +104,13 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		});
 	}
 
-	private async _waitUntilVisible(el: EntrypointPage) {
-		if (el.isMounted) {
-			return
-		}
-		await new Promise((resolve) => {
-			const originalMounted = el.mounted;
-			el.mounted = () => {
-				originalMounted && originalMounted();
-				resolve();
-			}
-		});
-	}
-
 	async changePage(page: Entrypoint) {
 		this._hideNonCurrent();
 		this._definePage(page);
 		const el = this._addNewPage(page);
 		this.$.loadable.load();
 		await Promise.all([
-			this._waitUntilVisible(el),
+			awaitMounted(el),
 			wait(ANIMATE_TIME)
 		]);
 		this.props.page = page;

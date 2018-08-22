@@ -830,3 +830,17 @@ export function onMount(el: WebComponentBase) {
 		}, 5);
 	});
 }
+
+export async function awaitMounted(el: WebComponentBase) {
+	const realEl = el as WebComponent;
+	if (realEl.isMounted) {
+		return;
+	}
+	await new Promise((resolve) => {
+		const originalMounted = realEl.mounted;
+		realEl.mounted = () => {
+			originalMounted && originalMounted();
+			resolve();
+		}
+	});
+}
