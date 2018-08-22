@@ -37,7 +37,9 @@ export class DashboardWeb extends Dashboard {
 			buttons: [PaperToast.BUTTONS.HIDE],
 			duration: 10000
 		});
-		this.getRoot().changePage('login');
+		if (!document.body.classList.contains('dev')) {
+			this.getRoot().changePage('login');
+		}
 	}	
 
 	private _initData() {
