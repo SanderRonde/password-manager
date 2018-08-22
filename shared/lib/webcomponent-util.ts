@@ -76,7 +76,7 @@ export function getter<R>(element: HTMLElement, name: string, type: 'string'|'nu
 			if (type === 'number') {
 				return ~~value;
 			} else if (type === 'json') {
-				return JSON.parse(value);
+				return JSON.parse(decodeURIComponent(value));
 			}
 			return value;
 		}
@@ -112,7 +112,7 @@ export function setter(setAttrFn: (key: string, val: string) => void,
 		} else {
 			const strVal = value as string|number;
 			if (type === 'json') {
-				setAttrFn(name, JSON.stringify(strVal));
+				setAttrFn(name, encodeURIComponent(JSON.stringify(strVal)));
 			} else {
 				setAttrFn(name, `${strVal}`);
 			}
