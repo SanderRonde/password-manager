@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, config, isNewElement, createCancellableTimeout, awaitMounted } from '../../../lib/webcomponent-util';
+import { defineProps, PROP_TYPE, config, isNewElement, createCancellableTimeout, awaitMounted, wait } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { PaperButton } from '../paper-button/paper-button';
 import { PaperToastIDMap } from './paper-toast-querymap';
@@ -53,9 +53,11 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 		}, this.props.duration);
 	}
 
-	hide() {
+	async hide() {
 		this.classList.remove('show');
 		this._fire('hide');
+		await wait(300);
+		this.remove();
 	}
 
 	async postRender() {
@@ -148,7 +150,7 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 		if (!this._queue.length) return;
 
 		const first = this._queue[0];
-		while (this._queue.length) { this._queue.pop(); }
+		while (this._queue.length) { this._queue.pop()!.hide(); }
 
 		first.hide();
 	}
