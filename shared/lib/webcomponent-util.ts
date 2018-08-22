@@ -477,6 +477,7 @@ export function createCancellableTimeout(el: any, name: string, callback: () => 
 		cancelTimeout(el, name);
 	}
 	elMap.set(name, setTimeout(callback, waitTime));
+	return wait(waitTime);
 }
 
 export function cancelTimeout(el: any, name: string) {
