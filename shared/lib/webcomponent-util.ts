@@ -84,25 +84,25 @@ export function getter<R>(element: HTMLElement, name: string, type: 'string'|'nu
 	}
 }
 
-export function setter(element: HTMLElement, name: string, value: string|boolean|number, type: 'string'|'number'|'bool'|'json'): void;
-export function setter(element: HTMLElement, name: string, value: number, type: 'json'): void;
-export function setter(element: HTMLElement, name: string, value: boolean, type: 'bool'): void;
-export function setter(element: HTMLElement, name: string, value: string, type: 'string'): void;
-export function setter(element: HTMLElement, name: string, value: number, type: 'number'): void;
-export function setter(element: HTMLElement, name: string, value: string|boolean|number, type: 'string'|'number'|'bool'|'json'): void {
+export function setter(element: HTMLElement, setAttrFn: (key: string, val: string) => void, name: string, value: string|boolean|number, type: 'string'|'number'|'bool'|'json'): void;
+export function setter(element: HTMLElement, setAttrFn: (key: string, val: string) => void, name: string, value: number, type: 'json'): void;
+export function setter(element: HTMLElement, setAttrFn: (key: string, val: string) => void, name: string, value: boolean, type: 'bool'): void;
+export function setter(element: HTMLElement, setAttrFn: (key: string, val: string) => void, name: string, value: string, type: 'string'): void;
+export function setter(element: HTMLElement, setAttrFn: (key: string, val: string) => void, name: string, value: number, type: 'number'): void;
+export function setter(element: HTMLElement, setAttrFn: (key: string, val: string) => void, name: string, value: string|boolean|number, type: 'string'|'number'|'bool'|'json'): void {
 	if (type === 'bool') {
 		const boolVal = value as boolean;
 		if (boolVal) {
-			element.setAttribute(name, '');
+			setAttrFn(name, '');
 		} else {
 			element.removeAttribute(name);
 		}
 	} else {
 		const strVal = value as string|number;
 		if (type === 'json') {
-			element.setAttribute(name, JSON.stringify(strVal));
+			setAttrFn(name, JSON.stringify(strVal));
 		} else {
-			element.setAttribute(name, `${strVal}`);
+			setAttrFn(name, `${strVal}`);
 		}
 	}
 }
@@ -282,7 +282,26 @@ export function defineProps<P extends {
 			reflectToAttr: false
 		}
 	})];
-	for (const { key, reflectToAttr, value } of keys) {
+	
+	const originalSetAttr = element.setAttribute.bind(element);
+	const keyMap: Map<(typeof keys)[0]['key'], boolean> = new Map();
+	Object.defineProperty(element, 'setAttribute', {
+		get() {
+			return (key: string, val: string) => {
+				(propValues as any)[key] = val;
+				if (keyMap.has(key as (typeof keys)[0]['key'])) {
+					const watch = keyMap.get(key as (typeof keys)[0]['key'])!;
+					if (watch) {
+						element.renderToDOM();
+					}
+				}
+				originalSetAttr(key, val);
+			};
+		}
+	});
+
+	for (let i in keys) {
+		const { key, reflectToAttr, value } = keys[i];
 		const mapKey = key as Extract<keyof P|T, string>;
 
 		const { 
@@ -292,6 +311,8 @@ export function defineProps<P extends {
 			type: mapType,
 			watchProperties = []
 		} = getDefinePropConfig(value);
+
+		keyMap.set(key, watch);
 
 		const propName = casingToDashes(mapKey);
 		if (reflectToAttr) {
@@ -327,7 +348,7 @@ export function defineProps<P extends {
 				}
 				propValues[mapKey] = value;
 				if (reflectToAttr) {
-					setter(element, propName, original, mapType);
+					setter(element, originalSetAttr, propName, original, mapType);
 				}
 				if (watch) {
 					element.renderToDOM();
@@ -337,7 +358,7 @@ export function defineProps<P extends {
 		propValues[mapKey] = getter(element, propName, mapType) as any;
 		if (defaultValue !== undefined && propValues[mapKey] === undefined) {
 			propValues[mapKey] = defaultValue as any;
-			setter(element, propName, defaultValue, mapType);
+			setter(element, originalSetAttr, propName, defaultValue, mapType);
 		}
 	}
 	return props as R;
