@@ -189,7 +189,9 @@ export function rateLimitTest() {
 
 			server.kill();
 		});
-		it('api use ratelimiter works', async () => {
+		it('api use ratelimiter works', async function() {
+			this.retries(10);
+
 			const config = await genUserAndDb({
 				account_twofactor_enabled: false
 			});
