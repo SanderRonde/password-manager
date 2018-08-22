@@ -24,6 +24,12 @@ export class DashboardWeb extends Dashboard {
 	private _data!: Remove<GlobalControllerData['loginData'], 'password' & {
 		decrypt_hash: Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>;	
 	}>;
+	private _count: number = 0;
+	private _upCount() {
+		const count = this._count;
+		this._count = count + 1;
+		return count;
+	}
 
 	private _failNoCredentials(message: string) {
 		PaperToast.create({
@@ -82,7 +88,7 @@ export class DashboardWeb extends Dashboard {
 		}, '/api/password/allmeta', {
 			instance_id: this._data.instance_id
 		}, {
-			count: 0,
+			count: this._upCount(),
 			token: this._data.login_auth,
 			password_hash: verifyHashed
 		});
