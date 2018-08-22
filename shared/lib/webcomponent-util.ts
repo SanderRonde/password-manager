@@ -164,6 +164,7 @@ interface DefinePropTypeConfig {
 	watchProperties?: string[];
 	exactType?: any;
 	coerce?: boolean;
+	isPrivate?: boolean;
 }
 
 function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): DefinePropTypeConfig {
@@ -174,6 +175,7 @@ function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): Defin
 		return {
 			coerce: false,
 			watch: true,
+			isPrivate: false,
 			type: value as DefinePropTypes
 		}
 	}
@@ -312,18 +314,23 @@ export function defineProps<P extends {
 	const keyMap: Map<(typeof keys)[0]['key'], {
 		watch: boolean;
 		coerce: boolean;
-		mapType: DefinePropTypes
+		mapType: DefinePropTypes;
+		isPrivate: boolean;
 	}> = new Map();
 	Object.defineProperty(element, 'setAttribute', {
 		get() {
 			return (key: string, val: string) => {
 				(propValues as any)[key] = val;
 				if (keyMap.has(key as (typeof keys)[0]['key'])) {
-					const { watch } = keyMap.get(key as (typeof keys)[0]['key'])!;
+					const { watch, isPrivate } = keyMap.get(key as (typeof keys)[0]['key'])!;
 					if (watch) {
 						element.renderToDOM();
 					}
-				}
+					if (isPrivate) {
+						originalSetAttr(key, '_');
+						return;
+					}
+				} 
 				originalSetAttr(key, val);
 			};
 		}
@@ -354,17 +361,21 @@ export function defineProps<P extends {
 			coerce = false,
 			defaultValue,
 			type: mapType,
+			isPrivate = false,
 			watchProperties = []
 		} = getDefinePropConfig(value);
 
 		keyMap.set(key, {
-			watch, coerce, mapType
+			watch, coerce, mapType, isPrivate
 		});
 
 		const propName = casingToDashes(mapKey);
 		if (reflectToAttr) {
 			Object.defineProperty(element, mapKey, {
 				get() {
+					if (isPrivate) {
+						return propValues[mapKey];
+					}
 					return getter(element, propName, mapType);
 				},
 				set(value) {
@@ -388,7 +399,8 @@ export function defineProps<P extends {
 				}
 				propValues[mapKey] = value;
 				if (reflectToAttr) {
-					setter(originalSetAttr, originalRemoveAttr, propName, original, mapType);
+					setter(originalSetAttr, originalRemoveAttr, propName, 
+						isPrivate ? '_' : original, mapType);
 				}
 				if (watch) {
 					element.renderToDOM();
@@ -398,7 +410,11 @@ export function defineProps<P extends {
 		propValues[mapKey] = getter(element, propName, mapType) as any;
 		if (defaultValue !== undefined && propValues[mapKey] === undefined) {
 			propValues[mapKey] = defaultValue as any;
-			setter(originalSetAttr, originalRemoveAttr, propName, defaultValue, mapType);
+			setter(originalSetAttr, originalRemoveAttr, propName, 
+				isPrivate ? '_' : defaultValue, mapType);
+		} else if (isPrivate || mapType === 'json') {
+			setter(originalSetAttr, originalRemoveAttr, propName,
+				isPrivate ? '_' : propValues[mapKey] as any, mapType);
 		}
 	}
 	return props as R;
