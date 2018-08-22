@@ -410,11 +410,15 @@ export function defineProps<P extends {
 		propValues[mapKey] = getter(element, propName, mapType) as any;
 		if (defaultValue !== undefined && propValues[mapKey] === undefined) {
 			propValues[mapKey] = defaultValue as any;
-			setter(originalSetAttr, originalRemoveAttr, propName, 
-				isPrivate ? '_' : defaultValue, mapType);
+			awaitMounted(element as any).then(() => {
+				setter(originalSetAttr, originalRemoveAttr, propName, 
+					isPrivate ? '_' : defaultValue, mapType);
+			});
 		} else if (isPrivate || mapType === 'json') {
-			setter(originalSetAttr, originalRemoveAttr, propName,
-				isPrivate ? '_' : propValues[mapKey] as any, mapType);
+			awaitMounted(element as any).then(() => {
+				setter(originalSetAttr, originalRemoveAttr, propName,
+					isPrivate ? '_' : propValues[mapKey] as any, mapType);
+			});
 		}
 	}
 	return props as R;
