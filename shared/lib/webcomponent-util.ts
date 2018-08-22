@@ -89,7 +89,7 @@ export function setter(setAttrFn: (key: string, val: string) => void,
 	value: string|boolean|number, type: 'string'|'number'|'bool'|'json'): void;
 export function setter(setAttrFn: (key: string, val: string) => void, 
 	removeAttrFn: (key: string) => void, name: string, 
-	value: number, type: 'json'): void;
+	value: any, type: 'json'): void;
 export function setter(setAttrFn: (key: string, val: string) => void, 
 	removeAttrFn: (key: string) => void, name: string, 
 	value: boolean, type: 'bool'): void;
