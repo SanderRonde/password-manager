@@ -844,7 +844,7 @@ export async function awaitMounted(el: WebComponentBase) {
 		return;
 	}
 	await new Promise((resolve) => {
-		const originalMounted = realEl.mounted;
+		const originalMounted = realEl.mounted && realEl.mounted.bind(realEl);
 		realEl.mounted = () => {
 			originalMounted && originalMounted();
 			resolve();
