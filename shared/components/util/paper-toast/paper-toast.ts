@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, config, isNewElement, createCancellableTimeout, onMount } from '../../../lib/webcomponent-util';
+import { defineProps, PROP_TYPE, config, isNewElement, createCancellableTimeout, awaitMounted } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { PaperButton } from '../paper-button/paper-button';
 import { PaperToastIDMap } from './paper-toast-querymap';
@@ -63,13 +63,13 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 		if (buttons) {
 			const [ button1, button2 ] = <PaperButton[]><any>buttons.children;
 			if (this.props.button1 && isNewElement(button1)) {
-				await onMount(button1);
+				await awaitMounted(button1);
 				button1.listen('click', (e) => {
 					this._fire('buttonClick', 0, e);
 				});
 			}
 			if (this.props.button2 && isNewElement(button2)) {
-				await onMount(button2);
+				await awaitMounted(button2);
 				button2.listen('click', (e) => {
 					this._fire('buttonClick', 1, e);
 				});

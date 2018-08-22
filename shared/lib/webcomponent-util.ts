@@ -818,19 +818,6 @@ export function isDark(color: string) {
 	return r * a < 100 && g * a < 100 && b * a < 100;
 }
 
-export function onMount(el: WebComponentBase) {
-	if (el.renderToDOM) {
-		return Promise.resolve(el);
-	}
-	return new Promise((resolve) => {
-		setInterval(() => {
-			if (el.renderToDOM) {
-				resolve(el);
-			}
-		}, 5);
-	});
-}
-
 export async function awaitMounted(el: WebComponentBase) {
 	const realEl = el as WebComponent;
 	if (realEl.isMounted) {
