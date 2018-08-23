@@ -111,7 +111,7 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	 */
 	public renderToDOM() {
 		if (this._disableRender) return;
-		if (!this._doPreRenderLifecycle()) {
+		if (this._doPreRenderLifecycle() === false) {
 			return;
 		}
 		render(this.renderer.apply(this, [this.props]), this.internals.root);
@@ -121,7 +121,7 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	/**
 	 * A method called before rendering (changing props won't trigger additional re-render)
 	 */
-	protected preRender() {}
+	protected preRender(): false|any {}
 	/**
 	 * A method called after rendering
 	 */
