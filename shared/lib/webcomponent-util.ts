@@ -950,7 +950,7 @@ export function createNumberList(start: number, end: number) {
 }
 
 export function any(arr: boolean[]) {
-	for (let i in arr) {
+	for (let i = 0; i < arr.length; i++) {
 		if (arr[i]) {
 			return i;
 		}
