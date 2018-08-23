@@ -556,12 +556,6 @@ function doListen<I extends {
 				element,
 				map: new Map()
 			});
-		} else {
-			const { 
-				map: elementEventMap,
-				element: eventElement
-			} = usedMap.get(id)!;
-			removeListeners(eventElement, elementEventMap);
 		}
 
 		const { map: eventIDMap } = usedMap.get(id)!;
