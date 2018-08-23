@@ -44,7 +44,7 @@ export class ThemeSelector extends ConfigurableWebComponent<ThemeSelectorIDMap> 
 				const theme = themes[i];
 				if (isNewElement(theme as HTMLElement)) {
 					listenWithIdentifier(this, theme as HTMLElement,
-						`theme${i}`, 'click', () => {
+						`__theme${i}`, 'click', () => {
 						const name = theme.getAttribute('themename');
 						this._animateOut();
 
