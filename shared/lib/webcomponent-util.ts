@@ -941,13 +941,19 @@ export async function awaitMounted(el: WebComponentBase) {
 	});
 }
 
-export function interlace<T, I>(data: T[], interlaced: I): (T|I)[] {
-	const combined: (T|I)[] = [];
-	data.forEach((dataPart, index) => {
-		if (index) {
-			combined.push(interlaced)
+export function createNumberList(start: number, end: number) {
+	const list = [];
+	for (let i = start; i <+ end; i++) {
+		list.push(i);
+	}
+	return list;
+}
+
+export function any(arr: boolean[]) {
+	for (let i in arr) {
+		if (arr[i]) {
+			return i;
 		}
-		combined.push(dataPart);
-	});
-	return combined;
+	}
+	return false;
 }
