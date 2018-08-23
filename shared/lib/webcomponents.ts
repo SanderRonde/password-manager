@@ -91,8 +91,9 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 
 	private _doPreRenderLifecycle() {
 		this._disableRender = true;
-		this.preRender();
+		const retVal = this.preRender();
 		this._disableRender = false;
+		return retVal;
 	}
 
 	private _doPostRenderLifecycle() {
@@ -110,7 +111,9 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	 */
 	public renderToDOM() {
 		if (this._disableRender) return;
-		this._doPreRenderLifecycle();
+		if (!this._doPreRenderLifecycle()) {
+			return;
+		}
 		render(this.renderer.apply(this, [this.props]), this.internals.root);
 		this._doPostRenderLifecycle();
 	}
