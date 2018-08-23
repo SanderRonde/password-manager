@@ -388,7 +388,7 @@ export abstract class WebComponent<IDS extends {
 					return null;
 				}
 				const cached = __this._idMap.get(id);
-				if (cached) {
+				if (cached && __this.shadowRoot!.contains(cached)) {
 					return cached;
 				}
 				const el = __this.internals.root.getElementById(id);
