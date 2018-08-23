@@ -1,5 +1,5 @@
+import { listenWithIdentifier } from '../lib/webcomponent-util';
 import { ExtendableComponent } from '../lib/decorators';
-import { listen } from '../lib/webcomponent-util';
 
 export interface RippleEffect {
 	applyRipple(): void;
@@ -142,15 +142,19 @@ export function rippleEffect(target: ExtendableComponent): any {
 				// mouse down after a touch start.
 				this._ignoringMouseDown = false;
 		
-				listen(this.container, 'mousedown',
-					this._downHandler.bind(this));
-				listen(this.container, 'touchstart',
-					this._downHandler.bind(this));
+				listenWithIdentifier(this as any, this.container, 'container',
+					'mousedown', this._downHandler.bind(this));
+				listenWithIdentifier(this as any, this.container, 'container',
+					'touchstart', this._downHandler.bind(this));
 		
-				listen(this.container, 'mouseup', this._upHandler.bind(this));
-				listen(this.container, 'mouseleave', this._upHandler.bind(this));
-				listen(this.container, 'touchend', this._upHandler.bind(this));
-				listen(this.container, 'blur', this._upHandler.bind(this));
+				listenWithIdentifier(this as any, this.container, 'container', 
+					'mouseup', this._upHandler.bind(this));
+				listenWithIdentifier(this as any, this.container, 'container', 
+					'mouseleave', this._upHandler.bind(this));
+				listenWithIdentifier(this as any, this.container, 'container', 
+					'touchend', this._upHandler.bind(this));
+				listenWithIdentifier(this as any, this.container, 'container', 
+					'blur', this._upHandler.bind(this));
 			}
 		}
 	}

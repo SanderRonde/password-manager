@@ -144,8 +144,8 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	}
 
 	postRender() {
-		listen(this.$.button, 'click', this.onLogin);
-		listen(this.$.lockButton, 'click', this.handleEmailRememberToggle);
+		listen(this, 'button', 'click', this.onLogin);
+		listen(this, 'lockButton', 'click', this.handleEmailRememberToggle);
 		for (const input of [this.$.emailInput, this.$.passwordInput, this.$.twofactorInput]) {
 			if (isNewElement(input)) {
 				input.listen('valid', this._updateValidity);

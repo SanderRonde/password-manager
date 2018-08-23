@@ -169,7 +169,7 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 		if (this.$.input && this.$.container) {
 			this._validityState = this.valid;
 
-			listen(this.$.input, 'keydown', (e) => {
+			listen(this, 'input', 'keydown', (e) => {
 				window.setTimeout(() => {
 					if (this.$.input) {
 						this.props.value = this.$.input.value;
@@ -185,12 +185,12 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 			if (this.$.input.hasAttribute('placeholder')) {
 				this.$.container.classList.add('has-placeholder');
 			}
-			listen(this.$.input, 'input', this._updateClasses);
-			listen(this.$.input, 'focus', this._onFocus);
-			listen(this.$.input, 'blur', this._onBlur);
-			listen(this.$.input, 'reset', this._onReset);
+			listen(this, 'input', 'input', this._updateClasses);
+			listen(this, 'input', 'focus', this._onFocus);
+			listen(this, 'input', 'blur', this._onBlur);
+			listen(this, 'input', 'reset', this._onReset);
 			if (this._maxRows !== -1) {
-				listen(this.$.input, 'keydown', this._onKeyDown);
+				listen(this, 'input', 'keydown', this._onKeyDown);
 			}
 
 			const isInvalid = this.$.container.classList.contains('is-invalid');
