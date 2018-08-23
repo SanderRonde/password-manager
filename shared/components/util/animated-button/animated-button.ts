@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, isNewElement, defineProps, PROP_TYPE, wait } from '../../../lib/webcomponent-util';
+import { config, isNewElement, defineProps, PROP_TYPE, wait, listenIfNew } from '../../../lib/webcomponent-util';
 import { AnimatedButtonCSS, FADE_IN_OUT_TIME, COLOR_FADE_TIME } from './animated-button.css';
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
@@ -130,6 +130,11 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 			if (this.$.button.classList.contains('mdl-js-ripple-effect')) {
 				var rippleContainer = document.createElement('span');
 				rippleContainer.classList.add('mdl-button__ripple-container');
+				if (this.rippleElement) {
+					this.rippleElement.removeEventListener('mouseup',
+						this.blurHandler);
+					this.rippleElement.remove();
+				}
 				this.rippleElement = document.createElement('span');
 				this.rippleElement.classList.add('mdl-ripple');
 				rippleContainer.appendChild(this.rippleElement);
@@ -138,11 +143,12 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 
 				(<any>this as RippleEffect).applyRipple();
 			}
-			this.$.button.addEventListener('mouseup', this.blurHandler);
-			this.$.button.addEventListener('mouseleave', this.blurHandler);
-			this.$.button.addEventListener('click', (e) => {
+
+			listenIfNew(this, 'button', 'mouseup', this.blurHandler, true);
+			listenIfNew(this, 'button', 'mouseleave', this.blurHandler, true);
+			listenIfNew(this, 'button', 'click', (e) => {
 				this._fire('click', e);
-			});
+			}, true);
 		}
 	}
 }

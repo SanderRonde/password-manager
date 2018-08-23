@@ -1,5 +1,5 @@
 import { GlobalController } from '../components/entrypoints/global/global-controller';
-import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
+import { ComponentIs, WebComponentConfiguration, removeAllElementListeners } from './webcomponent-util';
 import { VALID_THEMES } from '../components/theming/theme/theme';
 import { GlobalProperties } from '../types/shared-types';
 import { TemplateResult, render } from 'lit-html';
@@ -418,6 +418,13 @@ export abstract class WebComponent<IDS extends {
 		this.renderToDOM();
 		this.isMounted = true;
 		this.mounted();
+	}
+
+	/**
+	 * Called when the component is unmounted from the dom
+	 */
+	disconnectedCallback() {
+		removeAllElementListeners(this);
 	}
 
 	/**

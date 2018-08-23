@@ -485,51 +485,6 @@ export function config(config: WebComponentConfiguration) {
 	}
 }
 
-const listenerMap: WeakMap<HTMLElement, Set<string>> = new WeakMap();
-export function listen<K extends keyof HTMLElementEventMap>(target: HTMLElement, 
-	event: K, listener: (this: HTMLInputElement, ev: HTMLElementEventMap[K]) => any) {
-		if (listenerMap.has(target)) {
-			const eventSet = listenerMap.get(target)!;
-			if (!eventSet.has(event)) {
-				target.addEventListener(event, listener as any);
-				eventSet.add(event);
-			} else {
-				//Listener already exists
-			}
-		} else {
-			target.addEventListener(event, listener as any);
-			const eventSet = new Set();
-			eventSet.add(event);
-			listenerMap.set(target, eventSet);
-		}
-	}
-
-const boundMap: WeakMap<Function, WeakMap<any, Function>> = new WeakMap();
-function getBoundFn(listener: Function, bindTarget: any) {
-	if (boundMap.has(listener)) {
-		const bindMap = boundMap.get(listener)!;
-		if (bindMap.has(bindTarget)) {
-			return bindMap.get(bindTarget)!;
-		}
-
-		const fn = listener.bind(bindTarget);
-		bindMap.set(bindTarget, fn);
-		return fn;
-	} else {
-		const fn = listener.bind(bindTarget);
-		const map = new WeakMap();
-		map.set(bindTarget, fn);
-		boundMap.set(listener, map);
-		return fn;
-	}
-}
-
-export function listenAndBind<K extends keyof HTMLElementEventMap>(target: HTMLElement, 
-	event: K, listener: (this: HTMLInputElement, ev: HTMLElementEventMap[K]) => any, bindTarget: any) {
-		const bound = getBoundFn(listener, bindTarget);
-		listen(target, event, bound);	
-	}
-
 const usedElements: WeakSet<HTMLElement> = new WeakSet();
 export function isNewElement(element: HTMLElement) {
 	if (!element) return false;
@@ -539,6 +494,140 @@ export function isNewElement(element: HTMLElement) {
 	}
 	return !has;
 }
+
+function removeListeners(element: HTMLElement, map: IDMap) {
+	for (const [ event, listener ] of map.entries()) {
+		element.removeEventListener(event, listener);
+	}
+}
+
+export function removeAllElementListeners(base: WebComponent) {
+	if (!listenedToElements.has(base)) {
+		return;
+	}
+
+	const { 
+		elements: elementIDMap,
+		self: selfEventMap
+	} = listenedToElements.get(base)!;
+	for (const { map, element } of elementIDMap.values()) {
+		removeListeners(element, map);
+	}
+	removeListeners(base, selfEventMap);
+}
+
+type IDMap = Map<string, (this: any, ev: HTMLElementEventMap[keyof HTMLElementEventMap]) => any>;
+const listenedToElements: WeakMap<WebComponent, {
+	self: IDMap;
+	identifiers: Map<string, {
+		element: HTMLElement;
+		map: IDMap;
+	}>;
+	elements: Map<string, {
+		element: HTMLElement;
+		map: IDMap;
+	}>
+}> = new WeakMap();
+
+function doListen<I extends {
+	[key: string]: HTMLElement;
+}, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, 
+	type: 'element'|'identifier', element: HTMLElement, id: string, 
+	event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, 
+	options?: boolean|AddEventListenerOptions) {
+		const boundListener = listener.bind(base);
+
+		if (!listenedToElements.has(base)) {
+			listenedToElements.set(base, {
+				identifiers: new Map(),
+				elements: new Map(),
+				self: new Map()
+			});
+		}
+
+		const { 
+			elements: elementIDMap,
+			identifiers: identifiersMap
+		} = listenedToElements.get(base)!;
+		const usedMap = type === 'element' ?
+			elementIDMap : identifiersMap;
+		if (!usedMap.has(id)) {
+			usedMap.set(id, {
+				element,
+				map: new Map()
+			});
+		} else {
+			const { 
+				map: elementEventMap,
+				element: eventElement
+			} = usedMap.get(id)!;
+			removeListeners(eventElement, elementEventMap);
+		}
+
+		const { map: eventIDMap } = usedMap.get(id)!;
+		if (!eventIDMap.has(event)) {
+			eventIDMap.set(event, boundListener);
+		} else {
+			element.removeEventListener(event, eventIDMap.get(event)!);
+		}
+		if (options !== undefined && options !== null) {
+			element.addEventListener(event, boundListener, options);
+		} else {
+			element.addEventListener(event, boundListener);
+		}
+	}
+
+export function listen<I extends {
+	[key: string]: HTMLElement;
+}, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, 
+	id: keyof T['$'], event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, 
+	options?: boolean|AddEventListenerOptions) {
+		const element: HTMLElement = (base.$ as any)[id];
+
+		doListen(base, 'element', element, id as string, event, listener, options);
+	}
+
+export function listenWithIdentifier<I extends {
+	[key: string]: HTMLElement;
+}, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, element: HTMLElement,
+	identifier: string, event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, 
+	options?: boolean|AddEventListenerOptions) {
+		doListen(base, 'identifier', element, identifier, event, listener, options);
+	}
+
+export function listenIfNew<I extends {
+	[key: string]: HTMLElement;
+}, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, 
+	id: keyof T['$'], event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, isNew?: boolean,
+	options?: boolean|AddEventListenerOptions) {
+		const element: HTMLElement = (base.$ as any)[id];
+		const isElementNew = typeof isNew === 'boolean' ? isNew : isNewElement(element);
+
+		if (!isElementNew) {
+			return;
+		}
+
+		listen(base, id, event, listener, options);
+	}
+
+export function listenToComponent<T extends WebComponent<any>, K extends keyof HTMLElementEventMap>(base: T,
+	event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any) {
+		if (!listenedToElements.has(base)) {
+			listenedToElements.set(base, {
+				identifiers: new Map(),
+				elements: new Map(),
+				self: new Map()
+			});
+		}
+
+		const { self: selfEventMap } = listenedToElements.get(base)!;
+		if (!selfEventMap.has(event)) {
+			selfEventMap.set(event, listener);
+		} else {
+			base.removeEventListener(event, selfEventMap.get(event)!);
+		}
+		base.addEventListener(event, listener);
+	}
 
 export function wait(time: number) {
 	return new Promise((resolve) => {

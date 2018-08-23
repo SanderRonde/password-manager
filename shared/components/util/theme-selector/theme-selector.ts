@@ -1,11 +1,12 @@
 /// <reference path="../../../types/elements.d.ts" />
+import { config, isNewElement, defineProps, PROP_TYPE, listenIfNew, listenWithIdentifier } from "../../../lib/webcomponent-util";
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
-import { config, isNewElement, defineProps, PROP_TYPE } from "../../../lib/webcomponent-util";
 import { ThemeSelectorIDMap } from "./theme-selector-querymap";
 import { VALID_THEMES_T } from '../../../types/shared-types';
 import { ThemeSelectorHTML } from './theme-selector.html';
 import { ThemeSelectorCSS } from './theme-selector.css';
 import { IconButton } from '../icon-button/icon-button';
+import { bindToClass } from '../../../lib/decorators';
 
 @config({
 	is: 'theme-selector',
@@ -36,16 +37,14 @@ export class ThemeSelector extends ConfigurableWebComponent<ThemeSelectorIDMap> 
 	}
 
 	postRender() {
-		if (isNewElement(this.$.button)) {
-			this.$.button.addEventListener('click', () => {
-				this._toggleAnimation();
-			});
-		}
+		listenIfNew(this, 'button', 'click', this._toggleAnimation);
 		if (isNewElement(this.$.themes)) {
 			const themes = [...this.$.themes.querySelectorAll('.theme')];
-			for (const theme of themes) {
+			for (let i in themes) {
+				const theme = themes[i];
 				if (isNewElement(theme as HTMLElement)) {
-					theme.addEventListener('click', () => {
+					listenWithIdentifier(this, theme as HTMLElement,
+						`theme${i}`, 'click', () => {
 						const name = theme.getAttribute('themename');
 						this._animateOut();
 
@@ -69,6 +68,7 @@ export class ThemeSelector extends ConfigurableWebComponent<ThemeSelectorIDMap> 
 	}
 
 	private _isVisible: boolean = false;
+	@bindToClass
 	private _toggleAnimation() {
 		if (this._isVisible) {
 			this._animateOut();
