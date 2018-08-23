@@ -851,3 +851,14 @@ export async function awaitMounted(el: WebComponentBase) {
 		}
 	});
 }
+
+export function interlace<T, I>(data: T[], interlaced: I): (T|I)[] {
+	const combined: (T|I)[] = [];
+	data.forEach((dataPart, index) => {
+		if (index) {
+			combined.push(interlaced)
+		}
+		combined.push(dataPart);
+	});
+	return combined;
+}
