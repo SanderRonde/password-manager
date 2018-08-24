@@ -4,6 +4,8 @@ import { html } from "lit-html";
 
 export function DashboardCSS(this: Dashboard, _theme: Theme, _props: Dashboard['props']) {
 	return html`<style>
-		
+		#infiniteList {
+			height: 80vh;
+		}
 	</style>`
 }
