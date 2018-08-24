@@ -6,10 +6,11 @@ import { WebserverRouter } from "./modules/routing";
 import { WebserverRoutes } from "./modules/routes";
 import { WebserverAuth } from "./modules/auth";
 import * as cookieParser from 'cookie-parser'
-import * as serveStatic from 'serve-static'
 import { ServerConfig } from "../../server";
+import * as serveStatic from 'serve-static'
 import * as bodyParser from 'body-parser'
 import { Cache } from "./modules/cache";
+import * as rawBody from 'raw-body';
 import * as express from 'express'
 import * as morgan from 'morgan'
 import * as https from 'https'
@@ -49,6 +50,19 @@ export class Webserver {
 		if (!this.debug) {
 			this.app.use(morgan(this.config.development ? 'dev' : 'short'));
 		}
+		this.app.use((req, _res, next) => {
+			rawBody(req, {
+				length: null,
+				limit: '1mb',
+				encoding: true
+			}, (err) => {
+				if (err) {
+					return next(err);
+				} else {
+					next();
+				}
+			});
+		});
 		this.app.use(cookieParser());
 		this.app.use(bodyParser.json());
 		this.app.use(serveStatic(STATIC_SERVE_PATH, {
