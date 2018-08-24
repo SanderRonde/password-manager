@@ -1,18 +1,14 @@
 import { InfiniteList } from './infinite-list';
 import { html } from 'lit-html';
 
-export function InfiniteListHTML<D>(this: InfiniteList<D>, props: InfiniteList<D>['props']) {
+export function InfiniteListHTML<D, ID>(this: InfiniteList<D, ID>, _props: InfiniteList<D, ID>['props']) {
 	return html`
 		${this.css}
-		<slot name="template" id="template"></slot>
+		<slot name="template" id="template" class="hidden"></slot>
+		<div id="sizeGetter" class="hidden"></div>
+		<div id="focusCapturer" tabIndex="-1"></div>
 		<div id="contentContainer">
-			<div id="topFiller"></div>
-			<div id="content">
-				${props.data.map((data) => {
-					return this.htmlTemplate(data);
-				})}
-			</div>
-			<div id="bottomFiller"></div>
+			<div id="physicalContent"></div>
 		</div>
 	`;
 }
