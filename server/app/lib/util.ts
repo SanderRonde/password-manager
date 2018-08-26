@@ -8,7 +8,6 @@ import * as babel from 'babel-core';
 import { Readable } from 'stream';
 import * as mkdirp from 'mkdirp';
 import { Stream } from 'stream';
-import { ERRS } from './crypto';
 import * as mongo from 'mongodb'
 import * as path from 'path'
 import * as fs from 'fs'
@@ -531,12 +530,4 @@ export async function requireES6File<T>(filePath: string): Promise<T> {
 	await unlink(outfile);
 	requireMap.set(filePath, required);
 	return required;
-}
-
-export function tryParse<T>(stringified: EncodedString<T>): T|ERRS.INVALID_PARSE {
-	try {
-		return JSON.parse(stringified);
-	} catch(e) {
-		return ERRS.INVALID_PARSE
-	}
 }
