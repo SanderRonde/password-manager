@@ -73,7 +73,6 @@ export function passwordAllmetaTest() {
 
 			server.kill();
 
-			console.log(response);
 			assert.isTrue(response.success, 'API call succeeded');
 			if (!response.success) {
 				return;
