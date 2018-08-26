@@ -164,7 +164,7 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 					websites: [{
 						exact: encrypt('www.reddit.com/r/random', dbpw, ENCRYPTION_ALGORITHM),
 						host: encrypt('www.reddit.com', dbpw, ENCRYPTION_ALGORITHM),
-						favicon_url: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
+						favicon: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
 					}],
 					encrypted: encrypt(encrypt({
 						username: 'someusername2',
