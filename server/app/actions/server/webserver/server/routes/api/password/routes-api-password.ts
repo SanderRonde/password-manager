@@ -605,7 +605,7 @@ export class RoutesApiPassword {
 			if (!this._verify2FAIfEnabled(account.twofactor_secret, twofactor_token,
 				password, res)) return;
 
-			const { encrypted } = this.server.database.Crypto
+			const { encrypted, websites, twofactor_enabled } = this.server.database.Crypto
 				.dbDecryptPasswordRecord(password);
 			res.status(200);
 			res.json({
@@ -613,6 +613,8 @@ export class RoutesApiPassword {
 				data: {
 					encrypted: encryptWithPublicKey(JSON.stringify({
 						id: password._id.toHexString(),
+						websites: websites,
+						twofactor_enabled: twofactor_enabled,
 						encrypted: encrypted
 					}), decryptedInstance.public_key)
 				}
@@ -664,7 +666,7 @@ export class RoutesApiPassword {
 					encrypted: encryptWithPublicKey(JSON.stringify({
 						id: password._id.toHexString(),
 						websites: websites,
-						twofactor_enabled: twofactor_enabled		
+						twofactor_enabled: twofactor_enabled
 					}), decryptedInstance.public_key)
 				}
 			});
