@@ -1,10 +1,10 @@
-import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord, EncryptedAsset, EncryptedAccount } from "../../../../../../../../../shared/types/db-types";
+import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
 import { UnstringifyObjectIDs, APIToken } from "../../../../../../../../../shared/types/crypto";
 import { API_ERRS, APIReturns } from "../../../../../../../../../shared/types/api";
 import { SERVER_ROOT, MAX_FILE_BYTES } from "../../../../../../../lib/constants";
-import { genTimeBasedString } from "../../../../../../../lib/util";
 import { COLLECTIONS } from "../../../../../../../database/database";
+import { genTimeBasedString } from "../../../../../../../lib/util";
 import { ServerResponse } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
 import icoToPng from 'ico-to-png';
@@ -77,8 +77,7 @@ export class RoutesApiPassword {
 		const fileExtension = mime.split('/')[1];
 		const fileName = `${genTimeBasedString()}.${fileExtension}`;
 
-		const location = path.join(SERVER_ROOT, this.server.config.assets,
-			'icons', fileName);
+		const location = path.join(this.server.assetPath, 'icons', fileName);
 		await fs.mkdirp(path.dirname(location));
 		await fs.writeFile(location, content);
 		return location;
@@ -613,7 +612,14 @@ export class RoutesApiPassword {
 				data: {
 					encrypted: encryptWithPublicKey(JSON.stringify({
 						id: password._id.toHexString(),
-						websites: websites,
+						websites: websites.map((website) => {
+							return {
+								host: website.host,
+								exact: website.exact,
+								favicon: website.favicon === null ? null :
+									path.relative(website.favicon, this.server.assetPath)
+							}
+						}),
 						twofactor_enabled: twofactor_enabled,
 						encrypted: encrypted
 					}), decryptedInstance.public_key)
@@ -665,7 +671,14 @@ export class RoutesApiPassword {
 				data: {
 					encrypted: encryptWithPublicKey(JSON.stringify({
 						id: password._id.toHexString(),
-						websites: websites,
+						websites: websites.map((website) => {
+							return {
+								host: website.host,
+								exact: website.exact,
+								favicon: website.favicon === null ? null :
+									path.relative(website.favicon, this.server.assetPath)
+							}
+						}),
 						twofactor_enabled: twofactor_enabled
 					}), decryptedInstance.public_key)
 				}
@@ -758,7 +771,14 @@ export class RoutesApiPassword {
 							.dbDecryptPasswordRecord(password);
 						return {
 							id: password._id.toHexString(),
-							websites: decrypted.websites,
+							websites: password.websites.map((website) => {
+								return {
+									host: website.host,
+									exact: website.exact,
+									favicon: website.favicon === null ? null :
+										path.relative(website.favicon, this.server.assetPath)
+								}
+							}),
 							twofactor_enabled: decrypted.twofactor_enabled
 						}
 					})), decryptedInstance.public_key)
@@ -884,7 +904,14 @@ export class RoutesApiPassword {
 							.dbDecryptPasswordRecord(password);
 						return {
 							id: password._id.toHexString(),
-							websites: decrypted.websites,
+							websites: decrypted.websites.map((website) => {
+								return {
+									host: website.host,
+									exact: website.exact,
+									favicon: website.favicon === null ? null :
+										path.relative(website.favicon, this.server.assetPath)
+								}
+							}),
 							twofactor_enabled: decrypted.twofactor_enabled
 						}
 					})), decryptedInstance.public_key)

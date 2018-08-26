@@ -1,5 +1,5 @@
 import { initDevelopmentMiddleware } from "./modules/development";
-import { MAX_FILE_SIZE } from "../../../../lib/constants";
+import { MAX_FILE_SIZE, SERVER_ROOT } from "../../../../lib/constants";
 import { Database } from "../../../../database/database";
 import { initPeriodicals } from "./modules/periodicals";
 import { optionalArrayFn } from "../../../../lib/util";
@@ -47,6 +47,12 @@ export class Webserver {
 		this.Router = new WebserverRouter(this);
 	}
 
+	public get assetPath() {
+		return path.isAbsolute(this.config.assets) ?
+			this.config.assets : path.join(
+				SERVER_ROOT, this.config.assets);
+	}
+
 	private _initMiddleware() {
 		if (!this.debug) {
 			this.app.use(morgan(this.config.development ? 'dev' : 'short'));
@@ -67,6 +73,13 @@ export class Webserver {
 		this.app.use(cookieParser());
 		this.app.use(bodyParser.json());
 		this.app.use(serveStatic(STATIC_SERVE_PATH, {
+			maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
+			dotfiles: this.config.development ? 'allow' : 'ignore',
+			fallthrough: true,
+			index: false,
+			redirect: false
+		}));
+		this.app.use(serveStatic(this.assetPath, {
 			maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
 			dotfiles: this.config.development ? 'allow' : 'ignore',
 			fallthrough: true,
