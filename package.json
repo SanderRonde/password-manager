@@ -29,7 +29,7 @@
     "googleapis": "^32.0.0",
     "html-minifier": "^3.5.19",
     "http2": "^3.3.7",
-    "ico-to-png": "^0.1.2",
+    "icojs": "^0.12.1",
     "idb-keyval": "^3.1.0",
     "js-sha512": "^0.8.0",
     "lit-html": "^0.10.2",
