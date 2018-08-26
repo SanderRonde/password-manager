@@ -246,7 +246,8 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
 		websites: [{
 			exact: encrypt('someexacturl', dbpw, ENCRYPTION_ALGORITHM),
-			host: encrypt('somehost', dbpw, ENCRYPTION_ALGORITHM)
+			host: encrypt('somehost', dbpw, ENCRYPTION_ALGORITHM),
+			favicon_url: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
 		}],
 		encrypted: encrypt(encrypt({
 			username: 'someusername',
@@ -279,7 +280,8 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
 		websites: [{
 			exact: encrypt('someexacturl', dbpw, ENCRYPTION_ALGORITHM),
-			host: encrypt('somehost', dbpw, ENCRYPTION_ALGORITHM)
+			host: encrypt('somehost', dbpw, ENCRYPTION_ALGORITHM),
+			favicon_url: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
 		}],
 		encrypted: encrypt(encrypt({
 			username: 'someusername',

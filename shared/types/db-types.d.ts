@@ -305,6 +305,10 @@ export interface EncryptedPassword {
 		 * (encrypted) The full URL
 		 */
 		exact: EncodedString<DatabaseEncrypted<EncodedString<string>>>;
+		/**
+		 * (encrypted) The (local) path to the favicon for this website
+		 */
+		favicon_url: EncodedString<DatabaseEncrypted<EncodedString<string|null>>>;
 	}[];
 	/**
 	 * (encrypted) Whether 2FA is enabled for this password
@@ -359,6 +363,10 @@ export interface DecryptedPassword {
 		 * The full URL
 		 */
 		exact: string;
+		/**
+		 * The (local) path to the favicon for this website
+		 */
+		favicon_url: string|null;
 	}[];
 	/**
 	 * Whether 2FA is enabled for this password
@@ -384,14 +392,6 @@ export interface DecryptedPassword {
 			/**
 			 * Any notes about this website (or group)
 			 */
-			notes: string[];
-		}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
-		/**
-		 * The algorithm used to encrypt the data
-		 */
-		algorithm: EncryptionAlgorithm;
-	}>;
-}		 */
 			notes: string[];
 		}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 		/**
