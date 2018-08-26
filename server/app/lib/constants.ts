@@ -45,3 +45,11 @@ export const DASHBOARD_INSTANCE_EXPIRE_TIME = 1000 * 60 * 60 * 24;
  * The theme that is active by default
  */
 export const DEFAULT_THEME: DEFAULT_THEME_T = 'light';
+/**
+ * The max file size for passed favicons (1MB)
+ */
+export const MAX_FILE_SIZE = '1mb';
+/**
+ * The max file size in bytes (also 1MB)
+ */
+export const MAX_FILE_BYTES = 1024 * 1024 * 8;

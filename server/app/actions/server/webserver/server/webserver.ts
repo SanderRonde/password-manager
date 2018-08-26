@@ -1,4 +1,5 @@
 import { initDevelopmentMiddleware } from "./modules/development";
+import { MAX_FILE_SIZE } from "../../../../lib/constants";
 import { Database } from "../../../../database/database";
 import { initPeriodicals } from "./modules/periodicals";
 import { optionalArrayFn } from "../../../../lib/util";
@@ -53,7 +54,7 @@ export class Webserver {
 		this.app.use((req, _res, next) => {
 			rawBody(req, {
 				length: null,
-				limit: '1mb',
+				limit: MAX_FILE_SIZE,
 				encoding: true
 			}, (err) => {
 				if (err) {
