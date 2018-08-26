@@ -94,11 +94,11 @@ export class DatabaseEncryption {
 	}: EncryptedPassword|UnstringifyObjectIDs<EncryptedPassword>): DecryptedPassword {
 		return {
 			user_id: user_id,
-			websites: websites.map(({ host, exact, favicon_url }) => {
+			websites: websites.map(({ host, exact, favicon }) => {
 				return {
 					host: this.dbDecrypt(host),
 					exact: this.dbDecrypt(exact),
-					favicon_url: this.dbDecrypt(favicon_url)
+					favicon: this.dbDecrypt(favicon)
 				}
 			}),
 			encrypted: this.dbDecrypt(encrypted),

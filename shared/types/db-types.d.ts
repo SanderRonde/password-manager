@@ -308,7 +308,7 @@ export interface EncryptedPassword {
 		/**
 		 * (encrypted) The (local) path to the favicon for this website
 		 */
-		favicon_url: EncodedString<DatabaseEncrypted<EncodedString<string|null>>>;
+		favicon: EncodedString<DatabaseEncrypted<EncodedString<StringifiedObjectId<EncryptedAsset>|null>>>;
 	}[];
 	/**
 	 * (encrypted) Whether 2FA is enabled for this password
@@ -366,7 +366,7 @@ export interface DecryptedPassword {
 		/**
 		 * The (local) path to the favicon for this website
 		 */
-		favicon_url: string|null;
+		favicon: StringifiedObjectId<EncryptedAsset>|null|null;
 	}[];
 	/**
 	 * Whether 2FA is enabled for this password

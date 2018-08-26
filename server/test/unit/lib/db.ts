@@ -247,7 +247,7 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 		websites: [{
 			exact: encrypt('someexacturl', dbpw, ENCRYPTION_ALGORITHM),
 			host: encrypt('somehost', dbpw, ENCRYPTION_ALGORITHM),
-			favicon_url: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
+			favicon: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
 		}],
 		encrypted: encrypt(encrypt({
 			username: 'someusername',
@@ -281,7 +281,7 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 		websites: [{
 			exact: encrypt('someexacturl', dbpw, ENCRYPTION_ALGORITHM),
 			host: encrypt('somehost', dbpw, ENCRYPTION_ALGORITHM),
-			favicon_url: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
+			favicon: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
 		}],
 		encrypted: encrypt(encrypt({
 			username: 'someusername',
