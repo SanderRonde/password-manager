@@ -49,7 +49,12 @@ export function passwordSetTest() {
 			}, {
 				token: token!,
 				count: config.count++,
-				websites: expectedWebsites,
+				websites: expectedWebsites.map((website) => {
+					return {
+						url: website,
+						favicon: null
+					}
+				}),
 				twofactor_enabled: expected2FAEnabled,
 				encrypted: expectedEncrypted
 			}));

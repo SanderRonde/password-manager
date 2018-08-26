@@ -63,7 +63,12 @@ export function passwordUpdateTest() {
 				token: token!,
 				count: config.count++,
 				password_id: passwordId!,
-				websites: expectedWebsites,
+				websites: expectedWebsites.map((website) => {
+					return {
+						url: website,
+						favicon: null
+					}
+				}),
 				twofactor_enabled: expected2FAEnabled,
 				encrypted: expectedEncrypted
 			}));
@@ -161,7 +166,12 @@ export function passwordUpdateTest() {
 				token: loginToken!,
 				count: config.count++,
 				password_id: passwordId!,
-				websites: expectedWebsites,
+				websites: expectedWebsites.map((website) => {
+					return {
+						url: website,
+						favicon: null
+					}
+				}),
 				twofactor_enabled: expected2FAEnabled,
 				encrypted: expectedEncrypted
 			}));
@@ -213,7 +223,12 @@ export function passwordUpdateTest() {
 				token: token!,
 				count: config.count++,
 				password_id: passwordId!,
-				websites: expectedWebsites,
+				websites: expectedWebsites.map((website) => {
+					return {
+						url: website,
+						favicon: null
+					}
+				}),
 				twofactor_enabled: expected2FAEnabled,
 				twofactor_token: speakeasy.totp({
 					secret: base32,

@@ -368,7 +368,25 @@ export declare namespace APIRoutes {
 			/**
 			 * The websites for which this password works
 			 */
-			websites: string[];
+			websites: {
+				/**
+				 * The URL of the website
+				 */
+				url: string;
+				/**
+				 * A favicon for this website
+				 */
+				favicon: null|{
+					/**
+					 * The content of the image
+					 */
+					content: string;
+					/**
+					 * The mime type of this image
+					 */
+					mime: string;
+				}
+			}[];
 			/**
 			 * Whether 2FA should be enabled for this password
 			 */
@@ -428,7 +446,25 @@ export declare namespace APIRoutes {
 			/**
 			 * The websites for which this password works
 			 */
-			websites: string[];
+			websites: {
+				/**
+				 * The URL of the website
+				 */
+				url: string;
+				/**
+				 * A favicon for this website
+				 */
+				favicon: null|{
+					/**
+					 * The content of the image
+					 */
+					content: string;
+					/**
+					 * The mime type of this image
+					 */
+					mime: string;
+				}
+			}[];
 			/**
 			 * Whether 2FA should be enabled for this password
 			 */
@@ -593,6 +629,10 @@ export declare namespace APIRoutes {
 					 * The exact URL
 					 */
 					exact: string;
+					/**
+					 * The path to the favicon for this website
+					 */
+					favicon: string|null;
 				}[];
 				/**
 				 * Whether 2FA is enabled for this instance
@@ -643,6 +683,10 @@ export declare namespace APIRoutes {
 					 * The exact URL
 					 */
 					exact: string;
+					/**
+					 * The path to the favicon for this website
+					 */
+					favicon: string|null;
 				}[];
 				/**
 				 * Whether 2Fa is enabled for this password
@@ -693,6 +737,10 @@ export declare namespace APIRoutes {
 					 * The exact URL
 					 */
 					exact: string;
+					/**
+					 * The path to the favicon for this website
+					 */
+					favicon: string|null;
 				}[];
 				/**
 				 * Whether 2Fa is enabled for this password

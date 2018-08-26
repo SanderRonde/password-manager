@@ -380,7 +380,12 @@ export async function setPasword(toSet: {
 }, token: string, config: UserAndDbData) {
 	const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
 
-	const expectedWebsites = toSet.websites;
+	const expectedWebsites = toSet.websites.map((website) => {
+		return {
+			url: website,
+			favicon: null
+		}
+	});
 	const expected2FAEnabled = toSet.twofactor_enabled;
 	const expectedEncrypted = encrypt({
 		username: toSet.username,
@@ -444,11 +449,11 @@ export async function setPasword(toSet: {
 		const expectedWebsite = expectedWebsites[i];
 		const actualWebsite = actualWebsites[i];
 
-		const host = url.parse(expectedWebsite).hostname ||
-			url.parse(expectedWebsite).host || expectedWebsite;
+	const host = url.parse(expectedWebsite.url).hostname ||
+			url.parse(expectedWebsite.url).host || expectedWebsite;
 		assert.isTrue(!!actualWebsite, 'a website exists at given index');
 		assert.strictEqual(actualWebsite.host, host, 'hosts match');
-		assert.strictEqual(actualWebsite.exact, expectedWebsite, 'actual urls match');
+		assert.strictEqual(actualWebsite.exact, expectedWebsite.url, 'actual urls match');
 	}
 
 	const decryptedEncryptedData = decrypt(password.encrypted, dbpw);

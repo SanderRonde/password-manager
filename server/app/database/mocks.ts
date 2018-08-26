@@ -424,34 +424,40 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		websites: [{
 			host: 'www.google.com',
-			exact: 'www.google.com/login'
+			exact: 'www.google.com/login',
+			favicon: null
 		}],
 		twofactor_enabled: false
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		websites: [{
 			host: 'www.facebook.com',
-			exact: 'www.facebook.com/login'
+			exact: 'www.facebook.com/login',
+			favicon: null
 		}, {
 			host: 'www.instagram.com',
-			exact: 'www.instagram.com/login'
+			exact: 'www.instagram.com/login',
+			favicon: null
 		}, {
 			host: 'www.whatsapp.com',
-			exact: 'www.whatsapp.com/somelogin'
+			exact: 'www.whatsapp.com/somelogin',
+			favicon: null
 		}],
 		twofactor_enabled: false
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		websites: [{
 			host: 'www.google.com',
-			exact: 'www.google.com/login'
+			exact: 'www.google.com/login',
+			favicon: null
 		}],
 		twofactor_enabled: true
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		websites: [{
 			host: 'www.reddit.com',
-			exact: 'www.reddit.com/login'
+			exact: 'www.reddit.com/login',
+			favicon: null
 		}],
 		twofactor_enabled: false
 	}, {
@@ -461,7 +467,8 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 			exact: `www.somebigwebsite.com/${
 				genRandomString(50)}/${
 					genRandomString(50)}/${
-						genRandomString(50)}`
+						genRandomString(50)}`,
+			favicon: null
 		}],
 		twofactor_enabled: false
 	}]), 'dev_public_key');
