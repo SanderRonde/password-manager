@@ -772,7 +772,7 @@ export class RoutesApiPassword {
 							.dbDecryptPasswordRecord(password);
 						return {
 							id: password._id.toHexString(),
-							websites: password.websites.map((website) => {
+							websites: decrypted.websites.map((website) => {
 								return {
 									host: website.host,
 									exact: website.exact,
