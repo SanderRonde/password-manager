@@ -300,7 +300,7 @@ export class WebserverRouter {
 			return true;
 		}
 
-	private _printTypeErr(res: ServerResponse, val: string, type: BasicType|'array', inner?: BasicType) {
+	private _printTypeErr(res: ServerResponse, val: string, type: BasicType|'array', inner?: BasicType|'object') {
 		if (inner) {
 			res.status(200);
 			res.json({
