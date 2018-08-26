@@ -7,7 +7,6 @@ import { COLLECTIONS } from "../../../../../../../database/database";
 import { genTimeBasedString } from "../../../../../../../lib/util";
 import { ServerResponse } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
-import icoToPng from 'ico-to-png';
 import * as express from 'express'
 import * as mongo from 'mongodb'
 import * as fs from 'fs-extra';
@@ -17,6 +16,11 @@ import * as url from 'url'
 export class RoutesApiPassword {
 	constructor(public server: Webserver) { 
 		fs.mkdirp(path.join(SERVER_ROOT, 'temp/'));
+
+		if (!this.server.config.development) {
+			//Don't lazy-require this in production
+			require('ico-to-png');
+		}
 	}
 
 	private async _getPasswordIfOwner(passwordId: StringifiedObjectId<EncryptedPassword>, 
@@ -83,6 +87,15 @@ export class RoutesApiPassword {
 		return location;
 	}
 
+	private __icoToPng: typeof import('ico-to-png')|null = null;
+
+	private get _icoToPng(): typeof import('ico-to-png') {
+		if (this.__icoToPng !== null) {
+			return this.__icoToPng;
+		}
+		return (this.__icoToPng = require('ico-to-png'));
+	}
+
 	public async uploadImage(host: string, user_id: StringifiedObjectId<EncryptedAccount>, image: {
 		mime: string;
 		content: string;
@@ -112,7 +125,7 @@ export class RoutesApiPassword {
 
 		if (format === 'x-icon') {
 			//Convert to png
-			imageBuffer = await icoToPng(imageBuffer, 128);
+			imageBuffer = await this._icoToPng(imageBuffer, 128);
 			image.mime = 'image/png';
 		}
 
