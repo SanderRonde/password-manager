@@ -17,11 +17,6 @@ import * as url from 'url'
 export class RoutesApiPassword {
 	constructor(public server: Webserver) { 
 		fs.mkdirp(path.join(SERVER_ROOT, 'temp/'));
-
-		if (!this.server.config.development) {
-			//Don't lazy-require this in production
-			require('ico-to-png');
-		}
 	}
 
 	private async _getPasswordIfOwner(passwordId: StringifiedObjectId<EncryptedPassword>, 
