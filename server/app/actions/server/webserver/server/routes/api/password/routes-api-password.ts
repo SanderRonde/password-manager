@@ -617,7 +617,7 @@ export class RoutesApiPassword {
 								host: website.host,
 								exact: website.exact,
 								favicon: website.favicon === null ? null :
-									path.relative(website.favicon, this.server.assetPath)
+									'/' + path.relative(this.server.assetPath, website.favicon)
 							}
 						}),
 						twofactor_enabled: twofactor_enabled,
@@ -676,7 +676,7 @@ export class RoutesApiPassword {
 								host: website.host,
 								exact: website.exact,
 								favicon: website.favicon === null ? null :
-									path.relative(website.favicon, this.server.assetPath)
+									'/' + path.relative(this.server.assetPath, website.favicon)
 							}
 						}),
 						twofactor_enabled: twofactor_enabled
@@ -776,7 +776,7 @@ export class RoutesApiPassword {
 									host: website.host,
 									exact: website.exact,
 									favicon: website.favicon === null ? null :
-										path.relative(website.favicon, this.server.assetPath)
+										'/' + path.relative(this.server.assetPath, website.favicon)
 								}
 							}),
 							twofactor_enabled: decrypted.twofactor_enabled
@@ -909,7 +909,7 @@ export class RoutesApiPassword {
 									host: website.host,
 									exact: website.exact,
 									favicon: website.favicon === null ? null :
-										path.relative(website.favicon, this.server.assetPath)
+										'/' + path.relative(this.server.assetPath, website.favicon)
 								}
 							}),
 							twofactor_enabled: decrypted.twofactor_enabled
