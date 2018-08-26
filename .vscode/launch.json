@@ -77,6 +77,21 @@
 		}, {
 			"type": "node",
 			"request": "launch",
+			"name": "Launch HTTPS Server (databaseless)",
+			"program": "${workspaceFolder}/server/app/main.js",
+			"args": [
+				"server",
+				"--http", "1256",
+				"--https", "1257",
+				"--https-key", "./certs/cert.key",
+				"--https-cert", "./certs/cert.crt",
+				"-p", "somepw",
+				"--databaseless",
+				"--no-https-only"
+			],
+		}, {
+			"type": "node",
+			"request": "launch",
 			"env": {
 				"NODE_ENV": "development"
 			},
