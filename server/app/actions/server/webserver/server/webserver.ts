@@ -11,7 +11,6 @@ import { ServerConfig } from "../../server";
 import * as serveStatic from 'serve-static'
 import * as bodyParser from 'body-parser'
 import { Cache } from "./modules/cache";
-import * as rawBody from 'raw-body';
 import * as express from 'express'
 import * as morgan from 'morgan'
 import * as https from 'https'
@@ -57,21 +56,10 @@ export class Webserver {
 		if (!this.debug) {
 			this.app.use(morgan(this.config.development ? 'dev' : 'short'));
 		}
-		this.app.use((req, _res, next) => {
-			rawBody(req, {
-				length: null,
-				limit: MAX_FILE_SIZE,
-				encoding: true
-			}, (err) => {
-				if (err) {
-					return next(err);
-				} else {
-					next();
-				}
-			});
-		});
 		this.app.use(cookieParser());
-		this.app.use(bodyParser.json());
+		this.app.use(bodyParser.json({
+			limit: MAX_FILE_SIZE
+		}));
 		this.app.use(serveStatic(STATIC_SERVE_PATH, {
 			maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
 			dotfiles: this.config.development ? 'allow' : 'ignore',
