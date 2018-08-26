@@ -20,7 +20,8 @@ export async function runCypressServer() {
 		debug: false,
 		development: false,
 		httpsOnly: false,
-		isConfig: true
+		isConfig: true,
+		assets: '../../data/assets/'
 	});
 	const account: EncryptedAccount = {
 		email: DEFAULT_EMAIL,
