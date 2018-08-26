@@ -16,12 +16,12 @@ declare global {
 	type HTMLIconButtonElement = IconButton;
 	type HTMLPaperToastElement = PaperToast;
 	type HTMLPaperButtonElement = PaperButton;
-	type HTMLInfiniteListElement = InfiniteList;
 	type HTMLLoadableBlockElement = LoadableBlock;
 	type HTMLMaterialInputElement = MaterialInput;
 	type HTMLThemeSelectorElement = ThemeSelector;
 	type HTMLAnimatedButtonElement = AnimatedButton;
 	type HTMLLoadingSpinnerElement = LoadingSpinner;
 	type HTMLVerticalCentererElement = VerticalCenterer;
+	type HTMLInfiniteListElement = InfiniteList<any, any>;
 	type HTMLHorizontalCentererElement = HorizontalCenterer;
 }
