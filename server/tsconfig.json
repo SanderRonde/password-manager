@@ -18,8 +18,7 @@
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
         "strictNullChecks": true,
-        "composite": true,
-        "allowSyntheticDefaultImports": true
+        "composite": true
 	}, 
     "allowJs": true,
     "compileOnSave": true,
