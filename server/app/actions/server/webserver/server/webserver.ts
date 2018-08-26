@@ -53,7 +53,7 @@ export class Webserver {
 				SERVER_ROOT, this.config.assets);
 	}
 
-	private _initMiddleware() {
+	private async _initMiddleware() {
 		if (!this.debug) {
 			this.app.use(morgan(this.config.development ? 'dev' : 'short'));
 		}
@@ -79,6 +79,7 @@ export class Webserver {
 			index: false,
 			redirect: false
 		}));
+		await fs.mkdirp(this.assetPath);
 		this.app.use(serveStatic(this.assetPath, {
 			maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
 			dotfiles: this.config.development ? 'allow' : 'ignore',
@@ -100,7 +101,7 @@ export class Webserver {
 	}
 
 	async init() {
-		this._initMiddleware();
+		await this._initMiddleware();
 		this.Router.init();
 		initPeriodicals(this);
 		
