@@ -21,7 +21,7 @@ script:
 - gulp defs
 - tsc --build --force
 - gulp pretest
-- mocha test/unit/unit.test.js --exit --bail
+- mocha test/unit/unit.test.js --exit
 - node test/ui/test-cypress.js
 notifications:
   email:
