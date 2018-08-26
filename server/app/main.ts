@@ -138,6 +138,8 @@ export function initCommander(handledHolder: {
 		.option('-p, --password <pw>', 'The password used to decrypt the database')
 		.option('-d, --database <location>', 'The path to the database', 
 			'mongodb://127.0.0.1:27017/pwmanager')
+		.option('-a, --assets <location>', 'The path where all assets are placed',
+			'./data/assets/')
 		.option('--debug', 'Whether to enable debug parameters to the API')
 		.option('--development', 'Whether to enable development mode')
 		.option('--databaseless', 'Don\'t use any database (for development)')
