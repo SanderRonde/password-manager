@@ -244,7 +244,7 @@ async function getDevImports() {
 			import('glob')
 		]);
 		babel = _babel;
-		glob = _glob;	
+		glob = _glob.default;	
 	}
 	return {
 		glob,
