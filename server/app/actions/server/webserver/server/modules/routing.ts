@@ -21,7 +21,7 @@ type TypecheckConfig = {
 }|{
 	val: string;
 	type: 'array';
-	inner: BasicType;
+	inner: BasicType|'object';
 }
 
 export class WebserverRouter {
