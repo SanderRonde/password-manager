@@ -1,8 +1,8 @@
 import { GlobalProperties } from '../../../../../../../shared/types/shared-types'
-import { requireES6File, optionalArrayItem } from '../../../../../lib/util';
 import { preAppHTML, postAppHTML, DEFAULT_FILES } from '../../client/html';
 import { getFileContent, setBasePath } from "./resolveServerFile";
 import { PROJECT_ROOT } from '../../../../../lib/constants';
+import { requireES6File } from '../../../../../lib/util';
 import { ServerResponse } from './ratelimit';
 import mime = require('mime');
 import * as path from 'path';
@@ -76,8 +76,7 @@ export async function render(res: ServerResponse, {
 				'shared/components/theming/theme/theme.js'));
 			const themeName = data.theme;
 			return `style="background-color:${theme[themeName!].background};"`;
-		})() : '',
-		css: [...optionalArrayItem('/css/offline_fonts.css', isOffline)]
+		})() : ''
 	}));
 
 	const propStr: string[] = [];

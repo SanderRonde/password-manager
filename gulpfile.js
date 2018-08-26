@@ -366,8 +366,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 	));
 
 	const CACHE_STATIC = [
-		'/js/sw.js',
-		'/css/offline_fonts.css'
+		'/js/sw.js'
 	];
 	
 	const CACHE_PAGES = [

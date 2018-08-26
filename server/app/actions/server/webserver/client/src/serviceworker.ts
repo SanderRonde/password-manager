@@ -9,10 +9,6 @@ const CACHE_NAME = 'password-manager';
 
 const CACHE_STATIC = [
 	'/js/sw.js',
-	'/css/offline_fonts.css',
-	'/fonts/Roboto-Bold.ttf',
-	'/fonts/Roboto-Medium.ttf',
-	'/fonts/Roboto-Regular.ttf',
 	'/versions.json'
 ];
 
