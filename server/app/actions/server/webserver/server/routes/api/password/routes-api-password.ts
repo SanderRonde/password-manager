@@ -1,16 +1,23 @@
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
-import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord } from "../../../../../../../../../shared/types/db-types";
+import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord, EncryptedAsset, EncryptedAccount } from "../../../../../../../../../shared/types/db-types";
 import { UnstringifyObjectIDs, APIToken } from "../../../../../../../../../shared/types/crypto";
 import { API_ERRS, APIReturns } from "../../../../../../../../../shared/types/api";
+import { SERVER_ROOT, MAX_FILE_BYTES } from "../../../../../../../lib/constants";
+import { genTimeBasedString } from "../../../../../../../lib/util";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { ServerResponse } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
+import icoToPng from 'ico-to-png';
 import * as express from 'express'
 import * as mongo from 'mongodb'
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import * as url from 'url'
 
 export class RoutesApiPassword {
-	constructor(public server: Webserver) { }
+	constructor(public server: Webserver) { 
+		fs.mkdirp(path.join(SERVER_ROOT, 'temp/'));
+	}
 
 	private async _getPasswordIfOwner(passwordId: StringifiedObjectId<EncryptedPassword>, 
 		instance: DecryptedInstance, res: ServerResponse) {
@@ -61,13 +68,142 @@ export class RoutesApiPassword {
 			return true;
 		}
 
+	private async _isSameFile(expected: string, actual: Buffer) {
+		const expectedContent = await fs.readFile(expected);
+		return Buffer.compare(expectedContent, actual);
+	}
+	
+	public async createImageFile(content: Buffer, mime: string) {
+		const fileExtension = mime.split('/')[1];
+		const fileName = `${genTimeBasedString()}.${fileExtension}`;
+
+		const location = path.join(SERVER_ROOT, this.server.config.assets,
+			'icons', fileName);
+		await fs.mkdirp(path.dirname(location));
+		await fs.writeFile(location, content);
+		return location;
+	}
+
+	public async uploadImage(host: string, user_id: StringifiedObjectId<EncryptedAccount>, image: {
+		mime: string;
+		content: string;
+	}): Promise<null|{
+		success: true;
+		id: StringifiedObjectId<EncryptedAsset>
+	}|{
+		success: false;
+		statusCode: number;
+	}> {
+		if (image.content.length > MAX_FILE_BYTES) {
+			return {
+				success: false,
+				statusCode: 413
+			};
+		}
+
+		let imageBuffer = Buffer.from(image.content);
+
+		const [ fileType, format ] = image.mime.split('/');
+		if (fileType !== 'image') {
+			return {
+				success: false,
+				statusCode: 415
+			}
+		}
+
+		if (format === 'x-icon') {
+			//Convert to png
+			imageBuffer = await icoToPng(imageBuffer, 128);
+			image.mime = 'image/png';
+		}
+
+		//Check if a different user has already uploaded this image
+		const encryptedAsset = await this.server.database.Manipulation.findOne(COLLECTIONS.ASSETS, {
+			host
+		});
+
+		if (encryptedAsset) {
+			const decryptedAsset = this.server.database.Crypto.dbDecryptAssetRecord(
+				encryptedAsset);
+			if (decryptedAsset.default && 
+				await this._isSameFile(decryptedAsset.default, imageBuffer)) {
+					//It's the same as the default, leave it the same
+					return {
+						success: true,
+						id: encryptedAsset._id.toHexString()
+					}
+				}
+			if (user_id in decryptedAsset.by_user_id) {
+				//User has already uploaded this host, return that
+				return {
+					success: true,
+					id: encryptedAsset._id.toHexString()
+				}
+			}
+			const matches = (await Promise.all(Object.getOwnPropertyNames(decryptedAsset.by_user_id).map(async (key) => {
+				return {
+					match: this._isSameFile(decryptedAsset.by_user_id[key as any], imageBuffer),
+					key
+				}
+			}))).filter(descr => descr.match);
+			const imagePath = !matches[0] ? 
+				await this.createImageFile(imageBuffer, image.mime) :
+				decryptedAsset.by_user_id[matches[0].key as any];
+			decryptedAsset.by_user_id[user_id] = imagePath;
+			const update = await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.ASSETS, {
+				_id: encryptedAsset._id
+			}, {...{
+				by_user_id: this.server.database.Crypto.dbEncrypt(decryptedAsset.by_user_id)
+			}, ...decryptedAsset.default === null && matches[0] ? {
+				//If there was no default yet and another image is the same as this one
+				// set this one as the default
+				default: this.server.database.Crypto.dbEncrypt(imagePath)
+			} : {}});
+			if (update === false) {
+				return {
+					success: false,
+					statusCode: 500
+				}
+			}
+			return {
+				success: true,
+				id: encryptedAsset._id.toHexString()
+			}
+		} else {
+			const imagePath = await this.createImageFile(imageBuffer, image.mime);
+			const inserted = await this.server.database.Manipulation.insertOne(COLLECTIONS.ASSETS, {
+				host: this.server.database.Crypto.dbEncrypt(host),
+				by_user_id: this.server.database.Crypto.dbEncrypt({
+					[user_id]: imagePath
+				}),
+				default: this.server.database.Crypto.dbEncrypt(null)
+			});
+			if (inserted === false) {
+				return {
+					success: false,
+					statusCode: 500
+				}
+			}
+			return {
+				success: true,
+				id: inserted.toHexString() as StringifiedObjectId<EncryptedAsset>
+			}
+		}
+	}
+
 	public set(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-		}, {}, {
+		}, { }, {
 			count: number;
 			token: APIToken;
-			websites: string[];
+			websites: {
+				url: string;
+				favicon: {
+					mime: string;
+					content: string;
+				}|null;
+			}[]
 			twofactor_enabled: boolean;
 			encrypted: EncodedString<{
 				data: Encrypted<EncodedString<{
@@ -90,7 +226,7 @@ export class RoutesApiPassword {
 			}, {
 				val: 'websites',
 				type: 'array',
-				inner: 'string'
+				inner: 'object'
 			}, {
 				val: 'twofactor_enabled',
 				type: 'boolean'
@@ -100,6 +236,9 @@ export class RoutesApiPassword {
 			}, {
 				val: 'count',
 				type: 'number'
+			}, {
+				val: 'favicon',
+				type: 'string'
 			}])) return;
 
 			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
@@ -123,19 +262,53 @@ export class RoutesApiPassword {
 				return;
 			}
 
+			const mappedWebsites = await Promise.all(websites.map(async ({ url: websiteURL, favicon }) => {
+				const host = url.parse(websiteURL).hostname || url.parse(websiteURL).host || websiteURL;
+				if (favicon !== null) {
+					await this.uploadImage(host, account._id.toHexString(), favicon);
+				}
+				return {
+					host: host,
+					exact: websiteURL,
+					favicon: favicon !== null ?
+						await this.uploadImage(host, account._id.toHexString(), favicon) : null
+				}
+			}));
+			for (const mappedWebsite of mappedWebsites) {
+				if (mappedWebsite.favicon !== null && mappedWebsite.favicon.success === false) {
+					res.status(mappedWebsite.favicon.statusCode);
+					res.json({
+						success: false,
+						error: 'failed to upload image',
+						ERR: mappedWebsite.favicon.statusCode === 500 ?
+							API_ERRS.SERVER_ERROR :
+							API_ERRS.INVALID_PARAM_TYPES
+					});
+					return;
+				}
+			}
+
+			const filteredWebsites = mappedWebsites.filter((mappedWebsite) => {
+				return mappedWebsite.favicon === null ||
+					mappedWebsite.favicon.success === true;
+			}) as {
+				host: string;
+				exact: string;
+				favicon: {
+					success: true,
+					id: StringifiedObjectId<EncryptedAsset>
+				}
+			}[];
+
 			//All don't exist
 			const record: EncryptedPassword = {
 				user_id: account._id,
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled),
-				websites: websites.map((website) => {
-					return {
-						host: url.parse(website).hostname || url.parse(website).host || website,
-						exact: website
-					}
-				}).map(({ host, exact }) => {
+				websites: filteredWebsites.map(({ host, exact, favicon }) => {
 					return {
 						host: this.server.database.Crypto.dbEncrypt(host),
-						exact: this.server.database.Crypto.dbEncrypt(exact)
+						exact: this.server.database.Crypto.dbEncrypt(exact),
+						favicon: this.server.database.Crypto.dbEncrypt(favicon.id)
 					}
 				}),
 				encrypted: this.server.database.Crypto.dbEncrypt(encrypted)
@@ -163,12 +336,18 @@ export class RoutesApiPassword {
 	public update(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-		}, {}, {
+		}, { }, {
 			token: APIToken;
 			count: number;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
-			websites: string[];
+			websites: {
+				url: string;
+				favicon: {
+					mime: string;
+					content: string;
+				}|null;
+			}[];
 			twofactor_enabled: boolean;
 			twofactor_token: string;
 			encrypted: EncodedString<{
@@ -206,7 +385,7 @@ export class RoutesApiPassword {
 			}, {
 				val: 'websites',
 				type: 'array',
-				inner: 'string'
+				inner: 'object'
 			}, {
 				val: 'twofactor_enabled',
 				type: 'boolean'
@@ -245,21 +424,55 @@ export class RoutesApiPassword {
 			if (!this._verify2FAIfEnabled(twofactor_secret, twofactor_token,
 				password, res)) return;
 
+			const mappedWebsites = Array.isArray(websites) ? await Promise.all(websites.map(async ({ url: websiteURL, favicon }) => {
+				const host = url.parse(websiteURL).hostname || url.parse(websiteURL).host || websiteURL;
+				if (favicon !== null) {
+					await this.uploadImage(host, decryptedInstance.user_id.toHexString(), favicon);
+				}
+				return {
+					host: host,
+					exact: websiteURL,
+					favicon: favicon !== null ?
+						await this.uploadImage(host, decryptedInstance.user_id.toHexString(), favicon) : null
+				}
+			})) : undefined;
+			for (const mappedWebsite of mappedWebsites || []) {
+				if (mappedWebsite.favicon !== null && mappedWebsite.favicon.success === false) {
+					res.status(mappedWebsite.favicon.statusCode);
+					res.json({
+						success: false,
+						error: 'failed to upload image',
+						ERR: mappedWebsite.favicon.statusCode === 500 ?
+							API_ERRS.SERVER_ERROR :
+							API_ERRS.INVALID_PARAM_TYPES
+					});
+					return;
+				}
+			}
+
+			const filteredWebsites = (Array.isArray(mappedWebsites) ? mappedWebsites.filter((mappedWebsite) => {
+				return mappedWebsite.favicon === null ||
+					mappedWebsite.favicon.success === true;
+			}) : undefined) as undefined|{
+				host: string;
+				exact: string;
+				favicon: {
+					success: true,
+					id: StringifiedObjectId<EncryptedAsset>
+				}
+			}[];
+
 			if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
 				_id: new mongo.ObjectId(password_id)
 			}, {
 				twofactor_enabled: typeof twofactor_enabled === 'boolean' ?
 					this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled) : undefined,
-				websites: Array.isArray(websites) ?
-					websites.map((website) => {
-						return {
-							host: url.parse(website).hostname || url.parse(website).host || website,
-							exact: website
-						}
-					}).map(({ host, exact }) => {
+				websites: Array.isArray(filteredWebsites) ?
+					filteredWebsites.map(({ host, exact, favicon }) => {
 						return {
 							host: this.server.database.Crypto.dbEncrypt(host),
-							exact: this.server.database.Crypto.dbEncrypt(exact)
+							exact: this.server.database.Crypto.dbEncrypt(exact),
+							favicon: this.server.database.Crypto.dbEncrypt(favicon.id)
 						}
 					}) : undefined,
 				encrypted: encrypted ?
