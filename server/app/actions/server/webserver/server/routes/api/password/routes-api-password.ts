@@ -236,9 +236,6 @@ export class RoutesApiPassword {
 			}, {
 				val: 'count',
 				type: 'number'
-			}, {
-				val: 'favicon',
-				type: 'string'
 			}])) return;
 
 			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
