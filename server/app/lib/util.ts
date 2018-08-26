@@ -400,6 +400,11 @@ export function genRandomString(length: number = 50): string {
 	return str;
 }
 
+export function genTimeBasedString(length: number = 50): string {
+	const now = Date.now();
+	return `${now}${genRandomString(length - (now + '').length)}`;
+}
+
 const capturer = new StdinCapturer();
 export function readPassword(text: string) {
 	console.log(text);
@@ -521,12 +526,6 @@ export async function requireES6File<T>(filePath: string): Promise<T> {
 	});
 	const outfile = path.join(__dirname, `../../temp/${genRandomString(25)}.js`);
 	await assertDir(path.dirname(outfile));
-	await writeFile(outfile, transformed.code!);
-	const required = require(outfile);
-	await unlink(outfile);
-	requireMap.set(filePath, required);
-	return required;
-}await assertDir(path.dirname(outfile));
 	await writeFile(outfile, transformed.code!);
 	const required = require(outfile);
 	await unlink(outfile);
