@@ -83,5 +83,6 @@ export type Padded<T extends string, P extends Paddings> = string & {
 }
 
 export const enum ERRS {
-	INVALID_DECRYPT = 'ERR_INVALID_DECRYPT'
+	INVALID_DECRYPT = 'ERR_INVALID_DECRYPT',
+	INVALID_PARSE = 'ERR_INVALID_PARSE'
 }

@@ -1,6 +1,6 @@
 export { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms, MasterPasswordDecryptionpadding, MasterPasswordVerificationPadding, Padded } from '../../../shared/types/crypto'
-import { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms } from '../../../shared/types/crypto'
 import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey, HybridEncrypted, PublicKeyEncrypted } from "../../../shared/types/db-types";
+import { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms } from '../../../shared/types/crypto'
 import { Padded, Paddings } from "../../../shared/types/crypto";
 import { JSEncrypt } from '../libraries/jsencrypt'
 import { genRandomString } from './util';
@@ -35,7 +35,7 @@ export function encryptWithSalt<T, A extends EncryptionAlgorithm, K extends stri
 export function decryptWithSalt<T, A extends EncryptionAlgorithm, K extends string>(data: EncodedString<{
 	data: SaltEncrypted<T, K, A>
 	algorithm: A;
-}>, key: K): T|ERRS {
+}>, key: K): T|ERRS.INVALID_DECRYPT {
 	const decrypted = decrypt(data, key);
 	if (decrypted === ERRS.INVALID_DECRYPT) {
 		return ERRS.INVALID_DECRYPT;
@@ -105,7 +105,7 @@ export function encrypt<T, A extends EncryptionAlgorithm, K extends string>(data
 export function decrypt<T, A extends EncryptionAlgorithm, K extends string>(encrypted: EncodedString<{
 	data: Encrypted<EncodedString<T>, K, A>;
 	algorithm: A;
-}>, key: K): T|ERRS {
+}>, key: K): T|ERRS.INVALID_DECRYPT {
 	try {
 		const { data, algorithm } = JSON.parse(encrypted);
 		const input = Buffer.from(data, 'base64');
@@ -132,7 +132,7 @@ export function asyncEncrypt<T, K extends InstancePublicKey|ServerPublicKey>(dat
 
 export function asyncDecrypt<T, K extends ServerPrivateKey>(data: RSAEncrypted<EncodedString<T>, 
 	InstancePublicKey|ServerPublicKey>, 
-		privateKey: K): T|ERRS {
+		privateKey: K): T|ERRS.INVALID_DECRYPT {
 			const key = new JSEncrypt();
 			key.setPrivateKey(privateKey);
 
@@ -161,7 +161,7 @@ export function encryptWithPublicKey<T, K extends InstancePublicKey|ServerPublic
 
 export function decryptWithPrivateKey<T, K extends ServerPrivateKey>(data: PublicKeyEncrypted<T, 
 	InstancePublicKey|ServerPublicKey>, 
-		privateKey: K): T|ERRS {
+		privateKey: K): T|ERRS.INVALID_DECRYPT {
 			try {
 				const parsed = JSON.parse(data);
 				if (parsed.type === 'async') {
@@ -217,7 +217,7 @@ export function hybridEncrypt<T, K extends InstancePublicKey|ServerPublicKey>(da
 	}
 
 export function hybdridDecrypt<T, K extends ServerPrivateKey>(data: HybridEncrypted<T, K>,
-	privateKey: K): T|ERRS {
+	privateKey: K): T|ERRS.INVALID_DECRYPT {
 		try {
 			const { symmetricKey, data: encrypted } = JSON.parse(data);
 
