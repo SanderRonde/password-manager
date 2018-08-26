@@ -391,4 +391,52 @@ export interface DecryptedPassword {
 		 */
 		algorithm: EncryptionAlgorithm;
 	}>;
+}		 */
+			notes: string[];
+		}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+		/**
+		 * The algorithm used to encrypt the data
+		 */
+		algorithm: EncryptionAlgorithm;
+	}>;
+}
+
+/**
+ * An encrypted asset record
+ */
+export interface EncryptedAsset {
+	/**
+	 * The host name associated with this icon
+	 */
+	host: string;
+	/**
+	 * (encrypted) An object that maps user IDs to their own icon
+	 */
+	by_user_id: EncodedString<DatabaseEncrypted<EncodedString<{
+		[user_id: string]: string;
+	}>>>;
+	/**
+	 * (encrypted) A default icon to be used if no user-specific icon exists
+	 */
+	default: EncodedString<DatabaseEncrypted<EncodedString<string|null>>>;
+}
+
+/**
+ * A decrypted asset record
+ */
+export interface DecryptedAsset {
+	/**
+	 * The host name associated with this icon
+	 */
+	host: string;
+	/**
+	 * An object that maps user IDs to their own icon
+	 */
+	by_user_id: {
+		[user_id: string]: string;
+	};
+	/**
+	 * A default icon to be used if no user-specific icon exists
+	 */
+	default: string|null;
 }

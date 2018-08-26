@@ -1,4 +1,4 @@
-import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from '../../../../shared/types/db-types';
+import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord, EncryptedAsset } from '../../../../shared/types/db-types';
 import { UnstringifyObjectIDs } from '../../../../shared/types/crypto';
 import { Database, COLLECTIONS } from "../database";
 import { TypedCollection } from "../mocks";
@@ -6,6 +6,7 @@ import * as mongo from 'mongodb'
 
 interface EncryptedCollectionRecords {
 	[COLLECTIONS.USERS]: EncryptedAccount;
+	[COLLECTIONS.ASSETS]: EncryptedAsset;
 	[COLLECTIONS.INSTANCES]: EncryptedInstance;
 	[COLLECTIONS.PASSWORDS]: EncryptedPassword;
 }
@@ -23,6 +24,8 @@ export class DatabaseManipulation {
 				return this._parent.collections.instances;
 			case COLLECTIONS.PASSWORDS:
 				return this._parent.collections.passwords;
+			case COLLECTIONS.ASSETS:
+				return this._parent.collections.assets;
 		}
 		this._parent.err('Could not find given collection');
 		return null;

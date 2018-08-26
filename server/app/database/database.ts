@@ -1,5 +1,5 @@
 
-import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord } from './../../../shared/types/db-types';
+import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord, EncryptedAsset } from './../../../shared/types/db-types';
 import { exitWith, readPassword, getDBFromURI } from '../lib/util';
 import { DatabaseManipulation } from './libs/db-manipulation';
 import { DatabaseEncryption } from './libs/db-encryption';
@@ -33,7 +33,8 @@ export async function getDatabase(dbPath: string, password: string|undefined,
 export enum COLLECTIONS {
 	USERS,
 	INSTANCES,
-	PASSWORDS
+	PASSWORDS,
+	ASSETS
 }
 
 export class Database {
@@ -43,6 +44,7 @@ export class Database {
 	public mongoClient!: mongo.MongoClient;
 	public collections!: {
 		users: TypedCollection<MongoRecord<EncryptedAccount>>;
+		assets: TypedCollection<MongoRecord<EncryptedAsset>>;
 		instances: TypedCollection<MongoRecord<EncryptedInstance>>;
 		passwords: TypedCollection<MongoRecord<EncryptedPassword>>;
 	}
@@ -83,12 +85,14 @@ export class Database {
 
 	private _getCollections(): {
 		users: TypedCollection<MongoRecord<EncryptedAccount>>;
+		assets: TypedCollection<MongoRecord<EncryptedAsset>>;
 		instances: TypedCollection<MongoRecord<EncryptedInstance>>;
 		passwords: TypedCollection<MongoRecord<EncryptedPassword>>;
 	} {
 		const db = this.mongoInstance as MockMongoDb;
 		return {
 			users: db.collection('users'),
+			assets: db.collection('assets'),
 			instances: db.collection('instances'),
 			passwords: db.collection('passwords')
 		}

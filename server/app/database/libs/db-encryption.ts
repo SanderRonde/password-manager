@@ -1,4 +1,4 @@
-import { DatabaseEncrypted, EncryptedPassword, DecryptedPassword, EncryptedInstance, DecryptedInstance, EncryptedAccount, DecryptedAccount, DatabaseEncryptedWithSalt } from "../../../../shared/types/db-types";
+import { DatabaseEncrypted, EncryptedPassword, DecryptedPassword, EncryptedInstance, DecryptedInstance, EncryptedAccount, DecryptedAccount, DatabaseEncryptedWithSalt, EncryptedAsset, DecryptedAsset } from "../../../../shared/types/db-types";
 import { encrypt, decrypt, encryptWithSalt, decryptWithSalt } from "../../lib/crypto";
 import { UnstringifyObjectIDs } from "../../../../shared/types/crypto";
 import { ENCRYPTION_ALGORITHM } from "../../lib/constants";
@@ -126,6 +126,16 @@ export class DatabaseEncryption {
 			twofactor_secret: this.dbDecryptWithSalt(twofactor_secret),
 			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled),
 			reset_key: this.dbDecrypt(reset_key)
+		}
+	}
+
+	public dbDecryptAssetRecord({
+		by_user_id, default: defaultImg, host
+	}: EncryptedAsset|UnstringifyObjectIDs<EncryptedAsset>): DecryptedAsset {
+		return 	{
+			by_user_id: this.dbDecrypt(by_user_id),
+			default: this.dbDecrypt(defaultImg),
+			host: host
 		}
 	}
 }
