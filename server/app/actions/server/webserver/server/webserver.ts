@@ -8,6 +8,7 @@ import { WebserverRoutes } from "./modules/routes";
 import { WebserverAuth } from "./modules/auth";
 import * as cookieParser from 'cookie-parser'
 import { ServerConfig } from "../../server";
+import * as compression from 'compression';
 import * as serveStatic from 'serve-static'
 import * as bodyParser from 'body-parser'
 import { Cache } from "./modules/cache";
@@ -60,6 +61,7 @@ export class Webserver {
 		this.app.use(bodyParser.json({
 			limit: MAX_FILE_SIZE
 		}));
+		this.app.use(compression());
 		this.app.use(serveStatic(STATIC_SERVE_PATH, {
 			maxAge: 1000 * 60 * 60 * 24 * 7 * 4,
 			dotfiles: this.config.development ? 'allow' : 'ignore',
