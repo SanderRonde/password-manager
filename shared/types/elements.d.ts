@@ -10,8 +10,10 @@ import { PaperButton } from "../components/util/paper-button/paper-button";
 import { LoginWeb } from "../components/entrypoints/web/login/login-web";
 import { PaperToast } from "../components/util/paper-toast/paper-toast";
 import { IconButton } from "../components/util/icon-button/icon-button";
+import { MDCard } from "../components/util/md-card/md-card";
 
 declare global {
+	type HTMLMDCardElement = MDCard;
 	type HTMLLoginElement = LoginWeb;
 	type HTMLIconButtonElement = IconButton;
 	type HTMLPaperToastElement = PaperToast;
