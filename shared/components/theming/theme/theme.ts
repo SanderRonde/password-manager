@@ -18,12 +18,13 @@ export const theme: {
 			hover: '#AE52D4',
 			heavy: '#4A0072'
 		},
+		card: '#FFFFFF',
 		error: '#F44336',
 		success: '#2E7D32',
 		minOppositeColorText: '#0000008C',
 		textOnBackground: '#000000',
 		textOnNonbackground: '#FFFFFF',
-		background: '#FFFFFF'
+		background: '#F8F8F8'
 	},
 	dark: {
 		primary: {
@@ -38,6 +39,7 @@ export const theme: {
 			hover: '#4A0072',
 			heavy: '#AE52D4'
 		},
+		card: '#171718',
 		error: '#e34839',
 		success: '#1dba25',
 		minOppositeColorText: '#FFFFFF8C',

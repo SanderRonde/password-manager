@@ -65,6 +65,10 @@ export interface Theme {
 		heavy: string
 	},
 	/**
+	 * The color of a material design card
+	 */
+	card: string;
+	/**
 	 * The color of error messages
 	 */
 	error: string,
