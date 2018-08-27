@@ -39,7 +39,7 @@ export const theme: {
 			hover: '#4A0072',
 			heavy: '#AE52D4'
 		},
-		card: '#171718',
+		card: '#222222',
 		error: '#e34839',
 		success: '#1dba25',
 		minOppositeColorText: '#FFFFFF8C',
