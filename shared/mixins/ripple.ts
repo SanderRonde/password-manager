@@ -145,7 +145,9 @@ export function rippleEffect(target: ExtendableComponent): any {
 				listenWithIdentifier(this as any, this.container, 'container',
 					'mousedown', this._downHandler.bind(this));
 				listenWithIdentifier(this as any, this.container, 'container',
-					'touchstart', this._downHandler.bind(this));
+					'touchstart', this._downHandler.bind(this), {
+						passive: true
+					});
 		
 				listenWithIdentifier(this as any, this.container, 'container', 
 					'mouseup', this._upHandler.bind(this));
