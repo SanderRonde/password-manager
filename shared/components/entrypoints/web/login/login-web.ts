@@ -1,13 +1,14 @@
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { config, cancelTimeout, wait, createCancellableTimeout } from '../../../../lib/webcomponent-util';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
+import { Login, LoginDependencies } from '../../base/login/login';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { API_ERRS, APIReturns } from '../../../../types/api';
+import { ENTRYPOINT } from '../../../../types/shared-types';
 import { bindToClass } from '../../../../lib/decorators';
 import { LoginHTML } from '../../base/login/login.html';
 import { LoginCSS } from '../../base/login/login.css';
 import { ERRS } from '../../../../types/crypto';
-import { Login, LoginDependencies } from '../../base/login/login';
 
 type ServerLoginResponse = APIReturns['/api/dashboard/login'];
 
@@ -156,7 +157,7 @@ export class LoginWeb extends Login {
 			private_key: privateKey,
 			instance_id: instance_id
 		});
-		root.changePage('dashboard');
+		root.changePage(ENTRYPOINT.DASHBOARD);
 	}
 
 	@bindToClass

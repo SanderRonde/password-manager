@@ -7,6 +7,7 @@ import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { DashboardCSS } from '../../base/dashboard/dashboard.css';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { MasterPassword } from '../../../../types/db-types';
+import { ENTRYPOINT } from '../../../../types/shared-types';
 import { config } from '../../../../lib/webcomponent-util';
 import { Remove } from '../../../../types/serviceworker';
 
@@ -34,7 +35,7 @@ export class DashboardWeb extends Dashboard {
 			duration: 10000
 		});
 		if (!document.body.classList.contains('dev')) {
-			this.getRoot().changePage('login');
+			this.getRoot().changePage(ENTRYPOINT.LOGIN);
 		}
 	}	
 
