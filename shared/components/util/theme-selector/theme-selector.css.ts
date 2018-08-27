@@ -47,7 +47,7 @@ export function ThemeSelectorCSS(this: ThemeSelector, theme: Theme, _props: Them
 		.activeThemeHighlighter {
 			height: 34px;
 			width: 4px;
-			right: -5px;
+			right: 0;
 			position: absolute;
 			margin-top: 3px;
 			opacity: 0;
@@ -78,6 +78,7 @@ export function ThemeSelectorCSS(this: ThemeSelector, theme: Theme, _props: Them
 
 		#container {
 			overflow: hidden;
+			width: 45px;
 		}
 	</style>`
 }
