@@ -111,6 +111,18 @@
 		}, {
 			"type": "node",
 			"request": "launch",
+			"name": "Launch HTTPS Server (databaseless, ports 80 and 443)",
+			"program": "${workspaceFolder}/server/app/main.js",
+			"args": [
+				"server",
+				"--https-key", "./certs/cert.key",
+				"--https-cert", "./certs/cert.crt",
+				"-p", "somepw",
+				"--databaseless"
+			],
+		}, {
+			"type": "node",
+			"request": "launch",
 			"env": {
 				"NODE_ENV": "development"
 			},
