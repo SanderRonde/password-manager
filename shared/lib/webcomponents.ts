@@ -364,6 +364,25 @@ const listenedToElements: WeakMap<WebComponent, {
 	}>
 }> = new WeakMap();
 
+let _supportsPassive: boolean|null = null;
+function supportsPassive() {
+	if (_supportsPassive !== null) {
+		return _supportsPassive;
+	}
+	_supportsPassive = false;
+	try {
+		var opts = Object.defineProperty({}, 'passive', {
+			get: function() {
+				_supportsPassive = true;
+			}
+		});
+		const tempFn = () => {};
+		window.addEventListener("testPassive", tempFn, opts);
+		window.removeEventListener("testPassive", tempFn, opts);
+	} catch (e) {}
+	return _supportsPassive;
+}
+
 function doListen<I extends {
 	[key: string]: HTMLElement;
 }, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, 
@@ -399,7 +418,7 @@ function doListen<I extends {
 		} else {
 			element.removeEventListener(event, eventIDMap.get(event)!);
 		}
-		if (options !== undefined && options !== null) {
+		if (options !== undefined && options !== null && supportsPassive) {
 			element.addEventListener(event, boundListener, options);
 		} else {
 			element.addEventListener(event, boundListener);
