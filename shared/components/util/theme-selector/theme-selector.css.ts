@@ -67,6 +67,7 @@ export function ThemeSelectorCSS(this: ThemeSelector, theme: Theme, _props: Them
 		}
 
 		#themes {
+			overflow: hidden;
 			transition: transform 250ms ease-in-out;
 			transform: translateX(50px);
 		}
