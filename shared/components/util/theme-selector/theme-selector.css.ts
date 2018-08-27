@@ -75,5 +75,9 @@ export function ThemeSelectorCSS(this: ThemeSelector, theme: Theme, _props: Them
 		#themes.visible {
 			transform: translateX(0);
 		}
+
+		#container {
+			overflow: hidden;
+		}
 	</style>`
 }

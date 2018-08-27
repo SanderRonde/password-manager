@@ -8,7 +8,7 @@ export function ThemeSelectorHTML(this: ThemeSelector) {
 	const currentThemeName = this._globalProperties.theme;
 	return html`
 		${this.css}
-		<div>
+		<div id="container">
 			<icon-button id="button" fill="text">${Color}</icon-button>
 			<div id="themes">
 				${Object.getOwnPropertyNames(theme).map((themeName: keyof typeof theme) => {
