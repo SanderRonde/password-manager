@@ -15,7 +15,8 @@ export function MaterialInputHTML(this: MaterialInput) {
 				<slot class="iconSlot" name="preIcon"></slot>
 				<input class="mdl-textfield__input" type="${this.props.type}" 
 					id="input" value="${this.props.value}" 
-					pattern="${this.props.pattern}">
+					pattern="${this.props.pattern}"
+					aria-labelledby="label">
 				<slot class="iconSlot" name="postIcon"></slot>
 			</div>
 			<label id="label" class="mdl-textfield__label">${this.props.label}</label>
