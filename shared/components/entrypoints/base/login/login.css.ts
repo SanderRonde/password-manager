@@ -6,6 +6,7 @@ export function LoginCSS(this: Login, theme: Theme, _props: Login['props']) {
 	return html`<style>
 		#formContainer {
 			width: 400px;
+			max-width: 100vw;
 		}
 
 		#buttonPositioner {

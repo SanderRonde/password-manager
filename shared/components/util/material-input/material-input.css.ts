@@ -27,7 +27,7 @@ export function MaterialInputCSS(this: MaterialInput, theme: Theme, _props: Mate
 			display: inline-block;
 			box-sizing: border-box;
 			width: 300px;
-			max-width: 100%;
+			max-width: 100vw;
 			margin: 0;
 			padding: 20px 0;
 		}
