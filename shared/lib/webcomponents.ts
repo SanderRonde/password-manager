@@ -31,12 +31,28 @@ abstract class WebComponentDefiner extends elementBase {
 	 */
 	protected static is: ComponentIs;
 
+	constructor() {
+		super();
+		WebComponentDefiner.listenForFinished(this as any);
+	}
+
+	private static _finished: boolean = false;
+	private static _listeners: WebComponent<any, any>[] = [];
+	protected static listenForFinished(component: WebComponent<any, any>) {
+		if (this._finished) {
+			component.isMounted = true;
+			component.mounted();
+		} else {
+			this._listeners.push(component);
+		}
+	}
+
 	/**
 	 * Define this component and its dependencies as a webcomponent
 	 */
-	static define() {
+	static define(isRoot: boolean = true) {
 		for (const dependency of this.dependencies) {
-			dependency.define();
+			dependency.define(false);
 		}
 		if (!this.is) {
 			throw new Error('No component definition given (name and class)')
@@ -48,6 +64,34 @@ abstract class WebComponentDefiner extends elementBase {
 			throw new Error('No class given for component');
 		}
 		define(this.is.name, this.is.component);
+
+		if (isRoot) {
+			this._finishLoad();
+		}
+	}
+
+	private static _doSingleMount(listener: WebComponent<any, any>) {
+		return new Promise((resolve) => {
+			(window.requestAnimationFrame || window.webkitRequestAnimationFrame)(() => {
+				listener.isMounted = true;
+				listener.mounted();
+				resolve();
+			});
+		});
+	}
+
+	private static async _finishLoad() {
+		this._finished = true;
+		if (window.requestAnimationFrame || window.webkitRequestAnimationFrame) {
+			for (const listener of this._listeners) {
+				await this._doSingleMount(listener);
+			}
+		} else {
+			this._listeners.forEach((listener) => {
+				listener.isMounted = true;
+				listener.mounted();
+			});
+		}
 	}
 }
 

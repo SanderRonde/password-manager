@@ -2,12 +2,12 @@ import { defineProps, PROP_TYPE, config, wait, awaitMounted } from '../../../lib
 import { StringifiedObjectId, EncryptedInstance } from '../../../types/db-types';
 import { ANIMATE_TIME } from '../../util/loadable-block/loadable-block.css';
 import { LoadableBlock } from '../../util/loadable-block/loadable-block';
-import { ConfigurableWebComponent, WebComponent } from '../../../lib/webcomponents';
+import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { GlobalControllerIDMap } from './global-controller-querymap';
 import { GlobalControllerHTML } from './global-controller.html';
 import { GlobalControllerCSS } from './global-controller.css';
-import { Dashboard } from '../base/dashboard/dashboard';
 import { ENTRYPOINT } from '../../../types/shared-types';
+import { Dashboard } from '../base/dashboard/dashboard';
 import { Login } from '../base/login/login';
 
 export interface GlobalControllerData {
@@ -58,18 +58,6 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 			}
 		}
 	});
-
-	private static _finishedListeners: WebComponent<any, any>[] = [];
-	static finish() {
-		this._finishedListeners.forEach((component) => {
-			component.isMounted = true;
-			component.mounted();
-		});
-	}
-
-	static listenForFinished(component: WebComponent<any, any>) {
-		this._finishedListeners.push(component);
-	}
 
 	async _handleInitialState() {
 		if (window.history.state !== null) {
