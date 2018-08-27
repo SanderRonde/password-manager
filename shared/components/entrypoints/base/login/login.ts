@@ -1,5 +1,5 @@
 /// <reference path="../../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, isDefined, listen, isNewElement, getCookie } from '../../../../lib/webcomponent-util'
+import { defineProps, PROP_TYPE, isDefined, isNewElement, getCookie, listenIfNew } from '../../../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
@@ -94,6 +94,7 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 
 	@bindToClass
 	handleEmailRememberToggle() {
+		console.log('YOOOO');
 		const wasEnabled = this.props.emailRemembered;
 		this.props.emailRemembered = !wasEnabled;
 		if (wasEnabled) {
@@ -144,8 +145,8 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	}
 
 	postRender() {
-		listen(this, 'button', 'click', this.onLogin);
-		listen(this, 'lockButton', 'click', this.handleEmailRememberToggle);
+		listenIfNew(this, 'button', 'click', this.onLogin);
+		listenIfNew(this, 'lockButton', 'click', this.handleEmailRememberToggle);
 		for (const input of [this.$.emailInput, this.$.passwordInput, this.$.twofactorInput]) {
 			if (isNewElement(input)) {
 				input.listen('valid', this._updateValidity);
