@@ -22,7 +22,6 @@ export function PaperToastCSS(this: PaperToast, theme: Theme, _props: PaperToast
 			transition: transform 0.3s, opacity 0.3s;
 			opacity: 0;
 			bottom: 0;
-			left: 10px;
 			-webkit-transform: translateY(100px);
 			transform: translateY(100px);
 			background-color: ${isDark(theme.background) ? '#afafaf' : '#323232'};
