@@ -6,6 +6,7 @@ import { Webserver } from "../../webserver";
 import { COUNT } from "../../modules/auth";
 import * as express from 'express'
 import * as path from 'path'
+import { ENTRYPOINT } from "../../../../../../../../shared/types/shared-types";
 
 const routesBase = path.join(__dirname, '../../../client/');
 
@@ -41,7 +42,7 @@ export class RoutesDashboard {
 
 		await render(res, {
 			data: {
-				page: 'login',
+				page: ENTRYPOINT.LOGIN,
 				theme: this.server.Router.getTheme(req, res),
 				comm_token: token,
 				server_public_key: publicKey
@@ -56,7 +57,7 @@ export class RoutesDashboard {
 	public async login_offline(_req: express.Request, res: ServerResponse) {
 		await render(res, {
 			data: {
-				page: 'login'
+				page: ENTRYPOINT.LOGIN
 			},
 			rootElement: 'login-page',
 			script: 'entrypoints/login/login-page.js',
@@ -97,7 +98,7 @@ export class RoutesDashboard {
 					password_meta: dashboardData
 				} : {},
 				...{
-					page: 'dashboard',
+					page: ENTRYPOINT.DASHBOARD,
 					theme: this.server.Router.getTheme(req, res)
 				}
 			},
@@ -111,7 +112,7 @@ export class RoutesDashboard {
 	public async dashboard_offline(_req: express.Request, res: ServerResponse) {
 		await render(res, {
 			data: {
-				page: 'dashboard'
+				page: ENTRYPOINT.DASHBOARD
 			},
 			rootElement: 'dashboard-page',
 			script: 'entrypoints/dashboard/dashboard-page.js',
