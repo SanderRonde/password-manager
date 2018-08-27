@@ -107,7 +107,8 @@ export class LoadableBlock extends ConfigurableWebComponent<LoadableBlockIDMap> 
 		}, ANIMATE_TIME);
 	}
 
-	layoutMounted() {
+	async layoutMounted() {
+		await awaitMounted(this.$.spinner)
 		if (this.props.loading) {
 			this.$.spinner.start();
 		} else {
