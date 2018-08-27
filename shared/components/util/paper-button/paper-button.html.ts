@@ -10,7 +10,7 @@ export function PaperButtonHTML(this: PaperButton, props: PaperButton['props']) 
 			'mdl-button', 'mdl-js-button', {
 				'mdl-button--raised': !this.props.flat,
 				'mdl-js-ripple-effect': !this.props.noRipple
-			 })}" label="${props.label}">
+			 })}" label="${props.ariaLabel}">
 			<slot></slot>
 			<span>${this.props.content}</span>
 		</button>`;
