@@ -42,8 +42,9 @@ export async function preAppHTML({
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
-		${conditionalString(`<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; script-src 'self'; style-src 'unsafe-inline' 'self'; connect-src *">`,
+		${conditionalString(`<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; script-src 'self'; style-src 'unsafe-inline' 'self'; connect-src *; manifest-src 'self'">`,
 			!development)}
+		<link rel="manifest" href="/about/manifest.json">
 		<meta name="theme-color" content="#455A64">
 		<meta name="description" content="Your password manager dashboard">
 		<title>${title}</title>
