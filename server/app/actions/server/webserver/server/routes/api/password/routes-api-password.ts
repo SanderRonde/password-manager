@@ -305,7 +305,8 @@ export class RoutesApiPassword {
 					return {
 						host: this.server.database.Crypto.dbEncrypt(host),
 						exact: this.server.database.Crypto.dbEncrypt(exact),
-						favicon: this.server.database.Crypto.dbEncrypt(favicon.id)
+						favicon: this.server.database.Crypto.dbEncrypt(favicon ?
+							favicon.id : null)
 					}
 				}),
 				encrypted: this.server.database.Crypto.dbEncrypt(encrypted)
@@ -469,7 +470,8 @@ export class RoutesApiPassword {
 						return {
 							host: this.server.database.Crypto.dbEncrypt(host),
 							exact: this.server.database.Crypto.dbEncrypt(exact),
-							favicon: this.server.database.Crypto.dbEncrypt(favicon.id)
+							favicon: this.server.database.Crypto.dbEncrypt(favicon ?
+								favicon.id : null)
 						}
 					}) : undefined,
 				encrypted: encrypted ?
