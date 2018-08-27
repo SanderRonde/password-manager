@@ -227,7 +227,7 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 
 	@bindToClass
 	private _registerToParent() {
-		let element: HTMLElement|null = this.parentElement;
+		let element: Node|null = this.parentNode;
 		while (element && !(element instanceof (window as any).ShadowRoot) && 
 			(element as any) !== document && !(element instanceof DocumentFragment) && 
 			!(element instanceof WebComponentHierarchyManager)) {
