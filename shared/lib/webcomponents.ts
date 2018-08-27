@@ -573,8 +573,7 @@ export abstract class WebComponent<IDS extends {
 	connectedCallback() {
 		super.connectedCallback();
 		this.renderToDOM();
-		this.isMounted = true;
-		this.mounted();
+		this.layoutMounted();
 	}
 
 	/**
@@ -585,7 +584,13 @@ export abstract class WebComponent<IDS extends {
 	}
 
 	/**
-	 * Called when the component is mounted to the dom
+	 * Called when the component is mounted to the dom for the first time.
+	 * 	This will be part of the "constructor" and will slow down the initial render
+	 */
+	layoutMounted() {}
+
+	/**
+	 * Called when the component is mounted to the dom and is ready to be manipulated
 	 */
 	mounted() {}
 }

@@ -107,8 +107,16 @@ export class LoadableBlock extends ConfigurableWebComponent<LoadableBlockIDMap> 
 		}, ANIMATE_TIME);
 	}
 
+	layoutMounted() {
+		if (this.props.loading) {
+			this.$.spinner.start();
+		} else {
+			this.$.spinner.stop();
+		}
+	}
+
 	mounted() {
-	if (this.props.loading) {
+		if (this.props.loading) {
 			this.load();
 		} else {
 			this.finish();

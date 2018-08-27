@@ -29,7 +29,7 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 		}
 	});
 
-	mounted() {
+	layoutMounted() {
 		if (!this.getRoot().getAttribute('prop_theme')) {
 			//This is a non-server-served page
 			const currentTheme = this._globalProperties.theme;
@@ -37,7 +37,11 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 			if (cookieTheme && cookieTheme !== currentTheme) {
 				this.setGlobalProperty('theme', cookieTheme as VALID_THEMES_T);
 			}
+		}
+	}
 
+	mounted() {
+		if (!this.getRoot().getAttribute('prop_theme')) {
 			this._fetchData();
 		}
 	}

@@ -5,3 +5,6 @@ import { registerServiceWorker } from "../../../static/js/sw";
 GlobalController.define();
 LoginWeb.define();
 registerServiceWorker();
+window.requestAnimationFrame(() => {
+	GlobalController.finish();
+});
