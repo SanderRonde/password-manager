@@ -3,13 +3,15 @@ import { AnimatedButton } from "./animated-button";
 import { CrossSize } from "../../icons/cross/cross";
 import { html } from "lit-html";
 
-export function AnimatedButtonHTML(this: AnimatedButton) {
+export function AnimatedButtonHTML(this: AnimatedButton, props: AnimatedButton['props']) {
 	const Checkmark = CheckmarkSize(35);
 	const Cross = CrossSize(35);
 
 	return html`
 		${this.css}
-		<button id="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+		<button id="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+			label="${props.label}"
+		>
 			<div id="content">
 				<span id="regularContent" class="visible">
 					<slot></slot>

@@ -17,6 +17,10 @@ export class IconButton extends ConfigurableWebComponent<IconButtonIDMap> {
 				type: PROP_TYPE.STRING,
 				exactType: '' as 'text'|'nontext',
 				defaultValue: 'text'
+			},
+			ariaLabel: {
+				type: PROP_TYPE.STRING,
+				coerce: true
 			}
 		}
 	})

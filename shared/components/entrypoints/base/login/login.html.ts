@@ -36,7 +36,9 @@ export function LoginHTML(this: Login, props: Login['props']) {
 							title="Twofactor authentication token (if enabled for the account)"
 							autoFocus label="2FA Token (if enabled)"></material-input>
 						<div id="buttonPositioner">
-							<animated-button id="button" content="SUBMIT"></animated-button>
+							<animated-button aria-label="Submit form" id="button" 
+								content="SUBMIT"
+							></animated-button>
 						</div>
 					</form>
 				</vertical-centerer>

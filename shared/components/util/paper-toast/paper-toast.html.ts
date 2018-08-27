@@ -11,7 +11,7 @@ export function PaperToastHTML(this: PaperToast) {
 					${[this.props.button1, this.props.button2]
 						.filter(val => val).map((text) => {
 							return html`
-								<paper-button flat color="yellow" 
+								<paper-button aria-label="${text}" flat color="yellow" 
 									class="toastButton" small
 									ripple-color="white"
 								>${text}</paper-button>

@@ -22,7 +22,11 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 }> {
 	props = defineProps(this, {
 		reflect: {
-			content: PROP_TYPE.STRING
+			content: PROP_TYPE.STRING,
+			ariaLabel: {
+				type: PROP_TYPE.STRING,
+				coerce: true
+			}
 		}
 	});
 	private _state: 'success'|'failure'|'loading'|'regular' = 'regular';

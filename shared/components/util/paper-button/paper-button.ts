@@ -26,7 +26,11 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 			background: PROP_TYPE.STRING,
 			rippleColor: PROP_TYPE.STRING,
 			noRipple: PROP_TYPE.BOOL,
-			small: PROP_TYPE.BOOL
+			small: PROP_TYPE.BOOL,
+			ariaLabel: {
+				type: PROP_TYPE.STRING,
+				coerce: true
+			}
 		}
 	});
 
