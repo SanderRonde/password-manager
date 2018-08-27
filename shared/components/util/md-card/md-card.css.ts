@@ -23,9 +23,11 @@ function getShadow(level: number) {
 export function MDCardCSS(this: MDCard, theme: Theme, props: MDCard['props']) {
 	return html`<style>
 		#shadow {
-			background-color: ${theme.card};
-			padding: ${props.paddingVertical || 20}px ${props.paddingHorizontal || 20}px;
-			${getShadow(props.level || 1)}
+			${
+				`background-color: ${theme.card};
+				padding: ${props.paddingVertical || 20}px ${props.paddingHorizontal || 20}px;
+				${getShadow(props.level || 1)}`
+			}
 		}	
 	</style>`;
 }
