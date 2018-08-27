@@ -58,6 +58,7 @@ export async function preAppHTML({
 		}).join('\n')}
 	</head>
 	<body ${bodyStyles} ${conditionalString('class="dev"', development)}>
+		<noscript>This website requires javascript to function, please enable it</noscript>
 		<div id="app">`
 }
 
