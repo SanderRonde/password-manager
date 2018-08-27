@@ -20,9 +20,9 @@ export interface GlobalControllerData {
 	}
 }
 
-export type EntrypointPage = Login|Dashboard;
+type EntrypointPage = Login|Dashboard;
 
-export function getEntrypointValue(entrypoint: ENTRYPOINT) {
+function getEntrypointValue(entrypoint: ENTRYPOINT) {
 	switch (entrypoint) {
 		case ENTRYPOINT.LOGIN:
 			return 'login';
