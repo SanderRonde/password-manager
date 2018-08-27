@@ -7,6 +7,7 @@ import { GlobalControllerIDMap } from './global-controller-querymap';
 import { GlobalControllerHTML } from './global-controller.html';
 import { GlobalControllerCSS } from './global-controller.css';
 import { Dashboard } from '../base/dashboard/dashboard';
+import { ENTRYPOINT } from '../../../types/shared-types';
 import { Login } from '../base/login/login';
 
 export interface GlobalControllerData {
@@ -19,8 +20,16 @@ export interface GlobalControllerData {
 	}
 }
 
-export type Entrypoint = 'login'|'dashboard';
 export type EntrypointPage = Login|Dashboard;
+
+export function getEntrypointValue(entrypoint: ENTRYPOINT) {
+	switch (entrypoint) {
+		case ENTRYPOINT.LOGIN:
+			return 'login';
+		case ENTRYPOINT.DASHBOARD:
+			return 'dashboard';
+	}
+}
 
 @config({
 	is: 'global-controller',
@@ -37,7 +46,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		reflect: {
 			page: {
 				type: PROP_TYPE.STRING,
-				exactType: '' as Entrypoint
+				exactType: '' as ENTRYPOINT
 			}
 		}
 	});
@@ -73,11 +82,12 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		return null;
 	}
 
-	private _definePage(page: Entrypoint) {
-		if (customElements.get(`${page}-page`)) {
+	private _definePage(page: ENTRYPOINT) {
+		const entrypoint = getEntrypointValue(page);
+		if (customElements.get(`${entrypoint}-page`)) {
 			return;
 		}
-		const src = `/entrypoints/${page}/${page}-page.js`;
+		const src = `/entrypoints/${entrypoint}/${entrypoint}-page.js`;
 		const script = document.createElement('script');
 		if (document.body.classList.contains('dev')) {
 			script.type = 'module';
@@ -86,8 +96,8 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		document.body.appendChild(script);
 	}
 
-	private _addNewPage(page: Entrypoint): EntrypointPage {
-		const newEl = document.createElement(`${page}-page`);
+	private _addNewPage(page: ENTRYPOINT): EntrypointPage {
+		const newEl = document.createElement(`${getEntrypointValue(page)}-page`);
 		newEl.classList.add('hidden', 'newpage', 'invisible');
 
 		this.$.content.appendChild(newEl);
@@ -104,7 +114,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		});
 	}
 
-	async changePage(page: Entrypoint) {
+	async changePage(page: ENTRYPOINT) {
 		this._hideNonCurrent();
 		this._definePage(page);
 		const el = this._addNewPage(page);
@@ -124,7 +134,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		this.props.page = this._globalProperties.page!;
 		this.listen('globalPropChange', (key, val) => {
 			if (key === 'page') {
-				this.props.page = val as Entrypoint;
+				this.props.page = val as ENTRYPOINT;
 			}
 		});
 	}

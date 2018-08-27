@@ -9,10 +9,14 @@ export interface DashboardData {
 	password_meta: APISuccessfulReturns['/api/password/allmeta']['encrypted'];
 }
 
+export const enum ENTRYPOINT {
+	LOGIN = 'login',
+	DASHBOARD = 'dashboard'
+}
 export type GlobalProperties = {
 	theme?: 'dark'|'light';
 } & Partial<{
-	page: 'login'|'dashboard';
+	page: ENTRYPOINT;
 } & LoginData & DashboardData>;
 
 export type VALID_THEMES_T = 'light'|'dark';
