@@ -1,7 +1,7 @@
 import { classNames } from '../../../lib/webcomponent-util';
+import { ColorSize } from '../../icons/color/color';
 import { theme } from '../../theming/theme/theme';
 import { ThemeSelector } from "./theme-selector";
-import { Color } from '../../icons/color/color';
 import { html } from "lit-html";
 
 export function ThemeSelectorHTML(this: ThemeSelector) {
@@ -9,7 +9,7 @@ export function ThemeSelectorHTML(this: ThemeSelector) {
 	return html`
 		${this.css}
 		<div id="container">
-			<icon-button id="button" fill="text">${Color}</icon-button>
+			<icon-button id="button" fill="text">${ColorSize(30, 30)}</icon-button>
 			<div id="themes">
 				${Object.getOwnPropertyNames(theme).map((themeName: keyof typeof theme) => {
 					const currentTheme = theme[themeName];
