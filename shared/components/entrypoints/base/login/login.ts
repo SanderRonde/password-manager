@@ -10,6 +10,7 @@ import { ConfigurableWebComponent } from "../../../../lib/webcomponents";
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { bindToClass } from '../../../../lib/decorators';
+import { MDCard } from '../../../util/md-card/md-card';
 import { JSONResponse } from '../../../../types/api';
 import { LoginIDMap } from './login-querymap';
 
@@ -20,7 +21,8 @@ export const LoginDependencies = [
 	IconButton,
 	AnimatedButton,
 	ThemeSelector,
-	PaperToast
+	PaperToast,
+	MDCard
 ];
 export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	props = defineProps(this, {
