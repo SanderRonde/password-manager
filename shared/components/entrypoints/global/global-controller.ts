@@ -40,8 +40,16 @@ function getEntrypointValue(entrypoint: ENTRYPOINT) {
 	]
 })
 export abstract class GlobalController extends ConfigurableWebComponent<GlobalControllerIDMap> {
-	private _data: Map<keyof GlobalControllerData, GlobalControllerData[keyof GlobalControllerData]> =
-		new Map();
+	private _data: Map<keyof GlobalControllerData, 
+		GlobalControllerData[keyof GlobalControllerData]> = new Map();
+	private static readonly _entrypointURLs = {
+		[ENTRYPOINT.LOGIN]: '/login',
+		[ENTRYPOINT.DASHBOARD]: '/dashboard'
+	};
+	private static readonly _entrypointTitles = {
+		[ENTRYPOINT.LOGIN]: 'Log in to your dashboard',
+		[ENTRYPOINT.DASHBOARD]: 'Your Dashboard'
+	};
 	props = defineProps(this, {
 		reflect: {
 			page: {
@@ -50,6 +58,28 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 			}
 		}
 	});
+
+	async _handleInitialState() {
+		if (window.history.state !== null) {
+			//Custom state, change to that page if not there already
+			await this.changePage(window.history.state.page, true);
+		}
+		//Create an entry in the history
+		window.history.replaceState({
+			page: this.props.page
+		}, GlobalController._entrypointTitles[this.props.page],
+			GlobalController._entrypointURLs[this.props.page]);
+		this._setTitle(GlobalController._entrypointTitles[this.props.page]);
+
+		window.addEventListener('popstate', (e) => {
+			if (e.state === null) {
+				//Could only be the login page
+				this.changePage(ENTRYPOINT.LOGIN, true);
+			} else {
+				this.changePage(e.state.page, true);
+			}
+		});
+	}
 
 	get content(): HTMLElement[] {
 		const slotContent = this.$.slotContent.assignedNodes()
@@ -114,7 +144,23 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		});
 	}
 
-	async changePage(page: ENTRYPOINT) {
+	private _setTitle(title: string) {
+		try {
+			document.getElementsByTagName('title')[0].innerHTML = title
+				.replace('<','&lt;')
+				.replace('>','&gt;')
+				.replace(' & ',' &amp; ');
+		}
+		catch ( e ) {
+			document.title = title;
+		}
+	}
+
+	async changePage(page: ENTRYPOINT, replace: boolean = false) {
+		if (this.props.page === page) {
+			return;
+		}
+
 		this._hideNonCurrent();
 		this._definePage(page);
 		const el = this._addNewPage(page);
@@ -128,6 +174,20 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		this._hideNonCurrent();
 		el.classList.remove('invisible', 'hidden');
 		this.$.loadable.finish();
+
+		if (replace) {
+			window.history.replaceState({
+				page: page
+			}, GlobalController._entrypointTitles[page],
+				GlobalController._entrypointURLs[page]);
+			this._setTitle(GlobalController._entrypointTitles[page]);
+		} else {
+			window.history.pushState({
+				page: page
+			}, GlobalController._entrypointTitles[page],
+				GlobalController._entrypointURLs[page]);
+			this._setTitle(GlobalController._entrypointTitles[page]);
+		}
 	}
 	
 	mounted() {
@@ -137,5 +197,6 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 				this.props.page = val as ENTRYPOINT;
 			}
 		});
+		this._handleInitialState();
 	}
 }
