@@ -1,6 +1,7 @@
 import { ConfigurableWebComponent, WebComponentBase } from "../../../../lib/webcomponents";
-import { defineProps, JSONType } from '../../../../lib/webcomponent-util';
+import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
+import { defineProps, JSONType } from '../../../../lib/webcomponent-util';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { PublicKeyDecrypted } from '../../../../types/db-types';
@@ -10,7 +11,8 @@ export type MetaPasswords = PublicKeyDecrypted<APISuccessfulReturns['/api/passwo
 export const DashboarDependencies: (typeof WebComponentBase)[] = [
 	MaterialInput,
 	PaperToast,
-	InfiniteList
+	InfiniteList,
+	ThemeSelector
 ]
 export abstract class Dashboard extends ConfigurableWebComponent { 
 	props = defineProps(this, {

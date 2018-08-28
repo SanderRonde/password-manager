@@ -27,6 +27,7 @@ export function DashboardHTML(this: Dashboard, props: Dashboard['props']) {
 				</div>
 				<div id="passwordFocus"></div>
 			</div>
+			<theme-selector id="themeSelector"></theme-selector>
 			<div id="passwordFab">+</div>
 		</div>`;
 }

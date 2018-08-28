@@ -90,5 +90,11 @@ export function DashboardCSS(this: Dashboard, theme: Theme, _props: Dashboard['p
 			margin-top: 13px;
 			fill: ${theme.textOnNonbackground};
 		}
+
+		#themeSelector {
+			position: absolute;
+			bottom: 5px;
+			right: 0;
+		}
 	</style>`
 }
