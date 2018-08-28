@@ -99,7 +99,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 			if (index === 0) return null;
 			return part.slice(0, part.indexOf('"'));
 		}).filter(value => value !== null) as string[];
-		const strings = split.map((part, index, arr) => {
+		const strings = split.length === 1 ? split : split.map((part, index, arr) => {
 			if (index === 0) {
 				return `${part}="`;
 			} else if (index === arr.length - 1) {
