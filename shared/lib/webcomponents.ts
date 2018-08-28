@@ -638,6 +638,7 @@ export abstract class WebComponent<IDS extends {
 	 */
 	disconnectedCallback() {
 		removeAllElementListeners(this);
+		this.isMounted = false;
 	}
 
 	/**
