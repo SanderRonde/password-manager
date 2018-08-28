@@ -1,4 +1,4 @@
-import { config, defineProps, PROP_TYPE, JSONType, createNumberList, any, listenWithIdentifier, isNewElement, listen, wait, listenIfNew } from '../../../lib/webcomponent-util';
+import { config, defineProps, PROP_TYPE, JSONType, createNumberList, any, listenWithIdentifier, isNewElement, listen, wait, listenIfNew, createDisposableWindowListener } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { InfiniteListIDMap } from './infinite-list-querymap';
 import { TemplateResult, html, render } from 'lit-html';
@@ -30,7 +30,8 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 				type: JSONType<D[]>(),
 				defaultValue: [],
 				isPrivate: true
-			}
+			},
+			window: PROP_TYPE.BOOL
 		}
 	});
 	public itemSize: number|null = null;
@@ -139,12 +140,24 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 
 	private get _itemsPerViewport() {
 		const viewport = this.getBoundingClientRect().height;
-		this._usedViewportHeight = viewport;
-		return Math.ceil((viewport / this.itemSize!) * 3) + 1;
+		this._usedViewportHeight = this.props.window ? window.innerHeight : viewport;
+		return Math.ceil((this._usedViewportHeight / this.itemSize!) * 3) + 1;
 	}
 
 	private get _scrolled() {
-		return this.$.contentContainer.scrollTop;
+		if (this.props.window) {
+			return document.documentElement.scrollTop;
+		} else {
+			return this.$.contentContainer.scrollTop;
+		}
+	}
+
+	private set _scrolled(value: number) {
+		if (this.props.window) {
+			document.documentElement.scrollTop = value;
+		} else {
+			this.$.contentContainer.scrollTop = value;
+		}
 	}
 
 	private _selectedItem: {
@@ -362,10 +375,10 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 			//Scroll into view
 			if (this._containers[Math.floor(this._containers.length / 2)].virtual! >= newVirtual) {
 				//It's before the current one, scroll up
-				this.$.contentContainer.scrollTop = newVirtual * this.itemSize!;
+				this._scrolled = newVirtual * this.itemSize!;
 			} else {
 				//Scroll down
-				this.$.contentContainer.scrollTop = this._usedViewportHeight! +
+				this._scrolled = this._usedViewportHeight! +
 					((newVirtual - 1) * this.itemSize!);
 			}
 
@@ -374,11 +387,13 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		});
 		if (isNewElement(this.$.contentContainer)) {
 			this._setContainerSize();
-			listen(this, 'contentContainer', 'scroll', () => {
-				requestAnimationFrame(() => {
-					this._render(false);
+			if (!this.props.window) {
+				listen(this, 'contentContainer', 'scroll', () => {
+					requestAnimationFrame(() => {
+						this._render(false);
+					});
 				});
-			});
+			}
 			listen(this, 'contentContainer', 'keypress', async (e) => {
 				if (!this._selectedItem) {
 					return;
@@ -412,5 +427,13 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		this.renderToDOM();
 		this._disposables.push(
 			createDisposableWindowListener('resize', this._onWindowResize));
+		if (this.props.window) {
+			this._disposables.push(
+				createDisposableWindowListener('scroll', () => {
+					requestAnimationFrame(() => {
+						this._render(false);
+					});
+				}));
+		}
 	}
 }
