@@ -63,16 +63,15 @@ export function isDefined<U>(value: null|undefined|U): value is U {
 	return value !== undefined && value !== null;
 }
 
-export function getter<R>(element: HTMLElement, name: string, type: 'string'|'number'|'bool'|'json'): boolean|string|number|undefined|R;
-export function getter(element: HTMLElement, name: string, type: 'bool'): boolean;
-export function getter(element: HTMLElement, name: string, type: 'string'): string|undefined;
-export function getter(element: HTMLElement, name: string, type: 'number'): number|undefined;
-export function getter<R>(element: HTMLElement, name: string, type: 'json'): R|undefined;
-export function getter<R>(element: HTMLElement, name: string, type: 'string'|'number'|'bool'|'json'): boolean|string|number|undefined|R {
+function getterWithVal<R>(value: string|null, type: 'string'|'number'|'bool'|'json'): boolean|string|number|undefined|R;
+function getterWithVal(value: string|null, type: 'bool'): boolean;
+function getterWithVal(value: string|null, type: 'string'): string|undefined;
+function getterWithVal(value: string|null, type: 'number'): number|undefined;
+function getterWithVal<R>(value: string|null, type: 'json'): R|undefined;
+function getterWithVal<R>(value: string|null, type: 'string'|'number'|'bool'|'json'): boolean|string|number|undefined|R {
 	if (type === 'bool') {
-		return isDefined(element.getAttribute(name));
+		return isDefined(value);
 	} else {
-		const value = element.getAttribute(name);
 		if (isDefined(value)) {
 			if (type === 'number') {
 				return ~~value;
@@ -83,6 +82,15 @@ export function getter<R>(element: HTMLElement, name: string, type: 'string'|'nu
 		}
 		return undefined;
 	}
+}
+
+export function getter<R>(element: HTMLElement, name: string, type: 'string'|'number'|'bool'|'json'): boolean|string|number|undefined|R;
+export function getter(element: HTMLElement, name: string, type: 'bool'): boolean;
+export function getter(element: HTMLElement, name: string, type: 'string'): string|undefined;
+export function getter(element: HTMLElement, name: string, type: 'number'): number|undefined;
+export function getter<R>(element: HTMLElement, name: string, type: 'json'): R|undefined;
+export function getter<R>(element: HTMLElement, name: string, type: 'string'|'number'|'bool'|'json'): boolean|string|number|undefined|R {
+	return getterWithVal(element.getAttribute(name), type);
 }
 
 export function setter(setAttrFn: (key: string, val: string) => void, 
@@ -321,9 +329,9 @@ export function defineProps<P extends {
 	Object.defineProperty(element, 'setAttribute', {
 		get() {
 			return (key: string, val: string) => {
-				(propValues as any)[key] = val;
 				if (keyMap.has(key as (typeof keys)[0]['key'])) {
-					const { watch, isPrivate } = keyMap.get(key as (typeof keys)[0]['key'])!;
+					const { watch, isPrivate, mapType } = keyMap.get(key as (typeof keys)[0]['key'])!;
+					(propValues as any)[key] = getterWithVal(val, mapType);
 					if (watch) {
 						element.renderToDOM();
 					}
@@ -331,7 +339,9 @@ export function defineProps<P extends {
 						originalSetAttr(key, '_');
 						return;
 					}
-				} 
+				} else {
+					(propValues as any)[key] = val;
+				}
 				originalSetAttr(key, val);
 			};
 		}
