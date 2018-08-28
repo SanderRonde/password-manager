@@ -190,6 +190,7 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 		prefix: '/static/',
 		extensions: ['js']
 	}));
+	webserver.app.use(serve(path.join(__dirname, '../development/'), { }));
 	webserver.app.use(serve(path.join(PROJECT_ROOT, 'shared/components/'), {
 		rewrite(content, filePath) {
 			if (filePath.endsWith('.js')) {
