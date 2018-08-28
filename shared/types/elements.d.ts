@@ -13,6 +13,7 @@ import { IconButton } from "../components/util/icon-button/icon-button";
 import { MDCard } from "../components/util/md-card/md-card";
 
 declare global {
+	type HTMLMdCardElement = MDCard;
 	type HTMLMDCardElement = MDCard;
 	type HTMLLoginElement = LoginWeb;
 	type HTMLIconButtonElement = IconButton;
