@@ -315,6 +315,11 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 								}
 								console.log(warning);
 							},
+							external: [
+								path.join(__dirname, 
+									'shared/components/entrypoints',
+									'base/dashboard/dev-passwords.js')
+							],
 							plugins: [
 								rollupResolve({
 									module: true,
@@ -341,7 +346,12 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 
 						await bundle.write({
 							format: 'iife',
-							file: output
+							file: output,
+							globals: {
+								[path.join(__dirname, 
+									'shared/components/entrypoints',
+									'base/dashboard/dev-passwords.js')]: '{getDevPasswords: () {}}'
+							},
 						});
 					}),
 					dynamicFunctionNameAsync(`minifyJS${capitalize(route)}`, async () => {

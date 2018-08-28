@@ -1,4 +1,5 @@
 import { Search } from '../../../icons/search/search';
+import * as devPasswords from './dev-passwords';
 import { Dashboard } from './dashboard';
 import { html } from "lit-html";
 
