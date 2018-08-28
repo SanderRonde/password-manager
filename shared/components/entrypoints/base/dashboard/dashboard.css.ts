@@ -66,7 +66,7 @@ export function DashboardCSS(this: Dashboard, theme: Theme, _props: Dashboard['p
 			background-color: ${theme.primary.main};
 		}
 
-		#searchInput, #searchBar {
+		#searchInput, #pageContainer {
 			width: 1000px;
 			max-width: calc(100vw - 40px);
 		}
@@ -79,6 +79,8 @@ export function DashboardCSS(this: Dashboard, theme: Theme, _props: Dashboard['p
 			padding: 0 15px;
 			margin-top: 10px;
 			border-radius: 2px;
+			width: 970px;
+			max-width: calc(100vw - 70px);
 			background-color: ${theme.primary.weak};
 		}
 
