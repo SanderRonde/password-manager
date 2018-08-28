@@ -48,6 +48,11 @@ export const CustomDashboardCSS = {
 			margin-left: 10px;
 			margin-top: 2px;
 		}
+	</style>`,
+	infiniteList: () => html`<style>
+		#contentContainer {
+			overflow-y: hidden;
+		}
 	</style>`
 }
 
