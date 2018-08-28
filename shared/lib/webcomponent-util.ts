@@ -1,5 +1,5 @@
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './webcomponents';
-import { WebComponentBase, EventListenerObj, WebComponent } from './webcomponents';
+import { WebComponentBase, EventListenerObj, WebComponent, supportsPassive } from './webcomponents';
 import { Theme, DEFAULT_THEME } from '../types/shared-types';
 import { theme } from '../components/theming/theme/theme';
 import { TemplateResult } from "lit-html";
@@ -832,7 +832,7 @@ export function any(arr: boolean[]) {
 export function createDisposableListener<T extends HTMLElement, E extends keyof HTMLElementEventMap>(
 	target: T, event: E, listener: (ev: HTMLElementEventMap[E]) => any, 
 	options?: boolean|AddEventListenerOptions) {
-		if (options) {
+		if (options || typeof options === 'boolean' && supportsPassive()) {
 			target.addEventListener(event, listener, options);
 		} else {
 			target.addEventListener(event, listener);
@@ -845,7 +845,7 @@ export function createDisposableListener<T extends HTMLElement, E extends keyof 
 export function createDisposableWindowListener<E extends keyof WindowEventMap>(
 	event: E, listener: (this: Window, ev: WindowEventMap[E]) => any,
 	options?: boolean|AddEventListenerOptions) {
-		if (options) {
+		if (options || typeof options === 'boolean' && supportsPassive()) {
 			window.addEventListener(event, listener, options);
 		} else {
 			window.addEventListener(event, listener);

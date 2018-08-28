@@ -495,7 +495,7 @@ const listenedToElements: WeakMap<WebComponent, {
 }> = new WeakMap();
 
 let _supportsPassive: boolean|null = null;
-function supportsPassive() {
+export function supportsPassive() {
 	if (_supportsPassive !== null) {
 		return _supportsPassive;
 	}
