@@ -98,5 +98,17 @@ export function DashboardCSS(this: Dashboard, theme: Theme, _props: Dashboard['p
 			bottom: 5px;
 			right: 0;
 		}
+
+		#passwordList, #passwordFocus {
+			width: 490px;
+			background-color: grey;
+		}
+
+		#pageContainer {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			margin-top: 70px;
+		}
 	</style>`
 }

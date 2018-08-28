@@ -14,23 +14,27 @@ export function DashboardHTML(this: Dashboard, props: Dashboard['props']) {
 					</material-input>
 				</div>
 			</div>
-			<div id="pageContainer">
-				<div id="passwordList">
-					<infinite-list id="infiniteList" data-name="password" 
-						data="${
+			<horizontal-centerer>
+				<div id="pageContainer">
+					<div id="passwordList">
+						<infinite-list id="infiniteList" data-name="password" 
+							data="${
 								encodeURIComponent(JSON.stringify(
 									props.metaPasswords.length === 0 && 
 										document.body.classList.contains('dev') ? 
 											devPasswords.getDevPasswords() : props.metaPasswords))
-						}"
-					>
-						<div slot="template">
-							<div></div>
-						</div>
-					</infinite-list>
+							}"
+						>
+							<div slot="template">
+								<md-card></md-card>
+							</div>
+						</infinite-list>
+					</div>
+					<md-card id="passwordFocus" level="3">
+						Select something
+					</md-card>
 				</div>
-				<div id="passwordFocus"></div>
-			</div>
+			</horizontal-centerer>
 			<theme-selector id="themeSelector"></theme-selector>
 			<div id="passwordFab">+</div>
 		</div>`;
