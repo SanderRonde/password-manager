@@ -286,33 +286,73 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		this._registerToParent();
 	}
 
-	@bindToClass
-	private _registerToParent() {
+	private _findLocalRoot() {
 		let element: Node|null = this.parentNode;
 		while (element && !(element instanceof (window as any).ShadowRoot) && 
-			(element as any) !== document && !(element instanceof DocumentFragment) && 
+			(element as any) !== document && !(element instanceof DocumentFragment)) {
+				element = element.parentNode as HTMLElement|null;
+			}
+
+		if (!element) {
+			return null;
+		}
+		if (<any>element === document) {
+			return this;
+		}
+		const host = element instanceof WebComponentHierarchyManager ?
+			element : (<ShadowRoot><any>element).host;
+
+		if (!(host instanceof WebComponentHierarchyManager)) {
+			return null;
+		}
+		return host;
+	}
+
+	private _findDirectParents() {
+		let element: Node|null = this.parentNode;
+		while (element && !(element instanceof (window as any).ShadowRoot) && 
+			(element as any) !== document && !(element instanceof DocumentFragment) &&
 			!(element instanceof WebComponentHierarchyManager)) {
 				element = element.parentNode as HTMLElement|null;
 			}
 
 		if (!element) {
 			//Ignore this
-			return;
+			return null;
 		}
 		if (<any>element === document) {
 			//This is in the light DOM, ignore it since it's the root
-			this._isRoot = true;
-			return;
+			return this;
 		}
 		const host = element instanceof WebComponentHierarchyManager ?
 			element : (<ShadowRoot><any>element).host;
 
 		if (!(host instanceof WebComponentHierarchyManager)) {
+			return null;
+		}
+		return host;
+	}
+
+	private _getRoot() {
+		const localRoot = this._findLocalRoot();
+		if (localRoot !== null && localRoot !== this) {
+			//Found an actual root, use that
+			return localRoot;
+		}
+		return this._findDirectParents();
+	}
+
+	@bindToClass
+	private _registerToParent() {
+		const root = this._getRoot();
+		if (root === this) {
+			this._isRoot = true;
+		} else if (root === null) {
 			return;
 		}
-
-		this._parent = host;
-		const newProps = {...host.registerChild(this)};
+		
+		this._parent = root;
+		const newProps = {...root.registerChild(this)};
 		for (const key in newProps) {
 			this._setGlobalProperty(key as keyof typeof newProps, 
 				newProps[key as keyof typeof newProps]);
