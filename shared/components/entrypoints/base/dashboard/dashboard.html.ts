@@ -1,3 +1,4 @@
+import { Search } from '../../../icons/search/search';
 import { Dashboard } from './dashboard';
 import { html } from "lit-html";
 
@@ -7,7 +8,8 @@ export function DashboardHTML(this: Dashboard, props: Dashboard['props']) {
 		<div id="container">
 			<div id="titleBar">
 				<div id="searchBar">
-					<material-input label="search websites" fill>
+					<material-input no-floating-label custom-css id="searchInput" label="search websites" fill>
+						<div id="searchIcon" slot="preIcon">${Search}</div>
 					</material-input>
 				</div>
 			</div>
