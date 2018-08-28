@@ -454,7 +454,7 @@ abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends 
 	}
 
 	private _getCustomCSS() {
-		if (!this._hasCustomCSS) {
+		if (!this._hasCustomCSS()) {
 			return this._noCustomCSS;
 		}
 
