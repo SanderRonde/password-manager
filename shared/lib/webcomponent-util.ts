@@ -458,6 +458,9 @@ export interface WebComponentConfiguration {
 	css: ((this: any, theme: Theme, props: any) => TemplateResult)|null;
 	dependencies?: typeof WebComponentBase[];
 	html: (this: any, props: any) => TemplateResult;
+	customCSS?: {
+		[key: string]: (theme: Theme) => TemplateResult;
+	}
 }
 export function config(config: WebComponentConfiguration) {
 	const {
@@ -472,7 +475,8 @@ export function config(config: WebComponentConfiguration) {
 		class WebComponentConfig extends targetComponent<I, E> implements WebComponentBase {
 			static is = genIs(is, WebComponentConfig);
 			static dependencies = dependencies
-			static config: WebComponentConfiguration = config;
+			static config = config;
+			config = config;
 			renderer = html;
 
 			get css() {

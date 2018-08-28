@@ -1,8 +1,8 @@
 import { GlobalController } from '../components/entrypoints/global/global-controller';
+import { GlobalProperties, VALID_THEMES_T, Theme } from '../types/shared-types';
 import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
-import { VALID_THEMES } from '../components/theming/theme/theme';
-import { GlobalProperties } from '../types/shared-types';
-import { TemplateResult, render } from 'lit-html';
+import { VALID_THEMES, theme } from '../components/theming/theme/theme';
+import { TemplateResult, render, html } from 'lit-html';
 import { bindToClass } from './decorators';
 
 
@@ -256,6 +256,10 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 	private _isRoot!: boolean;
 	protected _globalProperties!: GlobalProperties;
 
+	protected _getParent() {
+		return this._parent;
+	}
+
 	private _getGlobalProperties() {
 		if (!this._isRoot) {
 			return {};
@@ -405,6 +409,75 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 
 	public getTheme() {
 		return this._globalProperties.theme!;
+	}
+}
+
+abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
+	private __customCSS: TemplateResult|null = null;
+	private __hasCustomCSS: boolean|null = null;
+	private _customCSSFn: ((theme: Theme) => TemplateResult)|null = null;
+	private _renderedTheme: VALID_THEMES_T|null = null;
+	private _noCustomCSS = html``;
+
+	private _hasCustomCSS() {
+		if (this.__hasCustomCSS !== null) {
+			return this.__hasCustomCSS;
+		}
+		if (!this.hasAttribute('custom-css')) {
+			//No custom CSS applies
+			return (this.__hasCustomCSS = false);
+		}
+
+		const id = this.id;
+		const parent = this._getParent();
+		if (parent === null) {
+			//Parent is null for now, expect it to change later on
+			return false;
+		}
+
+		const config = (parent as ConfigurableWebComponent<any, any>).config;
+		if (!config.customCSS) {
+			//Parent has no custom CSS
+			console.warn('Attempted to find custom CSS in parent node of', this, ';', parent,
+				'and found no custom CSS object');
+			return (this.__hasCustomCSS = false);
+		}
+
+		if (!(id in config.customCSS)) {
+			//Parent has custom CSS but none for this element
+			console.warn('Attempted to find custom CSS in parent node of', this, ';', parent,
+				'and found a custom CSS object', config.customCSS, 'without the ID key', id);
+			return (this.__hasCustomCSS = false);
+		}
+
+		return (this.__hasCustomCSS = true);
+	}
+
+	private _getCustomCSS() {
+		if (!this._hasCustomCSS) {
+			return this._noCustomCSS;
+		}
+
+		if (this._renderedTheme === null) {
+			this._renderedTheme = this.getTheme();
+			const id = this.id;
+			const parent = this._getParent()!;
+			const config = (parent as ConfigurableWebComponent<any, any>).config;
+			const currentTheme = theme[this.getTheme()];
+			this._customCSSFn = config.customCSS![id];
+			return (this.__customCSS = this._customCSSFn(currentTheme))
+		}
+
+		if (this._renderedTheme !== this.getTheme()) {
+			this._renderedTheme = this.getTheme();
+			const currentTheme = theme[this.getTheme()]
+			return (this.__customCSS = this._customCSSFn!(currentTheme))
+		}
+		return this.__customCSS;
+	}
+
+	get customCSS() {
+		return this._getCustomCSS();
 	}
 }
 
@@ -567,7 +640,7 @@ export function removeAllElementListeners(base: WebComponent) {
 
 export abstract class WebComponent<IDS extends {
 	[key: string]: HTMLElement;
-} = {}, E extends EventListenerObj = {}> extends WebComponentThemeManger<E> {
+} = {}, E extends EventListenerObj = {}> extends WebComponentCustomCSSManager<E> {
 	/**
 	 * An ID map containing maps between queried IDs and elements,
 	 * 	cleared upon render
@@ -658,6 +731,7 @@ export class ConfigurableWebComponent<IDS extends {
 } = {}, E extends EventListenerObj = {}> extends WebComponent<IDS, E> {
 	protected renderer!: (this: any, props: any) => TemplateResult;
 	public static config: WebComponentConfiguration;
+	public config!: WebComponentConfiguration;
 	get css() { throw new Error('Not implemented'); }
 }
 
