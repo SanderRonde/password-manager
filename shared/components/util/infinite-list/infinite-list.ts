@@ -411,10 +411,8 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		this._genTemplateGetter();
 		this.renderToDOM();
 		window.addEventListener('resize', this._onWindowResize);
-	}
-
-	disconnectedCallback() {
-		super.disconnectedCallback();
+		this._disposables.push(() => {
 		window.removeEventListener('resize', this._onWindowResize);
+		});
 	}
 }

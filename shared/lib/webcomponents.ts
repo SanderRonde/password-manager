@@ -646,6 +646,7 @@ export abstract class WebComponent<IDS extends {
 	 * 	cleared upon render
 	 */
 	private _idMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
+	protected _disposables: (() => void)[] = [];
 	public isMounted: boolean = false;
 
 	constructor() {
@@ -711,6 +712,8 @@ export abstract class WebComponent<IDS extends {
 	 */
 	disconnectedCallback() {
 		removeAllElementListeners(this);
+		this._disposables.forEach(disposable => disposable());
+		this._disposables = [];
 		this.isMounted = false;
 	}
 
