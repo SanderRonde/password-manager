@@ -5,6 +5,7 @@ import { html } from "lit-html";
 export function MaterialInputHTML(this: MaterialInput) {
 	return html`
 		${this.css}
+		${this.customCSS}
 		<div id="container" class="${classNames(
 			'mdl-textfield', 'mdl-js-textfield', {
 				'mdl-textfield--floating-label': !this.props.noFloatingLabel,
