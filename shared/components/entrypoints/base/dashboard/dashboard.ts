@@ -1,9 +1,10 @@
-import { ConfigurableWebComponent, WebComponentBase } from "../../../../lib/webcomponents";
+import { WebComponentBase } from "../../../../lib/webcomponents";
+import { defineProps, JSONType } from '../../../../lib/webcomponent-util';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
-import { defineProps, JSONType } from '../../../../lib/webcomponent-util';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
+import { DashboardScrollManager } from './dashboard-scroll-manager';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { PublicKeyDecrypted } from '../../../../types/db-types';
 import { APISuccessfulReturns } from '../../../../types/api';
@@ -18,7 +19,8 @@ export const DashboarDependencies: (typeof WebComponentBase)[] = [
 	HorizontalCenterer,
 	MDCard
 ]
-export abstract class Dashboard extends ConfigurableWebComponent { 
+
+export abstract class Dashboard extends DashboardScrollManager { 
 	props = defineProps(this, {
 		priv: {
 			metaPasswords: {
@@ -30,12 +32,17 @@ export abstract class Dashboard extends ConfigurableWebComponent {
 
 	protected abstract _getPasswordMeta(): Promise<MetaPasswords|null>|MetaPasswords|null;
 
-	async mounted() {
+	private async _getPwMeta() {
 		const pwMeta = await this._getPasswordMeta();
 		if (!pwMeta) {
 			//Redirecting to /login, just let this go
 			return;
 		}
 		this.props.metaPasswords = pwMeta || [];
+	}
+
+	mounted() {
+		super.mounted();
+		this._getPwMeta();
 	}
 }

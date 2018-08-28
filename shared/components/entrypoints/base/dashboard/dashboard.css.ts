@@ -3,6 +3,10 @@ import { Theme } from '../../../../types/shared-types';
 import { Dashboard } from './dashboard';
 import { html } from "lit-html";
 
+const PAGE_TOP = 130;
+export const TITLE_BAR_HEIGHT = 60;
+export const MAX_PASSWORD_VIEW_SCROLL = 85;
+
 export const CustomDashboardCSS = {
 	searchInput: (theme: Theme) => html`<style>
 		.mdl-textfield__input {
@@ -58,17 +62,15 @@ export const CustomDashboardCSS = {
 
 export function DashboardCSS(this: Dashboard, theme: Theme, _props: Dashboard['props']) {
 	return html`<style>
-		/* #infiniteList {
-			height: 80vh;
-		} */
-
 		#titleBar {
-			height: 60px;
 			width: 100vw;
 			display: flex;
 			flex-direction: row;
 			justify-content: center;
-			background-color: ${theme.primary.main};
+			position: fixed;
+			z-index: 100;
+			${`background-color: ${theme.primary.main};`}
+			${`height: ${TITLE_BAR_HEIGHT}px;`}
 		}
 
 		#searchInput, #pageContainer {
@@ -99,7 +101,7 @@ export function DashboardCSS(this: Dashboard, theme: Theme, _props: Dashboard['p
 		}
 
 		#themeSelector {
-			position: absolute;
+			position: fixed;
 			bottom: 5px;
 			right: 0;
 		}
@@ -109,11 +111,23 @@ export function DashboardCSS(this: Dashboard, theme: Theme, _props: Dashboard['p
 			background-color: grey;
 		}
 
+		#passwordFocus {
+			max-height: calc(80vh - 70px);
+			margin-left: 520px;
+			position: absolute;
+		}
+
+		#passwordFocus.fixed {
+			position: fixed;
+			${`margin-top: -${PAGE_TOP - MAX_PASSWORD_VIEW_SCROLL}px;`}
+		}
+
 		#pageContainer {
 			display: flex;
 			flex-direction: row;
 			justify-content: space-between;
-			margin-top: 70px;
+			margin-bottom: 40px;
+			${`margin-top: ${PAGE_TOP}px;`}
 		}
 	</style>`
 }

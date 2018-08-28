@@ -17,6 +17,7 @@ export function DashboardHTML(this: Dashboard, props: Dashboard['props']) {
 			<horizontal-centerer>
 				<div id="pageContainer">
 					<div id="passwordList">
+						<div id="passwordTop"></div>
 						<infinite-list custom-css window id="infiniteList" data-name="password" 
 							data="${
 								encodeURIComponent(JSON.stringify(
