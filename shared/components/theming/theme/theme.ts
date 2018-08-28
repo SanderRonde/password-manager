@@ -8,7 +8,7 @@ export const theme: {
 	light: {
 		primary: {
 			main: '#607d8b',
-			weak: '#b5c5cd',
+			weak: '#7799a9',
 			hover: '#d0dbe1',
 			heavy: '#1C313A'
 		},
@@ -29,7 +29,7 @@ export const theme: {
 	dark: {
 		primary: {
 			main: '#61a1c0',
-			weak: '#274351',
+			weak: '#a3c3d3',
 			hover: '#5fafd6',
 			heavy: '#77bddf'
 		},
