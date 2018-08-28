@@ -51,6 +51,12 @@ abstract class WebComponentDefiner extends elementBase {
 	 * Define this component and its dependencies as a webcomponent
 	 */
 	static define(isRoot: boolean = true) {
+		if (isRoot && this._finished) {
+			//Another root is being defined, clear last one
+			this._finished = false;
+			this._listeners = [];
+		}
+
 		for (const dependency of this.dependencies) {
 			dependency.define(false);
 		}
@@ -73,6 +79,10 @@ abstract class WebComponentDefiner extends elementBase {
 	private static _doSingleMount(listener: WebComponent<any, any>) {
 		return new Promise((resolve) => {
 			(window.requestAnimationFrame || window.webkitRequestAnimationFrame)(() => {
+				if (listener.isMounted) {
+					resolve();
+					return;
+				}
 				listener.isMounted = true;
 				listener.mounted();
 				resolve();
@@ -83,11 +93,14 @@ abstract class WebComponentDefiner extends elementBase {
 	private static async _finishLoad() {
 		this._finished = true;
 		if (window.requestAnimationFrame || window.webkitRequestAnimationFrame) {
-			for (const listener of this._listeners) {
+			for (const listener of [...this._listeners]) {
 				await this._doSingleMount(listener);
 			}
 		} else {
 			this._listeners.forEach((listener) => {
+				if (listener.isMounted) {
+					return;
+				}
 				listener.isMounted = true;
 				listener.mounted();
 			});
