@@ -232,7 +232,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 
 	gulp.task('dashboard.bundle.serviceworker', genTask('Bundles the serviceworker',
 		gulp.series(
-			async function rolupServiceWorker() {
+			async function rollupServiceWorker() {
 				const input = path.join(SRC_DIR, `serviceworker.js`);
 				const output = path.join(BUILD_DIR, `serviceworker.js`);	
 
