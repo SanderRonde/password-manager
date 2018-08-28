@@ -21,7 +21,7 @@ export function LoginCSS(this: Login, theme: Theme, _props: Login['props']) {
 
 		#themeSelector {
 			position: absolute;
-			top: 5px;
+			bottom: 5px;
 			right: 0;
 		}
 	</style>`

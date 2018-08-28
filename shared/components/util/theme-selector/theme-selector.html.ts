@@ -9,7 +9,6 @@ export function ThemeSelectorHTML(this: ThemeSelector) {
 	return html`
 		${this.css}
 		<div id="container">
-			<icon-button aria-label="Change theme" id="button" fill="text">${ColorSize(30, 30)}</icon-button>
 			<div id="themes">
 				${Object.getOwnPropertyNames(theme).map((themeName: keyof typeof theme) => {
 					const currentTheme = theme[themeName];
@@ -40,6 +39,7 @@ export function ThemeSelectorHTML(this: ThemeSelector) {
 					`
 				})}
 			</div>
+			<icon-button aria-label="Change theme" id="button" fill="text">${ColorSize(30, 30)}</icon-button>
 		</div>
 	`
 }
