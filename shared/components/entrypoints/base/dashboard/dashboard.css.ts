@@ -53,9 +53,9 @@ export const CustomDashboardCSS = {
 
 export function DashboardCSS(this: Dashboard, theme: Theme, _props: Dashboard['props']) {
 	return html`<style>
-		#infiniteList {
+		/* #infiniteList {
 			height: 80vh;
-		}
+		} */
 
 		#titleBar {
 			height: 60px;

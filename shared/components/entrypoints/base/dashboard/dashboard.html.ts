@@ -17,7 +17,7 @@ export function DashboardHTML(this: Dashboard, props: Dashboard['props']) {
 			<horizontal-centerer>
 				<div id="pageContainer">
 					<div id="passwordList">
-						<infinite-list id="infiniteList" data-name="password" 
+						<infinite-list window id="infiniteList" data-name="password" 
 							data="${
 								encodeURIComponent(JSON.stringify(
 									props.metaPasswords.length === 0 && 
