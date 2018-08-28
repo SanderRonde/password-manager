@@ -18,7 +18,10 @@ export function DashboardHTML(this: Dashboard, props: Dashboard['props']) {
 				<div id="passwordList">
 					<infinite-list id="infiniteList" data-name="password" 
 						data="${
-							encodeURIComponent(JSON.stringify(props.metaPasswords))
+								encodeURIComponent(JSON.stringify(
+									props.metaPasswords.length === 0 && 
+										document.body.classList.contains('dev') ? 
+											devPasswords.getDevPasswords() : props.metaPasswords))
 						}"
 					>
 						<div slot="template">
