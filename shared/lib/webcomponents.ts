@@ -415,7 +415,7 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
 	private __customCSS: TemplateResult|null = null;
 	private __hasCustomCSS: boolean|null = null;
-	private _customCSSFn: ((theme: Theme) => TemplateResult)|null = null;
+	private _customCSSFn: ((theme: Theme) => TemplateResult)|TemplateResult|null = null;
 	private _renderedTheme: VALID_THEMES_T|null = null;
 	private _noCustomCSS = html``;
 
@@ -465,12 +465,18 @@ abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends 
 			const config = (parent as ConfigurableWebComponent<any, any>).config;
 			const currentTheme = theme[this.getTheme()];
 			this._customCSSFn = config.customCSS![id];
+			if (typeof this._customCSSFn !== 'function') {
+				return (this.__customCSS = this._customCSSFn);
+			}
 			return (this.__customCSS = this._customCSSFn(currentTheme))
 		}
 
 		if (this._renderedTheme !== this.getTheme()) {
 			this._renderedTheme = this.getTheme();
 			const currentTheme = theme[this.getTheme()]
+			if (typeof this._customCSSFn !== 'function') {
+				return (this.__customCSS = this._customCSSFn);
+			}
 			return (this.__customCSS = this._customCSSFn!(currentTheme))
 		}
 		return this.__customCSS;

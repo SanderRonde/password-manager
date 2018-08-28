@@ -469,7 +469,7 @@ export interface WebComponentConfiguration {
 	dependencies?: typeof WebComponentBase[];
 	html: (this: any, props: any) => TemplateResult;
 	customCSS?: {
-		[key: string]: (theme: Theme) => TemplateResult;
+		[key: string]: ((theme: Theme) => TemplateResult)|TemplateResult;
 	}
 }
 export function config(config: WebComponentConfiguration) {
