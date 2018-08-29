@@ -1,5 +1,5 @@
 import { GlobalController } from '../components/entrypoints/global/global-controller';
-import { GlobalProperties, VALID_THEMES_T, Theme } from '../types/shared-types';
+import { GlobalProperties, Theme, DEFAULT_THEME } from '../types/shared-types';
 import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
 import { VALID_THEMES, theme } from '../components/theming/theme/theme';
 import { TemplateResult, render, html } from 'lit-html';
@@ -108,6 +108,79 @@ abstract class WebComponentDefiner extends elementBase {
 	}
 }
 
+export const enum CHANGE_TYPE {
+	PROP, THEME, NEVER, ALWAYS
+}
+export type TemplateFn = {
+	changeOn: CHANGE_TYPE.NEVER;
+	template: TemplateResult|null;
+}|{
+	changeOn: CHANGE_TYPE.ALWAYS|CHANGE_TYPE.THEME|CHANGE_TYPE.PROP;
+	template: <T extends WebComponent<any, any>>(this: T, props: T['props'], theme: Theme) => TemplateResult
+};
+
+export function genTemplateFn<T extends WebComponent<any, any>>(
+	fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult)|null,
+	changeType: CHANGE_TYPE.NEVER): TemplateFn;
+export function genTemplateFn<T extends WebComponent<any, any>>(
+	fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
+	changeType: CHANGE_TYPE.ALWAYS): TemplateFn;
+export function genTemplateFn<T extends WebComponent<any, any>>(
+	fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
+	changeType: CHANGE_TYPE.PROP): TemplateFn;
+export function genTemplateFn<T extends WebComponent<any, any>>(
+	fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
+	changeType: CHANGE_TYPE.THEME): TemplateFn;
+export function genTemplateFn<T extends WebComponent<any, any>>(
+	fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult)|null,
+	changeType: CHANGE_TYPE): TemplateFn {
+		if (changeType === CHANGE_TYPE.NEVER) {
+			return {
+				changeOn: CHANGE_TYPE.NEVER,
+				//Args don't matter here as they aren't used
+				template: fn ? (fn as any)() : null
+			}
+		}
+		return {
+			changeOn: changeType,
+			template: fn as any
+		}
+	}
+
+const componentTemplateMap: WeakMap<WebComponent<any, any>, 
+	WeakMap<TemplateFn, TemplateResult|null>> = new WeakMap();
+export function renderTemplateFn(template: TemplateFn, changeType: CHANGE_TYPE, 
+	component: WebComponent<any, any>) {
+		if (!componentTemplateMap.has(component)) {
+			componentTemplateMap.set(component, new WeakMap());
+		}
+		const templateMap = componentTemplateMap.get(component)!;
+		if (template.changeOn === CHANGE_TYPE.NEVER) {
+			//Never change, return the only render
+			const cached = templateMap.get(template);
+			if (cached) {
+				return cached;
+			}
+			const rendered = template.template === null ?
+				html`` : template.template;
+				templateMap.set(template, rendered);
+			return rendered;
+		}
+		if (template.changeOn === CHANGE_TYPE.ALWAYS || 
+			changeType === CHANGE_TYPE.ALWAYS ||
+			template.changeOn === changeType ||
+			!templateMap.has(template)) {
+				//Change, rerender
+				const rendered = template.template.call(component,
+					component.props, component.getTheme());
+					templateMap.set(template, rendered);
+				return rendered;
+			}
+		
+		//No change, return what was last rendered
+		return templateMap.get(template)!;
+	}
+
 export abstract class WebComponentBase extends WebComponentDefiner {
 	/**
 	 * Whether the render method should be temporarily disabled (to prevent infinite loops)
@@ -122,9 +195,24 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	/**
 	 * The render method that will render this component
 	 */
-	protected abstract renderer: (this: any, props: any) => TemplateResult = () => {
+	protected abstract renderer: TemplateFn = genTemplateFn(() => {
 		throw new Error('No render method implemented');	
-	};
+	}, CHANGE_TYPE.ALWAYS);
+
+	/**
+	 * The render method that will render this component's css
+	 */
+	protected abstract css: TemplateFn = genTemplateFn(null, CHANGE_TYPE.NEVER);
+
+	/**
+	 * A function signalign whether this component has custom CSS applied to it
+	 */
+	protected abstract _hasCustomCSS(): boolean;
+
+	/**
+	 * The render method that will render this component's css
+	 */
+	protected abstract customCSS(): TemplateFn;
 
 	/**
 	 * Internal properties used by the WebComponent class
@@ -162,16 +250,29 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		this.postRender();
 	}
 
+	private _noHTML = html``;
+
 	@bindToClass
 	/**
 	 * The method that starts the rendering cycle
 	 */
-	public renderToDOM() {
+	public renderToDOM(change: CHANGE_TYPE = CHANGE_TYPE.ALWAYS) {
 		if (this._disableRender) return;
 		if (this._doPreRenderLifecycle() === false) {
 			return;
 		}
-		render(this.renderer.apply(this, [this.props]), this.internals.root);
+		render(html`${
+			this._hasCustomCSS() ? 
+				renderTemplateFn(this.customCSS(), change, this as any) : 
+				this._noHTML
+		}
+		${
+			renderTemplateFn(this.css, change, this as any)
+		}
+		${
+			renderTemplateFn(this.renderer, change, this as any)
+		}`, 
+			this.internals.root);
 		this._doPostRenderLifecycle();
 	}
 
@@ -430,6 +531,7 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 	}
 }
 
+const defaultTheme: DEFAULT_THEME = 'light';
 abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebComponentHierarchyManager<E> {
 	constructor() {
 		super();
@@ -451,22 +553,24 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 			this.classList.remove(otherTheme);
 		}
 		this.classList.add(theme!);
-		this.renderToDOM();
+		this.renderToDOM(CHANGE_TYPE.THEME);
+	}
+
+	public getThemeName() {
+		return (this._globalProperties && this._globalProperties.theme) 
+			|| defaultTheme;
 	}
 
 	public getTheme() {
-		return this._globalProperties.theme!;
+		return theme[this.getThemeName()!];
 	}
 }
 
 abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
-	private __customCSS: TemplateResult|null = null;
 	private __hasCustomCSS: boolean|null = null;
-	private _customCSSFn: ((theme: Theme) => TemplateResult)|TemplateResult|null = null;
-	private _renderedTheme: VALID_THEMES_T|null = null;
-	private _noCustomCSS = html``;
+	private _noCustomCSS: TemplateFn = genTemplateFn(null, CHANGE_TYPE.NEVER);
 
-	private _hasCustomCSS() {
+	protected _hasCustomCSS() {
 		if (this.__hasCustomCSS !== null) {
 			return this.__hasCustomCSS;
 		}
@@ -505,31 +609,13 @@ abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends 
 			return this._noCustomCSS;
 		}
 
-		if (this._renderedTheme === null) {
-			this._renderedTheme = this.getTheme();
-			const id = this.id;
-			const parent = this._getParent()!;
-			const config = (parent as ConfigurableWebComponent<any, any>).config;
-			const currentTheme = theme[this.getTheme()];
-			this._customCSSFn = config.customCSS![id];
-			if (typeof this._customCSSFn !== 'function') {
-				return (this.__customCSS = this._customCSSFn);
-			}
-			return (this.__customCSS = this._customCSSFn(currentTheme))
-		}
-
-		if (this._renderedTheme !== this.getTheme()) {
-			this._renderedTheme = this.getTheme();
-			const currentTheme = theme[this.getTheme()]
-			if (typeof this._customCSSFn !== 'function') {
-				return (this.__customCSS = this._customCSSFn);
-			}
-			return (this.__customCSS = this._customCSSFn!(currentTheme))
-		}
-		return this.__customCSS;
+		const id = this.id;
+		const parent = this._getParent()!;
+		const config = (parent as ConfigurableWebComponent<any, any>).config;
+		return config.customCSS![id];
 	}
 
-	get customCSS() {
+	protected customCSS() {
 		return this._getCustomCSS();
 	}
 }
@@ -756,7 +842,7 @@ export abstract class WebComponent<IDS extends {
 	 */
 	connectedCallback() {
 		super.connectedCallback();
-		this.renderToDOM();
+		this.renderToDOM(CHANGE_TYPE.ALWAYS);
 		this.layoutMounted();
 	}
 
@@ -785,10 +871,11 @@ export abstract class WebComponent<IDS extends {
 export class ConfigurableWebComponent<IDS extends {
 	[key: string]: HTMLElement;
 } = {}, E extends EventListenerObj = {}> extends WebComponent<IDS, E> {
-	protected renderer!: (this: any, props: any) => TemplateResult;
+	protected customCSS!: () => TemplateFn;
+	protected renderer!: TemplateFn;
 	public static config: WebComponentConfiguration;
 	public config!: WebComponentConfiguration;
-	get css() { throw new Error('Not implemented'); }
+	protected css!: TemplateFn;
 }
 
 export function define(name: string, component: any) {

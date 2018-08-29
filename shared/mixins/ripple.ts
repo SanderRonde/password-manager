@@ -1,5 +1,6 @@
 import { listenWithIdentifier } from '../lib/webcomponent-util';
 import { ExtendableComponent } from '../lib/decorators';
+import { TemplateFn } from '../lib/webcomponents';
 
 export interface RippleEffect {
 	applyRipple(): void;
@@ -9,7 +10,10 @@ export interface RippleEffect {
 // so credit goes to the original authors
 export function rippleEffect(target: ExtendableComponent): any {
 	return class Rippled extends target implements RippleEffect {
-		protected renderer!: (this: any, props: any) => import('lit-html').TemplateResult;
+		protected css!: TemplateFn;
+		protected _hasCustomCSS!: () => boolean;
+		protected customCSS!: () => TemplateFn;
+		protected renderer!: TemplateFn;
 		private _rippleElement!: HTMLElement|null;
 		private _rippleSize!: number;
 		private _ignoringMouseDown!: boolean;

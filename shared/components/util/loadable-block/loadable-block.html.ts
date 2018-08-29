@@ -1,10 +1,10 @@
+import { CHANGE_TYPE, genTemplateFn } from '../../../lib/webcomponents';
 import { LoadableBlock } from './loadable-block';
 import { html } from "lit-html";
 
-export function LoadableBlockHTML(this: LoadableBlock, _props: LoadableBlock['props']) {
+export const LoadableBlockHTML = genTemplateFn<LoadableBlock>(function() {
 	const { big, medium, dimensions } = this.getSpinnerSizes();
 	return html`
-		${this.css}
 		<div id="spinnerContainer">
 			<horizontal-centerer>
 				<vertical-centerer fullscreen>
@@ -19,4 +19,4 @@ export function LoadableBlockHTML(this: LoadableBlock, _props: LoadableBlock['pr
 			<slot id="content"></slot>
 		</div>
 	`;
-}
+}, CHANGE_TYPE.PROP);

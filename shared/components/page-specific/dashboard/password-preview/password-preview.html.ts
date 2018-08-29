@@ -1,9 +1,9 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { PasswordPreview } from './password-preview';
 import { html } from 'lit-html';
 
-export function PasswordPreviewHTML(this: PasswordPreview, props: PasswordPreview['props']) {
+export const PasswordPreviewHTML = genTemplateFn<PasswordPreview>((props) => {
 	return html`
-		${this.css}
 		<md-card>
 			<div>ID: ${props.id}</div>
 			<div>
@@ -18,4 +18,4 @@ export function PasswordPreviewHTML(this: PasswordPreview, props: PasswordPrevie
 			<div>2FA enabled: ${props.twofactor_enabled.toString()}</div>
 		</md-card>
 	`
-}
+}, CHANGE_TYPE.PROP);

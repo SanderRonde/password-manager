@@ -1,11 +1,11 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { LockClosed } from "../../../icons/lockClosed/lockClosed";
 import { LockOpen } from "../../../icons/lockOpen/lockOpen";
 import { Login } from "./login";
 import { html } from "lit-html";
 
-export function LoginHTML(this: Login, props: Login['props']) {
+export const LoginHTML = genTemplateFn<Login>((props) => {
 	return html`
-		${this.css}
 		<div id="pageContainer">
 			<horizontal-centerer>
 				<vertical-centerer fullscreen>
@@ -49,4 +49,4 @@ export function LoginHTML(this: Login, props: Login['props']) {
 			</horizontal-centerer>
 			<theme-selector id="themeSelector"></theme-selector>
 		</div>`;
-}
+}, CHANGE_TYPE.PROP);

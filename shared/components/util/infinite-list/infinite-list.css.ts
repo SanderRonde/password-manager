@@ -1,8 +1,8 @@
-import { Theme } from '../../../types/shared-types';
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { InfiniteList } from './infinite-list';
 import { html } from 'lit-html';
 
-export function InfiniteListCSS<D, ID>(this: InfiniteList<D, ID>, theme: Theme, _props: InfiniteList<D, ID>['props']) {
+export const InfiniteListCSS = genTemplateFn<InfiniteList<any, any>>(function(_props, theme) {
 	return html`<style>
 		:host {
 			display: flex;
@@ -39,4 +39,4 @@ export function InfiniteListCSS<D, ID>(this: InfiniteList<D, ID>, theme: Theme, 
 			width: 0;
 		}
 	</style>`;
-}
+}, CHANGE_TYPE.THEME);

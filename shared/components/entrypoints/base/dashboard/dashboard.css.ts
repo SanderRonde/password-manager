@@ -1,5 +1,5 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { changeOpacity } from '../../../../lib/webcomponent-util';
-import { Theme } from '../../../../types/shared-types';
 import { Dashboard } from './dashboard';
 import { html } from "lit-html";
 
@@ -8,7 +8,7 @@ export const TITLE_BAR_HEIGHT = 60;
 export const MAX_PASSWORD_VIEW_SCROLL = 85;
 
 export const CustomDashboardCSS = {
-	searchInput: (theme: Theme) => html`<style>
+	searchInput: genTemplateFn<Dashboard>((theme) => html`<style>
 		.mdl-textfield__input {
 			color: ${theme.textOnNonbackground};
 			border-bottom: none;
@@ -52,15 +52,15 @@ export const CustomDashboardCSS = {
 			margin-left: 10px;
 			margin-top: 2px;
 		}
-	</style>`,
-	infiniteList: () => html`<style>
+	</style>`, CHANGE_TYPE.THEME),
+	infiniteList: genTemplateFn<Dashboard>(() => html`<style>
 		#contentContainer {
 			overflow-y: hidden;
 		}
-	</style>`
+	</style>`, CHANGE_TYPE.NEVER)
 }
 
-export function DashboardCSS(this: Dashboard, theme: Theme, _props: Dashboard['props']) {
+export const DashboardCSS = genTemplateFn<Dashboard>((_props, theme) => {
 	return html`<style>
 		#titleBar {
 			width: 100vw;
@@ -130,4 +130,4 @@ export function DashboardCSS(this: Dashboard, theme: Theme, _props: Dashboard['p
 			${`margin-top: ${PAGE_TOP}px;`}
 		}
 	</style>`
-}
+}, CHANGE_TYPE.THEME);

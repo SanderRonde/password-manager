@@ -1,8 +1,8 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { VerticalCenterer } from './vertical-centerer';
-import { Theme } from '../../../types/shared-types';
 import { html } from "lit-html";
 
-export function VerticalCentererCSS(this: VerticalCenterer, _theme: Theme, _props: VerticalCenterer['props']) {
+export const VerticalCentererCSS = genTemplateFn<VerticalCenterer>(() => {
 	return html`<style>
 		#container {
 			display: flex;
@@ -19,4 +19,4 @@ export function VerticalCentererCSS(this: VerticalCenterer, _theme: Theme, _prop
 			display: block;
 		}
 	</style>`
-}
+}, CHANGE_TYPE.NEVER);

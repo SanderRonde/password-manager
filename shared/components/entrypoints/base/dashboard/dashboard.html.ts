@@ -1,11 +1,11 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Search } from '../../../icons/search/search';
 import * as devPasswords from './dev-passwords';
 import { Dashboard } from './dashboard';
 import { html } from "lit-html";
 
-export function DashboardHTML(this: Dashboard, props: Dashboard['props']) {
+export const DashboardHTML = genTemplateFn<Dashboard>((props, _theme) => {
 	return html`
-		${this.css}
 		<div id="container">
 			<div id="titleBar">
 				<div id="searchBar">
@@ -43,4 +43,4 @@ export function DashboardHTML(this: Dashboard, props: Dashboard['props']) {
 			<theme-selector id="themeSelector"></theme-selector>
 			<div id="passwordFab">+</div>
 		</div>`;
-}
+}, CHANGE_TYPE.PROP);

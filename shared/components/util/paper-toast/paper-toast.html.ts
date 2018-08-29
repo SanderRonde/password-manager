@@ -1,14 +1,14 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { PaperToast } from './paper-toast';
 import { html } from 'lit-html';
 
-export function PaperToastHTML(this: PaperToast) {
+export const PaperToastHTML = genTemplateFn<PaperToast>((props) => {
 	return html`
-		${this.css}
 		<div id="toastContainer">
 			<div id="toastContent">
-				<div id="toastText">${this.props.content}</div>
+				<div id="toastText">${props.content}</div>
 				<div id="toastButtons">
-					${[this.props.button1, this.props.button2]
+					${[props.button1, props.button2]
 						.filter(val => val).map((text) => {
 							return html`
 								<paper-button aria-label="${text}" flat color="yellow" 
@@ -21,4 +21,4 @@ export function PaperToastHTML(this: PaperToast) {
 			</div>
 		</div>
 	`
-}
+}, CHANGE_TYPE.PROP);

@@ -1,6 +1,8 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { HorizontalCenterer } from './horizontal-centerer';
 import { html } from "lit-html";
 
-export function HorizontalCentererCSS() {
+export const HorizontalCentererCSS = genTemplateFn<HorizontalCenterer>(() => {
 	return html`<style>
 		#container {
 			display: flex;
@@ -12,4 +14,4 @@ export function HorizontalCentererCSS() {
 			display: block;
 		}
 	</style>`
-}
+}, CHANGE_TYPE.NEVER);

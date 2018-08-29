@@ -1,10 +1,10 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { classNames } from "../../../lib/webcomponent-util";
 import { VerticalCenterer } from "./vertical-centerer";
 import { html } from "lit-html";
 
-export function VerticalCentererHTML(this: VerticalCenterer, props: VerticalCenterer['props']) {
+export const VerticalCentererHTML = genTemplateFn<VerticalCenterer>((props) => {
 	return html`
-		${this.css}
 		<div id="container" class="${classNames({
 			fullscreen: props.fullscreen
 		})}">
@@ -12,4 +12,4 @@ export function VerticalCentererHTML(this: VerticalCenterer, props: VerticalCent
 				<slot></slot>
 			</div>
 		</div>`
-}
+}, CHANGE_TYPE.PROP);

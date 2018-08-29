@@ -1,8 +1,8 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { ThemeSelector } from './theme-selector';
-import { Theme } from '../../../types/shared-types';
 import { html } from "lit-html";
 
-export function ThemeSelectorCSS(this: ThemeSelector, theme: Theme, _props: ThemeSelector['props']) {
+export const ThemeSelectorCSS = genTemplateFn<ThemeSelector>((_props, theme) => {
 	return html`<style>
 		.themeContainer {
 			height: 40px;
@@ -81,4 +81,4 @@ export function ThemeSelectorCSS(this: ThemeSelector, theme: Theme, _props: Them
 			width: 45px;
 		}
 	</style>`
-}
+}, CHANGE_TYPE.THEME);

@@ -1,14 +1,14 @@
+import { CHANGE_TYPE, genTemplateFn } from '../../../lib/webcomponents';
 import { CheckmarkSize } from "../../icons/checkmark/checkmark";
-import { AnimatedButton } from "./animated-button";
 import { CrossSize } from "../../icons/cross/cross";
+import { AnimatedButton } from "./animated-button";
 import { html } from "lit-html";
 
-export function AnimatedButtonHTML(this: AnimatedButton, props: AnimatedButton['props']) {
+export const AnimatedButtonHTML = genTemplateFn<AnimatedButton>(function (props) {
 	const Checkmark = CheckmarkSize(35);
 	const Cross = CrossSize(35);
 
 	return html`
-		${this.css}
 		<button id="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
 			label="${props.ariaLabel}"
 		>
@@ -28,4 +28,4 @@ export function AnimatedButtonHTML(this: AnimatedButton, props: AnimatedButton['
 				</span>
 			</div>
 		</button>`;
-}
+}, CHANGE_TYPE.PROP);

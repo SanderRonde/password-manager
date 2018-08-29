@@ -1,10 +1,10 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { AnimatedButton } from '../animated-button/animated-button';
 import { changeOpacity } from '../../../lib/webcomponent-util';
-import { Theme } from '../../../types/shared-types';
 import { PaperButton } from './paper-button';
 import { html } from "lit-html";
 
-export function PaperButtonCSS(this: PaperButton|AnimatedButton, theme: Theme, _props: (PaperButton|AnimatedButton)['props']) {
+export const PaperButtonCSS = genTemplateFn<PaperButton|AnimatedButton>((_props, theme) => {
 	return html`<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.
@@ -283,4 +283,4 @@ export function PaperButtonCSS(this: PaperButton|AnimatedButton, theme: Theme, _
 			border-radius: 0;
 		}
 	</style>`
-}
+}, CHANGE_TYPE.THEME);

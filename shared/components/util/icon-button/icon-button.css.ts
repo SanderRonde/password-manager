@@ -1,8 +1,8 @@
-import { Theme } from '../../../types/shared-types';
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { IconButton } from './icon-button';
 import { html } from "lit-html";
 
-export function IconButtonCSS(this: IconButton, theme: Theme, _props: IconButton['props']) {
+export const IconButtonCSS = genTemplateFn<IconButton>((_props, theme) => {
 	return html`<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.
@@ -261,4 +261,4 @@ export function IconButtonCSS(this: IconButton, theme: Theme, _props: IconButton
 			fill: ${theme.textOnNonbackground}
 		}
 	</style>`
-}
+}, CHANGE_TYPE.THEME);

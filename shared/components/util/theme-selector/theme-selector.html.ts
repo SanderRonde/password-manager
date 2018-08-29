@@ -1,13 +1,13 @@
+import { CHANGE_TYPE, genTemplateFn } from '../../../lib/webcomponents';
 import { classNames } from '../../../lib/webcomponent-util';
 import { ColorSize } from '../../icons/color/color';
 import { theme } from '../../theming/theme/theme';
 import { ThemeSelector } from "./theme-selector";
 import { html } from "lit-html";
 
-export function ThemeSelectorHTML(this: ThemeSelector) {
-	const currentThemeName = this._globalProperties.theme;
+export const ThemeSelectorHTML = genTemplateFn<ThemeSelector>(function() {
+	const currentThemeName = this.getGlobalProperty('theme');
 	return html`
-		${this.css}
 		<div id="container">
 			<div id="themes">
 				${Object.getOwnPropertyNames(theme).map((themeName: keyof typeof theme) => {
@@ -42,4 +42,4 @@ export function ThemeSelectorHTML(this: ThemeSelector) {
 			<icon-button aria-label="Change theme" id="button" fill="text">${ColorSize(30, 30)}</icon-button>
 		</div>
 	`
-}
+}, CHANGE_TYPE.THEME);

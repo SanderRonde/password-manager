@@ -1,17 +1,17 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { classNames } from '../../../lib/webcomponent-util';
 import { PaperButton } from "./paper-button";
 import { html } from "lit-html";
-import { classNames } from '../../../lib/webcomponent-util';
 
-export function PaperButtonHTML(this: PaperButton, props: PaperButton['props']) {
+export const PaperButtonHTML = genTemplateFn<PaperButton>(function(props) {
 	return html`
-		${this.css}
-		${this.customCSS}
+		${this.__customCSS}
 		<button id="button" class="${classNames(
 			'mdl-button', 'mdl-js-button', {
-				'mdl-button--raised': !this.props.flat,
-				'mdl-js-ripple-effect': !this.props.noRipple
+				'mdl-button--raised': !props.flat,
+				'mdl-js-ripple-effect': !props.noRipple
 			 })}" label="${props.ariaLabel}">
 			<slot></slot>
-			<span>${this.props.content}</span>
+			<span>${props.content}</span>
 		</button>`;
-}
+}, CHANGE_TYPE.PROP);

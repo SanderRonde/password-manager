@@ -1,13 +1,13 @@
+import { genTemplateFn, CHANGE_TYPE, renderTemplateFn } from '../../../lib/webcomponents';
 import { PaperButtonCSS } from '../paper-button/paper-button.css';
 import { AnimatedButton } from './animated-button';
-import { Theme } from '../../../types/shared-types';
 import { html } from "lit-html";
 
 export const COLOR_FADE_TIME = 300;
 export const FADE_IN_OUT_TIME = COLOR_FADE_TIME / 2;
-export function AnimatedButtonCSS(this: AnimatedButton, theme: Theme, props: AnimatedButton['props']) {
+export const AnimatedButtonCSS = genTemplateFn<AnimatedButton>(function(_props, theme) {
 	return html`<style>
-		${PaperButtonCSS.bind(this)(theme, props)}
+		${renderTemplateFn(PaperButtonCSS, CHANGE_TYPE.THEME, this)}
 
 		#content > * {
 			display: none;
@@ -41,4 +41,4 @@ export function AnimatedButtonCSS(this: AnimatedButton, theme: Theme, props: Ani
 			background: ${theme.error}
 		}
 	</style>`
-}
+}, CHANGE_TYPE.THEME);

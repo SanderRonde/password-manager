@@ -34,7 +34,7 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 		}
 	});
 
-	get customCSS() {
+	get __customCSS() {
 		if (this.props.color || this.props.background || this.props.rippleColor) {
 			return html`<style>
 				${this.props.color ? html`<style>

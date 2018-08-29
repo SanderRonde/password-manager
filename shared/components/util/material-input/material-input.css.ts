@@ -1,9 +1,9 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { changeOpacity } from '../../../lib/webcomponent-util';
-import { Theme } from '../../../types/shared-types';
 import { MaterialInput } from './material-input';
 import { html } from "lit-html";
 
-export function MaterialInputCSS(this: MaterialInput, theme: Theme, _props: MaterialInput['props']) {
+export const MaterialInputCSS = genTemplateFn<MaterialInput>((_props, theme) => {
 	return html`<style>
 		/** From https://github.com/google/material-design-lite/blob/mdl-1.x/src/textfield/_textfield.scss */
 		/**
@@ -201,4 +201,4 @@ export function MaterialInputCSS(this: MaterialInput, theme: Theme, _props: Mate
 			bottom: 0;
 		}
 	</style>`
-}
+}, CHANGE_TYPE.THEME);

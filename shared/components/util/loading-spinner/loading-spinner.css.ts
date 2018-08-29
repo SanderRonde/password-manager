@@ -1,4 +1,4 @@
-import { Theme } from '../../../types/shared-types';
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { LoadingSpinner } from './loading-spinner';
 import { html } from "lit-html";
 
@@ -15,7 +15,7 @@ function getDimensions(props: LoadingSpinner['props']) {
 	return 28;
 }
 
-export function LoadingSpinnerCSS(this: LoadingSpinner, _theme: Theme, props: LoadingSpinner['props']) {
+export const LoadingSpinnerCSS = genTemplateFn<LoadingSpinner>((props) => {
 	return html`<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.
@@ -290,4 +290,4 @@ export function LoadingSpinnerCSS(this: LoadingSpinner, _theme: Theme, props: Lo
 			}
 		}
 	</style>`
-}
+}, CHANGE_TYPE.PROP);

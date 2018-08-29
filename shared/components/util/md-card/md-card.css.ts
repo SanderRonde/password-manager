@@ -1,4 +1,4 @@
-import { Theme } from '../../../types/shared-types';
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { MDCard } from './md-card';
 import { html } from 'lit-html';
 
@@ -20,7 +20,7 @@ function getShadow(level: number) {
 	}
 }
 
-export function MDCardCSS(this: MDCard, theme: Theme, props: MDCard['props']) {
+export const MDCardCSS = genTemplateFn<MDCard>((props, theme) => {
 	return html`<style>
 		#shadow {
 			${
@@ -30,4 +30,4 @@ export function MDCardCSS(this: MDCard, theme: Theme, props: MDCard['props']) {
 			}
 		}	
 	</style>`;
-}
+}, CHANGE_TYPE.ALWAYS);

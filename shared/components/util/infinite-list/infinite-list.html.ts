@@ -1,10 +1,9 @@
 import { InfiniteList } from './infinite-list';
 import { html } from 'lit-html';
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 
-export function InfiniteListHTML<D, ID>(this: InfiniteList<D, ID>, _props: InfiniteList<D, ID>['props']) {
+export const InfiniteListHTML = genTemplateFn<InfiniteList<any, any>>(() => {
 	return html`
-		${this.css}
-		${this.customCSS}
 		<slot name="template" id="template" class="hidden"></slot>
 		<div id="sizeGetter" class="hidden"></div>
 		<div id="focusCapturer" tabIndex="-1"></div>
@@ -12,4 +11,4 @@ export function InfiniteListHTML<D, ID>(this: InfiniteList<D, ID>, _props: Infin
 			<div id="physicalContent"></div>
 		</div>
 	`;
-}
+}, CHANGE_TYPE.NEVER);

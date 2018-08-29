@@ -1,9 +1,9 @@
 import { ANIMATE_TIME } from '../../util/loadable-block/loadable-block.css';
+import { CHANGE_TYPE, genTemplateFn } from '../../../lib/webcomponents';
 import { GlobalController } from './global-controller';
-import { Theme } from '../../../types/shared-types';
 import { html } from 'lit-html';
 
-export function GlobalControllerCSS(this: GlobalController, _theme: Theme, _props: GlobalController['props']) {
+export const GlobalControllerCSS = genTemplateFn<GlobalController>(() => {
 	return html`<style>
 		#content .newpage.invisible {
 			opacity: 1;
@@ -19,4 +19,4 @@ export function GlobalControllerCSS(this: GlobalController, _theme: Theme, _prop
 			opacity: 0;
 		}
 	</style>`
-}
+}, CHANGE_TYPE.NEVER);

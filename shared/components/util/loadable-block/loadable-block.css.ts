@@ -1,9 +1,9 @@
-import { Theme } from '../../../types/shared-types';
+import { CHANGE_TYPE, genTemplateFn } from '../../../lib/webcomponents';
 import { LoadableBlock } from './loadable-block';
 import { html } from "lit-html";
 
 export const ANIMATE_TIME = 500;
-export function LoadableBlockCSS(this: LoadableBlock, theme: Theme, _props: LoadableBlock['props']) {
+export const LoadableBlockCSS = genTemplateFn<LoadableBlock>((_props, theme) => {
 	return html`<style>
 		:host {
 			display: block;
@@ -28,4 +28,4 @@ export function LoadableBlockCSS(this: LoadableBlock, theme: Theme, _props: Load
 			opacity: 1;
 		}
 	</style>`
-}
+}, CHANGE_TYPE.THEME);

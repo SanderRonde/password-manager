@@ -1,9 +1,9 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { LoadingSpinner } from "./loading-spinner";
 import { html } from "lit-html";
 
-export function LoadingSpinnerHTML(this: LoadingSpinner) {
+export const LoadingSpinnerHTML = genTemplateFn<LoadingSpinner>(() => {
 	return html`
-		${this.css}
 		<div id="container" class="mdl-spinner mdl-js-spinner is-active"></div>
 	`;
-}
+}, CHANGE_TYPE.NEVER);

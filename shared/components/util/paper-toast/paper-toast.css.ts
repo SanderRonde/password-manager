@@ -1,9 +1,9 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { isDark } from '../../../lib/webcomponent-util';
-import { Theme } from '../../../types/shared-types';
 import { PaperToast } from './paper-toast';
 import { html } from "lit-html";
 
-export function PaperToastCSS(this: PaperToast, theme: Theme, _props: PaperToast['props']) {
+export const PaperToastCSS = genTemplateFn<PaperToast>((_props, theme) => {
 	return html`<style>
 		#toastContainer {
 			display: block;
@@ -52,4 +52,4 @@ export function PaperToastCSS(this: PaperToast, theme: Theme, _props: PaperToast
 			padding-left: 13px;
 		}
 	</style>`
-}
+}, CHANGE_TYPE.THEME);

@@ -1,26 +1,25 @@
+import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { classNames } from "../../../lib/webcomponent-util";
 import { MaterialInput } from "./material-input";
 import { html } from "lit-html";
 
-export function MaterialInputHTML(this: MaterialInput) {
+export const MaterialInputHTML = genTemplateFn<MaterialInput>((props) => {
 	return html`
-		${this.css}
-		${this.customCSS}
 		<div id="container" class="${classNames(
 			'mdl-textfield', 'mdl-js-textfield', {
-				'mdl-textfield--floating-label': !this.props.noFloatingLabel,
-				'fill': this.props.fill
+				'mdl-textfield--floating-label': !props.noFloatingLabel,
+				'fill': props.fill
 			}
 		)}">
 			<div id="mainInputContainer">
 				<slot class="iconSlot" name="preIcon"></slot>
-				<input class="mdl-textfield__input" type="${this.props.type}" 
-					id="input" value="${this.props.value}" 
-					pattern="${this.props.pattern}"
+				<input class="mdl-textfield__input" type="${props.type}" 
+					id="input" value="${props.value}" 
+					pattern="${props.pattern}"
 					aria-labelledby="label">
 				<slot class="iconSlot" name="postIcon"></slot>
 			</div>
-			<label id="label" class="mdl-textfield__label">${this.props.label}</label>
-			<span class="mdl-textfield__error">${this.props.error}</span>
+			<label id="label" class="mdl-textfield__label">${props.label}</label>
+			<span class="mdl-textfield__error">${props.error}</span>
 		</div>`;
-}
+}, CHANGE_TYPE.PROP);

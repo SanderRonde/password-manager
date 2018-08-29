@@ -1,8 +1,5 @@
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './webcomponents';
-import { WebComponentBase, EventListenerObj, WebComponent, supportsPassive } from './webcomponents';
-import { Theme, DEFAULT_THEME } from '../types/shared-types';
-import { theme } from '../components/theming/theme/theme';
-import { TemplateResult } from "lit-html";
+import { WebComponentBase, EventListenerObj, WebComponent, supportsPassive, TemplateFn, CHANGE_TYPE } from './webcomponents';
 
 // From https://github.com/JedWatson/classnames
 
@@ -294,7 +291,7 @@ export function defineProps<P extends {
 } & {
 	[K in keyof T]: GetTSType<T[K]>;
 }>(element: HTMLElement & {
-	renderToDOM(): void;
+	renderToDOM(changeType: CHANGE_TYPE): void;
 }, {
 	reflect = {} as P, priv = {} as T
 }: {
@@ -333,7 +330,7 @@ export function defineProps<P extends {
 					const { watch, isPrivate, mapType } = keyMap.get(key as (typeof keys)[0]['key'])!;
 					(propValues as any)[key] = getterWithVal(val, mapType);
 					if (watch) {
-						element.renderToDOM();
+						element.renderToDOM(CHANGE_TYPE.PROP);
 					}
 					if (isPrivate) {
 						originalSetAttr(key, '_');
@@ -356,7 +353,7 @@ export function defineProps<P extends {
 					(propValues as any)[key] = undefined;
 				}
 				if (watch) {
-					element.renderToDOM();
+					element.renderToDOM(CHANGE_TYPE.PROP);
 				}
 				originalRemoveAttr(key);
 			}
@@ -406,7 +403,9 @@ export function defineProps<P extends {
 			set(value) {
 				const original = value;
 				if (typeof value === 'object' && watchProperties.length > 0) {
-					value = watchObject(value, watchProperties, element.renderToDOM);
+					value = watchObject(value, watchProperties, () => {
+						element.renderToDOM(CHANGE_TYPE.PROP)
+					});
 				}
 				propValues[mapKey] = value;
 				if (reflectToAttr) {
@@ -414,7 +413,7 @@ export function defineProps<P extends {
 						isPrivate ? '_' : original, mapType);
 				}
 				if (watch) {
-					element.renderToDOM();
+					element.renderToDOM(CHANGE_TYPE.PROP);
 				}
 			}
 		});
@@ -465,11 +464,11 @@ export function genIsAccessor(name: string, component: () => typeof WebComponent
 
 export interface WebComponentConfiguration {
 	is: string;
-	css: ((this: any, theme: Theme, props: any) => TemplateResult)|null;
+	css: TemplateFn;
 	dependencies?: typeof WebComponentBase[];
-	html: (this: any, props: any) => TemplateResult;
+	html: TemplateFn;
 	customCSS?: {
-		[key: string]: ((theme: Theme) => TemplateResult)|TemplateResult;
+		[key: string]: TemplateFn;
 	}
 }
 export function config(config: WebComponentConfiguration) {
@@ -481,20 +480,13 @@ export function config(config: WebComponentConfiguration) {
 		[key: string]: HTMLElement;
 	}, T, E extends EventListenerObj = {}>(target: T): T => {
 		const targetComponent = <any>target as typeof WebComponent;
-		const defaultTheme: DEFAULT_THEME = 'light';
 		class WebComponentConfig extends targetComponent<I, E> implements WebComponentBase {
 			static is = genIs(is, WebComponentConfig);
 			static dependencies = dependencies
 			static config = config;
 			config = config;
 			renderer = html;
-
-			get css() {
-				return !config.css ? html`` :
-					config.css(theme[(this._globalProperties && 
-						this._globalProperties.theme) || defaultTheme], 
-						this.props);
-			}
+			css = config.css;
 		}
 		return <any>WebComponentConfig as T;
 	}
