@@ -403,6 +403,13 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 			}
 		}
 
+	public getGlobalProperty<P extends keyof GlobalProperties>(key: P): GlobalProperties[P]|undefined {
+		if (!this._globalProperties) {
+			return undefined;
+		}
+		return this._globalProperties[key] as any;
+	}
+
 	public setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
 		value: V) {
 			this._setGlobalProperty(key, value);
