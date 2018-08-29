@@ -1,8 +1,8 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { VerticalCenterer } from './vertical-centerer';
 import { html } from "lit-html";
 
-export const VerticalCentererCSS = genTemplateFn<VerticalCenterer>(() => {
+export const VerticalCentererCSS = new TemplateFn<VerticalCenterer>(() => {
 	return html`<style>
 		#container {
 			display: flex;

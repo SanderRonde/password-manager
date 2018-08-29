@@ -1,8 +1,8 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { PasswordPreview } from './password-preview';
 import { html } from 'lit-html';
 
-export const PasswordPreviewHTML = genTemplateFn<PasswordPreview>((props) => {
+export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>((props) => {
 	return html`
 		<md-card>
 			<div>ID: ${props.id}</div>

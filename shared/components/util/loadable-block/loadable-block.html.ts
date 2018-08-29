@@ -1,8 +1,8 @@
-import { CHANGE_TYPE, genTemplateFn } from '../../../lib/webcomponents';
+import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { LoadableBlock } from './loadable-block';
 import { html } from "lit-html";
 
-export const LoadableBlockHTML = genTemplateFn<LoadableBlock>(function() {
+export const LoadableBlockHTML = new TemplateFn<LoadableBlock>(function() {
 	const { big, medium, dimensions } = this.getSpinnerSizes();
 	return html`
 		<div id="spinnerContainer">

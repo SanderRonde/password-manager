@@ -1,9 +1,9 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { isDark } from '../../../lib/webcomponent-util';
 import { PaperToast } from './paper-toast';
 import { html } from "lit-html";
 
-export const PaperToastCSS = genTemplateFn<PaperToast>((_props, theme) => {
+export const PaperToastCSS = new TemplateFn<PaperToast>((_props, theme) => {
 	return html`<style>
 		#toastContainer {
 			display: block;

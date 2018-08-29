@@ -1,4 +1,4 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { changeOpacity } from '../../../../lib/webcomponent-util';
 import { Dashboard } from './dashboard';
 import { html } from "lit-html";
@@ -8,7 +8,7 @@ export const TITLE_BAR_HEIGHT = 60;
 export const MAX_PASSWORD_VIEW_SCROLL = 85;
 
 export const CustomDashboardCSS = {
-	searchInput: genTemplateFn<Dashboard>((theme) => html`<style>
+	searchInput: new TemplateFn<Dashboard>((theme) => html`<style>
 		.mdl-textfield__input {
 			color: ${theme.textOnNonbackground};
 			border-bottom: none;
@@ -53,14 +53,14 @@ export const CustomDashboardCSS = {
 			margin-top: 2px;
 		}
 	</style>`, CHANGE_TYPE.THEME),
-	infiniteList: genTemplateFn<Dashboard>(() => html`<style>
+	infiniteList: new TemplateFn<Dashboard>(() => html`<style>
 		#contentContainer {
 			overflow-y: hidden;
 		}
 	</style>`, CHANGE_TYPE.NEVER)
 }
 
-export const DashboardCSS = genTemplateFn<Dashboard>((_props, theme) => {
+export const DashboardCSS = new TemplateFn<Dashboard>((_props, theme) => {
 	return html`<style>
 		#titleBar {
 			width: 100vw;

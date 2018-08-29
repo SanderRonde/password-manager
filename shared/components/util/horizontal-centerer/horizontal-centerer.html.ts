@@ -1,8 +1,8 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { HorizontalCenterer } from "./horizontal-centerer";
 import { html } from "lit-html";
 
-export const HorizontalCentererHTML = genTemplateFn<HorizontalCenterer>(() => {
+export const HorizontalCentererHTML = new TemplateFn<HorizontalCenterer>(() => {
 	return html`
 		<div id="container">
 			<div id="content">

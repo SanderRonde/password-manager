@@ -1,8 +1,8 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { IconButton } from './icon-button';
 import { html } from "lit-html";
 
-export const IconButtonCSS = genTemplateFn<IconButton>((_props, theme) => {
+export const IconButtonCSS = new TemplateFn<IconButton>((_props, theme) => {
 	return html`<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.

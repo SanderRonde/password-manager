@@ -1,9 +1,9 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { classNames } from '../../../lib/webcomponent-util';
 import { PaperButton } from "./paper-button";
 import { html } from "lit-html";
 
-export const PaperButtonHTML = genTemplateFn<PaperButton>(function(props) {
+export const PaperButtonHTML = new TemplateFn<PaperButton>(function(props) {
 	return html`
 		${this.__customCSS}
 		<button id="button" class="${classNames(

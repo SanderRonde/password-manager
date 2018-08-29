@@ -1,9 +1,9 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { classNames } from "../../../lib/webcomponent-util";
 import { MaterialInput } from "./material-input";
 import { html } from "lit-html";
 
-export const MaterialInputHTML = genTemplateFn<MaterialInput>((props) => {
+export const MaterialInputHTML = new TemplateFn<MaterialInput>((props) => {
 	return html`
 		<div id="container" class="${classNames(
 			'mdl-textfield', 'mdl-js-textfield', {

@@ -1,11 +1,11 @@
-import { CHANGE_TYPE, genTemplateFn } from '../../../lib/webcomponents';
+import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { classNames } from '../../../lib/webcomponent-util';
 import { ColorSize } from '../../icons/color/color';
 import { theme } from '../../theming/theme/theme';
 import { ThemeSelector } from "./theme-selector";
 import { html } from "lit-html";
 
-export const ThemeSelectorHTML = genTemplateFn<ThemeSelector>(function() {
+export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function() {
 	const currentThemeName = this.getGlobalProperty('theme');
 	return html`
 		<div id="container">

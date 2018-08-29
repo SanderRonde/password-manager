@@ -1,8 +1,8 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { InfiniteList } from './infinite-list';
 import { html } from 'lit-html';
 
-export const InfiniteListCSS = genTemplateFn<InfiniteList<any, any>>(function(_props, theme) {
+export const InfiniteListCSS = new TemplateFn<InfiniteList<any, any>>(function(_props, theme) {
 	return html`<style>
 		:host {
 			display: flex;

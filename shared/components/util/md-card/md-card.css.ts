@@ -1,4 +1,4 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { MDCard } from './md-card';
 import { html } from 'lit-html';
 
@@ -20,7 +20,7 @@ function getShadow(level: number) {
 	}
 }
 
-export const MDCardCSS = genTemplateFn<MDCard>((props, theme) => {
+export const MDCardCSS = new TemplateFn<MDCard>((props, theme) => {
 	return html`<style>
 		#shadow {
 			${

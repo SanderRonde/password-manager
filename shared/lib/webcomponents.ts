@@ -111,74 +111,70 @@ abstract class WebComponentDefiner extends elementBase {
 export const enum CHANGE_TYPE {
 	PROP, THEME, NEVER, ALWAYS
 }
-export type TemplateFn = {
+
+const componentTemplateMap: WeakMap<WebComponent<any, any>, 
+	WeakMap<TemplateFn<any>, TemplateResult|null>> = new WeakMap();
+export type TemplateFnConfig = {
 	changeOn: CHANGE_TYPE.NEVER;
 	template: TemplateResult|null;
 }|{
 	changeOn: CHANGE_TYPE.ALWAYS|CHANGE_TYPE.THEME|CHANGE_TYPE.PROP;
 	template: <T extends WebComponent<any, any>>(this: T, props: T['props'], theme: Theme) => TemplateResult
 };
+export class TemplateFn<T extends WebComponent<any, any> = any> {
+	private _changeOn: CHANGE_TYPE;
+	private _template: ((this: T, props: T['props'], theme: Theme) => TemplateResult)|TemplateResult|null;
 
-export function genTemplateFn<T extends WebComponent<any, any>>(
-	fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult)|null,
-	changeType: CHANGE_TYPE.NEVER): TemplateFn;
-export function genTemplateFn<T extends WebComponent<any, any>>(
-	fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
-	changeType: CHANGE_TYPE.ALWAYS): TemplateFn;
-export function genTemplateFn<T extends WebComponent<any, any>>(
-	fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
-	changeType: CHANGE_TYPE.PROP): TemplateFn;
-export function genTemplateFn<T extends WebComponent<any, any>>(
-	fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
-	changeType: CHANGE_TYPE.THEME): TemplateFn;
-export function genTemplateFn<T extends WebComponent<any, any>>(
-	fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult)|null,
-	changeType: CHANGE_TYPE): TemplateFn {
+	constructor(fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult)|null,
+		changeType: CHANGE_TYPE.NEVER);
+	constructor(fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
+		changeType: CHANGE_TYPE.ALWAYS);
+	constructor(fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
+		changeType: CHANGE_TYPE.PROP);
+	constructor(fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
+		changeType: CHANGE_TYPE.THEME);
+	constructor(fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult)|null,
+		changeType: CHANGE_TYPE) { 
 		if (changeType === CHANGE_TYPE.NEVER) {
-			return {
-				changeOn: CHANGE_TYPE.NEVER,
+				this._changeOn = CHANGE_TYPE.NEVER,
 				//Args don't matter here as they aren't used
-				template: fn ? (fn as any)() : null
-			}
-		}
-		return {
-			changeOn: changeType,
-			template: fn as any
+				this._template = fn ? (fn as any)() : null;
+			} else {
+				this._changeOn = changeType,
+				this._template = fn as any
 		}
 	}
 
-const componentTemplateMap: WeakMap<WebComponent<any, any>, 
-	WeakMap<TemplateFn, TemplateResult|null>> = new WeakMap();
-export function renderTemplateFn(template: TemplateFn, changeType: CHANGE_TYPE, 
-	component: WebComponent<any, any>) {
+	public render(changeType: CHANGE_TYPE, component: T) {
 		if (!componentTemplateMap.has(component)) {
 			componentTemplateMap.set(component, new WeakMap());
 		}
 		const templateMap = componentTemplateMap.get(component)!;
-		if (template.changeOn === CHANGE_TYPE.NEVER) {
+		if (this._changeOn === CHANGE_TYPE.NEVER) {
 			//Never change, return the only render
-			const cached = templateMap.get(template);
+			const cached = templateMap.get(this);
 			if (cached) {
 				return cached;
 			}
-			const rendered = template.template === null ?
-				html`` : template.template;
-				templateMap.set(template, rendered);
+			const rendered = this._template === null ?
+				html`` : this._template;
+				templateMap.set(this, rendered as TemplateResult);
 			return rendered;
 		}
-		if (template.changeOn === CHANGE_TYPE.ALWAYS || 
+		if (this._changeOn === CHANGE_TYPE.ALWAYS || 
 			changeType === CHANGE_TYPE.ALWAYS ||
-			template.changeOn === changeType ||
-			!templateMap.has(template)) {
+			this._changeOn === changeType ||
+			!templateMap.has(this)) {
 				//Change, rerender
-				const rendered = template.template.call(component,
-					component.props, component.getTheme());
-					templateMap.set(template, rendered);
+				const rendered = (this._template as (this: T, props: T['props'], theme: Theme) => TemplateResult)
+					.call(component, component.props, component.getTheme());
+						templateMap.set(this, rendered);
 				return rendered;
 			}
 		
 		//No change, return what was last rendered
-		return templateMap.get(template)!;
+		return templateMap.get(this)!;
+	}
 	}
 
 export abstract class WebComponentBase extends WebComponentDefiner {
@@ -195,14 +191,14 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	/**
 	 * The render method that will render this component
 	 */
-	protected abstract renderer: TemplateFn = genTemplateFn(() => {
+	protected abstract renderer: TemplateFn = new TemplateFn(() => {
 		throw new Error('No render method implemented');	
 	}, CHANGE_TYPE.ALWAYS);
 
 	/**
 	 * The render method that will render this component's css
 	 */
-	protected abstract css: TemplateFn = genTemplateFn(null, CHANGE_TYPE.NEVER);
+	protected abstract css: TemplateFn = new TemplateFn(null, CHANGE_TYPE.NEVER);
 
 	/**
 	 * A function signalign whether this component has custom CSS applied to it
@@ -261,17 +257,11 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		if (this._doPreRenderLifecycle() === false) {
 			return;
 		}
-		render(html`${
-			this._hasCustomCSS() ? 
-				renderTemplateFn(this.customCSS(), change, this as any) : 
-				this._noHTML
-		}
-		${
-			renderTemplateFn(this.css, change, this as any)
-		}
-		${
-			renderTemplateFn(this.renderer, change, this as any)
-		}`, 
+		render(html`${this._hasCustomCSS() ? 
+			this.customCSS().render(change, this as any) : 
+			this._noHTML}
+		${this.css.render(change, this as any)}
+		${this.renderer.render(change, this as any)}`, 
 			this.internals.root);
 		this._doPostRenderLifecycle();
 	}
@@ -564,7 +554,7 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 
 abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
 	private __hasCustomCSS: boolean|null = null;
-	private _noCustomCSS: TemplateFn = genTemplateFn(null, CHANGE_TYPE.NEVER);
+	private _noCustomCSS: TemplateFn = new TemplateFn(null, CHANGE_TYPE.NEVER);
 
 	protected _hasCustomCSS() {
 		if (this.__hasCustomCSS !== null) {

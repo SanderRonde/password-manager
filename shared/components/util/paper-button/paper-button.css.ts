@@ -1,10 +1,10 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { AnimatedButton } from '../animated-button/animated-button';
 import { changeOpacity } from '../../../lib/webcomponent-util';
 import { PaperButton } from './paper-button';
 import { html } from "lit-html";
 
-export const PaperButtonCSS = genTemplateFn<PaperButton|AnimatedButton>((_props, theme) => {
+export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>((_props, theme) => {
 	return html`<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.

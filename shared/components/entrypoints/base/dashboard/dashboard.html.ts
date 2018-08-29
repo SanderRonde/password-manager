@@ -1,10 +1,10 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Search } from '../../../icons/search/search';
 import * as devPasswords from './dev-passwords';
 import { Dashboard } from './dashboard';
 import { html } from "lit-html";
 
-export const DashboardHTML = genTemplateFn<Dashboard>((props, _theme) => {
+export const DashboardHTML = new TemplateFn<Dashboard>((props, _theme) => {
 	return html`
 		<div id="container">
 			<div id="titleBar">

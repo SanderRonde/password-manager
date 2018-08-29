@@ -1,8 +1,8 @@
 import { InfiniteList } from './infinite-list';
 import { html } from 'lit-html';
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 
-export const InfiniteListHTML = genTemplateFn<InfiniteList<any, any>>(() => {
+export const InfiniteListHTML = new TemplateFn<InfiniteList<any, any>>(() => {
 	return html`
 		<slot name="template" id="template" class="hidden"></slot>
 		<div id="sizeGetter" class="hidden"></div>

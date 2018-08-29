@@ -1,8 +1,8 @@
-import { CHANGE_TYPE, genTemplateFn } from '../../../lib/webcomponents';
+import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { GlobalController } from './global-controller';
 import { html } from 'lit-html';
 
-export const GlobalControllerHTML = genTemplateFn<GlobalController>(() => {
+export const GlobalControllerHTML = new TemplateFn<GlobalController>(() => {
 	return html`
 		<loadable-block spinner-size="big" id="loadable">
 			<div>

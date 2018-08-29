@@ -1,10 +1,10 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { LockClosed } from "../../../icons/lockClosed/lockClosed";
 import { LockOpen } from "../../../icons/lockOpen/lockOpen";
 import { Login } from "./login";
 import { html } from "lit-html";
 
-export const LoginHTML = genTemplateFn<Login>((props) => {
+export const LoginHTML = new TemplateFn<Login>((props) => {
 	return html`
 		<div id="pageContainer">
 			<horizontal-centerer>

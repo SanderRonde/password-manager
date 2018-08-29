@@ -1,8 +1,8 @@
-import { genTemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { PaperToast } from './paper-toast';
 import { html } from 'lit-html';
 
-export const PaperToastHTML = genTemplateFn<PaperToast>((props) => {
+export const PaperToastHTML = new TemplateFn<PaperToast>((props) => {
 	return html`
 		<div id="toastContainer">
 			<div id="toastContent">
