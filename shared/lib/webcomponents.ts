@@ -1,7 +1,7 @@
 import { GlobalController } from '../components/entrypoints/global/global-controller';
 import { GlobalProperties, Theme, DEFAULT_THEME } from '../types/shared-types';
 import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
-import { VALID_THEMES, theme } from '../components/theming/theme/theme';
+import { theme } from '../components/theming/theme/theme';
 import { TemplateResult, render, html } from 'lit-html';
 import { bindToClass } from './decorators';
 
@@ -536,23 +536,19 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 	constructor() {
 		super();
 
-		this.listen('globalPropChange', (prop, value): any => {
+		this.listen('globalPropChange', (prop): any => {
 			if (prop === 'theme') {
-				this._setTheme(value as GlobalProperties['theme']);
+				this._setTheme();
 			}
 		});
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._setTheme(this._globalProperties.theme);
+		this._setTheme();
 	}
 
-	private _setTheme(theme: GlobalProperties['theme']) {
-		for (const otherTheme of VALID_THEMES) {
-			this.classList.remove(otherTheme);
-		}
-		this.classList.add(theme!);
+	private _setTheme() {
 		this.renderToDOM(CHANGE_TYPE.THEME);
 	}
 
