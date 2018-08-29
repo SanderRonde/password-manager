@@ -8,7 +8,7 @@ export const TITLE_BAR_HEIGHT = 60;
 export const MAX_PASSWORD_VIEW_SCROLL = 85;
 
 export const CustomDashboardCSS = {
-	searchInput: new TemplateFn<Dashboard>((theme) => html`<style>
+	searchInput: new TemplateFn<Dashboard>((_props, theme) => html`<style>
 		.mdl-textfield__input {
 			color: ${theme.textOnNonbackground};
 			border-bottom: none;
