@@ -1,11 +1,12 @@
-import { WebComponentBase } from "../../../../lib/webcomponents";
-import { defineProps, JSONType } from '../../../../lib/webcomponent-util';
+import { PasswordPreview } from '../../../page-specific/dashboard/password-preview/password-preview';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
+import { defineProps, JSONType } from '../../../../lib/webcomponent-util';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { DashboardScrollManager } from './dashboard-scroll-manager';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
+import { WebComponentBase } from "../../../../lib/webcomponents";
 import { PublicKeyDecrypted } from '../../../../types/db-types';
 import { APISuccessfulReturns } from '../../../../types/api';
 import { MDCard } from '../../../util/md-card/md-card';
@@ -17,7 +18,8 @@ export const DashboarDependencies: (typeof WebComponentBase)[] = [
 	InfiniteList,
 	ThemeSelector,
 	HorizontalCenterer,
-	MDCard
+	MDCard,
+	PasswordPreview
 ]
 
 export abstract class Dashboard extends DashboardScrollManager { 

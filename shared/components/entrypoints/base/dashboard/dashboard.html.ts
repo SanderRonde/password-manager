@@ -27,7 +27,11 @@ export function DashboardHTML(this: Dashboard, props: Dashboard['props']) {
 							}"
 						>
 							<div slot="template">
-								<md-card></md-card>
+								<md-card>x</md-card>
+								<password-preview id="password.is"
+									websites="password.websites"
+									twofactor_enabled="password.twofactor_enabled"
+								></password-preview>
 							</div>
 						</infinite-list>
 					</div>
