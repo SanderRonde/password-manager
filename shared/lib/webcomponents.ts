@@ -813,7 +813,7 @@ export abstract class WebComponent<IDS extends {
 	 */
 	private _idMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
 	protected _disposables: (() => void)[] = [];
-	public isMounted: boolean = false;
+	public isMounted: boolean = this.isMounted || false;
 
 	constructor() {
 		super();
