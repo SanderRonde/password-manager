@@ -350,7 +350,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 							globals: {
 								[path.join(__dirname, 
 									'shared/components/entrypoints',
-									'base/dashboard/dev-passwords.js')]: '{getDevPasswords: () {}}'
+									'base/dashboard/dev-passwords.js')]: '{getDevPasswords: () => {}}'
 							},
 						});
 					}),
