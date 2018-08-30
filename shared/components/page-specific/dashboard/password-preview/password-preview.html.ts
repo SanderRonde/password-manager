@@ -7,7 +7,7 @@ export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>((props) => {
 		<md-card>
 			<div>ID: ${props.id}</div>
 			<div>
-				${props.websites.map((website) => {
+				${(props.websites || []).map((website) => {
 					return html`
 						<div>host: ${website.host}</div>
 						<div>exact: ${website.exact}</div>

@@ -1,5 +1,5 @@
+import { WebComponentBase, EventListenerObj, WebComponent, supportsPassive, TemplateFn, CHANGE_TYPE, WebComponentComplexValueManager } from './webcomponents';
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './webcomponents';
-import { WebComponentBase, EventListenerObj, WebComponent, supportsPassive, TemplateFn, CHANGE_TYPE } from './webcomponents';
 
 // From https://github.com/JedWatson/classnames
 
@@ -60,20 +60,36 @@ export function isDefined<U>(value: null|undefined|U): value is U {
 	return value !== undefined && value !== null;
 }
 
-function getterWithVal<R>(value: string|null, type: 'string'|'number'|'bool'|'json'): boolean|string|number|undefined|R;
-function getterWithVal(value: string|null, type: 'bool'): boolean;
-function getterWithVal(value: string|null, type: 'string'): string|undefined;
-function getterWithVal(value: string|null, type: 'number'): number|undefined;
-function getterWithVal<R>(value: string|null, type: 'json'): R|undefined;
-function getterWithVal<R>(value: string|null, type: 'string'|'number'|'bool'|'json'): boolean|string|number|undefined|R {
+function getterWithVal<R>(component: {
+	getParentRef(ref: string): any;
+}, value: string|null, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R;
+function getterWithVal(component: {
+	getParentRef(ref: string): any;
+}, value: string|null, type: 'bool'): boolean;
+function getterWithVal(component: {
+	getParentRef(ref: string): any;
+}, value: string|null, type: 'string'): string|undefined;
+function getterWithVal(component: {
+	getParentRef(ref: string): any;
+}, value: string|null, type: 'number'): number|undefined;
+function getterWithVal<R>(component: {
+	getParentRef(ref: string): any;
+}, value: string|null, type: 'complex'): R|undefined;
+function getterWithVal<R>(component: {
+	getParentRef(ref: string): any;
+}, value: string|null, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R {
 	if (type === 'bool') {
 		return isDefined(value);
 	} else {
 		if (isDefined(value)) {
 			if (type === 'number') {
 				return ~~value;
-			} else if (type === 'json') {
-				return JSON.parse(decodeURIComponent(value));
+			} else if (type === 'complex') {
+				if (value.startsWith(WebComponentComplexValueManager.refPrefix)) {
+					return component.getParentRef(value);
+				} else {
+					return JSON.parse(decodeURIComponent(value));
+				}
 			}
 			return value;
 		}
@@ -81,21 +97,33 @@ function getterWithVal<R>(value: string|null, type: 'string'|'number'|'bool'|'js
 	}
 }
 
-export function getter<R>(element: HTMLElement, name: string, type: 'string'|'number'|'bool'|'json'): boolean|string|number|undefined|R;
-export function getter(element: HTMLElement, name: string, type: 'bool'): boolean;
-export function getter(element: HTMLElement, name: string, type: 'string'): string|undefined;
-export function getter(element: HTMLElement, name: string, type: 'number'): number|undefined;
-export function getter<R>(element: HTMLElement, name: string, type: 'json'): R|undefined;
-export function getter<R>(element: HTMLElement, name: string, type: 'string'|'number'|'bool'|'json'): boolean|string|number|undefined|R {
-	return getterWithVal(element.getAttribute(name), type);
+export function getter<R>(element: HTMLElement & {
+	getParentRef(ref: string): any;
+}, name: string, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R;
+export function getter(element: HTMLElement & {
+	getParentRef(ref: string): any;
+}, name: string, type: 'bool'): boolean;
+export function getter(element: HTMLElement & {
+	getParentRef(ref: string): any;
+}, name: string, type: 'string'): string|undefined;
+export function getter(element: HTMLElement & {
+	getParentRef(ref: string): any;
+}, name: string, type: 'number'): number|undefined;
+export function getter<R>(element: HTMLElement & {
+	getParentRef(ref: string): any;
+}, name: string, type: 'complex'): R|undefined;
+export function getter<R>(element: HTMLElement & {
+	getParentRef(ref: string): any;
+}, name: string, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R {
+	return getterWithVal(element, element.getAttribute(name), type);
 }
 
 export function setter(setAttrFn: (key: string, val: string) => void, 
 	removeAttrFn: (key: string) => void, name: string, 
-	value: string|boolean|number, type: 'string'|'number'|'bool'|'json'): void;
+	value: string|boolean|number, type: 'string'|'number'|'bool'|'complex'): void;
 export function setter(setAttrFn: (key: string, val: string) => void, 
 	removeAttrFn: (key: string) => void, name: string, 
-	value: any, type: 'json'): void;
+	value: any, type: 'complex'): void;
 export function setter(setAttrFn: (key: string, val: string) => void, 
 	removeAttrFn: (key: string) => void, name: string, 
 	value: boolean, type: 'bool'): void;
@@ -107,7 +135,7 @@ export function setter(setAttrFn: (key: string, val: string) => void,
 	value: number, type: 'number'): void;
 export function setter(setAttrFn: (key: string, val: string) => void, 
 	removeAttrFn: (key: string) => void, name: string, 
-	value: string|boolean|number, type: 'string'|'number'|'bool'|'json'): void {
+	value: string|boolean|number, type: 'string'|'number'|'bool'|'complex'): void {
 		if (type === 'bool') {
 			const boolVal = value as boolean;
 			if (boolVal) {
@@ -117,7 +145,7 @@ export function setter(setAttrFn: (key: string, val: string) => void,
 			}
 		} else {
 			const strVal = value as string|number;
-			if (type === 'json') {
+			if (type === 'complex') {
 				setAttrFn(name, encodeURIComponent(JSON.stringify(strVal)));
 			} else {
 				setAttrFn(name, `${strVal}`);
@@ -133,11 +161,11 @@ interface Coerced {
 	coerce: true;
 }
 
-type GetTSType<V extends PROP_TYPE|JSONType<any>|DefinePropTypeConfig> = 
+type GetTSType<V extends PROP_TYPE|ComplexType<any>|DefinePropTypeConfig> = 
 	V extends PROP_TYPE.BOOL ? boolean : 
 		V extends PROP_TYPE.NUMBER ?  number : 
 			V extends PROP_TYPE.STRING ? string : 
-				V extends JSONType<infer R> ? R : 
+				V extends ComplexType<infer R> ? R : 
 					V extends DefinePropTypeConfig ? 
 						V extends ExactTypeHaver ? V['exactType'] :
 							V['type'] extends PROP_TYPE.BOOL ? 
@@ -146,7 +174,7 @@ type GetTSType<V extends PROP_TYPE|JSONType<any>|DefinePropTypeConfig> =
 								V extends Coerced ? number : number|undefined : 
 							V['type'] extends PROP_TYPE.STRING ? 
 								V extends Coerced ? string : string|undefined : 
-							V['type'] extends JSONType<infer R> ? R :
+							V['type'] extends ComplexType<infer R> ? R :
 								void : void;
 
 export const enum PROP_TYPE {
@@ -154,15 +182,15 @@ export const enum PROP_TYPE {
 	NUMBER = 'number',
 	BOOL = 'bool'
 }
-type JSONType<T> = 'json' & {
+type ComplexType<T> = 'complex' & {
 	__data: T;
 };
 
-export function JSONType<T>(): JSONType<T> {
-	return 'json' as JSONType<T>;
+export function ComplexType<T>(): ComplexType<T> {
+	return 'complex' as ComplexType<T>;
 }
 
-type DefinePropTypes = PROP_TYPE|JSONType<any>;
+type DefinePropTypes = PROP_TYPE|ComplexType<any>;
 interface DefinePropTypeConfig {
 	type: DefinePropTypes;
 	watch?: boolean;
@@ -292,6 +320,7 @@ export function defineProps<P extends {
 	[K in keyof T]: GetTSType<T[K]>;
 }>(element: HTMLElement & {
 	renderToDOM(changeType: CHANGE_TYPE): void;
+	getParentRef(ref: string): any;
 }, {
 	reflect = {} as P, priv = {} as T
 }: {
@@ -328,7 +357,7 @@ export function defineProps<P extends {
 			return (key: string, val: string) => {
 				if (keyMap.has(key as (typeof keys)[0]['key'])) {
 					const { watch, isPrivate, mapType } = keyMap.get(key as (typeof keys)[0]['key'])!;
-					(propValues as any)[key] = getterWithVal(val, mapType);
+					(propValues as any)[key] = getterWithVal(element, val, mapType);
 					if (watch) {
 						element.renderToDOM(CHANGE_TYPE.PROP);
 					}
@@ -417,19 +446,26 @@ export function defineProps<P extends {
 				}
 			}
 		});
-		propValues[mapKey] = getter(element, propName, mapType) as any;
-		if (defaultValue !== undefined && propValues[mapKey] === undefined) {
-			propValues[mapKey] = defaultValue as any;
-			awaitMounted(element as any).then(() => {
+		(async () => {
+			if (mapType !== 'complex') {
+				propValues[mapKey] = getter(element, propName, mapType) as any;
+			} else {
+				await awaitMounted(element as any);
+				if (!isPrivate || element.getAttribute(propName) !== '_') {
+					propValues[mapKey] = getter(element, propName, mapType) as any;
+				}
+			}
+			if (defaultValue !== undefined && propValues[mapKey] === undefined) {
+				propValues[mapKey] = defaultValue as any;
+				await awaitMounted(element as any);
 				setter(originalSetAttr, originalRemoveAttr, propName, 
 					isPrivate ? '_' : defaultValue, mapType);
-			});
-		} else if (isPrivate || mapType === 'json') {
-			awaitMounted(element as any).then(() => {
+			} else if (isPrivate || mapType === 'complex') {
+				await awaitMounted(element as any);
 				setter(originalSetAttr, originalRemoveAttr, propName,
 					isPrivate ? '_' : propValues[mapKey] as any, mapType);
-			});
-		}
+			}
+		})();
 	}
 	return props as R;
 }
@@ -467,9 +503,6 @@ export interface WebComponentConfiguration {
 	css: TemplateFn;
 	dependencies?: typeof WebComponentBase[];
 	html: TemplateFn;
-	customCSS?: {
-		[key: string]: TemplateFn;
-	}
 }
 export function config(config: WebComponentConfiguration) {
 	const {

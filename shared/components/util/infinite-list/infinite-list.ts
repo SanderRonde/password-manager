@@ -1,4 +1,4 @@
-import { config, defineProps, PROP_TYPE, JSONType, createNumberList, any, listenWithIdentifier, isNewElement, listen, wait, listenIfNew, createDisposableWindowListener } from '../../../lib/webcomponent-util';
+import { config, defineProps, PROP_TYPE, ComplexType, createNumberList, any, listenWithIdentifier, isNewElement, listen, wait, listenIfNew, createDisposableWindowListener } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { InfiniteListIDMap } from './infinite-list-querymap';
 import { TemplateResult, html, render } from 'lit-html';
@@ -27,7 +27,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 				defaultValue: 'item'
 			},
 			data: {
-				type: JSONType<D[]>(),
+				type: ComplexType<D[]>(),
 				defaultValue: [],
 				isPrivate: true
 			},
@@ -69,7 +69,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 	private _evaluateDataPath(data: D, itemData: ID, { isData, path }: {
 		isData: boolean;
 		path: (string|number)[]
-	}): string {
+	}): any {
 		try {
 			let current: D|ID|{} = isData ? itemData : data;
 			for (const part of path) {
@@ -78,10 +78,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 				}
 				current = current[part as keyof typeof current];
 			}
-			if (Array.isArray(current)) {
-				return current.join(',');
-			}
-			return current.toString();
+			return current;
 		} catch(e) {
 			return '';
 		}
@@ -113,7 +110,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		const templateString: any = strings;
 		templateString.raw = strings;
 		this._htmlTemplate = (data: D, itemData: ID) => {
-			return html(templateString as TemplateStringsArray,
+			return this.complexHTML(templateString as TemplateStringsArray,
 				...dataPaths.map((dataPath) => {
 					return this._evaluateDataPath(data, 
 						itemData, dataPath);
@@ -123,6 +120,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 
 	private async _setListItemSize() {
 		if (this.itemSize || !this.$.sizeGetter ||
+			!this.props.data ||
 			!(0 in this.props.data)) {
 				return;
 			}
@@ -322,6 +320,9 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 	}
 
 	private _startRender() {
+		if (!this.props.data) {
+			return;
+		}
 		if (this.props.data !== this._usedData) {
 			this._usedData = this.props.data;
 			this._itemData = this.props.data.map(_ => null);

@@ -1,15 +1,18 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Search } from '../../../icons/search/search';
+import { CustomDashboardCSS } from './dashboard.css';
 import * as devPasswords from './dev-passwords';
 import { Dashboard } from './dashboard';
-import { html } from "lit-html";
 
-export const DashboardHTML = new TemplateFn<Dashboard>((props, _theme) => {
+export const DashboardHTML = new TemplateFn<Dashboard>((props, _theme, html) => {
 	return html`
 		<div id="container">
 			<div id="titleBar">
 				<div id="searchBar">
-					<material-input no-floating-label custom-css id="searchInput" label="search websites" fill>
+					<material-input no-floating-label id="searchInput" 
+						custom-css="${CustomDashboardCSS.searchInput}"
+						label="search websites" fill
+					>
 						<div id="searchIcon" slot="preIcon">${Search}</div>
 					</material-input>
 				</div>
@@ -18,21 +21,21 @@ export const DashboardHTML = new TemplateFn<Dashboard>((props, _theme) => {
 				<div id="pageContainer">
 					<div id="passwordList">
 						<div id="passwordTop"></div>
-						<infinite-list custom-css window id="infiniteList" data-name="password" 
+						<infinite-list custom-css="${CustomDashboardCSS.infiniteList}" 
+							window id="infiniteList" data-name="password" 
 							data="${
-								encodeURIComponent(JSON.stringify(
-									props.metaPasswords.length === 0 && 
-										document.body.classList.contains('dev') ? 
-											devPasswords.getDevPasswords() : props.metaPasswords))
+								(props.metaPasswords || []).length === 0 && 
+									document.body.classList.contains('dev') ? 
+										devPasswords.getDevPasswords() : (props.metaPasswords || [])
 							}"
 						>
-							<div slot="template">
+							<template slot="template">
 								<md-card>x</md-card>
-								<password-preview id="password.is"
+								<password-preview id="password.id"
 									websites="password.websites"
 									twofactor_enabled="password.twofactor_enabled"
 								></password-preview>
-							</div>
+							</template>
 						</infinite-list>
 					</div>
 					<md-card id="passwordFocus" level="3">

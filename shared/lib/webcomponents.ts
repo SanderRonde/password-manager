@@ -112,6 +112,21 @@ export const enum CHANGE_TYPE {
 	PROP, THEME, NEVER, ALWAYS
 }
 
+type InferThis<T extends (this: any, ...args: any[]) => any> = 
+	T extends (this: infer D, ...args: any[]) => any ? D : void;
+type InferArgs<T extends (this: any, ...args: any[]) => any> = 
+	T extends (this: any, ...args: infer R) => any ? R : void[];
+type InferReturn<T extends (this: any, ...args: any[]) => any> = 
+T extends (this: any, ...args: any[]) => infer R ? R : void;
+function typeSafeCall<T extends (this: any, ...args: any[]) => any>(fn: T, 
+	thisCtx: InferThis<T>, ...args: InferArgs<T>): InferReturn<T> {
+		return fn.call(thisCtx, ...args);
+	}
+
+type TemplateRenderFunction<T extends WebComponent<any, any>> = (this: T, 
+	props: T['props'], theme: Theme, 
+	complexHTML: (strings: TemplateStringsArray, ...values: any[]) => TemplateResult) => TemplateResult;
+
 const componentTemplateMap: WeakMap<WebComponent<any, any>, 
 	WeakMap<TemplateFn<any>, TemplateResult|null>> = new WeakMap();
 export type TemplateFnConfig = {
@@ -119,21 +134,21 @@ export type TemplateFnConfig = {
 	template: TemplateResult|null;
 }|{
 	changeOn: CHANGE_TYPE.ALWAYS|CHANGE_TYPE.THEME|CHANGE_TYPE.PROP;
-	template: <T extends WebComponent<any, any>>(this: T, props: T['props'], theme: Theme) => TemplateResult
+	template: TemplateRenderFunction<any>
 };
 export class TemplateFn<T extends WebComponent<any, any> = any> {
 	private _changeOn: CHANGE_TYPE;
-	private _template: ((this: T, props: T['props'], theme: Theme) => TemplateResult)|TemplateResult|null;
+	private _template: (TemplateRenderFunction<T>)|TemplateResult|null;
 
-	constructor(fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult)|null,
+	constructor(fn: (TemplateRenderFunction<T>)|null,
 		changeType: CHANGE_TYPE.NEVER);
-	constructor(fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
+	constructor(fn: (TemplateRenderFunction<T>),
 		changeType: CHANGE_TYPE.ALWAYS);
-	constructor(fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
+	constructor(fn: (TemplateRenderFunction<T>),
 		changeType: CHANGE_TYPE.PROP);
-	constructor(fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult),
+	constructor(fn: (TemplateRenderFunction<T>),
 		changeType: CHANGE_TYPE.THEME);
-	constructor(fn: ((this: T, props: T['props'], theme: Theme) => TemplateResult)|null,
+	constructor(fn: (TemplateRenderFunction<T>)|null,
 		changeType: CHANGE_TYPE) { 
 		if (changeType === CHANGE_TYPE.NEVER) {
 				this._changeOn = CHANGE_TYPE.NEVER,
@@ -166,9 +181,10 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 			this._changeOn === changeType ||
 			!templateMap.has(this)) {
 				//Change, rerender
-				const rendered = (this._template as (this: T, props: T['props'], theme: Theme) => TemplateResult)
-					.call(component, component.props, component.getTheme());
-						templateMap.set(this, rendered);
+				const rendered = typeSafeCall(this._template as TemplateRenderFunction<T>, 
+					component, component.props, component.getTheme(), 
+					component.complexHTML);
+				templateMap.set(this, rendered);
 				return rendered;
 			}
 		
@@ -257,10 +273,10 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		if (this._doPreRenderLifecycle() === false) {
 			return;
 		}
-		render(html`${this._hasCustomCSS() ? 
+		render(html`${this.css.render(change, this as any)}
+		${this._hasCustomCSS() ? 
 			this.customCSS().render(change, this as any) : 
 			this._noHTML}
-		${this.css.render(change, this as any)}
 		${this.renderer.render(change, this as any)}`, 
 			this.internals.root);
 		this._doPostRenderLifecycle();
@@ -347,8 +363,8 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 	private _isRoot!: boolean;
 	protected _globalProperties!: GlobalProperties;
 
-	protected _getParent() {
-		return this._parent;
+	protected _getParent<T extends WebComponentHierarchyManager<any>>(): T|null {
+		return this._parent as T;
 	}
 
 	private _getGlobalProperties() {
@@ -552,7 +568,55 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 	}
 }
 
-abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
+type ComplexValue = TemplateFn|Function|Object;
+export abstract class WebComponentComplexValueManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
+	public static readonly refPrefix = '___complex_ref';
+	private _reffed: ComplexValue[] = [];
+
+	private _genRef(value: ComplexValue) {
+		if (this._reffed.indexOf(value) !== -1) {
+			return `${WebComponentComplexValueManager.refPrefix}${
+				this._reffed.indexOf(value)}`;
+		}
+
+		this._reffed.push(value);
+		const refIndex = this._reffed.length - 1;
+		return `${WebComponentComplexValueManager.refPrefix}${refIndex}`;
+	}
+
+	@bindToClass
+	public complexHTML(strings: TemplateStringsArray, ...values: any[]) {
+		values = values.map((value) => {
+			if (value instanceof TemplateFn ||
+				(typeof value === 'object' && !(value instanceof TemplateResult)) ||
+				typeof value === 'function') {
+					return this._genRef(value);
+				}
+			return value;
+		});
+		return html(strings, ...values);
+	}
+
+	public getRef(ref: string) {
+		if (typeof ref !== 'string') {
+			return undefined;
+		}
+		const refNumber = ~~ref.split(WebComponentComplexValueManager.refPrefix)[1];
+		return this._reffed[refNumber];
+	}
+
+	public getParentRef(ref: string) {
+		const parent = this._getParent<WebComponentComplexValueManager<any>>();
+		if (!parent) {
+			console.warn('Could not find parent of', this, 
+				'and because of that could not find ref with id', ref);
+			return undefined;
+		}
+		return parent.getRef(ref);
+	}
+}
+
+abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends WebComponentComplexValueManager<E> {
 	private __hasCustomCSS: boolean|null = null;
 	private _noCustomCSS: TemplateFn = new TemplateFn(null, CHANGE_TYPE.NEVER);
 
@@ -560,32 +624,11 @@ abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends 
 		if (this.__hasCustomCSS !== null) {
 			return this.__hasCustomCSS;
 		}
-		if (!this.hasAttribute('custom-css')) {
-			//No custom CSS applies
-			return (this.__hasCustomCSS = false);
-		}
-
-		const id = this.id;
-		const parent = this._getParent();
-		if (parent === null) {
-			//Parent is null for now, expect it to change later on
-			return false;
-		}
-
-		const config = (parent as ConfigurableWebComponent<any, any>).config;
-		if (!config.customCSS) {
-			//Parent has no custom CSS
-			console.warn('Attempted to find custom CSS in parent node of', this, ';', parent,
-				'and found no custom CSS object');
-			return (this.__hasCustomCSS = false);
-		}
-
-		if (!(id in config.customCSS)) {
-			//Parent has custom CSS but none for this element
-			console.warn('Attempted to find custom CSS in parent node of', this, ';', parent,
-				'and found a custom CSS object', config.customCSS, 'without the ID key', id);
-			return (this.__hasCustomCSS = false);
-		}
+		if (!this.hasAttribute('custom-css') ||
+			!this.getParentRef(this.getAttribute('custom-css')!)) {
+				//No custom CSS applies
+				return (this.__hasCustomCSS = false);
+			}
 
 		return (this.__hasCustomCSS = true);
 	}
@@ -595,10 +638,7 @@ abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends 
 			return this._noCustomCSS;
 		}
 
-		const id = this.id;
-		const parent = this._getParent()!;
-		const config = (parent as ConfigurableWebComponent<any, any>).config;
-		return config.customCSS![id];
+		return this.getParentRef(this.getAttribute('custom-css')!) as TemplateFn<any>
 	}
 
 	protected customCSS() {
@@ -857,7 +897,6 @@ export abstract class WebComponent<IDS extends {
 export class ConfigurableWebComponent<IDS extends {
 	[key: string]: HTMLElement;
 } = {}, E extends EventListenerObj = {}> extends WebComponent<IDS, E> {
-	protected customCSS!: () => TemplateFn;
 	protected renderer!: TemplateFn;
 	public static config: WebComponentConfiguration;
 	public config!: WebComponentConfiguration;

@@ -2,7 +2,7 @@ import { PasswordPreview } from '../../../page-specific/dashboard/password-previ
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
-import { defineProps, JSONType } from '../../../../lib/webcomponent-util';
+import { defineProps, ComplexType } from '../../../../lib/webcomponent-util';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { DashboardScrollManager } from './dashboard-scroll-manager';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
@@ -26,7 +26,7 @@ export abstract class Dashboard extends DashboardScrollManager {
 	props = defineProps(this, {
 		priv: {
 			metaPasswords: {
-				type: JSONType<MetaPasswords>(),
+				type: ComplexType<MetaPasswords>(),
 				defaultValue: []
 			}
 		}

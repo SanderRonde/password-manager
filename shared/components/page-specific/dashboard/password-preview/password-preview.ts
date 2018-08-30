@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, defineProps, PROP_TYPE, JSONType } from '../../../../lib/webcomponent-util';
+import { config, defineProps, PROP_TYPE, ComplexType } from '../../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { PasswordPreviewHTML } from './password-preview.html';
 import { PasswordPreviewCSS } from './password-preview.css';
@@ -19,7 +19,7 @@ export class PasswordPreview extends ConfigurableWebComponent<{}> {
 		reflect: {
 			id: PROP_TYPE.STRING,
 			websites: {
-				type: JSONType<{
+				type: ComplexType<{
 					host: string;
 					exact: string;
 					favicon: string|null;	

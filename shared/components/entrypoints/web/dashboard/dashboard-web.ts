@@ -1,10 +1,10 @@
 import { ERRS, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../../types/crypto';
-import { DashboardCSS, CustomDashboardCSS } from '../../base/dashboard/dashboard.css';
 import { decryptWithPrivateKey, hash, pad } from '../../../../lib/browser-crypto';
 import { Dashboard, DashboarDependencies } from '../../base/dashboard/dashboard';
 import { GlobalControllerData } from '../../global/global-controller';
 import { DashboardHTML } from '../../base/dashboard/dashboard.html';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
+import { DashboardCSS } from '../../base/dashboard/dashboard.css';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { MasterPassword } from '../../../../types/db-types';
 import { ENTRYPOINT } from '../../../../types/shared-types';
@@ -15,8 +15,7 @@ import { Remove } from '../../../../types/serviceworker';
 	is: 'dashboard-page',
 	css: DashboardCSS,
 	html: DashboardHTML,
-	dependencies: DashboarDependencies,
-	customCSS: CustomDashboardCSS
+	dependencies: DashboarDependencies
 })
 export class DashboardWeb extends Dashboard { 
 	private _data!: Remove<GlobalControllerData['loginData'], 'password' & {
