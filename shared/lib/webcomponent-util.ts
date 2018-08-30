@@ -375,14 +375,16 @@ export function defineProps<P extends {
 	Object.defineProperty(element, 'removeAttribute', {
 		get() {
 			return (key: string) => {
-				const { watch, coerce, mapType } = keyMap.get(key as (typeof keys)[0]['key'])!;
-				if (coerce) {
-					(propValues as any)[key] = getCoerced(undefined, mapType);
-				} else {
-					(propValues as any)[key] = undefined;
-				}
-				if (watch) {
-					element.renderToDOM(CHANGE_TYPE.PROP);
+				if (keyMap.has(key as (typeof keys)[0]['key'])) {
+					const { watch, coerce, mapType } = keyMap.get(key as (typeof keys)[0]['key'])!;
+					if (coerce) {
+						(propValues as any)[key] = getCoerced(undefined, mapType);
+					} else {
+						(propValues as any)[key] = undefined;
+					}
+					if (watch) {
+						element.renderToDOM(CHANGE_TYPE.PROP);
+					}
 				}
 				originalRemoveAttr(key);
 			}
