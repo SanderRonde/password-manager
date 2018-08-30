@@ -33,7 +33,8 @@ abstract class WebComponentDefiner extends elementBase {
 
 	constructor() {
 		super();
-		WebComponentDefiner.listenForFinished(this as any);
+		const definer = customElements.get(this.tagName.toLowerCase()) as typeof WebComponentDefiner;
+		definer.listenForFinished(this as any);
 	}
 
 	private static _finished: boolean = false;
