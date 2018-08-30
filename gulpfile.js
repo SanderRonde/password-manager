@@ -315,11 +315,12 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 								}
 								console.log(warning);
 							},
-							external: [
-								path.join(__dirname, 
-									'shared/components/entrypoints',
-									'base/dashboard/dev-passwords.js')
-							],
+							external: (id) => {
+								if (id.indexOf('dev-passwords') > -1) {
+									return true;
+								}
+								return false;
+							},
 							plugins: [
 								rollupResolve({
 									module: true,
@@ -348,9 +349,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 							format: 'iife',
 							file: output,
 							globals: {
-								[path.join(__dirname, 
-									'shared/components/entrypoints',
-									'base/dashboard/dev-passwords.js')]: '{getDevPasswords: () => {}}'
+								'\u0000commonjs-proxy:./dev-passwords': '{getDevPasswords: () => {}}'
 							},
 						});
 					}),
