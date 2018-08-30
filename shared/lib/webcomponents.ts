@@ -455,6 +455,7 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		const root = this._getRoot();
 		if (root === this) {
 			this._isRoot = true;
+			return;
 		} else if (root === null) {
 			return;
 		}
