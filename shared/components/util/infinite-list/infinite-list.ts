@@ -10,13 +10,22 @@ export type ListItemContainer<D, ID> = HTMLDivElement & {
 	host: InfiniteList<D, ID>
 };
 
+type TemplateValue<D, ID> = {
+	type: "preset";
+	fn: (data: D, itemData: ID, index: number, isTemplate: boolean) => any;
+}|{
+	type: "path";
+	isData: boolean;
+	path: (string | number)[];
+}
+
 @config({
 	is: 'infinite-list',
 	css: InfiniteListCSS,
 	html: InfiniteListHTML
 })
 export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListIDMap> {
-	private _htmlTemplate: (data: D, itemData: ID|null) => TemplateResult = () => html``;
+	private _htmlTemplate: (data: D, itemData: ID|null, index: number, isTemplate: boolean) => TemplateResult = () => html``;
 	private _usedViewportHeight: number|null = null;
 	private _usedData: D[]|null = null;
 	private _itemData: (ID|null)[]|null = null;
@@ -36,7 +45,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 	});
 	public itemSize: number|null = null;
 
-	private static _strToPath(str: string) {
+	private static _strToPath(str: string): TemplateValue<any, any> {
 		const isData = str.startsWith('_data');
 		if (isData) {
 			str = str.slice('_data'.length);
@@ -61,6 +70,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		path.push(currentPathItem);
 
 		return {
+			type: 'path',
 			isData: isData,
 			path: path.filter(item => item !== '')
 		}
@@ -84,15 +94,36 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		}
 	}
 
-	private _genTemplateGetter() {
-		const srcNode = this.$.template.assignedNodes().filter((node) => {
-			//1 = HTMLElement
-			return node.nodeType === 1;
-		})[0] as HTMLElement;
-		if (!srcNode) {
-			return;
+	private _extractStringValue(str: string, value: string,
+		valueGetter: (data: D, itemData: ID, index: number, isTemplate: boolean) => any): {
+			strings: string[];
+			values: TemplateValue<D, ID>[];
+		} {
+			const split = str.split(`="${value}"`);
+			const originalValues = split.map((splitStr, index, arr) => {
+				if (arr.length === 1) {
+					return splitStr;
+				}
+				if (index === 0) {
+					return `${splitStr}="`;
+				}
+				if (index === arr.length - 1) {
+					return `"${splitStr}`
+				}
+				return `"${splitStr}="`;
+			});
+
+			return {
+				strings: originalValues,
+				values: new Array(originalValues.length - 1).fill('').map((_ => ({
+					type: 'preset' as 'preset',
+					fn: valueGetter
+				})))
+			}
 		}
-		const split = srcNode.innerHTML.split(`="${this.props.dataName}`);
+
+	private _splitDataValue(str: string) {
+		const split = str.split(`="${this.props.dataName}`);
 		const values = split.map((part, index) => {
 			if (index === 0) return null;
 			return part.slice(0, part.indexOf('"'));
@@ -107,13 +138,97 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		});
 
 		const dataPaths = values.map(InfiniteList._strToPath);
+		return {
+			strings,
+			values: dataPaths
+		}
+	}
+
+	private _applyExtractorRound(initialStrings: string[], initialValues: TemplateValue<D, ID>[],
+		extractor: (str: string) => {
+			strings: string[];
+			values: TemplateValue<D, ID>[];
+		}): {
+			strings: string[];
+			values: TemplateValue<D, ID>[];
+		} {
+			const newStrings: string[] = [];
+			const newValues: TemplateValue<D, ID>[] = [];
+			for (let i = 0; i < initialStrings.length; i++) {
+				const str = initialStrings[i];
+				const { strings, values } = extractor(str);
+
+				for (let j = 0 ; j < strings.length; j++) {
+					newStrings.push(strings[j]);
+					if (j !== strings.length - 1) {
+						newValues.push(values[j]);
+					}
+				}
+				if (i !== initialStrings.length - 1) {
+					newValues.push(initialValues[i]);
+				}
+			}
+			return {
+				strings: newStrings,
+				values: newValues
+			}
+		}
+
+	private _joinTemplateExtractors(strings: string[], ...extractors: ((str: string) => {
+		strings: string[];
+		values: TemplateValue<D, ID>[];
+	})[]): {
+		strings: string[];
+		values: TemplateValue<D, ID>[];
+	} {
+		let values: TemplateValue<D, ID>[] = [];
+		for (const extractor of extractors) {
+			const { 
+				strings: newStrings, 
+				values: newValues
+			} = this._applyExtractorRound(strings, values, extractor);
+			strings = newStrings;
+			values = newValues;
+		}
+		return {
+			strings, values
+		}
+	}
+
+	private _genTemplateGetter() {
+		const srcNode = this.$.template.assignedNodes().filter((node) => {
+			//1 = HTMLElement
+			return node.nodeType === 1;
+		})[0] as HTMLElement;
+		if (!srcNode) {
+			return;
+		}
+
+		const { strings, values } = this._joinTemplateExtractors([srcNode.innerHTML],
+			(str) => {
+				return this._extractStringValue(str, '_index', (_d, _i, index) => {
+					return index;
+				});
+			}, (str) => {
+				return this._extractStringValue(str, '_is-template', 
+					(_d, _i, __i, isTemplate) => {
+						return isTemplate;
+				});
+			}, (str) => {
+				return this._splitDataValue(str);
+			});
+
 		const templateString: any = strings;
-		templateString.raw = strings;
-		this._htmlTemplate = (data: D, itemData: ID) => {
+		templateString.raw = [...strings];
+		this._htmlTemplate = (data: D, itemData: ID, index: number, isTemplate: boolean) => {
 			return this.complexHTML(templateString as TemplateStringsArray,
-				...dataPaths.map((dataPath) => {
-					return this._evaluateDataPath(data, 
-						itemData, dataPath);
+				...values.map((value) => {
+					if (value.type === 'path') {
+						return this._evaluateDataPath(data, 
+							itemData, value);	
+					} else {
+						return value.fn(data, itemData, index, isTemplate);
+					}
 				}));
 		}
 	}
@@ -126,7 +241,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 			}
 
 		this.$.sizeGetter.classList.remove('hidden');
-		render(this._htmlTemplate(this.props.data[0], null), 
+		render(this._htmlTemplate(this.props.data[0], null, 0, true), 
 			this.$.sizeGetter);
 		this.itemSize = this.$.sizeGetter.getBoundingClientRect().height;
 		this.$.sizeGetter.classList.add('hidden');
@@ -290,7 +405,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 
 		this._containers[freePhysical].virtual = virtual;
 		render(this._htmlTemplate(this.props.data[virtual],
-			this._itemData![virtual]), this._containers[freePhysical].element);
+			this._itemData![virtual], virtual, false), this._containers[freePhysical].element);
 		this._containers[freePhysical].element.style.transform = 
 			`translateY(${virtual * this.itemSize!}px)`;
 	}
