@@ -17,6 +17,16 @@ const redditWebsite = {
 	favicon: '/icons/reddit.png'
 }
 
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
+
+function genRandomString(length: number = 50): string {
+	let str = '';
+	for (let i = 0; i < length; i++) {
+		str += chars[Math.floor(Math.random() * chars.length)];
+	}
+	return str;
+}
+
 function genPassword(websites: {
     host: string;
     exact: string;
@@ -25,6 +35,7 @@ function genPassword(websites: {
 	return {
 		id: getIncrementedId() as any,
 		websites: websites,
+		username: genRandomString(25),
 		twofactor_enabled: twofactorEnabled
 	}
 }
