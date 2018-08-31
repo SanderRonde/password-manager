@@ -228,20 +228,15 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	protected abstract customCSS(): TemplateFn;
 
 	/**
-	 * Internal properties used by the WebComponent class
+	 * The root of this component's DOM
 	 */
-	protected internals = {
-		/**
-		 * The root of this component's DOM
-		 */
-		root: this.attachShadow({
-			mode: 'open'
-		}),
-		/**
-		 * Any hooks that should be called after rendering
-		 */
-		postRenderHooks: [] as (() => void)[]
-	}
+	protected root = this.attachShadow({
+		mode: 'open'
+	})
+	/**
+	 * Any hooks that should be called after rendering
+	 */
+	protected _postRenderHooks = [] as (() => void)[]
 	/**
 	 * The properties of this component
 	 */
@@ -255,7 +250,7 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	}
 
 	private _doPostRenderLifecycle() {
-		this.internals.postRenderHooks.forEach(fn => fn());
+		this._postRenderHooks.forEach(fn => fn());
 		if (this._firstRender) {
 			this._firstRender = false;
 			this.firstRender();
@@ -279,7 +274,7 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 			this.customCSS().render(change, this as any) : 
 			this._noHTML}
 		${this.renderer.render(change, this as any)}`, 
-			this.internals.root);
+			this.root);
 		this._doPostRenderLifecycle();
 	}
 
@@ -819,7 +814,7 @@ export abstract class WebComponent<IDS extends {
 	constructor() {
 		super();
 
-		this.internals.postRenderHooks.push(this._clearMap);
+		this._postRenderHooks.push(this._clearMap);
 	}
 
 	@bindToClass
@@ -836,7 +831,7 @@ export abstract class WebComponent<IDS extends {
 	$: IDMapFn<IDS> = (() => {
 		const __this = this;
 		return new Proxy((selector: string) => {
-			return this.internals.root.querySelector(selector) as HTMLElement;
+			return this.root.querySelector(selector) as HTMLElement;
 		}, {
 			get(_, id) {
 				if (typeof id !== 'string') {
@@ -846,7 +841,7 @@ export abstract class WebComponent<IDS extends {
 				if (cached && __this.shadowRoot!.contains(cached)) {
 					return cached;
 				}
-				const el = __this.internals.root.getElementById(id);
+				const el = __this.root.getElementById(id);
 				if (el) {
 					__this._idMap.set(id, el);
 				}
@@ -862,7 +857,7 @@ export abstract class WebComponent<IDS extends {
     $$<K extends keyof SVGElementTagNameMap>(selector: K): NodeListOf<SVGElementTagNameMap[K]>;
 	$$<E extends Element = Element>(selector: string): NodeListOf<E>;
 	$$(selector: string): NodeListOf<HTMLElement> {
-		return this.internals.root.querySelectorAll(selector);
+		return this.root.querySelectorAll(selector);
 	}
 
 	/**
