@@ -90,9 +90,7 @@ abstract class WebComponentDefiner extends elementBase {
 		}
 		define(this.is.name, this.is.component);
 
-		if (isRoot) {
-			this._finishLoad();
-		}
+		this._finishLoad();
 	}
 
 	private static _doSingleMount(component: WebComponent<any, any>) {
