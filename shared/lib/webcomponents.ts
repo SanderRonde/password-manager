@@ -30,21 +30,38 @@ abstract class WebComponentDefiner extends elementBase {
 	 * A tuple consisting of the name of the component and its class
 	 */
 	protected static is: ComponentIs;
+	/**
+	 * Any hooks that should be called after the constructor
+	 */
+	protected _connectedHooks = [] as (() => void)[];
 
 	constructor() {
 		super();
+
+		const isConnected = new Promise<void>((resolve) => {
+			this._connectedHooks.push(() => {
+				resolve();
+			});
+		});
 		const definer = customElements.get(this.tagName.toLowerCase()) as typeof WebComponentDefiner;
-		definer.listenForFinished(this as any);
+		definer.listenForFinished(this as any, isConnected);
 	}
 
 	private static _finished: boolean = false;
-	private static _listeners: WebComponent<any, any>[] = [];
-	protected static listenForFinished(component: WebComponent<any, any>) {
+	private static _listeners: {
+		component: WebComponent<any, any>;
+		constructed: Promise<void>;
+	}[] = [];
+	protected static async listenForFinished(component: WebComponent<any, any>, isConstructed: Promise<void>) {
 		if (this._finished) {
+			await isConstructed;
 			component.isMounted = true;
 			component.mounted();
 		} else {
-			this._listeners.push(component);
+			this._listeners.push({
+				component,
+				constructed: isConstructed
+			});
 		}
 	}
 
@@ -77,15 +94,15 @@ abstract class WebComponentDefiner extends elementBase {
 		}
 	}
 
-	private static _doSingleMount(listener: WebComponent<any, any>) {
+	private static _doSingleMount(component: WebComponent<any, any>) {
 		return new Promise((resolve) => {
 			(window.requestAnimationFrame || window.webkitRequestAnimationFrame)(() => {
-				if (listener.isMounted) {
+				if (component.isMounted) {
 					resolve();
 					return;
 				}
-				listener.isMounted = true;
-				listener.mounted();
+				component.isMounted = true;
+				component.mounted();
 				resolve();
 			});
 		});
@@ -94,16 +111,18 @@ abstract class WebComponentDefiner extends elementBase {
 	private static async _finishLoad() {
 		this._finished = true;
 		if (window.requestAnimationFrame || window.webkitRequestAnimationFrame) {
-			for (const listener of [...this._listeners]) {
-				await this._doSingleMount(listener);
+			for (const { component, constructed } of [...this._listeners]) {
+				await constructed;
+				await this._doSingleMount(component);
 			}
 		} else {
-			this._listeners.forEach((listener) => {
-				if (listener.isMounted) {
+			this._listeners.forEach(async ({ constructed, component }) => {
+				await constructed;
+				if (component.isMounted) {
 					return;
 				}
-				listener.isMounted = true;
-				listener.mounted();
+				component.isMounted = true;
+				component.mounted();
 			});
 		}
 	}
@@ -232,11 +251,12 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	 */
 	protected root = this.attachShadow({
 		mode: 'open'
-	})
+	});
 	/**
 	 * Any hooks that should be called after rendering
 	 */
-	protected _postRenderHooks = [] as (() => void)[]
+	protected _postRenderHooks = [] as (() => void)[];
+	
 	/**
 	 * The properties of this component
 	 */
@@ -809,11 +829,10 @@ export abstract class WebComponent<IDS extends {
 	 */
 	private _idMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
 	protected _disposables: (() => void)[] = [];
-	public isMounted: boolean = this.isMounted || false;
+	public isMounted: boolean = false;
 
 	constructor() {
 		super();
-
 		this._postRenderHooks.push(this._clearMap);
 	}
 
@@ -867,6 +886,8 @@ export abstract class WebComponent<IDS extends {
 		super.connectedCallback();
 		this.renderToDOM(CHANGE_TYPE.ALWAYS);
 		this.layoutMounted();
+
+		this._connectedHooks.filter(fn => fn());
 	}
 
 	/**
