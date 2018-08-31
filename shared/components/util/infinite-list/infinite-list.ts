@@ -62,7 +62,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 	}
 
 	private get _itemSizes() {
-		this._genItemSizeArr();
+		this._genItemSizeArrs();
 		return this.__itemSizes;
 	}
 
@@ -82,15 +82,30 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 			return min;
 		}
 		return (this.__minSize = this._inferredItemSize);
-	}
+	}	
 
-	private _genItemSizeArr() {
+	private __cumulativeItemSizes: number[]|null = null;
+	private _genItemSizeArrs() {
 		if (this.__itemSizes || !this.props.data || !this.props.itemSize) return;
 		this.__itemSizes = this.props.data.map((data) => {
 			return this.props.itemSize(data, {
 				isMin: false
 			});
 		});
+
+		let offset: number = 0;
+		this.__cumulativeItemSizes = [];
+		for (const item of this.__itemSizes) {
+			this.__cumulativeItemSizes!.push(offset);
+			
+			offset += item;
+		}
+	}
+
+	private get _cumulativeItemSizes() {
+		this._genItemSizeArrs();
+		console.log(this.__cumulativeItemSizes);
+		return this.__cumulativeItemSizes;
 	}
 
 	private static _strToPath(str: string): TemplateValue<any, any> {
@@ -543,9 +558,8 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		}
 		if (this.props.itemSize) {
 			this.$.physicalContent.style.height = 
-				this._itemSizes!.reduce((prev, current) => {
-					return prev + current;
-				}, 0) + 'px';	
+				(this._cumulativeItemSizes!.slice(-1)[0] +
+					this._itemSizes!.slice(-1)[0]) + 'px';
 		} else {
 			this.$.physicalContent.style.height = (this.props.data.length *
 				this._inferredItemSize!) + 'px';
@@ -568,9 +582,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 
 	private _getStartOffset(virtualIndex: number) {
 		if (this.props.itemSize) {
-			return this.__itemSizes!.slice(0, virtualIndex).reduce((prev, current) => {
-				return prev + current;
-			}, 0);
+			return this._cumulativeItemSizes![virtualIndex];
 		}
 		return this._inferredItemSize * virtualIndex;
 	}
