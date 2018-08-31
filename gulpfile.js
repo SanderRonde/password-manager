@@ -352,11 +352,14 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 							format: 'iife',
 							file: output
 						});
-						const fileContent = await fs.readFile(output, {
-							encoding: 'utf8'
-						});
-						await fs.writeFile(output, fileContent
-							.replace(/\}\(devPasswords(.*)\)/g, '}({})'));
+						if (route === 'dashboard') {
+							const fileContent = await fs.readFile(output, {
+								encoding: 'utf8'
+							});
+							await fs.writeFile(output, fileContent
+								.split('\n').slice(0, -2).join('\n') +
+									`\n}({}));`)
+						}
 					}),
 					dynamicFunctionNameAsync(`minifyJS${capitalize(route)}`, async () => {
 						const file = await fs.readFile(output, {
