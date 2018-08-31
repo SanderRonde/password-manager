@@ -356,7 +356,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 							encoding: 'utf8'
 						});
 						await fs.writeFile(output, fileContent
-							.replace(/\}\(devPasswords\)/g, '}({})'));
+							.replace(/\}\(devPasswords(.*)\)/g, '}({})'));
 					}),
 					dynamicFunctionNameAsync(`minifyJS${capitalize(route)}`, async () => {
 						const file = await fs.readFile(output, {
