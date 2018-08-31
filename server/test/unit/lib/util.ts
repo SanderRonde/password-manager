@@ -388,10 +388,10 @@ export async function setPasword(toSet: {
 	});
 	const expected2FAEnabled = toSet.twofactor_enabled;
 	const expectedEncrypted = encrypt({
-		username: toSet.username,
 		password: toSet.password,
 		notes: toSet.notes
 	}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
+	const expectedUsername = toSet.username;
 	
 	const response = JSON.parse(await doServerAPIRequest({ 
 		port: http,
@@ -403,7 +403,8 @@ export async function setPasword(toSet: {
 		websites: expectedWebsites,
 		twofactor_enabled: expected2FAEnabled,
 		encrypted: expectedEncrypted,
-		count: config.count++
+		count: config.count++,
+		username: expectedUsername
 	}));
 
 	assert.isTrue(response.success, 'API call succeeded');
@@ -460,6 +461,8 @@ export async function setPasword(toSet: {
 	assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 	if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 	assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+	assert.strictEqual(decrypt(password.username, dbpw), expectedUsername,
+		'decrypted username is the same');
 
 	return data.id;
 }

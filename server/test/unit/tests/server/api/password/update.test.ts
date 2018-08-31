@@ -25,7 +25,8 @@ export function passwordUpdateTest() {
 			websites: 'array',
 			twofactor_enabled: 'boolean',
 			encrypted: 'string',
-			twofactor_token: 'string'
+			twofactor_token: 'string',
+			username: 'string'
 		});
 		it('password can be updated', async () => {
 			const config = await genUserAndDb({
@@ -49,10 +50,10 @@ export function passwordUpdateTest() {
 			const expectedWebsites = [genURL(), genURL(), genURL()];
 			const expected2FAEnabled = Math.random() > 0.5;
 			const expectedEncrypted = encrypt({
-				username: genRandomString(25),
 				password: genRandomString(25),
 				notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 			}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
+			const expectedUsername = genRandomString(25);
 			
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
@@ -69,6 +70,7 @@ export function passwordUpdateTest() {
 						favicon: null
 					}
 				}),
+				username: expectedUsername,
 				twofactor_enabled: expected2FAEnabled,
 				encrypted: expectedEncrypted
 			}));
@@ -126,6 +128,8 @@ export function passwordUpdateTest() {
 			assert.notStrictEqual(decryptedEncryptedData, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			if (decryptedTwofactorEnabled === ERRS.INVALID_DECRYPT) return;
 			assert.strictEqual(decryptedEncryptedData, expectedEncrypted, 'encrypted data is the same');
+			assert.strictEqual(decrypt(password.username, dbpw), expectedUsername,
+						'decrypted username is the same');
 		});
 		it('fails if it requires 2FA and no 2FA token is passed', async () => {
 			const { base32 } = speakeasy.generateSecret({
@@ -156,6 +160,7 @@ export function passwordUpdateTest() {
 				password: genRandomString(25),
 				notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 			}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
+			const expectedUsername = genRandomString(25);
 			
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
@@ -172,6 +177,7 @@ export function passwordUpdateTest() {
 						favicon: null
 					}
 				}),
+				username: expectedUsername,
 				twofactor_enabled: expected2FAEnabled,
 				encrypted: expectedEncrypted
 			}));
@@ -213,6 +219,7 @@ export function passwordUpdateTest() {
 				password: genRandomString(25),
 				notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 			}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
+			const expectedUsername = genRandomString(25);
 			
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
@@ -229,6 +236,7 @@ export function passwordUpdateTest() {
 						favicon: null
 					}
 				}),
+				username: expectedUsername,
 				twofactor_enabled: expected2FAEnabled,
 				twofactor_token: speakeasy.totp({
 					secret: base32,
@@ -314,12 +322,12 @@ export function passwordUpdateTest() {
 					twofactor_enabled: false,
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
-							username: string;
 							password: string;
 							notes: string[];
 						}>, Hashed<Padded<string, "masterpwdecrypt">, "sha512">, "aes-256-ctr">;
 						algorithm: "aes-256-ctr";
-					}>
+					}>,
+					username: 'someusername'
 				},
 				server: server,
 				publicKey: server_public_key
@@ -345,10 +353,10 @@ export function passwordUpdateTest() {
 					token: token!,
 					count: config.count++,
 					websites: [],
+					username: 'someusername',
 					twofactor_enabled: false,
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
-							username: string;
 							password: string;
 							notes: string[];
 						}>, Hashed<Padded<string, "masterpwdecrypt">, "sha512">, "aes-256-ctr">;

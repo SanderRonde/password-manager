@@ -388,6 +388,10 @@ export declare namespace APIRoutes {
 				}
 			}[];
 			/**
+			 * The username for this website
+			 */
+			username: string;
+			/**
 			 * Whether 2FA should be enabled for this password
 			 */
 			twofactor_enabled: boolean;
@@ -399,10 +403,6 @@ export declare namespace APIRoutes {
 				 * The actual data
 				 */
 				data: Encrypted<EncodedString<{
-					/**
-					 * The username for this website
-					 */
-					username: string;
 					/**
 					 * The password for this website
 					 */
@@ -466,6 +466,10 @@ export declare namespace APIRoutes {
 				}
 			}[];
 			/**
+			 * The username for this website
+			 */
+			username: string;
+			/**
 			 * Whether 2FA should be enabled for this password
 			 */
 			twofactor_enabled: boolean;
@@ -481,10 +485,6 @@ export declare namespace APIRoutes {
 				 * The actual data
 				 */
 				data: Encrypted<EncodedString<{
-					/**
-					 * The username for this website
-					 */
-					username: string;
 					/**
 					 * The password for this website
 					 */
@@ -561,15 +561,15 @@ export declare namespace APIRoutes {
 			 */
 			encrypted: PublicKeyEncrypted<EncodedString<{
 				id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
+				/**
+				 * The username of the website (or group)
+				 */
+				username: string;
 				encrypted: EncodedString<{
 					/**
 					 * The encrypted data
 					 */
 					data: Encrypted<EncodedString<{
-						/**
-						 * The username of the website (or group)
-						 */
-						username: string;
 						/**
 						 * The password of the website (or group)
 						 */
@@ -617,6 +617,10 @@ export declare namespace APIRoutes {
 				 * The ID of the password
 				 */
 				id: P;
+				/**
+				 * The username of the website (or group)
+				 */
+				username: string;
 				/**
 				 * The websites for which this password ID works
 				 */
@@ -672,6 +676,10 @@ export declare namespace APIRoutes {
 				 */
 				id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
 				/**
+				 * The username of the website (or group)
+				 */
+				username: string;
+				/**
 				 * The websites for which this password works
 				 */
 				websites: {
@@ -725,6 +733,10 @@ export declare namespace APIRoutes {
 				 * The ID of the password
 				 */
 				id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
+				/**
+				 * The username of the website (or group)
+				 */
+				username: string;
 				/**
 				 * The websites for which this password works
 				 */

@@ -90,10 +90,11 @@ export class DatabaseEncryption {
 	}
 
 	public dbDecryptPasswordRecord({ 
-		user_id, encrypted, websites , twofactor_enabled
+		user_id, encrypted, websites, twofactor_enabled, username
 	}: EncryptedPassword|UnstringifyObjectIDs<EncryptedPassword>): DecryptedPassword {
 		return {
 			user_id: user_id,
+			username: this.dbDecrypt(username),
 			websites: websites.map(({ host, exact, favicon }) => {
 				return {
 					host: this.dbDecrypt(host),

@@ -235,8 +235,8 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 		user_id: id,
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 		websites: [],
+		username: encrypt('someusername', dbpw, ENCRYPTION_ALGORITHM),
 		encrypted: encrypt(encrypt({
-			username: 'someusername',
 			password: 'somepw',
 			notes: []
 		}, hash(pad(userpw, 'masterpwdecrypt')), 
@@ -244,13 +244,13 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 	}, {
 		user_id: id,
 		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
+		username: encrypt('someusername', dbpw, ENCRYPTION_ALGORITHM),
 		websites: [{
 			exact: encrypt('someexacturl', dbpw, ENCRYPTION_ALGORITHM),
 			host: encrypt('somehost', dbpw, ENCRYPTION_ALGORITHM),
 			favicon: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
 		}],
 		encrypted: encrypt(encrypt({
-			username: 'someusername',
 			password: 'somepw',
 			notes: []
 		}, hash(pad(userpw, 'masterpwdecrypt')), 
@@ -259,8 +259,8 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 		user_id: id,
 		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
 		websites: [],
+		username: encrypt('someusername', dbpw, ENCRYPTION_ALGORITHM),
 		encrypted: encrypt(encrypt({
-			username: 'someusername',
 			password: 'somepw',
 			notes: []
 		}, hash(pad(userpw, 'masterpwdecrypt')), 
@@ -269,8 +269,8 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 		user_id: new mongo.ObjectId() as TypedObjectID<EncryptedAccount>, 
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 		websites: [],
+		username: encrypt('someusername', dbpw, ENCRYPTION_ALGORITHM),
 		encrypted: encrypt(encrypt({
-			username: 'someusername',
 			password: 'somepw',
 			notes: []
 		}, hash(pad(userpw, 'masterpwdecrypt')), 
@@ -278,13 +278,13 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 	}, {
 		user_id: new mongo.ObjectId() as TypedObjectID<EncryptedAccount>, 
 		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
+		username: encrypt('someusername', dbpw, ENCRYPTION_ALGORITHM),
 		websites: [{
 			exact: encrypt('someexacturl', dbpw, ENCRYPTION_ALGORITHM),
 			host: encrypt('somehost', dbpw, ENCRYPTION_ALGORITHM),
 			favicon: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
 		}],
 		encrypted: encrypt(encrypt({
-			username: 'someusername',
 			password: 'somepw',
 			notes: []
 		}, hash(pad(userpw, 'masterpwdecrypt')), 

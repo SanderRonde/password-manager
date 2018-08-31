@@ -74,7 +74,7 @@ export function passwordGetTest() {
 				hash(pad(userpw, 'masterpwdecrypt')));
 			if (isErr(decryptedEncrypted)) return;
 
-			assert.strictEqual(decryptedEncrypted.username, username, 'username is the same');
+			assert.strictEqual(parsed.username, username, 'username is the same');
 			assert.strictEqual(decryptedEncrypted.password, password, 'password is the same');
 			for (let i = 0; i < notes.length; i++) {
 				const expectedNote = notes[i];
@@ -188,7 +188,7 @@ export function passwordGetTest() {
 				hash(pad(userpw, 'masterpwdecrypt')));
 			if (isErr(decryptedEncrypted)) return;
 
-			assert.strictEqual(decryptedEncrypted.username, username, 'username is the same');
+			assert.strictEqual(parsed.username, username, 'username is the same');
 			assert.strictEqual(decryptedEncrypted.password, password, 'password is the same');
 			for (let i = 0; i < notes.length; i++) {
 				const expectedNote = notes[i];

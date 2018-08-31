@@ -311,6 +311,10 @@ export interface EncryptedPassword {
 		favicon: EncodedString<DatabaseEncrypted<EncodedString<StringifiedObjectId<EncryptedAsset>|null>>>;
 	}[];
 	/**
+	 * (encrypted) The username of the website (or group)
+	 */
+	username: EncodedString<DatabaseEncrypted<EncodedString<string>>>;
+	/**
 	 * (encrypted) Whether 2FA is enabled for this password
 	 */
 	twofactor_enabled: EncodedString<DatabaseEncryptedWithSalt<boolean>>;
@@ -323,10 +327,6 @@ export interface EncryptedPassword {
 		 * The encrypted data
 		 */
 		data: Encrypted<EncodedString<{
-			/**
-			 * The username of the website (or group)
-			 */
-			username: string;
 			/**
 			 * The password of the website (or group)
 			 */
@@ -369,6 +369,10 @@ export interface DecryptedPassword {
 		favicon: StringifiedObjectId<EncryptedAsset>|null|null;
 	}[];
 	/**
+	 * The username of the website (or group)
+	 */
+	username: string;
+	/**
 	 * Whether 2FA is enabled for this password
 	 */
 	twofactor_enabled: boolean;
@@ -381,10 +385,6 @@ export interface DecryptedPassword {
 		 * The encrypted data
 		 */
 		data: Encrypted<EncodedString<{
-			/**
-			 * The username of the website (or group)
-			 */
-			username: string;
 			/**
 			 * The password of the website (or group)
 			 */

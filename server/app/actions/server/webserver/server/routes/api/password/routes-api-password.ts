@@ -204,10 +204,10 @@ export class RoutesApiPassword {
 					content: string;
 				}|null;
 			}[]
+			username: string;
 			twofactor_enabled: boolean;
 			encrypted: EncodedString<{
 				data: Encrypted<EncodedString<{
-					username: string;
 					password: string;
 					notes: string[];
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
@@ -215,8 +215,8 @@ export class RoutesApiPassword {
 			}>;
 		}, {}>({
 			unencrypted: ['instance_id'], 
-			encrypted: ['token', 'count', 'websites', 'encrypted', 'twofactor_enabled']
-		}, {}, async (toCheck, { count, instance_id, token, websites, encrypted, twofactor_enabled }) => {
+			encrypted: ['token', 'count', 'websites', 'encrypted', 'twofactor_enabled', 'username']
+		}, {}, async (toCheck, { count, instance_id, token, websites, encrypted, twofactor_enabled, username }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -236,6 +236,9 @@ export class RoutesApiPassword {
 			}, {
 				val: 'count',
 				type: 'number'
+			}, {
+				val: 'username',
+				type: 'string'
 			}])) return;
 
 			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
@@ -309,6 +312,7 @@ export class RoutesApiPassword {
 							favicon.id : null)
 					}
 				}),
+				username: this.server.database.Crypto.dbEncrypt(username),
 				encrypted: this.server.database.Crypto.dbEncrypt(encrypted)
 			};
 			const result = await this.server.database.Manipulation.insertOne(COLLECTIONS.PASSWORDS, record);
@@ -346,11 +350,11 @@ export class RoutesApiPassword {
 					content: string;
 				}|null;
 			}[];
+			username: string;
 			twofactor_enabled: boolean;
 			twofactor_token: string;
 			encrypted: EncodedString<{
 				data: Encrypted<EncodedString<{
-					username: string;
 					password: string;
 					notes: string[];
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
@@ -360,7 +364,7 @@ export class RoutesApiPassword {
 			unencrypted: ['instance_id'], 
 			encrypted: ['token', 'count', 'password_id']
 		}, {
-			encrypted: ['encrypted', 'twofactor_enabled', 'websites', 'twofactor_token']
+			encrypted: ['encrypted', 'twofactor_enabled', 'websites', 'twofactor_token', 'username']
 		}, async (toCheck, { 
 			token, 
 			instance_id, 
@@ -369,7 +373,8 @@ export class RoutesApiPassword {
 			encrypted, 
 			twofactor_enabled, 
 			websites,
-			count
+			count,
+			username
 		}) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
@@ -396,6 +401,9 @@ export class RoutesApiPassword {
 			}, {
 				val: 'count',
 				type: 'number'
+			}, {
+				val: 'username',
+				type: 'string'
 			}])) return;
 
 			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
@@ -475,7 +483,9 @@ export class RoutesApiPassword {
 						}
 					}) : undefined,
 				encrypted: encrypted ?
-					this.server.database.Crypto.dbEncrypt(encrypted) : undefined
+					this.server.database.Crypto.dbEncrypt(encrypted) : undefined,
+				username: username ?
+					this.server.database.Crypto.dbEncrypt(username) : undefined
 			})) {
 				res.status(500);
 				res.json({
@@ -604,7 +614,7 @@ export class RoutesApiPassword {
 			if (!this._verify2FAIfEnabled(account.twofactor_secret, twofactor_token,
 				password, res)) return;
 
-			const { encrypted, websites, twofactor_enabled } = this.server.database.Crypto
+			const { encrypted, websites, twofactor_enabled, username } = this.server.database.Crypto
 				.dbDecryptPasswordRecord(password);
 			res.status(200);
 			res.json({
@@ -620,6 +630,7 @@ export class RoutesApiPassword {
 									'/' + path.relative(this.server.assetPath, website.favicon)
 							}
 						}),
+						username,
 						twofactor_enabled: twofactor_enabled,
 						encrypted: encrypted
 					}), decryptedInstance.public_key)
@@ -663,7 +674,7 @@ export class RoutesApiPassword {
 				decryptedInstance, res);
 			if (!password) return;
 
-			const { websites, twofactor_enabled } = this.server.database.Crypto
+			const { websites, twofactor_enabled, username } = this.server.database.Crypto
 				.dbDecryptPasswordRecord(password);
 			res.status(200);
 			res.json({
@@ -679,6 +690,7 @@ export class RoutesApiPassword {
 									'/' + path.relative(this.server.assetPath, website.favicon)
 							}
 						}),
+						username,
 						twofactor_enabled: twofactor_enabled
 					}), decryptedInstance.public_key)
 				}
@@ -771,6 +783,7 @@ export class RoutesApiPassword {
 							.dbDecryptPasswordRecord(password);
 						return {
 							id: password._id.toHexString(),
+							username: decrypted.username,
 							websites: decrypted.websites.map((website) => {
 								return {
 									host: website.host,
@@ -904,6 +917,7 @@ export class RoutesApiPassword {
 							.dbDecryptPasswordRecord(password);
 						return {
 							id: password._id.toHexString(),
+							username: decrypted.username,
 							websites: decrypted.websites.map((website) => {
 								return {
 									host: website.host,
