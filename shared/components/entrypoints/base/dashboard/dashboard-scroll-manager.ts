@@ -1,8 +1,9 @@
-import { ConfigurableWebComponent, isNewElement } from '../../../../lib/webcomponents';
 import { createDisposableWindowListener } from '../../../../lib/webcomponent-util';
+import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { PW_VIEW_SCROLL, TITLE_BAR_HEIGHT } from './dashboard.css';
 import { bindToClass } from '../../../../lib/decorators';
 import { DashboardIDMap } from './dashboard-querymap';
+import { isNewElement } from "../../../../lib/listeners";
 
 const MAX_DOC_SCROLL = PW_VIEW_SCROLL - TITLE_BAR_HEIGHT;
 

@@ -1,5 +1,6 @@
-import { WebComponentBase, EventListenerObj, WebComponent, supportsPassive, TemplateFn, CHANGE_TYPE, WebComponentComplexValueManager } from './webcomponents';
-export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './webcomponents';
+import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TYPE, WebComponentComplexValueManager } from './webcomponents';
+export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './listeners';
+import { supportsPassive } from "./listeners";
 
 // From https://github.com/JedWatson/classnames
 
