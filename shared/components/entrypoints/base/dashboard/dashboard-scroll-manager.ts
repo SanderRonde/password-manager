@@ -1,10 +1,10 @@
 import { ConfigurableWebComponent, isNewElement } from '../../../../lib/webcomponents';
 import { createDisposableWindowListener } from '../../../../lib/webcomponent-util';
-import { MAX_PASSWORD_VIEW_SCROLL, TITLE_BAR_HEIGHT } from './dashboard.css';
+import { PW_VIEW_SCROLL, TITLE_BAR_HEIGHT } from './dashboard.css';
 import { bindToClass } from '../../../../lib/decorators';
 import { DashboardIDMap } from './dashboard-querymap';
 
-const MAX_DOC_SCROLL = MAX_PASSWORD_VIEW_SCROLL - TITLE_BAR_HEIGHT;
+const MAX_DOC_SCROLL = PW_VIEW_SCROLL - TITLE_BAR_HEIGHT;
 
 export abstract class DashboardScrollManager extends ConfigurableWebComponent<DashboardIDMap> {
 	private get _intersectionObserverSupported() {
@@ -43,11 +43,11 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 	private _observers = this._intersectionObserverSupported ? {
 		detailView: new IntersectionObserver(this._detailViewIntersect, {
 			root: null,
-			rootMargin: `-${MAX_PASSWORD_VIEW_SCROLL + TITLE_BAR_HEIGHT}px 0px 0px 0px`
+			rootMargin: `-${PW_VIEW_SCROLL + TITLE_BAR_HEIGHT}px 0px 0px 0px`
 		}),
 		list: new IntersectionObserver(this._listIntersect, {
 			root: null,
-			rootMargin: `-${MAX_PASSWORD_VIEW_SCROLL}px 0px 0px 0px`
+			rootMargin: `-${PW_VIEW_SCROLL}px 0px 0px 0px`
 		})
 	 } : null;
 
@@ -58,7 +58,7 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 			this._passwordFocusIsFixed = false;
 			this.$.passwordFocus.classList.remove('fixed');
 		} else if (!this._passwordFocusIsFixed && 
-			this.$.passwordFocus.getBoundingClientRect().top <= MAX_PASSWORD_VIEW_SCROLL) {
+			this.$.passwordFocus.getBoundingClientRect().top <= PW_VIEW_SCROLL) {
 				this._passwordFocusIsFixed = true;
 				this.$.passwordFocus.classList.add('fixed');
 			}

@@ -5,7 +5,7 @@ import { html } from "lit-html";
 
 const PAGE_TOP = 130;
 export const TITLE_BAR_HEIGHT = 60;
-export const MAX_PASSWORD_VIEW_SCROLL = 85;
+export const PW_VIEW_SCROLL = 85;
 
 export const CustomDashboardCSS = {
 	searchInput: new TemplateFn<Dashboard>((_props, theme) => html`<style>
@@ -119,7 +119,7 @@ export const DashboardCSS = new TemplateFn<Dashboard>((_props, theme) => {
 
 		#passwordFocus.fixed {
 			position: fixed;
-			${`margin-top: -${PAGE_TOP - MAX_PASSWORD_VIEW_SCROLL}px;`}
+			${`margin-top: -${PAGE_TOP - PW_VIEW_SCROLL}px;`}
 		}
 
 		#pageContainer {
