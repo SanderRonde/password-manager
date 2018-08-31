@@ -18,12 +18,6 @@ export const InfiniteListCSS = new TemplateFn<InfiniteList<any, any>>(function(_
 			position: absolute;
 		}
 
-		.item {
-			${this.itemSize !== null ? 
-				html`height: ${this.itemSize}px` : html``
-			}
-		}
-
 		#contentContainer {
 			display: flex;
 			position: relative;

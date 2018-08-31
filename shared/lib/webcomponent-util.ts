@@ -450,31 +450,29 @@ export function defineProps<P extends {
 			}
 		});
 		(async () => {
-			let renderOnDone: boolean = false;
 			if (mapType !== 'complex') {
 				propValues[mapKey] = getter(element, propName, mapType) as any;
 			} else {
-				renderOnDone = true;
-				await awaitMounted(element as any);
-				if (!isPrivate || element.getAttribute(propName) !== '_') {
-					propValues[mapKey] = getter(element, propName, mapType) as any;
-				}
+				await hookIntoMount(element as any, () => {
+					if (!isPrivate || element.getAttribute(propName) !== '_') {
+						propValues[mapKey] = getter(element, propName, mapType) as any;
+					}
+				});
 			}
 			if (defaultValue !== undefined && propValues[mapKey] === undefined) {
 				propValues[mapKey] = defaultValue as any;
-				await awaitMounted(element as any);
-				setter(originalSetAttr, originalRemoveAttr, propName, 
-					isPrivate ? '_' : defaultValue, mapType);
-				renderOnDone = true;
+				await hookIntoMount(element as any, () => {
+					setter(originalSetAttr, originalRemoveAttr, propName, 
+						isPrivate ? '_' : defaultValue, mapType);
+				});
 			} else if (isPrivate || mapType === 'complex') {
-				await awaitMounted(element as any);
-				setter(originalSetAttr, originalRemoveAttr, propName,
-					isPrivate ? '_' : propValues[mapKey] as any, mapType);
-				renderOnDone = true;
+				await hookIntoMount(element as any, () => {
+					setter(originalSetAttr, originalRemoveAttr, propName,
+						isPrivate ? '_' : propValues[mapKey] as any, mapType);
+				});
 			}
-			if (renderOnDone) {
-				element.renderToDOM(CHANGE_TYPE.PROP);
-			}
+			await awaitMounted(element as any);
+			element.renderToDOM(CHANGE_TYPE.PROP);
 		})();
 	}
 	return props as R;
@@ -841,6 +839,22 @@ export async function awaitMounted(el: WebComponentBase) {
 	await new Promise((resolve) => {
 		const originalMounted = realEl.mounted && realEl.mounted.bind(realEl);
 		realEl.mounted = () => {
+			originalMounted && originalMounted();
+			resolve();
+		}
+	});
+}
+
+export async function hookIntoMount(el: WebComponentBase, fn: () => void) {
+	const realEl = el as WebComponent;
+	if (realEl.isMounted) {
+		fn();
+		return;
+	}
+	await new Promise((resolve) => {
+		const originalMounted = realEl.mounted && realEl.mounted.bind(realEl);
+		realEl.mounted = () => {
+			fn();
 			originalMounted && originalMounted();
 			resolve();
 		}

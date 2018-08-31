@@ -40,10 +40,58 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 				defaultValue: [],
 				isPrivate: true
 			},
-			window: PROP_TYPE.BOOL
+			window: PROP_TYPE.BOOL,
+			itemSize: ComplexType<(data: D, special: {
+				isMin: boolean;
+			}) => number>()
 		}
 	});
-	public itemSize: number|null = null;
+	private _inferredItemSize: number = 0;
+	private __itemSizes: number[]|null = null;
+
+	private _canGetItemSize() {
+		if (this.props.itemSize) {
+			if (!this._itemSizes) {
+				if (!this.props.data) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return !!this._inferredItemSize;
+	}
+
+	private get _itemSizes() {
+		this._genItemSizeArr();
+		return this.__itemSizes;
+	}
+
+	private __minSize: number|null = null;
+	private get _minSize() {
+		if (this.__minSize !== null) {
+			return this.__minSize;
+		}
+		if (this.props.itemSize) {
+			let min = (this.__minSize = this.props.itemSize({} as any, {
+				isMin: true
+			}));
+			if (min === 0) {
+				console.warn('Don\'t supply 0 as the minimum value as that results in infinite entries');
+				min = 1;
+			}
+			return min;
+		}
+		return (this.__minSize = this._inferredItemSize);
+	}
+
+	private _genItemSizeArr() {
+		if (this.__itemSizes || !this.props.data || !this.props.itemSize) return;
+		this.__itemSizes = this.props.data.map((data) => {
+			return this.props.itemSize(data, {
+				isMin: false
+			});
+		});
+	}
 
 	private static _strToPath(str: string): TemplateValue<any, any> {
 		const isData = str.startsWith('_data');
@@ -234,27 +282,35 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 	}
 
 	private async _setListItemSize() {
-		if (this.itemSize || !this.$.sizeGetter ||
+		if (this._inferredItemSize || !this.$.sizeGetter ||
 			!this.props.data ||
 			!(0 in this.props.data)) {
 				return;
 			}
 
+		if (this.props.itemSize) {
+			if (this._canGetItemSize()) {
+				this._setContainerSize();
+				this._inferredItemSize = 1;
+				this.renderToDOM();
+			}
+			return;
+		}
 		this.$.sizeGetter.classList.remove('hidden');
 		render(this._htmlTemplate(this.props.data[0], null, 0, true), 
 			this.$.sizeGetter);
-		this.itemSize = this.$.sizeGetter.getBoundingClientRect().height;
+		this._inferredItemSize = this.$.sizeGetter.getBoundingClientRect().height;
 		this.$.sizeGetter.classList.add('hidden');
-		if (this.itemSize !== 0) {
+		if (this._inferredItemSize !== 0) {
 			this._setContainerSize();
 			this.renderToDOM();
 		}
 	}
 
-	private get _itemsPerViewport() {
+	private _itemsPerViewport() {
 		const viewport = this.getBoundingClientRect().height;
 		this._usedViewportHeight = this.props.window ? window.innerHeight : viewport;
-		return Math.ceil((this._usedViewportHeight / this.itemSize!) * 3) + 1;
+		return Math.ceil((this._usedViewportHeight / this._minSize) * 3) + 1;
 	}
 
 	private get _scrolled() {
@@ -286,7 +342,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 	}[] = [];
 	private _createContainers() {
 		//Calculate the amount of containers
-		const containers = this._itemsPerViewport;
+		const containers = this._itemsPerViewport();
 		this._containers = Array(containers).fill('').map((_, index) => {
 			const el = document.createElement('div');
 			el.tabIndex = -1;
@@ -322,18 +378,46 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		});
 	}
 
+	private _getElementStartingAt(offset: number) {
+		const list = this._itemSizes!;
+		
+		let total: number = 0;
+		for (let i = 0; i < list.length; i++) {
+			if (total >= offset) {
+				return i;
+			}
+			total += list[i];
+		}
+		return list.length - 1;
+	}
+
+	private _getFillingItems(startOffset: number, maxOffset: number) {
+		let offset = startOffset;
+		let virtualIndex = Math.max(0, this._getElementStartingAt(startOffset));
+
+		const rendered: number[] = [];
+		while (offset < maxOffset && virtualIndex < this._itemSizes!.length) {
+			rendered.push(virtualIndex);
+			offset += this._itemSizes![virtualIndex];
+			virtualIndex++;
+		}
+		return rendered;
+	}
+
 	private _getVisibleVirtual() {
 		const scrolled = this._scrolled;
 		
 		//Render about a viewport above and a viewport below
-		const topScrolled = scrolled - this._usedViewportHeight!;
+		const topScrolled = Math.max(0, scrolled - this._usedViewportHeight!);
 		const bottomScrolled = scrolled + this._usedViewportHeight!;
 
-		const firstElementIndex = Math.max(0, 
-			Math.floor(topScrolled / this.itemSize!));
-		const lastElementIndex = Math.min(this.props.data.length,
-			Math.ceil(bottomScrolled / this.itemSize!));
-		return createNumberList(firstElementIndex, lastElementIndex);
+		if (!this.props.itemSize) {
+			const firstElementIndex = Math.floor(topScrolled / this._inferredItemSize!);
+			const lastElementIndex = Math.min(this.props.data.length,
+				Math.ceil(bottomScrolled / this._inferredItemSize!));
+			return createNumberList(firstElementIndex, lastElementIndex);
+		}
+		return this._getFillingItems(topScrolled, bottomScrolled);
 	}
 
 	private _isRendered(virtual: number) {
@@ -407,12 +491,12 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		render(this._htmlTemplate(this.props.data[virtual],
 			this._itemData![virtual], virtual, false), this._containers[freePhysical].element);
 		this._containers[freePhysical].element.style.transform = 
-			`translateY(${virtual * this.itemSize!}px)`;
+			`translateY(${this._getStartOffset(virtual)}px)`;
 	}
 
 	@bindToClass
 	private _render(force: boolean) {
-		if (!this.itemSize) {
+		if (!this._inferredItemSize) {
 			return;
 		}
 
@@ -454,11 +538,18 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 	}
 
 	private _setContainerSize() {
-		if (!this.itemSize) {
+		if (!this._canGetItemSize()) {
 			return;
 		}
-		this.$.physicalContent.style.height = (this.props.data.length *
-			this.itemSize!) + 'px';
+		if (this.props.itemSize) {
+			this.$.physicalContent.style.height = 
+				this._itemSizes!.reduce((prev, current) => {
+					return prev + current;
+				}, 0) + 'px';	
+		} else {
+			this.$.physicalContent.style.height = (this.props.data.length *
+				this._inferredItemSize!) + 'px';
+		}
 	}
 	
 	private _setSelectedItem(virtual: number, element: HTMLElement) {
@@ -473,6 +564,15 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		this._selectedItem.element.focus();
 		element.classList.remove('focused');
 		this._selectedItem.element.classList.add('focused');
+	}
+
+	private _getStartOffset(virtualIndex: number) {
+		if (this.props.itemSize) {
+			return this.__itemSizes!.slice(0, virtualIndex).reduce((prev, current) => {
+				return prev + current;
+			}, 0);
+		}
+		return this._inferredItemSize * virtualIndex;
 	}
 
 	postRender() {
@@ -491,11 +591,11 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 			//Scroll into view
 			if (this._containers[Math.floor(this._containers.length / 2)].virtual! >= newVirtual) {
 				//It's before the current one, scroll up
-				this._scrolled = newVirtual * this.itemSize!;
+				this._scrolled = this._getStartOffset(newVirtual);
 			} else {
 				//Scroll down
 				this._scrolled = this._usedViewportHeight! +
-					((newVirtual - 1) * this.itemSize!);
+					this._getStartOffset(newVirtual - 1);
 			}
 
 			await wait(50);
@@ -540,7 +640,6 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 
 	async mounted() {
 		this._genTemplateGetter();
-		this.renderToDOM();
 		this._disposables.push(
 			createDisposableWindowListener('resize', this._onWindowResize));
 		if (this.props.window) {

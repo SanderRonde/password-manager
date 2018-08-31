@@ -43,6 +43,17 @@ export abstract class Dashboard extends DashboardScrollManager {
 		this.props.metaPasswords = pwMeta || [];
 	}
 
+	public getItemSize(data: MetaPasswords[0], {
+		isMin
+	}: {
+		isMin: boolean;
+	}) {
+		if (isMin) {
+			return 78 + 57;
+		}
+		return 78 + (data.websites.length * 57);
+	}
+
 	mounted() {
 		super.mounted();
 		this._getPwMeta();

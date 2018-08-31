@@ -4,7 +4,7 @@ import { CustomDashboardCSS } from './dashboard.css';
 import * as devPasswords from './dev-passwords';
 import { Dashboard } from './dashboard';
 
-export const DashboardHTML = new TemplateFn<Dashboard>((props, _theme, html) => {
+export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, html) {
 	return html`
 		<div id="container">
 			<div id="titleBar">
@@ -23,6 +23,7 @@ export const DashboardHTML = new TemplateFn<Dashboard>((props, _theme, html) => 
 						<div id="passwordTop"></div>
 						<infinite-list custom-css="${CustomDashboardCSS.infiniteList}" 
 							window id="infiniteList" data-name="password" 
+							item-size="${this.getItemSize}"
 							data="${
 								(props.metaPasswords || []).length === 0 && 
 									document.body.classList.contains('dev') ? 
@@ -30,7 +31,6 @@ export const DashboardHTML = new TemplateFn<Dashboard>((props, _theme, html) => 
 							}"
 						>
 							<template slot="template">
-								<md-card>x</md-card>
 								<password-preview id="password.id"
 									websites="password.websites"
 									twofactor_enabled="password.twofactor_enabled"
