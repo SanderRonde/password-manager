@@ -62,6 +62,10 @@ export const CustomDashboardCSS = {
 
 export const DashboardCSS = new TemplateFn<Dashboard>((_props, theme) => {
 	return html`<style>
+		#container {
+			background-color: ${theme.background};
+		}
+
 		#titleBar {
 			width: 100vw;
 			display: flex;
