@@ -450,9 +450,11 @@ export function defineProps<P extends {
 			}
 		});
 		(async () => {
+			let renderOnDone: boolean = false;
 			if (mapType !== 'complex') {
 				propValues[mapKey] = getter(element, propName, mapType) as any;
 			} else {
+				renderOnDone = true;
 				await awaitMounted(element as any);
 				if (!isPrivate || element.getAttribute(propName) !== '_') {
 					propValues[mapKey] = getter(element, propName, mapType) as any;
@@ -463,10 +465,15 @@ export function defineProps<P extends {
 				await awaitMounted(element as any);
 				setter(originalSetAttr, originalRemoveAttr, propName, 
 					isPrivate ? '_' : defaultValue, mapType);
+				renderOnDone = true;
 			} else if (isPrivate || mapType === 'complex') {
 				await awaitMounted(element as any);
 				setter(originalSetAttr, originalRemoveAttr, propName,
 					isPrivate ? '_' : propValues[mapKey] as any, mapType);
+				renderOnDone = true;
+			}
+			if (renderOnDone) {
+				element.renderToDOM(CHANGE_TYPE.PROP);
 			}
 		})();
 	}
