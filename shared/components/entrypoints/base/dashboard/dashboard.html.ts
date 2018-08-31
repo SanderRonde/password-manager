@@ -33,6 +33,7 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, 
 							<template slot="template">
 								<password-preview id="password.id"
 									websites="password.websites"
+									username="password.username"
 									twofactor_enabled="password.twofactor_enabled"
 								></password-preview>
 							</template>

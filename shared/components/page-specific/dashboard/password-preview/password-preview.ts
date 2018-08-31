@@ -25,6 +25,7 @@ export class PasswordPreview extends ConfigurableWebComponent<{}> {
 					favicon: string|null;	
 				}[]>()
 			},
+			username: PROP_TYPE.STRING,
 			twofactor_enabled: PROP_TYPE.BOOL
 		}
 	});
