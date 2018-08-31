@@ -313,6 +313,9 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 									//Typescript inserted helper method, ignore it
 									return;
 								}
+								if (typeof warning !== 'string' && warning.code === 'MISSING_GLOBAL_NAME') {
+									return;
+								}
 								console.log(warning);
 							},
 							external: (id) => {
@@ -347,11 +350,13 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 
 						await bundle.write({
 							format: 'iife',
-							file: output,
-							globals: {
-								'\u0000commonjs-proxy:./dev-passwords': '{getDevPasswords: () => {}}'
-							},
+							file: output
 						});
+						const fileContent = await fs.readFile(output, {
+							encoding: 'utf8'
+						});
+						await fs.writeFile(output, fileContent
+							.replace(/\(devPasswords\)/g, '({getDevPasswords: function() {}})'));
 					}),
 					dynamicFunctionNameAsync(`minifyJS${capitalize(route)}`, async () => {
 						const file = await fs.readFile(output, {
