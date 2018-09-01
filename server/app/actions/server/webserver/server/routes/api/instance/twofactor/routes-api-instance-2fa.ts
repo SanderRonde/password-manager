@@ -306,9 +306,9 @@ export class RoutesAPIInstanceTwofactor {
 			}
 
 			const publicKey = this.server.database.Crypto.dbDecrypt(instance.public_key);
-			if (this.server.Router.verify2FA(twofactor_secret, twofactor_token)) {
+			if (this.server.Auth.verifyTwofactorToken(pw_verification_token, instance_id)) {
+				if (this.server.Router.verify2FA(twofactor_secret, twofactor_token)) {
 				//This is a login attempt
-				if (this.server.Auth.verifyTwofactorToken(pw_verification_token, instance_id)) {
 					res.status(200);
 					res.json({
 						success: true,
