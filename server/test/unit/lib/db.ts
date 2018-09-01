@@ -188,7 +188,8 @@ export async function genInstancesOnly(suppliedDb: SuppliedDatabase, userId: Typ
 		public_key: encrypt(instance_public_key, dbpw, ENCRYPTION_ALGORITHM),
 		user_id: userId,
 		server_private_key: encrypt(server_private_key, dbpw, ENCRYPTION_ALGORITHM),
-		expires: encrypt(nearInfinity, dbpw, ENCRYPTION_ALGORITHM)
+		expires: encrypt(nearInfinity, dbpw, ENCRYPTION_ALGORITHM),
+		u2f: encryptWithSalt(null, dbpw, ENCRYPTION_ALGORITHM)
 	}
 	await db.collection('instances').insertOne(firstInstance);
 
@@ -198,25 +199,29 @@ export async function genInstancesOnly(suppliedDb: SuppliedDatabase, userId: Typ
 		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
 		user_id: userId,
 		server_private_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
-		expires: encrypt(nearInfinity, dbpw, ENCRYPTION_ALGORITHM)
+		expires: encrypt(nearInfinity, dbpw, ENCRYPTION_ALGORITHM),
+		u2f: encryptWithSalt(null, dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
 		user_id: userId,
 		server_private_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
-		expires: encrypt(nearInfinity, dbpw, ENCRYPTION_ALGORITHM)
+		expires: encrypt(nearInfinity, dbpw, ENCRYPTION_ALGORITHM),
+		u2f: encryptWithSalt(null, dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
 		user_id: new mongo.ObjectId() as TypedObjectID<EncryptedAccount>,
 		server_private_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
-		expires: encrypt(nearInfinity, dbpw, ENCRYPTION_ALGORITHM)
+		expires: encrypt(nearInfinity, dbpw, ENCRYPTION_ALGORITHM),
+		u2f: encryptWithSalt(null, dbpw, ENCRYPTION_ALGORITHM)
 	}, {
 		twofactor_enabled: encryptWithSalt(true, dbpw, ENCRYPTION_ALGORITHM),
 		public_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
 		user_id: new mongo.ObjectId() as TypedObjectID<EncryptedAccount>,
 		server_private_key: encrypt(genRandomString(25), dbpw, ENCRYPTION_ALGORITHM),
-		expires: encrypt(nearInfinity, dbpw, ENCRYPTION_ALGORITHM)
+		expires: encrypt(nearInfinity, dbpw, ENCRYPTION_ALGORITHM),
+		u2f: encryptWithSalt(null, dbpw, ENCRYPTION_ALGORITHM)
 	}];
 	await db.collection('instances').insertMany(instanceRecords);
 	done();

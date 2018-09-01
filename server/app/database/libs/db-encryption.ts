@@ -108,14 +108,16 @@ export class DatabaseEncryption {
 	}
 
 	public dbDecryptInstanceRecord({
-		public_key, twofactor_enabled, user_id, server_private_key, expires
+		public_key, twofactor_enabled, user_id, server_private_key, expires, u2f
 	}: EncryptedInstance|UnstringifyObjectIDs<EncryptedInstance>): DecryptedInstance {
+		const u2fDecrypted = this.dbDecryptWithSalt(u2f);
 		return {
 			user_id: user_id,
 			public_key: this.dbDecrypt(public_key),
 			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled),
 			server_private_key: this.dbDecrypt(server_private_key),
-			expires: this.dbDecrypt(expires)
+			expires: this.dbDecrypt(expires),
+			u2f: u2fDecrypted === null ? null : JSON.parse(u2fDecrypted)
 		}
 	}
 

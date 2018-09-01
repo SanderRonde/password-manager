@@ -41,7 +41,8 @@ export class RoutesApiInstance {
 			public_key: this.server.database.Crypto.dbEncrypt(db_public_key),
 			user_id: auth._id,
 			server_private_key: this.server.database.Crypto.dbEncrypt(serverPrivateKey),
-			expires: this.server.database.Crypto.dbEncrypt(expires)
+			expires: this.server.database.Crypto.dbEncrypt(expires),
+			u2f: this.server.database.Crypto.dbEncryptWithSalt(null)
 		};
 		const result = await this.server.database.Manipulation.insertOne(
 			COLLECTIONS.INSTANCES, record);

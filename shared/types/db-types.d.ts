@@ -249,6 +249,25 @@ export type EncryptedInstance = {
 	 * (encrypted) When this instance expires (will be near-infinity for non-dashboard instances)
 	 */
 	expires: EncodedString<DatabaseEncrypted<EncodedString<number>>>;
+	/**
+	 * (encrypted) Data related to the u2f configuration, or null if disabled
+	 */
+	u2f: EncodedString<DatabaseEncryptedWithSalt<EncodedString<{
+		/**
+		 * The u2f keyhandle
+		 */
+		keyHandle: string;
+		/**
+		 * The u2f public key
+		 */
+		publicKey: string;
+		/**
+		 * The user's decryption password encrypted with their public key
+		 */
+		decryption_password: PublicKeyEncrypted<
+			Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
+			InstancePublicKey>;
+	}>|null>>;
 };
 
 /**
@@ -275,6 +294,25 @@ export type DecryptedInstance = {
 	 * When this instance expires (will be near-infinity for non-dashboard instances)
 	 */
 	expires: number;
+	/**
+	 * Data related to the u2f configuration, or null if disabled
+	 */
+	u2f: {
+		/**
+		 * The u2f keyhandle
+		 */
+		keyHandle: string;
+		/**
+		 * The u2f public key
+		 */
+		publicKey: string;
+		/**
+		 * The user's decryption password encrypted with their public key
+		 */
+		decryption_password: PublicKeyEncrypted<
+			Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
+			InstancePublicKey>;
+	}|null;
 }
 
 /**
