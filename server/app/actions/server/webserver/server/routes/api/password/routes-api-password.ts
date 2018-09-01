@@ -1,6 +1,7 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord, EncryptedAsset, EncryptedAccount } from "../../../../../../../../../shared/types/db-types";
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
 import { UnstringifyObjectIDs, APIToken } from "../../../../../../../../../shared/types/crypto";
+import { filterUndefined } from "../../../../../../../database/libs/db-manipulation";
 import { API_ERRS, APIReturns } from "../../../../../../../../../shared/types/api";
 import { SERVER_ROOT, MAX_FILE_BYTES } from "../../../../../../../lib/constants";
 import { COLLECTIONS } from "../../../../../../../database/database";
@@ -470,7 +471,7 @@ export class RoutesApiPassword {
 
 			if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
 				_id: new mongo.ObjectId(password_id)
-			}, {
+			}, filterUndefined({
 				twofactor_enabled: typeof twofactor_enabled === 'boolean' ?
 					this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled) : undefined,
 				websites: Array.isArray(filteredWebsites) ?
@@ -486,7 +487,7 @@ export class RoutesApiPassword {
 					this.server.database.Crypto.dbEncrypt(encrypted) : undefined,
 				username: username ?
 					this.server.database.Crypto.dbEncrypt(username) : undefined
-			})) {
+			}))) {
 				res.status(500);
 				res.json({
 					success: false,

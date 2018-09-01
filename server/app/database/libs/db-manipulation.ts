@@ -11,6 +11,20 @@ interface EncryptedCollectionRecords {
 	[COLLECTIONS.PASSWORDS]: EncryptedPassword;
 }
 
+type UndefinedRemoved<T> = {
+	[P in keyof T]: Exclude<T[P], undefined>;
+};
+
+export function filterUndefined<T>(obj: T): UndefinedRemoved<T> {
+	const copied: Partial<T> = {};
+	for (const key in obj) {
+		if (obj[key] !== undefined) {
+			copied[key] = obj[key];
+		}
+	}
+	return copied as UndefinedRemoved<T>;
+}
+
 export class DatabaseManipulation {
 	constructor(private _parent: Database) {
 
