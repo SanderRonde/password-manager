@@ -1248,10 +1248,3 @@ export function workflowPasswordTest() {
 			});
 	});
 }
-
-(() => {
-	describe('x', function() {
-		this.timeout(600000);
-		workflowPasswordTest();
-	})
-})();
