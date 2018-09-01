@@ -13,8 +13,9 @@ import { assert } from 'chai';
 export function twofactorDisableTest() {
 	parallel('Disable', () => {
 		const uris = captureURIs();
-		testParams(it, uris, '/api/instance/2fa/enable', {
-			instance_id: 'string'
+		testParams(it, uris, '/api/instance/2fa/disable', {
+			instance_id: 'string',
+			twofactor_token: 'string'
 		}, {}, {
 			password: 'string'
 		}, {});
