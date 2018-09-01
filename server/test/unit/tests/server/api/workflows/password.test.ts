@@ -754,7 +754,7 @@ export function workflowPasswordTest() {
 					}),
 					twofactor_enabled: expected2FAEnabled,
 					encrypted: expectedEncrypted,
-					// username: expectedUsername
+					username: expectedUsername
 				}));
 
 				assert.isTrue(response.success, 'API call succeeded');
