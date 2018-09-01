@@ -88,3 +88,4 @@ test/ui/served/
 !test/ui/plugins/index.js
 database/
 data/
+!server/app/database/
