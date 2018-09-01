@@ -15,31 +15,40 @@ export class RoutesAPIInstanceTwofactor {
 	public enable(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			email: string;
 		}, {}, {
 			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, {}>({
-			unencrypted: ['instance_id', 'email'],
+			unencrypted: ['instance_id'],
 			encrypted: ['password']
-		}, {}, async (toCheck, { email, password, instance_id }) => {
+		}, {}, async (toCheck, { password, instance_id }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
 			}, {
 				val: 'password',
 				type: 'string'
-			}, {
-				val: 'email',
-				type: 'string'
-			},])) return;
-
-			const auth = await this.server.Router.checkEmailPassword(
-				email, password, res);
-			if (auth === false) return;
+			}])) return;
 
 			const { instance, decryptedInstance, accountPromise } = 
-				await this.server.Router.verifyAndGetInstance(instance_id, res);
+				await this.server.Router.verifyAndGetInstance(instance_id, res, true);
 			if (instance === null || decryptedInstance === null || accountPromise === null) return;
+
+			const user = await this.server.database.Manipulation.findOne(COLLECTIONS.USERS, {
+				_id: instance._id
+			});
+			if (!user) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
+
+			const auth = await this.server.Router.checkEmailPassword(
+				user.email, password, res);
+			if (auth === false) return;
 
 			if (decryptedInstance.twofactor_enabled === true) {
 				res.status(200);
@@ -114,14 +123,13 @@ export class RoutesAPIInstanceTwofactor {
 	public disable(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			email: string;
 			twofactor_token: string;
 		}, {}, {
 			password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, {}>({
-			unencrypted: ['instance_id', 'email', 'twofactor_token'],
+			unencrypted: ['instance_id', 'twofactor_token'],
 			encrypted: ['password']
-		}, {}, async (toCheck, { email, password, instance_id, twofactor_token }) => {
+		}, {}, async (toCheck, { password, instance_id, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -129,20 +137,30 @@ export class RoutesAPIInstanceTwofactor {
 				val: 'password',
 				type: 'string'
 			}, {
-				val: 'email',
-				type: 'string'
-			}, {
 				val: 'twofactor_token',
 				type: 'string'
 			}])) return;
 
-			const auth = await this.server.Router.checkEmailPassword(
-				email, password, res);
-			if (auth === false) return;
-
 			const { instance, decryptedInstance, accountPromise } = 
-				await this.server.Router.verifyAndGetInstance(instance_id, res);
+				await this.server.Router.verifyAndGetInstance(instance_id, res, true);
 			if (instance === null || decryptedInstance === null || accountPromise === null) return;
+
+			const user = await this.server.database.Manipulation.findOne(COLLECTIONS.USERS, {
+				_id: instance._id
+			});
+			if (!user) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'invalid credentials',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return;
+			}
+
+			const auth = await this.server.Router.checkEmailPassword(
+				user.email, password, res);
+			if (auth === false) return;
 
 			const { twofactor_secret } = await accountPromise
 			if (decryptedInstance.twofactor_enabled === false || twofactor_secret === null) {

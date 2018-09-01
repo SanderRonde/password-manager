@@ -241,10 +241,6 @@ export declare namespace APIRoutes {
 				 * The id of the instance assigned at registration
 				 */
 				instance_id: StringifiedObjectId<EncryptedInstance>;
-				/**
-				 * The email address associated with the instance
-				 */
-				email: string;
 			}, encrypted: {
 				/**
 				 * The hashed master password for the user associated with the instance
@@ -283,10 +279,6 @@ export declare namespace APIRoutes {
 				 * The id of the instance assigned at registration
 				 */
 				instance_id: StringifiedObjectId<EncryptedInstance>;
-				/**
-				 * The email address associated with the instance
-				 */
-				email: string;
 				/**
 				 * A 2FA token for this account
 				 */

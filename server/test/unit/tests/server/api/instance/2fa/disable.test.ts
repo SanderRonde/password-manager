@@ -14,8 +14,7 @@ export function twofactorDisableTest() {
 	parallel('Disable', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/instance/2fa/enable', {
-			instance_id: 'string',
-			email: 'string'
+			instance_id: 'string'
 		}, {}, {
 			password: 'string'
 		}, {});
@@ -42,7 +41,6 @@ export function twofactorDisableTest() {
 				publicKey: server_public_key
 			}, '/api/instance/2fa/disable', {
 				instance_id: instance_id.toHexString(),
-				email: DEFAULT_EMAIL,
 				twofactor_token: speakeasy.totp({
 					secret: twofactor.base32,
 					encoding: 'base32'
@@ -102,7 +100,6 @@ export function twofactorDisableTest() {
 				publicKey: server_public_key
 			}, '/api/instance/2fa/disable', {
 				instance_id: instance_id.toHexString(),
-				email: DEFAULT_EMAIL,
 				twofactor_token: 'sometoken'
 			}, {
 				password: hash(pad(userpw, 'masterpwverify')),
@@ -139,7 +136,6 @@ export function twofactorDisableTest() {
 				publicKey: server_public_key
 			}, '/api/instance/2fa/disable', {
 				instance_id: instance_id.toHexString(),
-				email: DEFAULT_EMAIL,
 				twofactor_token: speakeasy.totp({
 					secret: twofactor.base32,
 					encoding: 'base32',

@@ -14,8 +14,7 @@ export function twofactorEnableTest() {
 	parallel('Enable', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/instance/2fa/enable', {
-			instance_id: 'string',
-			email: 'string'
+			instance_id: 'string'
 		}, {}, {
 			password: 'string'
 		}, {});
@@ -39,8 +38,7 @@ export function twofactorEnableTest() {
 				port: http,
 				publicKey: server_public_key
 			}, '/api/instance/2fa/enable', {
-				instance_id: instance_id.toHexString(),
-				email: DEFAULT_EMAIL
+				instance_id: instance_id.toHexString()
 			}, {
 				password: hash(pad(userpw, 'masterpwverify')),
 			}));
@@ -95,8 +93,7 @@ export function twofactorEnableTest() {
 				port: http,
 				publicKey: server_public_key
 			}, '/api/instance/2fa/enable', {
-				instance_id: instance_id.toHexString(),
-				email: DEFAULT_EMAIL
+				instance_id: instance_id.toHexString()
 			}, {
 				password: hash(pad(userpw, 'masterpwverify')),
 			}));
@@ -156,8 +153,7 @@ export function twofactorEnableTest() {
 				port: http,
 				publicKey: server_public_key
 			}, '/api/instance/2fa/enable', {
-				instance_id: instance_id.toHexString(),
-				email: DEFAULT_EMAIL
+				instance_id: instance_id.toHexString()
 			}, {
 				password: hash(pad(userpw, 'masterpwverify'))
 			}));
