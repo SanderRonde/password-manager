@@ -71,8 +71,7 @@ export function instanceTwofactorTest() {
 					port: http,
 					publicKey: server_key!
 				}, '/api/instance/2fa/enable', {
-					instance_id: instance_id!,
-					email: DEFAULT_EMAIL
+					instance_id: instance_id!
 				}, {
 					password: hash(pad(userpw, 'masterpwverify')),
 				}));
@@ -135,8 +134,7 @@ export function instanceTwofactorTest() {
 					port: http,
 					publicKey: server_public_key
 				}, '/api/instance/2fa/enable', {
-					instance_id: instance_id.toHexString(),
-					email: DEFAULT_EMAIL
+					instance_id: instance_id.toHexString()
 				}, {
 					password: hash(pad(userpw, 'masterpwverify'))
 				}));
@@ -179,7 +177,6 @@ export function instanceTwofactorTest() {
 					publicKey: server_public_key
 				}, '/api/instance/2fa/disable', {
 					instance_id: instance_id.toHexString(),
-					email: DEFAULT_EMAIL,
 					twofactor_token: speakeasy.totp({
 						secret: twofactor.base32,
 						encoding: 'base32'
@@ -242,8 +239,7 @@ export function instanceTwofactorTest() {
 					port: http,
 					publicKey: server_public_key
 				}, '/api/instance/2fa/enable', {
-					instance_id: instance_id.toHexString(),
-					email: DEFAULT_EMAIL
+					instance_id: instance_id.toHexString()
 				}, {
 					password: hash(pad(userpw, 'masterpwverify'))
 				}));
@@ -286,7 +282,6 @@ export function instanceTwofactorTest() {
 					publicKey: server_public_key
 				}, '/api/instance/2fa/disable', {
 					instance_id: instance_id.toHexString(),
-					email: DEFAULT_EMAIL,
 					twofactor_token: speakeasy.totp({
 						secret: twofactor.base32,
 						encoding: 'base32'
@@ -328,8 +323,7 @@ export function instanceTwofactorTest() {
 					port: http,
 					publicKey: server_public_key
 				}, '/api/instance/2fa/enable', {
-					instance_id: instance_id.toHexString(),
-					email: DEFAULT_EMAIL
+					instance_id: instance_id.toHexString()
 				}, {
 					password: hash(pad(userpw, 'masterpwverify'))
 				}));
@@ -522,8 +516,7 @@ export function instanceTwofactorTest() {
 					port: http,
 					publicKey: server_public_key!
 				}, '/api/instance/2fa/enable', {
-					instance_id: instance_id!,
-					email: DEFAULT_EMAIL
+					instance_id: instance_id!
 				}, {
 					password: hash(pad(userpw, 'masterpwverify'))
 				}));
@@ -639,7 +632,6 @@ export function instanceTwofactorTest() {
 					publicKey: server_public_key!
 				}, '/api/instance/2fa/disable', {
 					instance_id: instance_id!,
-					email: DEFAULT_EMAIL,
 					twofactor_token: speakeasy.totp({
 						secret: twofactor.base32,
 						encoding: 'base32'
@@ -738,8 +730,7 @@ export function instanceTwofactorTest() {
 					port: http,
 					publicKey: server_public_key!
 				}, '/api/instance/2fa/enable', {
-					instance_id: instance_id!,
-					email: DEFAULT_EMAIL
+					instance_id: instance_id!
 				}, {
 					password: hash(pad(userpw, 'masterpwverify'))
 				}));
@@ -883,7 +874,6 @@ export function instanceTwofactorTest() {
 					publicKey: server_public_key!
 				}, '/api/instance/2fa/disable', {
 					instance_id: instance_id!,
-					email: DEFAULT_EMAIL,
 					twofactor_token: speakeasy.totp({
 						secret: secret,
 						encoding: 'base32'
