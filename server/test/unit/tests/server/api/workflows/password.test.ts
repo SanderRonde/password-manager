@@ -155,8 +155,8 @@ export function workflowPasswordTest() {
 			const updatedPassword = {
 				websites: [genURL(), genURL(), genURL()],
 				twofactorEnabled: Math.random() > 0.5,
+				username: genRandomString(25),
 				encrypted: encrypt({
-					username: genRandomString(25),
 					password: genRandomString(25),
 					notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 				}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM)
@@ -165,6 +165,7 @@ export function workflowPasswordTest() {
 				const expectedWebsites = updatedPassword.websites;
 				const expected2FAEnabled = updatedPassword.twofactorEnabled;
 				const expectedEncrypted = updatedPassword.encrypted;
+				const expectedUsername = updatedPassword.username;
 				
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -182,7 +183,8 @@ export function workflowPasswordTest() {
 						}
 					}),
 					twofactor_enabled: expected2FAEnabled,
-					encrypted: expectedEncrypted
+					encrypted: expectedEncrypted,
+					username: expectedUsername
 				}));
 
 				assert.isTrue(response.success, 'API call succeeded');
@@ -209,6 +211,9 @@ export function workflowPasswordTest() {
 					dbpw);
 				assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 				assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+
+				assert.strictEqual(decrypt(password.username, dbpw), expectedUsername,
+					'username was updated');
 
 				const actualWebsites = password.websites.map(({ exact, host }) => {
 					return {
@@ -416,10 +421,10 @@ export function workflowPasswordTest() {
 				const expectedWebsites = updatedPassword.websites;
 				const expected2FAEnabled = updatedPassword.twofactorEnabled;
 				const expectedEncrypted = encrypt({
-					username: updatedPassword.username,
 					password: updatedPassword.password,
 					notes: updatedPassword.notes
 				}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
+				const expectedUsername = updatedPassword.username;
 				
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -437,7 +442,8 @@ export function workflowPasswordTest() {
 						}
 					}),
 					twofactor_enabled: expected2FAEnabled,
-					encrypted: expectedEncrypted
+					encrypted: expectedEncrypted,
+					username: expectedUsername
 				}));
 
 				assert.isTrue(response.success, 'API call succeeded');
@@ -464,6 +470,9 @@ export function workflowPasswordTest() {
 					dbpw);
 				assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 				assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+
+				assert.strictEqual(decrypt(password.username, dbpw), expectedUsername,
+					'username was updated');
 
 				const actualWebsites = password.websites.map(({ exact, host }) => {
 					return {
@@ -522,6 +531,7 @@ export function workflowPasswordTest() {
 					hash(pad(userpw, 'masterpwdecrypt')));
 				if (isErr(decryptedEncrypted)) return;
 			
+				console.log(decryptedData, '---', parsed, '----', updatedPassword);
 				assert.strictEqual(parsed.username, updatedPassword.username, 'username is the same');
 				assert.strictEqual(decryptedEncrypted.password, updatedPassword.password, 'password is the same');
 				for (let i = 0; i < updatedPassword.notes.length; i++) {
@@ -717,15 +727,16 @@ export function workflowPasswordTest() {
 				websites: [genURL(), genURL(), genURL()],
 				twofactorEnabled: Math.random() > 0.5,
 				encrypted: encrypt({
-					username: genRandomString(25),
 					password: genRandomString(25),
 					notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
-				}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM)
+				}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM),
+				username: genRandomString(25),
 			}
 			await (async () => {
 				const expectedWebsites = updatedPassword.websites;
 				const expected2FAEnabled = updatedPassword.twofactorEnabled;
 				const expectedEncrypted = updatedPassword.encrypted;
+				const expectedUsername = updatedPassword.username;
 				
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -743,7 +754,8 @@ export function workflowPasswordTest() {
 						}
 					}),
 					twofactor_enabled: expected2FAEnabled,
-					encrypted: expectedEncrypted
+					encrypted: expectedEncrypted,
+					// username: expectedUsername
 				}));
 
 				assert.isTrue(response.success, 'API call succeeded');
@@ -770,6 +782,9 @@ export function workflowPasswordTest() {
 					dbpw);
 				assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 				assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+
+				assert.strictEqual(decrypt(password.username, dbpw), expectedUsername,
+					'username was updated');
 
 				const actualWebsites = password.websites.map(({ exact, host }) => {
 					return {
@@ -998,10 +1013,10 @@ export function workflowPasswordTest() {
 					const expectedWebsites = updatedPassword.websites;
 					const expected2FAEnabled = updatedPassword.twofactorEnabled;
 					const expectedEncrypted = encrypt({
-						username: updatedPassword.username,
 						password: updatedPassword.password,
 						notes: updatedPassword.notes
 					}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
+					const expectedUsername = updatedPassword.username;
 					
 					const response = JSON.parse(await doServerAPIRequest({ 
 						port: http,
@@ -1019,7 +1034,8 @@ export function workflowPasswordTest() {
 							}
 						}),
 						twofactor_enabled: expected2FAEnabled,
-						encrypted: expectedEncrypted
+						encrypted: expectedEncrypted,
+						username: expectedUsername
 					}));
 
 					assert.isTrue(response.success, 'API call succeeded');
@@ -1046,6 +1062,9 @@ export function workflowPasswordTest() {
 						dbpw);
 					assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 					assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+
+					assert.strictEqual(decrypt(password.username, dbpw), expectedUsername,
+						'username was updated');
 
 					const actualWebsites = password.websites.map(({ exact, host }) => {
 						return {
@@ -1229,3 +1248,10 @@ export function workflowPasswordTest() {
 			});
 	});
 }
+
+(() => {
+	describe('x', function() {
+		this.timeout(600000);
+		workflowPasswordTest();
+	})
+})();
