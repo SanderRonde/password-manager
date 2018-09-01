@@ -115,7 +115,7 @@ export class DatabaseEncryption {
 			public_key: this.dbDecrypt(public_key),
 			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled),
 			server_private_key: this.dbDecrypt(server_private_key),
-			expires
+			expires: this.dbDecrypt(expires)
 		}
 	}
 

@@ -98,7 +98,7 @@ export class WebserverRouter {
 		if (instance === null) {
 			return null;
 		}
-		if (Date.now() > instance.expires) {
+		if (Date.now() > this.parent.database.Crypto.dbDecrypt(instance.expires)) {
 			await this.parent.database.Manipulation.deleteOne(COLLECTIONS.INSTANCES, {
 				_id: instance._id
 			});

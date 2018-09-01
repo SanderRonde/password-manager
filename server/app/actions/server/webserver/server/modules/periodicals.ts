@@ -22,7 +22,7 @@ export function initPeriodicals(server: Webserver) {
 		if (instances === null) return;
 
 		await Promise.all(instances.filter(({ expires }) => {
-			return Date.now() > expires;
+			return Date.now() > server.database.Crypto.dbDecrypt(expires);
 		}).map(async (instance) => {
 			await server.database.Manipulation.deleteOne(COLLECTIONS.INSTANCES, {
 				_id: instance._id

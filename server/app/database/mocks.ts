@@ -132,7 +132,7 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 					public_key: encrypt(publicKey, dbpw, ENCRYPTION_ALGORITHM),
 					user_id: userId!,
 					server_private_key: encrypt(privateKey, dbpw, ENCRYPTION_ALGORITHM),
-					expires: Infinity
+					expires: encrypt(Infinity, dbpw, ENCRYPTION_ALGORITHM)
 				};
 				this._records.push(instance);
 			} else if (name === 'passwords') {
