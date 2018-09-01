@@ -531,7 +531,6 @@ export function workflowPasswordTest() {
 					hash(pad(userpw, 'masterpwdecrypt')));
 				if (isErr(decryptedEncrypted)) return;
 			
-				console.log(decryptedData, '---', parsed, '----', updatedPassword);
 				assert.strictEqual(parsed.username, updatedPassword.username, 'username is the same');
 				assert.strictEqual(decryptedEncrypted.password, updatedPassword.password, 'password is the same');
 				for (let i = 0; i < updatedPassword.notes.length; i++) {
