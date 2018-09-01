@@ -297,7 +297,7 @@ export type DecryptedInstance = {
 	/**
 	 * Data related to the u2f configuration, or null if disabled
 	 */
-	u2f: {
+	u2f:  {
 		/**
 		 * The u2f keyhandle
 		 */

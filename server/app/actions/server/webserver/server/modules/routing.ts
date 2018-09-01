@@ -257,34 +257,35 @@ export class WebserverRouter {
 				}
 			}
 
-	public async verifyAndGetInstance(instanceId: StringifiedObjectId<EncryptedInstance>, res: ServerResponse) {
-		const instance = await this.getInstance(instanceId);
-		if (!instance) {
-			res.status(200);
-			res.json({
-				success: false,
-				error: 'invalid instance ID',
-				ERR: API_ERRS.INVALID_CREDENTIALS
-			});
-			return { instance: null, decryptedInstance: null, accountPromise: null };
-		}
-		const decryptedInstance = this.parent.database.Crypto
-			.dbDecryptInstanceRecord(instance);
-		const _this = this;
-		return { 
-			instance, 
-			decryptedInstance,
-			get accountPromise() {
-				return (async() => {
-					return _this.parent.database.Crypto.dbDecryptAccountRecord(
-						(await _this.parent.database.Manipulation.findOne(
-							COLLECTIONS.USERS, {
-								_id: new mongo.ObjectId(decryptedInstance.user_id)
-							}))!);
-				})();
+	public async verifyAndGetInstance(instanceId: StringifiedObjectId<EncryptedInstance>, res: ServerResponse,
+		beVague: boolean = false) {
+			const instance = await this.getInstance(instanceId);
+			if (!instance) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: beVague ? 'invalid credentials' : 'invalid instance ID',
+					ERR: API_ERRS.INVALID_CREDENTIALS
+				});
+				return { instance: null, decryptedInstance: null, accountPromise: null };
 			}
-		};
-	}
+			const decryptedInstance = this.parent.database.Crypto
+				.dbDecryptInstanceRecord(instance);
+			const _this = this;
+			return { 
+				instance, 
+				decryptedInstance,
+				get accountPromise() {
+					return (async() => {
+						return _this.parent.database.Crypto.dbDecryptAccountRecord(
+							(await _this.parent.database.Manipulation.findOne(
+								COLLECTIONS.USERS, {
+									_id: new mongo.ObjectId(decryptedInstance.user_id)
+								}))!);
+					})();
+				}
+			};
+		}
 
 	public verifyLoginToken(token: APIToken, count: number, 
 		instanceId: StringifiedObjectId<EncryptedInstance>, res: ServerResponse) {
@@ -453,6 +454,19 @@ export class WebserverRouter {
 		this.parent.app.post('/api/instance/2fa/verify', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.Twofactor, 'verify')));
+
+		this.parent.app.post('/api/instance/u2f/enable', bruteforceLimiter,
+			apiUseLimiter, this._wrapInErrorHandler(
+				this._doBind(this.parent.Routes.API.Instance.U2F, 'enable')));
+		this.parent.app.post('/api/instance/2fa/disable', bruteforceLimiter,
+			apiUseLimiter, this._wrapInErrorHandler(
+				this._doBind(this.parent.Routes.API.Instance.U2F, 'disable')));
+		this.parent.app.post('/api/instance/2fa/confirm', bruteforceLimiter,
+			apiUseLimiter, this._wrapInErrorHandler(
+				this._doBind(this.parent.Routes.API.Instance.U2F, 'confirm')));
+		this.parent.app.post('/api/instance/2fa/verify', bruteforceLimiter,
+			apiUseLimiter, this._wrapInErrorHandler(
+				this._doBind(this.parent.Routes.API.Instance.U2F, 'verify')));
 
 		this.parent.app.post('/api/password/set', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(

@@ -1,16 +1,16 @@
 declare module "u2f" {
-	interface U2FRequest {
+	export interface U2FRequest {
 		appId: string;
 		challenge: string;
 		version: string;
 	}
 
-	interface U2FRegisterResponse {
+	export interface U2FRegisterResponse {
 		clientData: string;
 		registrationData: string;
 	}
 
-	interface U2FSignResponse {
+	export interface U2FSignResponse {
 		clientData: string;
 		signatureData: string;
 	}
@@ -23,6 +23,7 @@ declare module "u2f" {
 		certificate: string;
 	}|{
 		errorMessage: string;
+		successful: undefined;
 	};
 	export function checkSignature(request: U2FRequest, response: U2FSignResponse, publicKey: string): {
 		successful: true;
@@ -31,5 +32,6 @@ declare module "u2f" {
 	}|{
 		errorMessage: string;
 		errorCode?: number;
+		successful: undefined;
 	}
 }

@@ -4,6 +4,7 @@ import { RoutesAPIInstanceTwofactor } from "./twofactor/routes-api-instance-2fa"
 import { APIToken } from "../../../../../../../../../shared/types/crypto";
 import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
+import { RoutesAPIInstanceU2f } from "./u2f/routes-api-instance-u2f";
 import { ServerResponse } from "../../../modules/ratelimit";
 import { sendEmail } from "../../../../../../../lib/util";
 import { Webserver } from "../../../webserver";
@@ -11,6 +12,7 @@ import * as express from 'express'
 
 export class RoutesApiInstance {
 	public Twofactor = new RoutesAPIInstanceTwofactor(this.server);
+	public U2F = new RoutesAPIInstanceU2f(this.server)
 
 	constructor(public server: Webserver) { }
 

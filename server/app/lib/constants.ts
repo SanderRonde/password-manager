@@ -53,3 +53,7 @@ export const MAX_FILE_SIZE = '1mb';
  * The max file size in bytes (also 1MB)
  */
 export const MAX_FILE_BYTES = 1024 * 1024 * 8;
+/**
+ * The App ID for U2F. Will change eventually
+ */
+export const APP_ID = 'https://www.password-manager.com';

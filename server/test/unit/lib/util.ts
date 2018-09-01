@@ -121,6 +121,9 @@ export interface MockConfig {
 	twofactor_secret?: string;
 	account_twofactor_enabled?: boolean;
 	instance_twofactor_enabled?: boolean;
+	u2f?: {
+		
+	}
 }
 
 export async function genUserAndDb(config: MockConfig = {}): Promise<UserAndDbData> {

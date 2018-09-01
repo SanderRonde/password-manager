@@ -10,8 +10,10 @@ import { twofactorVerifyTest } from "./instance/2fa/verify.test";
 import { userGenResetKeyTest } from "./user/genresetkey.test";
 import { passwordAllmetaTest } from "./password/allmeta.test";
 import { passwordGetMetaTest } from "./password/getmeta.test";
+import { u2fDisableTest } from "./instance/u2f/disable.test";
 import { passwordRemoveTest } from "./password/remove.test";
 import { passwordUpdateTest } from "./password/update.test";
+import { u2fEnableTest } from "./instance/u2f/enable.test";
 import { extendKeyTest } from "./instance/extend-key.test";
 import { registerTest } from "./instance/register.test";
 import { passwordSetTest } from "./password/set.test";
@@ -33,6 +35,10 @@ export function APITest() {
 				twofactorEnableTest();
 				twofactorVerifyTest();
 			});
+			describe('U2F', () => {
+				u2fEnableTest();
+				u2fDisableTest();
+			})
 		});
 		describe('Password', () => {
 			passwordAllmetaTest();

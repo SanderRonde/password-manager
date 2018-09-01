@@ -8,6 +8,10 @@ export type APIToken = string;
  * A token used to verify 2FA access
  */
 export type TwofactorVerifyToken = string;
+/**
+ * A token used to verify U2F access
+ */
+export type U2FToken = string;
 
 type ToTypedObjectID<T> = T extends StringifiedObjectId<infer V> ?
 	TypedObjectID<V> : TypedObjectID<void>;

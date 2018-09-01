@@ -1,6 +1,7 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, InstancePublicKey, ResetKey, ServerPublicKey, ServerPrivateKey, RSAEncrypted, PublicKeyEncrypted } from "./db-types";
-import { Hashed, Padded, MasterPasswordVerificationPadding, EncryptionAlgorithm, MasterPasswordDecryptionpadding, Encrypted } from "./crypto";
+import { Hashed, Padded, MasterPasswordVerificationPadding, EncryptionAlgorithm, MasterPasswordDecryptionpadding, Encrypted, U2FToken } from "./crypto";
 import { UnstringifyObjectIDs, APIToken, TwofactorVerifyToken } from "./crypto";
+import { U2FRequest, U2FSignResponse, U2FRegisterResponse } from "u2f";
 
 export interface APIFns {
 	/**
@@ -36,6 +37,23 @@ export interface APIFns {
 	 * Verify 2FA when logging in
 	 */
 	'/api/instance/2fa/verify': typeof APIRoutes.Instance.Twofactor.verify;
+
+	/**
+	 * Enable U2F for an instance
+	 */
+	'/api/instance/u2f/enable': typeof APIRoutes.Instance.U2F.enable;
+	/**
+	 * Disable U2F for this instance
+	 */
+	'/api/instance/u2f/disable': typeof APIRoutes.Instance.U2F.disable;
+	/**
+	 * Confirm U2F for this account
+	 */
+	'/api/instance/u2f/confirm': typeof APIRoutes.Instance.U2F.confirm;
+	/**
+	 * Verify U2F when logging in
+	 */
+	'/api/instance/u2f/verify': typeof APIRoutes.Instance.U2F.verify;
 
 	/**
 	 * Create a new password
@@ -330,6 +348,107 @@ export declare namespace APIRoutes {
 				 * The token passed along
 				 */
 				pw_verification_token: TwofactorVerifyToken;
+			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+				/**
+				 * A login token that can be used for the /api/password API
+				 */
+				auth_token: PublicKeyEncrypted<APIToken, InstancePublicKey>;
+			}>;
+		}
+
+		export namespace U2F {
+			/**
+			 * Enable 2FA for an instance
+			 */
+			export function enable(params: {
+				/**
+				 * The id of the instance assigned at registration
+				 */
+				instance_id: StringifiedObjectId<EncryptedInstance>;
+			}, encrypted: {
+				/**
+				 * The hashed master password for the user associated with the instance
+				 */
+				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+			}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+				/**
+				 * A message explaining what happened
+				 */
+				message: 'state unchanged (was already set)'
+			}|{
+				/**
+				 * The token that can be used to confirm this change
+				 */
+				token: U2FToken;
+				/**
+				 * The request that needs to be verified
+				 */
+				request: U2FRequest
+			}>;
+
+			/**
+			 * Disable 2FA for this instance
+			 */
+			export function disable(params: {
+				/**
+				 * The id of the instance assigned at registration
+				 */
+				instance_id: StringifiedObjectId<EncryptedInstance>;
+			}, encrypted: {
+				/**
+				 * The hashed master password for the user associated with the instance
+				 */
+				password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
+			}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+				/**
+				 * A message explaining what happens
+				 */
+				message: 'state unchanged (was already set)';
+			}|{
+				/**
+				 * The token that can be used to confirm this change
+				 */
+				token: U2FToken;
+				/**
+				 * The request that needs to be verified
+				 */
+				request: U2FRequest
+			}>;
+
+			/**
+			 * Confirm 2FA for this account
+			 */
+			export function confirm(params: {
+				/**
+				 * The id of the instance assigned at registration
+				 */
+				instance_id: StringifiedObjectId<EncryptedInstance>;
+				/**
+				 * The response to the request
+				 */
+				response: U2FSignResponse|U2FRegisterResponse;
+				/**
+				 * The token associated witht his intent
+				 */
+				token: U2FToken;
+			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{}>;
+
+			/**
+			 * Verify 2FA when logging in
+			 */
+			export function verify(params: {
+				/**
+				 * The id of the instance assigned at registration
+				 */
+				instance_id: StringifiedObjectId<EncryptedInstance>;
+				/**
+				 * The response to the request
+				 */
+				response: U2FSignResponse|U2FRegisterResponse;
+				/**
+				 * The token associated witht his intent
+				 */
+				token: U2FToken;
 			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 				/**
 				 * A login token that can be used for the /api/password API
