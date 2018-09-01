@@ -246,7 +246,7 @@ export type EncryptedInstance = {
 	 */
 	server_private_key: EncodedString<DatabaseEncrypted<EncodedString<ServerPrivateKey>>>;
 	/**
-	 * (encrypted) When this instance expires (will be infinity for non-dashboard instances)
+	 * (encrypted) When this instance expires (will be near-infinity for non-dashboard instances)
 	 */
 	expires: EncodedString<DatabaseEncrypted<EncodedString<number>>>;
 };
@@ -272,7 +272,7 @@ export type DecryptedInstance = {
 	 */
 	server_private_key: ServerPrivateKey;
 	/**
-	 * When this instance expires (will be infinity for non-dashboard instances)
+	 * When this instance expires (will be near-infinity for non-dashboard instances)
 	 */
 	expires: number;
 }

@@ -14,8 +14,10 @@ export class RoutesApiInstance {
 
 	constructor(public server: Webserver) { }
 
+	private static readonly nearInfinity = Date.now() + (1000 * 60 * 60 * 24 * 365 * 1000);
 	public async doRegister({
-		email, password, public_key, expires = Infinity, db_public_key = public_key
+		email, password, public_key, expires = RoutesApiInstance.nearInfinity, 
+		db_public_key = public_key
 	}: {
 		email: string;
 		public_key: string;
