@@ -37,7 +37,7 @@ export abstract class Dashboard extends DashboardScrollManager {
 				defaultValue: [],
 				isPrivate: true
 			},
-			currentPassword: {
+			currentPasswordIndex: {
 				type: PROP_TYPE.NUMBER,
 				defaultValue: -1
 			}
@@ -52,11 +52,11 @@ export abstract class Dashboard extends DashboardScrollManager {
 		super();
 
 		this.listen('beforePropChange', (key, prevVal: MetaPasswords, newVal: MetaPasswords) => {
-			if (key === 'metaPasswords' && this.props.currentPassword !== -1 &&
-				typeof this.props.currentPassword === 'number') {
+			if (key === 'metaPasswords' && this.props.currentPasswordIndex !== -1 &&
+				typeof this.props.currentPasswordIndex === 'number') {
 					//Check if the currently selected password is still in the new
 					// batch. If so, switch the currentPassword index to that new password
-					const currentPassword = prevVal[this.props.currentPassword];
+					const currentPassword = prevVal[this.props.currentPasswordIndex];
 					const id = currentPassword.id;
 
 					let newIndex: number = -1;
@@ -68,14 +68,14 @@ export abstract class Dashboard extends DashboardScrollManager {
 						}
 					}
 
-					this._list.updateItemData(this.props.currentPassword, {
+					this._list.updateItemData(this.props.currentPasswordIndex, {
 						selected: false
 					});
 
 					//Set it to -1 before the update and change it afterwards
-					this.props.currentPassword = -1;
+					this.props.currentPasswordIndex = -1;
 					window.setTimeout(() => {
-						this.props.currentPassword = newIndex;
+						this.props.currentPasswordIndex = newIndex;
 						if (newIndex !== -1) {
 							this._list.updateItemData(newIndex, {
 								selected: true
