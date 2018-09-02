@@ -551,6 +551,21 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		this._itemData![index] = data;
 	}
 
+	public getItemData(index: number): ID|null {
+		return this._itemData![index];
+	}
+
+	public updateItemData(index: number, updated: Partial<ID>) {
+		const prevData = this._itemData![index];
+		if (typeof prevData !== 'object' || typeof updated !== 'object') {
+			console.warn('Can\'t update non-object data (use set)');
+			return;
+		}
+		this._itemData![index] = {
+			...prevData as Object, ...updated as Object
+		} as ID;
+	}
+
 	private _setContainerSize() {
 		if (!this._canGetItemSize()) {
 			return;
