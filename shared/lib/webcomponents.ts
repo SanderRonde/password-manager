@@ -354,7 +354,7 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 		}
 	}
 
-	protected _fire<EV extends keyof E, R extends E[EV]['returnType']>(event: EV, ...params: E[EV]['args']): R[] {
+	public fire<EV extends keyof E, R extends E[EV]['returnType']>(event: EV, ...params: E[EV]['args']): R[] {
 		if (!(event in this._listenerMap)) {
 			return [];
 		}
@@ -502,7 +502,7 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		value: V) {
 			if (this._globalProperties[key] !== value) {
 				this._globalProperties[key] = value;
-				this._fire('globalPropChange', key, value);
+				this.fire('globalPropChange', key, value);
 			}
 		}
 

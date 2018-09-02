@@ -83,7 +83,7 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 		this._updateClasses();
 
 		if (prevValidState !== this.valid) {
-			this._fire('valid', this.valid);
+			this.fire('valid', this.valid);
 		}
 		this._validityState = this.valid;
 	}
@@ -176,9 +176,9 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 					}
 					if (this._validityState !== this.valid) {
 						this._validityState = this.valid;
-						this._fire('valid', this.valid);
+						this.fire('valid', this.valid);
 					}
-					this._fire('keydown', e)
+					this.fire('keydown', e)
 				}, 0);
 			});
 

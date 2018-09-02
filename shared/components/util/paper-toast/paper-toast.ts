@@ -55,7 +55,7 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 
 	async hide() {
 		this.classList.remove('show');
-		this._fire('hide');
+		this.fire('hide');
 		await wait(300);
 		this.remove();
 	}
@@ -67,13 +67,13 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 			if (this.props.button1 && isNewElement(button1)) {
 				await awaitMounted(button1);
 				button1.listen('click', (e) => {
-					this._fire('buttonClick', 0, e);
+					this.fire('buttonClick', 0, e);
 				});
 			}
 			if (this.props.button2 && isNewElement(button2)) {
 				await awaitMounted(button2);
 				button2.listen('click', (e) => {
-					this._fire('buttonClick', 1, e);
+					this.fire('buttonClick', 1, e);
 				});
 			}
 		}

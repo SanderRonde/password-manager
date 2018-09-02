@@ -151,7 +151,7 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 			listenIfNew(this, 'button', 'mouseup', this.blurHandler, true);
 			listenIfNew(this, 'button', 'mouseleave', this.blurHandler, true);
 			listenIfNew(this, 'button', 'click', (e) => {
-				this._fire('click', e);
+				this.fire('click', e);
 			}, true);
 		}
 	}
