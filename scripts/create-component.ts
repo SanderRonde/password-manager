@@ -32,7 +32,8 @@ import { config } from '../../../lib/webcomponent-util';
 	css: ${capitalize(dashesToUppercase(name))}CSS,
 	html: ${capitalize(dashesToUppercase(name))}HTML
 })
-export class ${capitalize(dashesToUppercase(name))} extends ConfigurableWebComponent<{}> {
+export class ${capitalize(dashesToUppercase(name))} extends ConfigurableWebComponent<${
+	capitalize(dashesToUppercase(name))}IDMap> {
 	
 }`;
 
