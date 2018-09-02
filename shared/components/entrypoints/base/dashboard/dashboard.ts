@@ -1,4 +1,4 @@
-import { PasswordPreview } from '../../../page-specific/dashboard/password-preview/password-preview';
+import { PasswordPreview, PasswordPreviewHost } from '../../../page-specific/dashboard/password-preview/password-preview';
 import { PasswordDetail } from '../../../page-specific/dashboard/password-detail/password-detail';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { defineProps, ComplexType, PROP_TYPE } from '../../../../lib/webcomponent-util';
@@ -29,7 +29,7 @@ export interface MetaPasswordsPreviewData {
 	selected: boolean;
 }
 
-export abstract class Dashboard extends DashboardScrollManager { 
+export abstract class Dashboard extends DashboardScrollManager implements PasswordPreviewHost { 
 	props = defineProps(this, {
 		priv: {
 			metaPasswords: {
@@ -55,7 +55,8 @@ export abstract class Dashboard extends DashboardScrollManager {
 	}
 
 	public get list() {
-		return this.$.infiniteList as InfiniteList<MetaPasswords[0], MetaPasswordsPreviewData>;
+		return this.$.infiniteList as InfiniteList<MetaPasswords[0], 
+			MetaPasswordsPreviewData, Dashboard>;
 	}
 
 	constructor() {

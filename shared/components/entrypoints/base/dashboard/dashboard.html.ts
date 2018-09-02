@@ -23,6 +23,7 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, 
 						<infinite-list custom-css="${CustomDashboardCSS.infiniteList}" 
 							window id="infiniteList" data-name="password" 
 							item-size="${this.getItemSize}"
+							ref="${this}"
 							data="${props.metaPasswords || []}"
 						>
 							<template slot="template">
@@ -30,6 +31,9 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, 
 									websites="password.websites"
 									username="password.username"
 									twofactor_enabled="password.twofactor_enabled"
+									selected="password_data.selected"
+									index="_index"
+									ref="_this"
 								></password-preview>
 							</template>
 						</infinite-list>

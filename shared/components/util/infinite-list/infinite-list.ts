@@ -6,8 +6,8 @@ import { InfiniteListHTML } from './infinite-list.html';
 import { InfiniteListCSS } from './infinite-list.css';
 import { bindToClass } from '../../../lib/decorators';
 
-export type ListItemContainer<D, ID> = HTMLDivElement & {
-	host: InfiniteList<D, ID>
+export type ListItemContainer<D, ID, P> = HTMLDivElement & {
+	host: InfiniteList<D, ID, P>
 };
 
 type TemplateValue<D, ID> = {
@@ -24,7 +24,7 @@ type TemplateValue<D, ID> = {
 	css: InfiniteListCSS,
 	html: InfiniteListHTML
 })
-export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListIDMap> {
+export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteListIDMap> {
 	private _htmlTemplate: (data: D, itemData: ID|null, index: number, isTemplate: boolean) => TemplateResult = () => html``;
 	private _usedViewportHeight: number|null = null;
 	private _usedData: D[]|null = null;
@@ -43,11 +43,18 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 			window: PROP_TYPE.BOOL,
 			itemSize: ComplexType<(data: D, special: {
 				isMin: boolean;
-			}) => number>()
+			}) => number>(),
+			ref: {
+				type: ComplexType<P>()
+			}
 		}
 	});
 	private _inferredItemSize: number = 0;
 	private __itemSizes: number[]|null = null;
+
+	public get parent(): P {
+		return this.props.ref;
+	}
 
 	private _canGetItemSize() {
 		if (this.props.itemSize) {
@@ -268,6 +275,11 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 
 		const { strings, values } = this._joinTemplateExtractors([srcNode.innerHTML],
 			(str) => {
+				return this._extractStringValue(str, '_this', () => {
+					return this;
+				});
+			},
+			(str) => {
 				return this._extractStringValue(str, '_index', (_d, _i, index) => {
 					return index;
 				});
@@ -369,7 +381,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 			};
 		});
 		this._containers.forEach((container, index) => {
-			const el = container.element as ListItemContainer<D, ID>;
+			const el = container.element as ListItemContainer<D, ID, P>;
 			el.host = this;
 			
 			listenWithIdentifier(this, container.element,
@@ -564,6 +576,15 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 		this._itemData![index] = {
 			...(prevData as Object || {}), ...updated as Object
 		} as ID;
+	}
+
+	public mapData(fn: (data: ID|null) => ID|null) {
+		if (!this._itemData) {
+			return;
+		}
+		for (let i = 0; i < this._itemData.length; i++) {
+			this._itemData[i] = fn(this._itemData[i]!);
+		}
 	}
 
 	private _setContainerSize() {
