@@ -43,7 +43,7 @@ export const theme: {
 		error: '#e34839',
 		success: '#1dba25',
 		minOppositeColorText: '#FFFFFF8C',
-		textOnBackground: '#FFFFFF',
+		textOnBackground: '#E1E1E1',
 		textOnNonbackground: '#000000',
 		background: '#171718'
 	}
