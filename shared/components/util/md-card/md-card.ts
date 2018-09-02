@@ -16,17 +16,17 @@ export class MDCard extends ConfigurableWebComponent<MdCardIDMap> {
 		reflect: {
 			level: {
 				type: PROP_TYPE.NUMBER,
-				value: 1,
+				defaultValue: 1,
 				coerce: true
 			},
 			paddingVertical: {
 				type: PROP_TYPE.NUMBER,
-				value: 20,
+				defaultValue: 20,
 				coerce: true
 			},
 			paddingHorizontal: {
 				type: PROP_TYPE.NUMBER,
-				value: 20,
+				defaultValue: 20,
 				coerce: true
 			}
 		}

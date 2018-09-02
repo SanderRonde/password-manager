@@ -49,9 +49,9 @@ export abstract class Dashboard extends DashboardScrollManager {
 		isMin: boolean;
 	}) {
 		if (isMin) {
-			return 78 + 57;
+			return 10 + 90 + 20;
 		}
-		return 78 + (data.websites.length * 57);
+		return 30 + (data.websites.length * 90);
 	}
 
 	mounted() {
