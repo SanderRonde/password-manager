@@ -56,6 +56,14 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 		return this.props.ref;
 	}
 
+	public get rendered(): HTMLElement[] {
+		return this._containers.filter((container) => {
+			return container.virtual !== null;
+		}).map((container) => {
+			return container.element.children[0];
+		}) as HTMLElement[];
+	}
+
 	private _canGetItemSize() {
 		if (this.props.itemSize) {
 			if (!this._itemSizes) {
