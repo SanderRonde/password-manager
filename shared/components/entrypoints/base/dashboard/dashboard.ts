@@ -37,7 +37,7 @@ export abstract class Dashboard extends DashboardScrollManager {
 				defaultValue: [],
 				isPrivate: true
 			},
-			currentPasswordIndex: {
+			selected: {
 				type: PROP_TYPE.NUMBER,
 				defaultValue: -1
 			}
@@ -45,16 +45,16 @@ export abstract class Dashboard extends DashboardScrollManager {
 	});
 
 	public get selectedPassword() {
-		if (!this.props.currentPasswordIndex ||
-			this.props.currentPasswordIndex === -1 || 
+		if (!this.props.selected ||
+			this.props.selected === -1 || 
 			!this.props.metaPasswords || 
 			this.props.metaPasswords.length === 0) {
 				return null;
 			}
-		return this.props.metaPasswords[this.props.currentPasswordIndex];
+		return this.props.metaPasswords[this.props.selected];
 	}
 
-	private get _list() {
+	public get list() {
 		return this.$.infiniteList as InfiniteList<MetaPasswords[0], MetaPasswordsPreviewData>;
 	}
 
@@ -62,11 +62,11 @@ export abstract class Dashboard extends DashboardScrollManager {
 		super();
 
 		this.listen('beforePropChange', (key, prevVal: MetaPasswords, newVal: MetaPasswords) => {
-			if (key === 'metaPasswords' && this.props.currentPasswordIndex !== -1 &&
-				typeof this.props.currentPasswordIndex === 'number') {
+			if (key === 'metaPasswords' && this.props.selected !== -1 &&
+				typeof this.props.selected === 'number') {
 					//Check if the currently selected password is still in the new
 					// batch. If so, switch the currentPassword index to that new password
-					const currentPassword = prevVal[this.props.currentPasswordIndex];
+					const currentPassword = prevVal[this.props.selected];
 					const id = currentPassword.id;
 
 					let newIndex: number = -1;
@@ -78,16 +78,16 @@ export abstract class Dashboard extends DashboardScrollManager {
 						}
 					}
 
-					this._list.updateItemData(this.props.currentPasswordIndex, {
+					this.list.updateItemData(this.props.selected, {
 						selected: false
 					});
 
 					//Set it to -1 before the update and change it afterwards
-					this.props.currentPasswordIndex = -1;
+					this.props.selected = -1;
 					window.setTimeout(() => {
-						this.props.currentPasswordIndex = newIndex;
+						this.props.selected = newIndex;
 						if (newIndex !== -1) {
-							this._list.updateItemData(newIndex, {
+							this.list.updateItemData(newIndex, {
 								selected: true
 							});
 						}
