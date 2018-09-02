@@ -191,6 +191,27 @@ export declare namespace APIRoutes {
 			twofactor_token: string;
 		}, optionalEncrypted: {}): JSONResponse<{
 			/**
+			 * Whether further U2F authentication is required (true in this case)
+			 */
+			u2fRequired: true;	
+			/**
+			 * The request that has to be solved
+			 */
+			request: U2FRequest;
+			/**
+			 * A token to identify the request
+			 */
+			u2fToken: U2FToken;
+			/**
+			 * The solved challenge
+			 */
+			challenge: C;
+		}|{
+			/**
+			 * Whether further U2F authentication is required (false in this case)
+			 */
+			u2fRequired: false;
+			/**
 			 * The auth token that can be used to make API requests. Encrypted with instance key
 			 */
 			auth_token: PublicKeyEncrypted<APIToken, InstancePublicKey>;	

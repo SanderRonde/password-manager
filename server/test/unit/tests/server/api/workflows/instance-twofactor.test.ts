@@ -381,14 +381,18 @@ export function instanceTwofactorTest() {
 			} = config;
 			uris.push(uri);
 
-			const pw_verification_token = await (async () => {	
+			const authToken = await (async () => {	
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
 					publicKey: server_public_key
 				}, '/api/instance/login', {
 					instance_id: instance_id.toHexString(),
-					challenge: encryptWithPublicKey(challenge, server_public_key)
+					challenge: encryptWithPublicKey(challenge, server_public_key),
+					twofactor_token: speakeasy.totp({
+						secret: twofactor.base32,
+						encoding: 'base32'
+					})
 				}, {
 					password_hash: hash(pad(userpw, 'masterpwverify'))
 				}));
@@ -398,37 +402,8 @@ export function instanceTwofactorTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isTrue(data.twofactor_required, 'further authentication is required');
-				if (data.twofactor_required === false) {
-					return;
-				}
-				const token = decryptWithPrivateKey(data.twofactor_auth_token, instance_private_key);
-				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-				if (token === ERRS.INVALID_DECRYPT) {
-					return;
-				}
-				assert.strictEqual(typeof token, 'string', 'token is a string');
-			
-				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
-			})();
-			const authToken = await (async () => {
-				const response = JSON.parse(await doServerAPIRequest({ 
-					port: http,
-					publicKey: server_public_key
-				}, '/api/instance/2fa/verify', {
-					instance_id: instance_id.toHexString(),
-					pw_verification_token: pw_verification_token!,
-					twofactor_token: speakeasy.totp({
-						secret: twofactor.base32,
-						encoding: 'base32'
-					})
-				}));
-
-				assert.isTrue(response.success, 'API call succeeded');
-				if (!response.success) return;
-
-				const data = response.data;
+				assert.isFalse(data.u2fRequired, 'no further authentication is required');
+				if (data.u2fRequired) return;
 				assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 				const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key);
 				assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -524,7 +499,7 @@ export function instanceTwofactorTest() {
 				assert.isTrue(response.success, 'API call succeeded');
 				if (!response.success) return;
 				const data = response.data;
-			assert.isFalse(!!(data as {
+				assert.isFalse(!!(data as {
 					message: 'state unchanged (was already set)'
 				}).message, 'state is not unchanged');
 				if ((data as {
@@ -553,14 +528,18 @@ export function instanceTwofactorTest() {
 				if (decrypt === ERRS.INVALID_DECRYPT) return;
 				assert.strictEqual(decrypt, true, '2FA is now enabled');
 			})();
-			const pw_verification_token = await (async () => {	
+			const authToken = await (async () => {	
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
 					publicKey: server_public_key!
 				}, '/api/instance/login', {
 					instance_id: instance_id!,
-					challenge: encryptWithPublicKey(challenge, server_public_key!)
+					challenge: encryptWithPublicKey(challenge, server_public_key!),
+					twofactor_token: speakeasy.totp({
+						secret: twofactor.base32,
+						encoding: 'base32'
+					})
 				}, {
 					password_hash: hash(pad(userpw, 'masterpwverify'))
 				}));
@@ -570,37 +549,8 @@ export function instanceTwofactorTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isTrue(data.twofactor_required, 'further authentication is required');
-				if (data.twofactor_required === false) {
-					return;
-				}
-				const token = decryptWithPrivateKey(data.twofactor_auth_token, instance_private_key!);
-				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-				if (token === ERRS.INVALID_DECRYPT) {
-					return;
-				}
-				assert.strictEqual(typeof token, 'string', 'token is a string');
-			
-				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
-			})();
-			const authToken = await (async () => {
-				const response = JSON.parse(await doServerAPIRequest({ 
-					port: http,
-					publicKey: server_public_key!
-				}, '/api/instance/2fa/verify', {
-					instance_id: instance_id!,
-					pw_verification_token: pw_verification_token!,
-					twofactor_token: speakeasy.totp({
-						secret: twofactor.base32,
-						encoding: 'base32'
-					})
-				}));
-
-				assert.isTrue(response.success, 'API call succeeded');
-				if (!response.success) return;
-
-				const data = response.data;
+				assert.isFalse(data.u2fRequired, 'no further authentication is required');
+				if (data.u2fRequired) return;
 				assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 				const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key!);
 				assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -795,14 +745,18 @@ export function instanceTwofactorTest() {
 				if (decrypt === ERRS.INVALID_DECRYPT) return;
 				assert.strictEqual(decrypt, true, '2FA is now enabled');
 			})();
-			const pw_verification_token = await (async () => {
+			const authToken = await (async () => {
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
 					publicKey: server_public_key!
 				}, '/api/instance/login', {
 					instance_id: instance_id!,
-					challenge: encryptWithPublicKey(challenge, server_public_key!)
+					challenge: encryptWithPublicKey(challenge, server_public_key!),
+					twofactor_token: speakeasy.totp({
+						secret: secret,
+						encoding: 'base32'
+					})
 				}, {
 					password_hash: hash(pad(userpw, 'masterpwverify'))
 				}));
@@ -812,37 +766,8 @@ export function instanceTwofactorTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isTrue(data.twofactor_required, 'further authentication is required');
-				if (data.twofactor_required === false) {
-					return;
-				}
-				const token = decryptWithPrivateKey(data.twofactor_auth_token, instance_private_key!);
-				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-				if (token === ERRS.INVALID_DECRYPT) {
-					return;
-				}
-				assert.strictEqual(typeof token, 'string', 'token is a string');
-			
-				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
-			})();
-			const authToken = await (async () => {
-				const response = JSON.parse(await doServerAPIRequest({ 
-					port: http,
-					publicKey: server_public_key
-				}, '/api/instance/2fa/verify', {
-					instance_id: instance_id!,
-					pw_verification_token: pw_verification_token!,
-					twofactor_token: speakeasy.totp({
-						secret: secret,
-						encoding: 'base32'
-					})
-				}));
-
-				assert.isTrue(response.success, 'API call succeeded');
-				if (!response.success) return;
-
-				const data = response.data;
+				assert.isFalse(data.u2fRequired, 'no further authentication is required');
+				if (data.u2fRequired) return;
 				assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 				const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key!);
 				assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');

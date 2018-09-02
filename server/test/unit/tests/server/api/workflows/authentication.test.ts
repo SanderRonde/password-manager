@@ -77,10 +77,8 @@ export function authenticationWorkflowTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isFalse(data.twofactor_required, 'further authentication is not required');
-				if (data.twofactor_required === true) {
-					return;
-				}
+				assert.isFalse(data.u2fRequired, 'no further authentication is required');
+				if (data.u2fRequired) return;
 				const token = decryptWithPrivateKey(data.auth_token, clientPrivateKey!);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 				assert.strictEqual(typeof token, 'string', 'token is a string');
@@ -120,10 +118,8 @@ export function authenticationWorkflowTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isFalse(data.twofactor_required, 'further authentication is not required');
-				if (data.twofactor_required === true) {
-					return;
-				}
+				assert.isFalse(data.u2fRequired, 'no further authentication is required');
+				if (data.u2fRequired) return;
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 				if (token === ERRS.INVALID_DECRYPT) {
@@ -177,10 +173,8 @@ export function authenticationWorkflowTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isFalse(data.twofactor_required, 'further authentication is not required');
-				if (data.twofactor_required === true) {
-					return;
-				}
+				assert.isFalse(data.u2fRequired, 'no further authentication is required');
+				if (data.u2fRequired) return;
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 				if (token === ERRS.INVALID_DECRYPT) {
@@ -271,10 +265,8 @@ export function authenticationWorkflowTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isFalse(data.twofactor_required, 'further authentication is not required');
-				if (data.twofactor_required === true) {
-					return;
-				}
+				assert.isFalse(data.u2fRequired, 'no further authentication is required');
+				if (data.u2fRequired) return;
 				const token = decryptWithPrivateKey(data.auth_token, clientPrivateKey!);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 				if (token === ERRS.INVALID_DECRYPT) {

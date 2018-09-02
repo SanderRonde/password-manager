@@ -6,9 +6,11 @@ import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { RoutesAPIInstanceU2f } from "./u2f/routes-api-instance-u2f";
 import { ServerResponse } from "../../../modules/ratelimit";
+import { APP_ID } from "../../../../../../../lib/constants";
 import { sendEmail } from "../../../../../../../lib/util";
 import { Webserver } from "../../../webserver";
 import * as express from 'express'
+import * as u2f from 'u2f';
 
 export class RoutesApiInstance {
 	public Twofactor = new RoutesAPIInstanceTwofactor(this.server);
@@ -143,10 +145,10 @@ export class RoutesApiInstance {
 			}
 		
 		//Solve challenge
-		const privateKey = this.server.database.Crypto.dbDecrypt(instance.server_private_key);
-		const solved = decryptWithPrivateKey(challenge, privateKey);
+		const decryptedInstance = this.server.database.Crypto.dbDecryptInstanceRecord(instance);
+		const solved = decryptWithPrivateKey(challenge, decryptedInstance.server_private_key);
 
-		if (this.server.database.Crypto.dbDecryptWithSalt(instance.twofactor_enabled)) {
+		if (decryptedInstance.twofactor_enabled) {
 			const decryptedAccount = this.server.database.Crypto.dbDecryptAccountRecord(
 				account);
 			const secret = decryptedAccount.twofactor_secret;
@@ -170,8 +172,24 @@ export class RoutesApiInstance {
 					});
 					return;
 				}
+
+			}
+		const u2fConfig = decryptedInstance.u2f;
+		if (u2fConfig !== null) {
+			const request = u2f.request(APP_ID);
+			const u2fToken = this.server.Auth.genU2FToken(
+				instance._id.toHexString(), decryptedInstance.user_id.toHexString(),
+				'verify', request);
+			return {
+				u2fRequired: true,
+				request: request,
+				u2fToken: u2fToken,
+				challenge: solved
+			}
 		}
+
 		return {
+			u2fRequired: false,
 			auth_token: encryptWithPublicKey(this.server.Auth.genLoginToken(
 				instance._id.toHexString(), account._id.toHexString()), publicKey),
 			challenge: solved

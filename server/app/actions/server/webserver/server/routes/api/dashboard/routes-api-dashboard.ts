@@ -128,12 +128,10 @@ export class RoutesAPIDashboard {
 			if (!loginData) {
 				return;
 			}
+			assert.isFalse(loginData.u2fRequired, 'no further authentication is required');
+			if (loginData.u2fRequired) return;
 
-			const token = (loginData as {
-				twofactor_required: false,
-				auth_token: PublicKeyEncrypted<string, string>,
-				challenge: string
-			}).auth_token;
+			const token = loginData.auth_token;
 
 			res.status(200);
 			res.json({
