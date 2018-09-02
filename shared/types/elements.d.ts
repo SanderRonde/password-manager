@@ -29,6 +29,6 @@ declare global {
 	type HTMLLoadingSpinnerElement = LoadingSpinner;
 	type HTMLPasswordPreviewElement = PasswordPreview;
 	type HTMLVerticalCentererElement = VerticalCenterer;
-	type HTMLInfiniteListElement = InfiniteList<any, any>;
+	type HTMLInfiniteListElement = InfiniteList<any, any, any>;
 	type HTMLHorizontalCentererElement = HorizontalCenterer;
 }
