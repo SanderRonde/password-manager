@@ -57,8 +57,8 @@ export function important(rule: string|number) {
 	return `${rule}!important`
 }
 
-export function isDefined<U>(value: null|undefined|U): value is U {
-	return value !== undefined && value !== null;
+export function isDefined<U extends string>(value: null|undefined|U): value is U {
+	return value !== undefined && value !== null && value !== 'false';
 }
 
 function getterWithVal<R>(component: {
