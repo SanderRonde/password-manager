@@ -184,25 +184,12 @@ export declare namespace APIRoutes {
 			 * The hash of the master password
 			 */
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+		}, optional: {
 			/**
-			 * Further 2FA authentication is required
+			 * A 2FA token if it's enabld
 			 */
-			twofactor_required: true;
-			/**
-			 * The token to use when verifying 2FA code, through /api/instance/2fa/verify. 
-			 * Encrypted with instance key
-			 */
-			twofactor_auth_token: PublicKeyEncrypted<TwofactorVerifyToken, InstancePublicKey>;	
-			/**
-			 * The solved challenge
-			 */
-			challenge: C;
-		}|{
-			/**
-			 * Further authentication is not required
-			 */
-			twofactor_required: false;
+			twofactor_token: string;
+		}, optionalEncrypted: {}): JSONResponse<{
 			/**
 			 * The auth token that can be used to make API requests. Encrypted with instance key
 			 */

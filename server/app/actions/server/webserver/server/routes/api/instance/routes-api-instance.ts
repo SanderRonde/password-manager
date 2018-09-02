@@ -103,7 +103,7 @@ export class RoutesApiInstance {
 		instance_id: StringifiedObjectId<EncryptedInstance>;
 		challenge: PublicKeyEncrypted<string, ServerPublicKey>;
 		password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
-	}, res: ServerResponse) {
+	}, res: ServerResponse, twofactor_token?: string) {
 		//Get user from instance ID
 		const instance = await this.server.Router.getInstance(instance_id);
 			
@@ -147,20 +147,34 @@ export class RoutesApiInstance {
 		const solved = decryptWithPrivateKey(challenge, privateKey);
 
 		if (this.server.database.Crypto.dbDecryptWithSalt(instance.twofactor_enabled)) {
-			//Require twofactor authentication before giving out token
-			return {
-				twofactor_required: true,
-				twofactor_auth_token: encryptWithPublicKey(this.server.Auth.genTwofactorToken(
-					instance._id.toHexString(), account._id.toHexString()), publicKey),
-				challenge: solved
-			};
-		} else {
-			return {
-				twofactor_required: false,
-				auth_token: encryptWithPublicKey(this.server.Auth.genLoginToken(
-					instance._id.toHexString(), account._id.toHexString()), publicKey),
-				challenge: solved
+			const decryptedAccount = this.server.database.Crypto.dbDecryptAccountRecord(
+				account);
+			const secret = decryptedAccount.twofactor_secret;
+			if (secret === null) {
+				res.status(500);
+				res.json({
+					success: false,
+					error: 'Server error',
+					ERR: API_ERRS.SERVER_ERROR
+				});
+				return;
 			}
+
+			if (!twofactor_token || 
+				!this.server.Router.verify2FA(secret, twofactor_token)) {
+					res.status(200);
+					res.json({
+						success: false,
+						error: 'Incorrect combination',
+						ERR: API_ERRS.INVALID_CREDENTIALS
+					});
+					return;
+				}
+		}
+		return {
+			auth_token: encryptWithPublicKey(this.server.Auth.genLoginToken(
+				instance._id.toHexString(), account._id.toHexString()), publicKey),
+			challenge: solved
 		}
 	}
 
@@ -168,12 +182,16 @@ export class RoutesApiInstance {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 			challenge: PublicKeyEncrypted<string, ServerPublicKey>;
-		}, {}, {
+		}, {
+			twofactor_token: string;
+		}, {
 			password_hash: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		}, {}>({
 			unencrypted: ['instance_id', 'challenge'],
 			encrypted: ['password_hash']
-		}, {}, async (toCheck, { instance_id, password_hash, challenge }) => {
+		}, {
+			unencrypted: ['twofactor_token']
+		}, async (toCheck, { instance_id, password_hash, challenge, twofactor_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -183,11 +201,14 @@ export class RoutesApiInstance {
 			}, {
 				val: 'challenge',
 				type: 'string'
+			}, {
+				val: 'twofactor_token',
+				type: 'string'
 			}])) return;
 
 			const data = await this.doLogin({
 				instance_id, password_hash, challenge
-			}, res);
+			}, res, twofactor_token);
 			if (data) {
 				res.status(200);
 				res.json({
