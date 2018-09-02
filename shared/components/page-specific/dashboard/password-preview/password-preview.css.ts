@@ -63,7 +63,7 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (prop
 			justify-content: center;
 		}
 
-		.noIcon {
+		.noIcon, #twofactorEnabled {
 			transition: fill 300ms ease-in-out;
 			fill: ${props.selected ?
 				changeOpacity(theme.textOnNonbackground, 70) :
