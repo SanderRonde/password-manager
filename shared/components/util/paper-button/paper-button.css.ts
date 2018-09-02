@@ -1,11 +1,13 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { AnimatedButton } from '../animated-button/animated-button';
 import { changeOpacity } from '../../../lib/webcomponent-util';
+import { RippleCSS } from '../../../mixins/ripple';
 import { PaperButton } from './paper-button';
 import { html } from "lit-html";
 
-export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>((_props, theme) => {
+export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>(function (_props, theme) {
 	return html`<style>
+		${RippleCSS.render(CHANGE_TYPE.THEME, this)}
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.
 		*
@@ -91,10 +93,7 @@ export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>((_props
 		.mdl-button--raised.mdl-button--colored:focus:not(:active) {
 			background-color: ${theme.primary.main};
 		}
-		.mdl-button--raised.mdl-button--colored .mdl-ripple {
-			background: ${theme.textOnNonbackground};
-		}
-
+		
 		.mdl-button--fab {
 			border-radius: 50%;
 			font-size: 24px;
@@ -122,10 +121,6 @@ export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>((_props
 			min-width: 40px;
 			width: 40px;
 		}
-		.mdl-button--fab .mdl-button__ripple-container {
-			border-radius: 50%;
-			-webkit-mask-image: -webkit-radial-gradient(circle, white, black);
-		}
 		.mdl-button--fab:active {
 			box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 			background-color: ${theme.primary.main};
@@ -142,9 +137,6 @@ export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>((_props
 		.mdl-button--fab.mdl-button--colored:focus:not(:active),
 		.mdl-button--fab.mdl-button--colored:active {
 			background-color: ${theme.accent.main};	
-		}
-		.mdl-button--fab.mdl-button--colored .mdl-ripple {
-			background: ${theme.textOnNonbackground};
 		}
 
 		.mdl-button--icon {
@@ -177,30 +169,9 @@ export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>((_props
 			top: 0px;
 			left: 0px;
 		}
-		.mdl-button--icon .mdl-button__ripple-container {
-			border-radius: 50%;
-			-webkit-mask-image: -webkit-radial-gradient(circle, white, black);
-		}
-
-		.mdl-button__ripple-container {
-			display: block;
-			height: 100%;
-			left: 0px;
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			z-index: 0;
-			overflow: hidden;
-		}
-		.mdl-button[disabled] .mdl-button__ripple-container .mdl-ripple, .mdl-button.mdl-button--disabled .mdl-button__ripple-container .mdl-ripple {
-			background-color: transparent;
-		}
 
 		.mdl-button--primary.mdl-button--primary {
 			color: ${theme.primary.main};
-		}
-		.mdl-button--primary.mdl-button--primary .mdl-ripple {
-			background: ${theme.textOnNonbackground};
 		}
 		.mdl-button--primary.mdl-button--primary.mdl-button--raised, 
 		.mdl-button--primary.mdl-button--primary.mdl-button--fab {
@@ -210,9 +181,6 @@ export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>((_props
 
 		.mdl-button--accent.mdl-button--accent {
 			color: ${theme.accent.main};
-		}
-		.mdl-button--accent.mdl-button--accent .mdl-ripple {
-			background: ${theme.textOnNonbackground};
 		}
 		.mdl-button--accent.mdl-button--accent.mdl-button--raised, 
 		.mdl-button--accent.mdl-button--accent.mdl-button--fab {
@@ -246,28 +214,6 @@ export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>((_props
 
 		.mdl-button .material-icons {
 			vertical-align: middle;
-		}
-		.mdl-ripple {
-			border-radius: 50%;
-			height: 50px;
-			left: 0;
-			opacity: 0;
-			pointer-events: none;
-			position: absolute;
-			top: 0;
-			transform: translate(-50%, -50%);
-			width: 50px;
-			overflow: hidden;
-			background-color: ${theme.textOnNonbackground};
-		}
-		.mdl-ripple.is-animating {
-			transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1), 
-				width 0.3s cubic-bezier(0, 0, 0.2, 1), 
-				height 0.3s cubic-bezier(0, 0, 0.2, 1), 
-				opacity 0.6s cubic-bezier(0, 0, 0.2, 1);
-		}
-		.mdl-ripple.is-visible {
-			opacity: 0.3;
 		}
 
 		#button {

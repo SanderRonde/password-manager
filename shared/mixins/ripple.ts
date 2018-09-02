@@ -1,6 +1,74 @@
 import { listenWithIdentifier } from '../lib/webcomponent-util';
+import { TemplateFn, CHANGE_TYPE } from '../lib/webcomponents';
 import { ExtendableComponent } from '../lib/decorators';
-import { TemplateFn } from '../lib/webcomponents';
+import { html } from 'lit-html';
+
+export const RippleCSS = new TemplateFn<any>((_props, theme) => {
+	return html`<style>
+		.mdl-button--raised.mdl-button--colored .mdl-ripple {
+			background: ${theme.textOnNonbackground};
+		}
+
+		.mdl-button--fab .mdl-button__ripple-container {
+			border-radius: 50%;
+			-webkit-mask-image: -webkit-radial-gradient(circle, white, black);
+		}
+
+		.mdl-button--fab.mdl-button--colored .mdl-ripple {
+			background: ${theme.textOnNonbackground};
+		}
+
+		.mdl-button--icon .mdl-button__ripple-container {
+			border-radius: 50%;
+			-webkit-mask-image: -webkit-radial-gradient(circle, white, black);
+		}
+
+		.mdl-button__ripple-container {
+			display: block;
+			height: 100%;
+			left: 0px;
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			z-index: 0;
+			overflow: hidden;
+		}
+		.mdl-button[disabled] .mdl-button__ripple-container .mdl-ripple, .mdl-button.mdl-button--disabled .mdl-button__ripple-container .mdl-ripple {
+			background-color: transparent;
+		}
+
+		.mdl-button--primary.mdl-button--primary .mdl-ripple {
+			background: ${theme.textOnNonbackground};
+		}
+
+		.mdl-button--accent.mdl-button--accent .mdl-ripple {
+			background: ${theme.textOnNonbackground};
+		}
+
+		.mdl-ripple {
+			border-radius: 50%;
+			height: 50px;
+			left: 0;
+			opacity: 0;
+			pointer-events: none;
+			position: absolute;
+			top: 0;
+			transform: translate(-50%, -50%);
+			width: 50px;
+			overflow: hidden;
+			background-color: ${theme.textOnNonbackground};
+		}
+		.mdl-ripple.is-animating {
+			transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1), 
+				width 0.3s cubic-bezier(0, 0, 0.2, 1), 
+				height 0.3s cubic-bezier(0, 0, 0.2, 1), 
+				opacity 0.6s cubic-bezier(0, 0, 0.2, 1);
+		}
+		.mdl-ripple.is-visible {
+			opacity: 0.3;
+		}
+	</style>`
+}, CHANGE_TYPE.THEME);
 
 export interface RippleEffect {
 	applyRipple(): void;
