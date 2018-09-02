@@ -1,7 +1,6 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Search } from '../../../icons/search/search';
 import { CustomDashboardCSS } from './dashboard.css';
-import * as devPasswords from './dev-passwords';
 import { Dashboard } from './dashboard';
 
 export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, html) {
@@ -24,11 +23,7 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, 
 						<infinite-list custom-css="${CustomDashboardCSS.infiniteList}" 
 							window id="infiniteList" data-name="password" 
 							item-size="${this.getItemSize}"
-							data="${
-								(props.metaPasswords || []).length === 0 && 
-									document.body.classList.contains('dev') ? 
-										devPasswords.getDevPasswords() : (props.metaPasswords || [])
-							}"
+							data="${props.metaPasswords || []}"
 						>
 							<template slot="template">
 								<password-preview id="password.id"

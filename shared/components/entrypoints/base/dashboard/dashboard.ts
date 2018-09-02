@@ -10,6 +10,7 @@ import { WebComponentBase } from "../../../../lib/webcomponents";
 import { PublicKeyDecrypted } from '../../../../types/db-types';
 import { APISuccessfulReturns } from '../../../../types/api';
 import { MDCard } from '../../../util/md-card/md-card';
+import * as devPasswords from './dev-passwords';
 
 export type MetaPasswords = PublicKeyDecrypted<APISuccessfulReturns['/api/password/allmeta']['encrypted']>;
 export const DashboarDependencies: (typeof WebComponentBase)[] = [
@@ -27,7 +28,8 @@ export abstract class Dashboard extends DashboardScrollManager {
 		priv: {
 			metaPasswords: {
 				type: ComplexType<MetaPasswords>(),
-				defaultValue: []
+				defaultValue: [],
+				isPrivate: true
 			}
 		}
 	});
@@ -37,6 +39,9 @@ export abstract class Dashboard extends DashboardScrollManager {
 	private async _getPwMeta() {
 		const pwMeta = await this._getPasswordMeta();
 		if (!pwMeta) {
+			if (document.body.classList.contains('dev')) {
+				this.props.metaPasswords = devPasswords.getDevPasswords();
+			}
 			//Redirecting to /login, just let this go
 			return;
 		}
