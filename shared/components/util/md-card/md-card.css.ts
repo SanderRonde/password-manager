@@ -20,12 +20,21 @@ function getShadow(level: number) {
 	}
 }
 
+function assertNumber(value: any, fallback: number): number {
+	if (typeof value !== 'number') {
+		return fallback;
+	}
+	return value;
+}
+
 export const MDCardCSS = new TemplateFn<MDCard>((props, theme) => {
 	return html`<style>
 		#shadow {
 			${
 				`background-color: ${theme.card};
-				padding: ${props.paddingVertical || 20}px ${props.paddingHorizontal || 20}px;
+				padding: ${
+					assertNumber(props.paddingVertical, 20)}px ${
+						assertNumber(props.paddingHorizontal, 20)}px;
 				${getShadow(props.level || 1)}`
 			}
 		}	
