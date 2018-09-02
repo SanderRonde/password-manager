@@ -371,7 +371,7 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends WebComponentListenable<E & {
 	globalPropChange: {
 		args: [keyof GlobalProperties, GlobalProperties[keyof GlobalProperties]]
-	}	
+	}
 }> {
 	private _children: Set<WebComponentHierarchyManager<any>> = new Set();
 	private _parent: WebComponentHierarchyManager<any>|null = null;
@@ -664,7 +664,14 @@ abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends 
 
 export abstract class WebComponent<IDS extends {
 	[key: string]: HTMLElement;
-} = {}, E extends EventListenerObj = {}> extends WebComponentCustomCSSManager<E> {
+} = {}, E extends EventListenerObj = {}> extends WebComponentCustomCSSManager<E & {
+	beforePropChange: {
+		args: [string, any, any];
+	};
+	propChange: {
+		args: [string, any, any];
+	}
+}> {
 	/**
 	 * An ID map containing maps between queried IDs and elements,
 	 * 	cleared upon render

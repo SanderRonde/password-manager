@@ -312,6 +312,16 @@ function getCoerced(initial: any, mapType: DefinePropTypes) {
 	return initial;
 }
 
+type DEFAULT_EVENTS = {
+	beforePropChange: {
+		args: [string, any, any];
+		returnType: void;
+	};
+	propChange: {
+		args: [string, any, any];
+		returnType: void;
+	}
+};
 export function defineProps<P extends {
 	[key: string]: DefinePropTypes|DefinePropTypeConfig;
 }, T extends {
@@ -323,6 +333,8 @@ export function defineProps<P extends {
 }>(element: HTMLElement & {
 	renderToDOM(changeType: CHANGE_TYPE): void;
 	getParentRef(ref: string): any;
+	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
 }, {
 	reflect = {} as P, priv = {} as T
 }: {
@@ -359,7 +371,12 @@ export function defineProps<P extends {
 			return (key: string, val: string) => {
 				if (keyMap.has(key as (typeof keys)[0]['key'])) {
 					const { watch, isPrivate, mapType } = keyMap.get(key as (typeof keys)[0]['key'])!;
-					(propValues as any)[key] = getterWithVal(element, val, mapType);
+
+					const prevVal = (propValues as any)[key];
+					const newVal = getterWithVal(element, val, mapType);
+					element.fire('beforePropChange', key, prevVal, newVal);
+					(propValues as any)[key] = newVal;
+					element.fire('propChange', key, prevVal, newVal);
 					if (watch) {
 						element.renderToDOM(CHANGE_TYPE.PROP);
 					}
@@ -379,11 +396,12 @@ export function defineProps<P extends {
 			return (key: string) => {
 				if (keyMap.has(key as (typeof keys)[0]['key'])) {
 					const { watch, coerce, mapType } = keyMap.get(key as (typeof keys)[0]['key'])!;
-					if (coerce) {
-						(propValues as any)[key] = getCoerced(undefined, mapType);
-					} else {
-						(propValues as any)[key] = undefined;
-					}
+
+					const prevVal = (propValues as any)[key];
+					const newVal = coerce ? getCoerced(undefined, mapType) : undefined;
+					element.fire('beforePropChange', key, prevVal, newVal);
+					(propValues as any)[key] = newVal;
+					element.fire('propChange', key, prevVal, newVal);
 					if (watch) {
 						element.renderToDOM(CHANGE_TYPE.PROP);
 					}
@@ -421,7 +439,10 @@ export function defineProps<P extends {
 					return getter(element, propName, mapType);
 				},
 				set(value) {
+					const prevVal = props[mapKey];
+					element.fire('beforePropChange', key, prevVal, value);
 					props[mapKey] = value;
+					element.fire('propChange', key, prevVal, value);
 				}
 			});
 		}
@@ -441,7 +462,11 @@ export function defineProps<P extends {
 						element.renderToDOM(CHANGE_TYPE.PROP)
 					});
 				}
+
+				const prevVal = propValues[mapKey];
+				element.fire('beforePropChange', key, prevVal, value);
 				propValues[mapKey] = value;
+				element.fire('propChange', key, prevVal, value);
 				if (reflectToAttr) {
 					setter(originalSetAttr, originalRemoveAttr, propName, 
 						isPrivate ? '_' : original, mapType);
