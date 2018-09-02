@@ -104,7 +104,6 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 
 	private get _cumulativeItemSizes() {
 		this._genItemSizeArrs();
-		console.log(this.__cumulativeItemSizes);
 		return this.__cumulativeItemSizes;
 	}
 
