@@ -171,8 +171,7 @@ export function loginTest() {
 				challenge: encryptWithPublicKey(challenge, server_public_key),
 				twofactor_token: speakeasy.totp({
 					secret: twofactorSecret.base32,
-					encoding: 'base32',
-					time: Date.now() - (60 * 60)
+					encoding: 'base32'
 				})
 			}, {
 				password_hash: hash(pad(userpw, 'masterpwverify'))
@@ -217,8 +216,3 @@ export function loginTest() {
 		});
 	});
 }
-
-describe('x', function() {
-	this.timeout(100000);
-	loginTest();
-});
