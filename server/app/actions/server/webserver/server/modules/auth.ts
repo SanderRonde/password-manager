@@ -1,6 +1,6 @@
-import { StringifiedObjectId, EncryptedInstance, EncryptedAccount, ServerPublicKey, ServerPrivateKey, PublicKeyEncrypted, MasterPassword, InstancePublicKey } from '../../../../../../../shared/types/db-types';
+import { StringifiedObjectId, EncryptedInstance, EncryptedAccount, ServerPublicKey, ServerPrivateKey } from '../../../../../../../shared/types/db-types';
 import { AUTH_TOKEN_EXPIRE_TIME, COMM_TOKEN_DEFAULT_EXPIRE_TIME } from "../../../../../lib/constants";
-import { APIToken, TwofactorVerifyToken, U2FToken, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../../../../../shared/types/crypto';
+import { APIToken, TwofactorVerifyToken, U2FToken } from '../../../../../../../shared/types/crypto';
 import { genRSAKeyPair } from "../../../../../lib/crypto";
 import { U2FRequest } from 'u2f';
 
@@ -26,9 +26,6 @@ interface DashboardComm {
 interface U2FAuthRepresentation extends InstanceAuthRepresentation {
 	request: U2FRequest;
 	type: 'disable'|'verify'|'enable';
-	pw: null|PublicKeyEncrypted<
-		Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
-		InstancePublicKey>;
 };
 
 export enum COUNT {
@@ -216,24 +213,19 @@ export class WebserverAuth {
 
 	public genU2FToken(instance: StringifiedObjectId<EncryptedInstance>,
 		account: StringifiedObjectId<EncryptedAccount>, type: 'disable'|'verify',
-		request: U2FRequest, pw?: null): U2FToken;
+		request: U2FRequest): U2FToken;
 	public genU2FToken(instance: StringifiedObjectId<EncryptedInstance>,
 		account: StringifiedObjectId<EncryptedAccount>, type: 'enable',
-		request: U2FRequest, pw?: PublicKeyEncrypted<
-			Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
-			InstancePublicKey>): U2FToken;
+		request: U2FRequest): U2FToken;
 	public genU2FToken(instance: StringifiedObjectId<EncryptedInstance>,
 		account: StringifiedObjectId<EncryptedAccount>, type: 'enable'|'disable'|'verify',
-		request: U2FRequest, pw: PublicKeyEncrypted<
-			Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
-			InstancePublicKey>|null = null): U2FToken {
+		request: U2FRequest): U2FToken {
 				const token = this._genRandomToken();
 				this._u2fTokens.set(token, {
 					instance,
 					account,
 					type,
 					request,
-					pw,
 					expires: Date.now() + (1000 * 60 * 10)
 				});
 				return token;
@@ -241,16 +233,8 @@ export class WebserverAuth {
 
 	public verifyU2FToken(token: U2FToken, instance: StringifiedObjectId<EncryptedInstance>): {
 		isValid: true;
-		type: 'disable'|'verify';
+		type: 'disable'|'verify'|'enable';
 		request: U2FRequest;
-		pw: null;
-	}|{
-		isValid: true;
-		type: 'enable';
-		request: U2FRequest;
-		pw: PublicKeyEncrypted<
-			Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
-			InstancePublicKey>;
 	}|{
 		isValid: false;
 		type: null;
@@ -271,22 +255,13 @@ export class WebserverAuth {
 		if (isValid) {
 			this._u2fTokens.delete(token);
 			return {
-				isValid: true,
+				isValid: true as true,
 				type: match.type,
-				pw: match.pw!,
 				request: match.request
 			} as {
 				isValid: true;
-				type: 'disable'|'verify';
+				type: 'disable'|'verify'|'enable';
 				request: U2FRequest;
-				pw: null;
-			}|{
-				isValid: true;
-				type: 'enable';
-				request: U2FRequest;
-				pw: PublicKeyEncrypted<
-					Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
-					InstancePublicKey>;
 			}
 		}
 		return {

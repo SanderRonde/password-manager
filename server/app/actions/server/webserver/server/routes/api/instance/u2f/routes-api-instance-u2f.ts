@@ -1,6 +1,6 @@
-import { StringifiedObjectId, EncryptedInstance, MasterPassword, PublicKeyEncrypted, InstancePublicKey } from "../../../../../../../../../../shared/types/db-types";
+import { StringifiedObjectId, EncryptedInstance, MasterPassword } from "../../../../../../../../../../shared/types/db-types";
 import { Hashed, Padded, MasterPasswordVerificationPadding, encryptWithPublicKey } from "../../../../../../../../lib/crypto";
-import { MasterPasswordDecryptionpadding, U2FToken } from "../../../../../../../../../../shared/types/crypto";
+import { U2FToken } from "../../../../../../../../../../shared/types/crypto";
 import { API_ERRS } from "../../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../../database/database";
 import { ServerResponse } from '../../../../modules/ratelimit';
@@ -202,19 +202,12 @@ export class RoutesAPIInstanceU2f {
 					u2f: this.server.database.Crypto.dbEncryptWithSalt(JSON.stringify({
 						keyHandle: verifiedResponse.keyHandle,
 						publicKey: verifiedResponse.publicKey,
-						decryption_password: verifiedToken.pw
 					} as {
 						keyHandle: string;
 						publicKey: string;
-						decryption_password: PublicKeyEncrypted<
-							Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
-							InstancePublicKey>;
 					}) as EncodedString<{
 						keyHandle: string;
 						publicKey: string;
-						decryption_password: PublicKeyEncrypted<
-							Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
-							InstancePublicKey>;
 					}>)
 				})) {
 					res.status(500);
@@ -314,8 +307,7 @@ export class RoutesAPIInstanceU2f {
 						data: {
 							auth_token: encryptWithPublicKey(
 								this.server.Auth.genLoginToken(instance_id, 
-								instance.user_id.toHexString()), publicKey),
-							pw: registration.decryption_password
+								instance.user_id.toHexString()), publicKey)
 						}
 					});
 				} else {

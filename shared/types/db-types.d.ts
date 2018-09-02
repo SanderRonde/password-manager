@@ -261,12 +261,6 @@ export type EncryptedInstance = {
 		 * The u2f public key
 		 */
 		publicKey: string;
-		/**
-		 * The user's decryption password encrypted with their public key
-		 */
-		decryption_password: PublicKeyEncrypted<
-			Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
-			InstancePublicKey>;
 	}>|null>>;
 };
 
@@ -306,12 +300,6 @@ export type DecryptedInstance = {
 		 * The u2f public key
 		 */
 		publicKey: string;
-		/**
-		 * The user's decryption password encrypted with their public key
-		 */
-		decryption_password: PublicKeyEncrypted<
-			Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>,
-			InstancePublicKey>;
 	}|null;
 }
 
