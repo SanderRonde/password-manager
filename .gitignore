@@ -89,3 +89,6 @@ test/ui/served/
 database/
 data/
 !server/app/database/
+scripts/*.js
+scripts/*.map
+scripts/*.d.ts

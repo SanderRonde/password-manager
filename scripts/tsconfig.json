@@ -22,15 +22,6 @@
     "compileOnSave": true,
     "allowJs": true,
 	"include": [
-        "typings/"
-    ],
-	"references": [{
-		"path": "./server/tsconfig.ts3.json"
-	}, {
-		"path": "./server/app/actions/server/webserver/client/src"
-	}, {
-        "path": "./test/tsconfig.json"
-    }, {
-        "path": "./scripts/tsconfig.json"
-    }]
+        "./"
+    ]
 }
