@@ -167,7 +167,7 @@ export class RoutesApiInstance {
 					res.status(200);
 					res.json({
 						success: false,
-						error: 'Incorrect combination',
+						error: 'invalid credentials',
 						ERR: API_ERRS.INVALID_CREDENTIALS
 					});
 					return;
