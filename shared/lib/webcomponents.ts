@@ -603,11 +603,19 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 	@bindToClass
 	public complexHTML(strings: TemplateStringsArray, ...values: any[]) {
 		values = values.map((value) => {
-			if (value instanceof TemplateFn ||
-				(typeof value === 'object' && !(value instanceof TemplateResult)) ||
-				typeof value === 'function') {
+			if (value instanceof TemplateFn) {
+				return this._genRef(value);
+			}
+			if (Array.isArray(value) && !(value[0] instanceof TemplateResult)) {
+				return this._genRef(value);
+			}
+			if (!Array.isArray(value) && typeof value === 'object' && 
+				!(value instanceof TemplateResult)) {
 					return this._genRef(value);
 				}
+			if (typeof value === 'function') {
+				return this._genRef(value);
+			}
 			return value;
 		});
 		return html(strings, ...values);
