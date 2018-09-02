@@ -22,7 +22,6 @@ export class RoutesAPIDashboard {
 		}, {}, {}, {}>({
 			unencrypted: ['comm_token', 'public_key', 'encrypted_data']
 		}, {}, async (toCheck, { comm_token, public_key, encrypted_data }) => {
-			debugger;
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'comm_token',
 				type: 'string'
