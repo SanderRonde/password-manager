@@ -562,7 +562,7 @@ export class InfiniteList<D, ID> extends ConfigurableWebComponent<InfiniteListID
 			return;
 		}
 		this._itemData![index] = {
-			...prevData as Object, ...updated as Object
+			...(prevData as Object || {}), ...updated as Object
 		} as ID;
 	}
 
