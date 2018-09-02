@@ -1,13 +1,39 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../../lib/webcomponents';
 import { changeOpacity } from '../../../../lib/webcomponent-util';
+import { RippleCSS } from '../../../../mixins/ripple';
 import { PasswordPreview } from './password-preview';
 import { html } from 'lit-html';
 
-export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>((_props, theme) => {
+export const invertedCardCSS = new TemplateFn<PasswordPreview>((_props, theme) => {
 	return html`<style>
+		#shadow {
+			transition: background-color 300ms ease-in-out;
+			background-color: ${theme.oppositeBackground};
+			color: ${theme.textOnNonbackground};
+		}
+	</style>`;
+}, CHANGE_TYPE.THEME);
+export const noCustomCSS = new TemplateFn<PasswordPreview>(_ => html`
+	<style>
+		#shadow {
+			transition: background-color 300ms ease-in-out;
+		}
+	</style>
+`, CHANGE_TYPE.NEVER);
+
+export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (props, theme) {
+	return html`
+		${RippleCSS.render(CHANGE_TYPE.THEME, this)}
+		<style>
+
 		#container {
 			margin-bottom: 20px;
 			cursor: pointer;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-khtml-user-select: none; 
+			-ms-user-select: none;
+			user-select: none;
 		}
 
 		#content {
@@ -38,11 +64,17 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>((_props, theme
 		}
 
 		.noIcon {
-			fill: ${changeOpacity(theme.textOnBackground, 70)};
+			transition: fill 300ms ease-in-out;
+			fill: ${props.selected ?
+				changeOpacity(theme.textOnNonbackground, 70) :
+				changeOpacity(theme.textOnBackground, 70)};
 		}
 
 		#pointer .__hollow_arrow {
-			border-color: ${changeOpacity(theme.textOnBackground, 70)};
+			transition: border-color 300ms ease-in-out;
+			border-color: ${props.selected ?
+				changeOpacity(theme.textOnNonbackground, 70) :
+				changeOpacity(theme.textOnBackground, 70)};
 		}
 
 		#websites {
@@ -50,7 +82,10 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>((_props, theme
 			display: -webkit-flex;
 			display: flex;
 			flex-direction: column;
-			color: ${theme.textOnBackground};
+			transition: color 300ms ease-in-out;
+			color: ${props.selected ? 
+				theme.textOnNonbackground : 
+				theme.textOnBackground};
 		}
 
 		.website {
@@ -62,7 +97,10 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>((_props, theme
 		}
 
 		.username {
-			color: ${changeOpacity(theme.textOnBackground, 85)};
+			transition: color 300ms ease-in-out;
+			color: ${props.selected ? 
+				changeOpacity(theme.textOnNonbackground, 85) :
+				changeOpacity(theme.textOnBackground, 85)};
 		}
 
 		.urls {
@@ -76,5 +114,9 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>((_props, theme
 			font-weight: 500;
 			font-size: 150%;
 		}
+
+		.mdl-ripple {
+			background-color: ${theme.oppositeBackground};
+		}
 	</style>`
-}, CHANGE_TYPE.THEME);
+}, CHANGE_TYPE.ALWAYS);

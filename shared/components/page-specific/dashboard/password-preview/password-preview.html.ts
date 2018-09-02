@@ -1,9 +1,9 @@
 import { HollowTriangleArrowSize } from '../../../icons/triangle-arrow/triangle-arrow';
-import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { PasswordPreview } from './password-preview';
-import { html } from 'lit-html';
 import { QuestionmarkSize } from '../../../icons/questionmark/questionmark';
 import { LockClosedUnfilled } from '../../../icons/lockClosed/lockClosed';
+import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { invertedCardCSS, noCustomCSS } from './password-preview.css';
+import { PasswordPreview } from './password-preview';
 
 function prefixWithWWW(url: string) {
 	if (url.startsWith('www.')) {
@@ -11,11 +11,12 @@ function prefixWithWWW(url: string) {
 	}
 	return `www.${url}`;
 }
-export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>((props) => {
+export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>((props, _, html) => {
 	return html`
 		<md-card id="container" level="2"
 			padding-vertical="0"
 			padding-horizontal="0"
+			custom-css="${props.selected ? invertedCardCSS : noCustomCSS}"
 		>
 			<div id="content">
 				<div id="websites">
