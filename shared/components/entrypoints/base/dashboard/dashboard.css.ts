@@ -133,5 +133,9 @@ export const DashboardCSS = new TemplateFn<Dashboard>((_props, theme) => {
 			margin-bottom: 40px;
 			${`margin-top: ${PAGE_TOP}px;`}
 		}
+
+		#passwordFocus {
+			display: block;
+		}
 	</style>`
 }, CHANGE_TYPE.THEME);

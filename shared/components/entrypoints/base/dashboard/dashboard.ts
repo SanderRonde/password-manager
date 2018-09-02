@@ -1,8 +1,9 @@
 import { PasswordPreview } from '../../../page-specific/dashboard/password-preview/password-preview';
+import { PasswordDetail } from '../../../page-specific/dashboard/password-detail/password-detail';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
+import { defineProps, ComplexType, PROP_TYPE } from '../../../../lib/webcomponent-util';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
-import { defineProps, ComplexType, PROP_TYPE } from '../../../../lib/webcomponent-util';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { DashboardScrollManager } from './dashboard-scroll-manager';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
@@ -20,7 +21,8 @@ export const DashboarDependencies: (typeof WebComponentBase)[] = [
 	ThemeSelector,
 	HorizontalCenterer,
 	MDCard,
-	PasswordPreview
+	PasswordPreview,
+	PasswordDetail
 ]
 
 export interface MetaPasswordsPreviewData {
