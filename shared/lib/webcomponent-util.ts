@@ -196,6 +196,7 @@ interface DefinePropTypeConfig {
 	type: DefinePropTypes;
 	watch?: boolean;
 	defaultValue?: GetTSType<this['type']>;
+	value?: GetTSType<this['type']>;
 	watchProperties?: string[];
 	exactType?: any;
 	coerce?: boolean;
@@ -400,6 +401,7 @@ export function defineProps<P extends {
 			watch = true,
 			coerce = false,
 			defaultValue,
+			value: defaultValue2,
 			type: mapType,
 			isPrivate = false,
 			watchProperties = []
@@ -459,11 +461,13 @@ export function defineProps<P extends {
 					}
 				});
 			}
-			if (defaultValue !== undefined && propValues[mapKey] === undefined) {
-				propValues[mapKey] = defaultValue as any;
+			const defaultVal = defaultValue !== undefined ? 
+				defaultValue : defaultValue2;
+			if (defaultVal !== undefined && propValues[mapKey] === undefined) {
+				propValues[mapKey] = defaultVal as any;
 				await hookIntoMount(element as any, () => {
 					setter(originalSetAttr, originalRemoveAttr, propName, 
-						isPrivate ? '_' : defaultValue, mapType);
+						isPrivate ? '_' : defaultVal, mapType);
 				});
 			} else if (isPrivate || mapType === 'complex') {
 				await hookIntoMount(element as any, () => {
