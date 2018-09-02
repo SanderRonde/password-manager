@@ -2,6 +2,7 @@
 
 import { config, defineProps, PROP_TYPE, ComplexType } from '../../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
+import { PasswordPreviewIDMap } from './password-preview-querymap';
 import { PasswordPreviewHTML } from './password-preview.html';
 import { PasswordPreviewCSS } from './password-preview.css';
 import { MDCard } from '../../../util/md-card/md-card';
@@ -14,7 +15,7 @@ import { MDCard } from '../../../util/md-card/md-card';
 		MDCard
 	]
 })
-export class PasswordPreview extends ConfigurableWebComponent<{}> {
+export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDMap> {
 	props = defineProps(this, {
 		reflect: {
 			id: PROP_TYPE.STRING,
