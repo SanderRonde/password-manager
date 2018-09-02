@@ -1,7 +1,7 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../../lib/webcomponents';
+import { changeOpacity } from '../../../../lib/webcomponent-util';
 import { PasswordPreview } from './password-preview';
 import { html } from 'lit-html';
-import { changeOpacity } from '../../../../lib/webcomponent-util';
 
 export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>((_props, theme) => {
 	return html`<style>
