@@ -2,7 +2,7 @@ import { PasswordPreview } from '../../../page-specific/dashboard/password-previ
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
-import { defineProps, ComplexType } from '../../../../lib/webcomponent-util';
+import { defineProps, ComplexType, PROP_TYPE } from '../../../../lib/webcomponent-util';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { DashboardScrollManager } from './dashboard-scroll-manager';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
@@ -23,6 +23,10 @@ export const DashboarDependencies: (typeof WebComponentBase)[] = [
 	PasswordPreview
 ]
 
+export interface MetaPasswordsPreviewData {
+	selected: boolean;
+}
+
 export abstract class Dashboard extends DashboardScrollManager { 
 	props = defineProps(this, {
 		priv: {
@@ -30,9 +34,55 @@ export abstract class Dashboard extends DashboardScrollManager {
 				type: ComplexType<MetaPasswords>(),
 				defaultValue: [],
 				isPrivate: true
+			},
+			currentPassword: {
+				type: PROP_TYPE.NUMBER,
+				defaultValue: -1
 			}
 		}
 	});
+
+	private get _list() {
+		return this.$.infiniteList as InfiniteList<MetaPasswords[0], MetaPasswordsPreviewData>;
+	}
+
+	constructor() {
+		super();
+
+		this.listen('beforePropChange', (key, prevVal: MetaPasswords, newVal: MetaPasswords) => {
+			if (key === 'metaPasswords' && this.props.currentPassword !== -1 &&
+				typeof this.props.currentPassword === 'number') {
+					//Check if the currently selected password is still in the new
+					// batch. If so, switch the currentPassword index to that new password
+					const currentPassword = prevVal[this.props.currentPassword];
+					const id = currentPassword.id;
+
+					let newIndex: number = -1;
+					//Find a password with that ID in the new value
+					for (let i = 0; i < newVal.length; i++) {
+						if (newVal[i].id === id) {
+							newIndex = i;
+							break;
+						}
+					}
+
+					this._list.updateItemData(this.props.currentPassword, {
+						selected: false
+					});
+
+					//Set it to -1 before the update and change it afterwards
+					this.props.currentPassword = -1;
+					window.setTimeout(() => {
+						this.props.currentPassword = newIndex;
+						if (newIndex !== -1) {
+							this._list.updateItemData(newIndex, {
+								selected: true
+							});
+						}
+					}, 0);
+				}
+		});
+	}
 
 	protected abstract _getPasswordMeta(): Promise<MetaPasswords|null>|MetaPasswords|null;
 
