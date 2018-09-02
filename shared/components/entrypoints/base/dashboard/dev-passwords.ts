@@ -60,8 +60,12 @@ function range<T>(from: number, to: number, fn: () => T): T[] {
 	return arr;
 }
 
+let generated: MetaPasswords|null = null;
 export function getDevPasswords() {
-	return [
+	if (generated) {
+		return generated;
+	}
+	return (generated = [
 		genGooglePassword(),
 		genGooglePassword(),
 		genPassword([{...googleWebsite}, {...redditWebsite}], false),
@@ -74,5 +78,5 @@ export function getDevPasswords() {
 		...range(0, 200, () => {
 			return genGooglePassword()
 		})
-	]
+	]);
 }
