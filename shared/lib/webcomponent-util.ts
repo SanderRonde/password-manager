@@ -63,23 +63,26 @@ export function isDefined<U extends string>(value: null|undefined|U): value is U
 
 function getterWithVal<R>(component: {
 	getParentRef(ref: string): any;
-}, value: string|null, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R;
+}, value: string|null, strict: boolean, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R;
 function getterWithVal(component: {
 	getParentRef(ref: string): any;
-}, value: string|null, type: 'bool'): boolean;
+}, value: string|null, strict: boolean, type: 'bool'): boolean;
 function getterWithVal(component: {
 	getParentRef(ref: string): any;
-}, value: string|null, type: 'string'): string|undefined;
+}, value: string|null, strict: boolean, type: 'string'): string|undefined;
 function getterWithVal(component: {
 	getParentRef(ref: string): any;
-}, value: string|null, type: 'number'): number|undefined;
+}, value: string|null, strict: boolean, type: 'number'): number|undefined;
 function getterWithVal<R>(component: {
 	getParentRef(ref: string): any;
-}, value: string|null, type: 'complex'): R|undefined;
+}, value: string|null, strict: boolean, type: 'complex'): R|undefined;
 function getterWithVal<R>(component: {
 	getParentRef(ref: string): any;
-}, value: string|null, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R {
+}, value: string|null, strict: boolean, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R {
 	if (type === 'bool') {
+		if (strict) {
+			return value === 'true';
+		}
 		return isDefined(value);
 	} else {
 		if (isDefined(value)) {
@@ -100,23 +103,23 @@ function getterWithVal<R>(component: {
 
 export function getter<R>(element: HTMLElement & {
 	getParentRef(ref: string): any;
-}, name: string, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R;
+}, name: string, strict: boolean, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R;
 export function getter(element: HTMLElement & {
 	getParentRef(ref: string): any;
-}, name: string, type: 'bool'): boolean;
+}, name: string, strict: boolean, type: 'bool'): boolean;
 export function getter(element: HTMLElement & {
 	getParentRef(ref: string): any;
-}, name: string, type: 'string'): string|undefined;
+}, name: string, strict: boolean, type: 'string'): string|undefined;
 export function getter(element: HTMLElement & {
 	getParentRef(ref: string): any;
-}, name: string, type: 'number'): number|undefined;
+}, name: string, strict: boolean, type: 'number'): number|undefined;
 export function getter<R>(element: HTMLElement & {
 	getParentRef(ref: string): any;
-}, name: string, type: 'complex'): R|undefined;
+}, name: string, strict: boolean, type: 'complex'): R|undefined;
 export function getter<R>(element: HTMLElement & {
 	getParentRef(ref: string): any;
-}, name: string, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R {
-	return getterWithVal(element, element.getAttribute(name), type);
+}, name: string, strict: boolean, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R {
+	return getterWithVal(element, element.getAttribute(name), strict, type);
 }
 
 export function setter(setAttrFn: (key: string, val: string) => void, 
@@ -204,6 +207,7 @@ interface DefinePropTypeConfig {
 	watchProperties?: string[];
 	exactType?: any;
 	coerce?: boolean;
+	strict?: boolean;
 	isPrivate?: boolean;
 }
 
@@ -215,6 +219,7 @@ function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): Defin
 		return {
 			coerce: false,
 			watch: true,
+			strict: false,
 			isPrivate: false,
 			type: value as DefinePropTypes
 		}
@@ -369,15 +374,16 @@ export function defineProps<P extends {
 		coerce: boolean;
 		mapType: DefinePropTypes;
 		isPrivate: boolean;
+		strict: boolean;
 	}> = new Map();
 	Object.defineProperty(element, 'setAttribute', {
 		get() {
 			return (key: string, val: string) => {
 				if (keyMap.has(key as (typeof keys)[0]['key'])) {
-					const { watch, isPrivate, mapType } = keyMap.get(key as (typeof keys)[0]['key'])!;
+					const { watch, isPrivate, mapType, strict } = keyMap.get(key as (typeof keys)[0]['key'])!;
 
 					const prevVal = (propValues as any)[key];
-					const newVal = getterWithVal(element, val, mapType);
+					const newVal = getterWithVal(element, val, strict, mapType);
 					element.fire('beforePropChange', key, prevVal, newVal);
 					(propValues as any)[key] = newVal;
 					element.fire('propChange', key, prevVal, newVal);
@@ -425,12 +431,13 @@ export function defineProps<P extends {
 			defaultValue,
 			value: defaultValue2,
 			type: mapType,
+			strict = false,
 			isPrivate = false,
 			watchProperties = []
 		} = getDefinePropConfig(value);
 
 		keyMap.set(key, {
-			watch, coerce, mapType, isPrivate
+			watch, coerce, mapType, isPrivate, strict
 		});
 
 		const propName = casingToDashes(mapKey);
@@ -440,7 +447,7 @@ export function defineProps<P extends {
 					if (isPrivate) {
 						return propValues[mapKey];
 					}
-					return getter(element, propName, mapType);
+					return getter(element, propName, strict, mapType);
 				},
 				set(value) {
 					const prevVal = props[mapKey];
@@ -482,11 +489,11 @@ export function defineProps<P extends {
 		});
 		(async () => {
 			if (mapType !== 'complex') {
-				propValues[mapKey] = getter(element, propName, mapType) as any;
+				propValues[mapKey] = getter(element, propName, strict, mapType) as any;
 			} else {
 				await hookIntoMount(element as any, () => {
 					if (!isPrivate || element.getAttribute(propName) !== '_') {
-						propValues[mapKey] = getter(element, propName, mapType) as any;
+						propValues[mapKey] = getter(element, propName, strict, mapType) as any;
 					}
 				});
 			}
