@@ -172,7 +172,7 @@ export function loginTest() {
 				twofactor_token: speakeasy.totp({
 					secret: twofactorSecret.base32,
 					encoding: 'base32',
-					time: Date.now()
+					time: Date.now() - (60 * 60)
 				})
 			}, {
 				password_hash: hash(pad(userpw, 'masterpwverify'))
@@ -217,3 +217,8 @@ export function loginTest() {
 		});
 	});
 }
+
+describe('x', function() {
+	this.timeout(100000);
+	loginTest();
+});
