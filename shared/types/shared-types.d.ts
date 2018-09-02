@@ -92,4 +92,8 @@ export interface Theme {
 	 * The default page background color
 	 */
 	background: string
+	/**
+	 * A background-color opposite to the regular one in this theme
+	 */
+	oppositeBackground: string;
 }

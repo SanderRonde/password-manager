@@ -24,7 +24,8 @@ export const theme: {
 		minOppositeColorText: '#0000008C',
 		textOnBackground: '#000000',
 		textOnNonbackground: '#FFFFFF',
-		background: '#F8F8F8'
+		background: '#F8F8F8',
+		oppositeBackground: '#171718'
 	},
 	dark: {
 		primary: {
@@ -45,6 +46,7 @@ export const theme: {
 		minOppositeColorText: '#FFFFFF8C',
 		textOnBackground: '#E1E1E1',
 		textOnNonbackground: '#000000',
-		background: '#171718'
+		background: '#171718',
+		oppositeBackground: '#F8F8F8'
 	}
 };
