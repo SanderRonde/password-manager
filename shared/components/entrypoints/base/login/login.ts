@@ -126,9 +126,9 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 			} else {	
 				return {
 					valid: true,
-					email: email!, 
-					password: password!,
-					twofactor_token: twofactor
+					email: email!.trim(), 
+					password: password!.trim(),
+					twofactor_token: twofactor.trim()
 				}
 			}
 	}
