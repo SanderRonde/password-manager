@@ -71,32 +71,6 @@ export class RoutesAPIDashboard {
 				return;
 			}
 
-			const decryptedAccount = this.server.database.Crypto.dbDecryptAccountRecord(
-				account);
-			if (decryptedAccount.twofactor_enabled) {
-				const secret = decryptedAccount.twofactor_secret;
-				if (secret === null) {
-					res.status(500);
-					res.json({
-						success: false,
-						error: 'Server error',
-						ERR: API_ERRS.SERVER_ERROR
-					});
-					return;
-				}
-
-				if (!decrypted.twofactor_token || 
-					!this.server.Router.verify2FA(secret, decrypted.twofactor_token)) {
-						res.status(200);
-						res.json({
-							success: false,
-							error: 'Incorrect combination',
-							ERR: API_ERRS.INVALID_CREDENTIALS
-						});
-						return;
-					}
-			}
-
 			//Subsitute public and private key
 			const keyPair = genRSAKeyPair();
 
@@ -122,15 +96,12 @@ export class RoutesAPIDashboard {
 				instance_id: decryptedInstanceData.id as StringifiedObjectId<EncryptedInstance>,
 				password_hash: decrypted.password,
 				challenge: encryptWithPublicKey('data', decryptedInstanceData.server_key)
-			}, res);
+			}, res, decrypted.twofactor_token);
 
 			if (!loginData) {
 				return;
 			}
-			assert.isFalse(loginData.u2fRequired, 'no further authentication is required');
-			if (loginData.u2fRequired) return;
-
-			const token = loginData.auth_token;
+			const token = loginData.auth_token!;
 
 			res.status(200);
 			res.json({
