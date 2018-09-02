@@ -9,14 +9,16 @@ import * as path from 'path'
 
 function serve(root: string, {
 	rewrite = (val) => val,
+	raw = false,
 	prefix = '',
 	exclude = [],
 	extensions = []
 }: {
 	rewrite?: (content: string, filename: string) => Promise<string>|string;
-prefix?: string;
+	prefix?: string;
 	exclude?: string[];
 	extensions?: string[]
+	raw?: boolean;
 } = {}): express.RequestHandler {
 	return async (req: express.Request, res: ServerResponse, next: express.NextFunction) => {
 		if (!req.url.startsWith(prefix)) {
@@ -37,10 +39,15 @@ prefix?: string;
 			if (err) {
 				continue;
 			}
+
 			res.contentType(filePath);
 			res.status(200);
-			res.send(await rewrite(result!.toString(), filePath));
-			res.end();
+			if (raw) {
+				res.sendFile(filePath);
+			} else {
+				res.send(await rewrite(result!.toString(), filePath));
+				res.end();
+			}
 			return;
 		}
 		next();
@@ -190,7 +197,9 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 		prefix: '/static/',
 		extensions: ['js']
 	}));
-	webserver.app.use(serve(path.join(__dirname, '../development/'), { }));
+	webserver.app.use(serve(path.join(__dirname, '../development/'), { 
+		raw: true
+	}));
 	webserver.app.use(serve(path.join(PROJECT_ROOT, 'shared/components/'), {
 		rewrite(content, filePath) {
 			if (filePath.endsWith('.js')) {
