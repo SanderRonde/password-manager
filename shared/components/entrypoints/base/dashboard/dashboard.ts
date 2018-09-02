@@ -44,6 +44,16 @@ export abstract class Dashboard extends DashboardScrollManager {
 		}
 	});
 
+	public get selectedPassword() {
+		if (!this.props.currentPasswordIndex ||
+			this.props.currentPasswordIndex === -1 || 
+			!this.props.metaPasswords || 
+			this.props.metaPasswords.length === 0) {
+				return null;
+			}
+		return this.props.metaPasswords[this.props.currentPasswordIndex];
+	}
+
 	private get _list() {
 		return this.$.infiniteList as InfiniteList<MetaPasswords[0], MetaPasswordsPreviewData>;
 	}
