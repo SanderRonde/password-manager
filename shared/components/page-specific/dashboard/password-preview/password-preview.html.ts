@@ -1,4 +1,4 @@
-import { TriangleArrowSize } from '../../../icons/triangle-arrow/triangle-arrow';
+import { HollowTriangleArrowSize } from '../../../icons/triangle-arrow/triangle-arrow';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { PasswordPreview } from './password-preview';
 import { html } from 'lit-html';
@@ -53,7 +53,7 @@ export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>((props) => {
 							${LockClosedUnfilled}
 						</div>` : html``}
 					<div id="arrow" title="View this password's details">
-						${TriangleArrowSize(35, 35)}
+						${HollowTriangleArrowSize(35, 35)}
 					</div>
 				</div>
 			</div>

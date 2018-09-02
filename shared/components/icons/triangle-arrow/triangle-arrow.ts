@@ -12,3 +12,31 @@ export function TriangleArrowSize(width: number = 24, height: number = width) {
 		</svg>
 	`
 }
+
+export const HollowTriangleArrow = HollowTriangleArrowSize();
+
+function pythagoras(crossSection: number) {
+	return Math.round(Math.sqrt(Math.pow(crossSection, 2) / 2));
+}
+
+export function HollowTriangleArrowSize(width: number, height: number): TemplateResult;
+export function HollowTriangleArrowSize(size: number): TemplateResult;
+export function HollowTriangleArrowSize(): TemplateResult;
+export function HollowTriangleArrowSize(width: number = 24, height: number = width) { 
+	const actualWidth = pythagoras(width);
+	const actualHeight = pythagoras(height);
+	const widthPart = actualWidth / 4;
+	const heightPart = actualHeight / 4;
+	return html`
+		<style>
+			.__hollow_arrow {
+				border-right: ${widthPart}px solid black;
+				border-bottom: ${heightPart}px solid black;
+				width: ${widthPart * 3}px;
+				height: ${heightPart * 3}px;
+				transform: rotate(-45deg);
+			}
+		</style>
+		<div class="__hollow_arrow"></div>
+	`
+}

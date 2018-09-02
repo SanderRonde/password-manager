@@ -21,7 +21,7 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>((_props, theme
 		}
 
 		#pointer {
-			margin-right: 15px;
+			margin-right: 25px;
 			display: -webkit-flex;
 			display: flex;
 			flex-direction: row;
@@ -37,8 +37,12 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>((_props, theme
 			justify-content: center;
 		}
 
-		.noIcon, #pointer {
+		.noIcon {
 			fill: ${changeOpacity(theme.textOnBackground, 70)};
+		}
+
+		#pointer .__hollow_arrow {
+			border-color: ${changeOpacity(theme.textOnBackground, 70)};
 		}
 
 		#websites {
