@@ -458,13 +458,13 @@ export class WebserverRouter {
 		this.parent.app.post('/api/instance/u2f/enable', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.U2F, 'enable')));
-		this.parent.app.post('/api/instance/2fa/disable', bruteforceLimiter,
+		this.parent.app.post('/api/instance/u2f/disable', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.U2F, 'disable')));
-		this.parent.app.post('/api/instance/2fa/confirm', bruteforceLimiter,
+		this.parent.app.post('/api/instance/u2f/confirm', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.U2F, 'confirm')));
-		this.parent.app.post('/api/instance/2fa/verify', bruteforceLimiter,
+		this.parent.app.post('/api/instance/u2f/verify', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.U2F, 'verify')));
 
