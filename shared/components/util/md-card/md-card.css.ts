@@ -32,6 +32,7 @@ export const MDCardCSS = new TemplateFn<MDCard>((props, theme) => {
 		#shadow {
 			${
 				`background-color: ${theme.card};
+				color: ${theme.textOnBackground};
 				padding: ${
 					assertNumber(props.paddingVertical, 20)}px ${
 						assertNumber(props.paddingHorizontal, 20)}px;
