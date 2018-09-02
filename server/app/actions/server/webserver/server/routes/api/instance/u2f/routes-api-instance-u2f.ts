@@ -34,13 +34,13 @@ export class RoutesAPIInstanceU2f {
 			if (instance === null || decryptedInstance === null || accountPromise === null) return;
 
 			const user = await this.server.database.Manipulation.findOne(COLLECTIONS.USERS, {
-				_id: instance._id
+				_id: instance.user_id
 			});
 			if (!user) {
 				res.status(200);
 				res.json({
 					success: false,
-					error: 'invalid credentials',
+					error: 'invalid credentials1',
 					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return;
@@ -98,7 +98,7 @@ export class RoutesAPIInstanceU2f {
 			if (instance === null || decryptedInstance === null || accountPromise === null) return;
 
 			const user = await this.server.database.Manipulation.findOne(COLLECTIONS.USERS, {
-				_id: instance._id
+				_id: instance.user_id
 			});
 			if (!user) {
 				res.status(200);
