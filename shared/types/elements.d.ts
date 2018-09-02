@@ -1,3 +1,5 @@
+import { PasswordPreview } from "../components/page-specific/dashboard/password-preview/password-preview";
+import { PasswordDetail } from "../components/page-specific/dashboard/password-detail/password-detail";
 import { HorizontalCenterer } from "../components/util/horizontal-centerer/horizontal-centerer";
 import { VerticalCenterer } from "../components/util/vertical-centerer/vertical-centerer";
 import { AnimatedButton } from "../components/util/animated-button/animated-button";
@@ -11,7 +13,6 @@ import { LoginWeb } from "../components/entrypoints/web/login/login-web";
 import { PaperToast } from "../components/util/paper-toast/paper-toast";
 import { IconButton } from "../components/util/icon-button/icon-button";
 import { MDCard } from "../components/util/md-card/md-card";
-import { PasswordPreview } from "../components/page-specific/dashboard/password-preview/password-preview";
 
 declare global {
 	type HTMLMdCardElement = MDCard;
@@ -24,6 +25,7 @@ declare global {
 	type HTMLMaterialInputElement = MaterialInput;
 	type HTMLThemeSelectorElement = ThemeSelector;
 	type HTMLAnimatedButtonElement = AnimatedButton;
+	type HTMLPasswordDetailElement = PasswordDetail;
 	type HTMLLoadingSpinnerElement = LoadingSpinner;
 	type HTMLPasswordPreviewElement = PasswordPreview;
 	type HTMLVerticalCentererElement = VerticalCenterer;
