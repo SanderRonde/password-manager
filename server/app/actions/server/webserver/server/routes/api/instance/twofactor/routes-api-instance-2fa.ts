@@ -34,7 +34,7 @@ export class RoutesAPIInstanceTwofactor {
 			if (instance === null || decryptedInstance === null || accountPromise === null) return;
 
 			const user = await this.server.database.Manipulation.findOne(COLLECTIONS.USERS, {
-				_id: instance._id
+				_id: instance.user_id
 			});
 			if (!user) {
 				res.status(200);
@@ -146,7 +146,7 @@ export class RoutesAPIInstanceTwofactor {
 			if (instance === null || decryptedInstance === null || accountPromise === null) return;
 
 			const user = await this.server.database.Manipulation.findOne(COLLECTIONS.USERS, {
-				_id: instance._id
+				_id: instance.user_id
 			});
 			if (!user) {
 				res.status(200);
