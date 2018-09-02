@@ -147,7 +147,11 @@ export function setter(setAttrFn: (key: string, val: string) => void,
 		} else {
 			const strVal = value as string|number;
 			if (type === 'complex') {
-				setAttrFn(name, encodeURIComponent(JSON.stringify(strVal)));
+				try {
+					setAttrFn(name, encodeURIComponent(JSON.stringify(strVal)));
+				} catch(e) {
+					setAttrFn(name, encodeURIComponent('_'));
+				}
 			} else {
 				setAttrFn(name, `${strVal}`);
 			}
