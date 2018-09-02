@@ -394,7 +394,6 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 				props[attr.name.slice('prop_'.length) as keyof GlobalProperties] = 
 					decodeURIComponent(
 						attr.value as GlobalProperties[keyof GlobalProperties] as string);
-				this.removeAttribute(attr.name);
 			}
 		}
 
