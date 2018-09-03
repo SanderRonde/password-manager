@@ -71,7 +71,6 @@ export function getDevPasswords() {
 	return (generated = [
 		genGooglePassword(),
 		genGooglePassword(),
-		genPassword([{...googleWebsite}, {...redditWebsite}], false, false),
 		genGooglePassword({
 			u2fEnabled: true,
 			twofactorEnabled: true
@@ -82,6 +81,7 @@ export function getDevPasswords() {
 		genGooglePassword({
 			twofactorEnabled: true
 		}),
+		genPassword([{...googleWebsite}, {...redditWebsite}], false, false),
 		genGooglePassword({
 			noFavicon: true
 		}),
