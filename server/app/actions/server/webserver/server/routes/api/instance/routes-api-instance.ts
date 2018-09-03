@@ -181,15 +181,15 @@ export class RoutesApiInstance {
 				instance._id.toHexString(), decryptedInstance.user_id.toHexString(),
 				'verify', request);
 			return {
-				u2fRequired: true,
+				u2f_required: true,
 				request: request,
-				u2fToken: u2fToken,
+				u2f_token: u2fToken,
 				challenge: solved
 			}
 		}
 
 		return {
-			u2fRequired: false,
+			u2f_required: false,
 			auth_token: encryptWithPublicKey(this.server.Auth.genLoginToken(
 				instance._id.toHexString(), account._id.toHexString()), publicKey),
 			challenge: solved
@@ -275,16 +275,16 @@ export class RoutesApiInstance {
 	public extendKey(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			oldToken: APIToken;
+			old_token: APIToken;
 			count: number;
 		}, {}, {}, {}>({
-			unencrypted: ['instance_id', 'oldToken', 'count']
-		}, {}, async (toCheck, { count, instance_id, oldToken }) => {
+			unencrypted: ['instance_id', 'old_token', 'count']
+		}, {}, async (toCheck, { count, instance_id, old_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
 			}, {
-				val: 'oldToken',
+				val: 'old_token',
 				type: 'string'
 			}, {
 				val: 'count',
@@ -297,7 +297,7 @@ export class RoutesApiInstance {
 			const publicKey = this.server.database.Crypto.dbDecrypt(
 				instance.public_key);
 
-			const newToken = this.server.Auth.extendLoginToken(oldToken, count,
+			const newToken = this.server.Auth.extendLoginToken(old_token, count,
 				instance_id, instance.user_id.toHexString());
 			if (newToken === false) {
 				res.status(200);

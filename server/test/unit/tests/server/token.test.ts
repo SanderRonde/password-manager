@@ -44,8 +44,8 @@ export function tokenTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isFalse(data.u2fRequired, 'no further authentication is required');
-				if (data.u2fRequired) return;
+				assert.isFalse(data.u2f_required, 'no further authentication is required');
+				if (data.u2f_required) return;
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 				if (token === ERRS.INVALID_DECRYPT) return;
@@ -60,7 +60,7 @@ export function tokenTest() {
 				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
 					count: 0,
-					oldToken: initialToken!
+					old_token: initialToken!
 				}));
 
 				assert.isTrue(response.success, 'API call succeeded');
@@ -80,7 +80,7 @@ export function tokenTest() {
 				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
 					count: 1,
-					oldToken: initialToken!
+					old_token: initialToken!
 				}));
 
 				assert.isFalse(response.success, 'API call failed');
@@ -139,8 +139,8 @@ export function tokenTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isFalse(data.u2fRequired, 'no further authentication is required');
-				if (data.u2fRequired) return;
+				assert.isFalse(data.u2f_required, 'no further authentication is required');
+				if (data.u2f_required) return;
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 				if (token === ERRS.INVALID_DECRYPT) return;
@@ -155,7 +155,7 @@ export function tokenTest() {
 				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
 					count: 0,
-					oldToken: initialToken!
+					old_token: initialToken!
 				}));
 
 				assert.isTrue(response.success, 'API call succeeded');
@@ -175,7 +175,7 @@ export function tokenTest() {
 				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
 					count: 0,
-					oldToken: initialToken!
+					old_token: initialToken!
 				}));
 
 				assert.isFalse(response.success, 'API call failed');
@@ -271,8 +271,8 @@ export function tokenTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isFalse(data.u2fRequired, 'no further authentication is required');
-				if (data.u2fRequired) return;
+				assert.isFalse(data.u2f_required, 'no further authentication is required');
+				if (data.u2f_required) return;
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 				if (token === ERRS.INVALID_DECRYPT) return;
@@ -287,7 +287,7 @@ export function tokenTest() {
 				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
 					count: 0,
-					oldToken: initialToken!
+					old_token: initialToken!
 				}));
 
 				assert.isTrue(response.success, 'API call succeeded');
@@ -307,7 +307,7 @@ export function tokenTest() {
 				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 					instance_id: secondInstance!,
 					count: 1,
-					oldToken: initialToken!
+					old_token: initialToken!
 				}));
 
 				assert.isFalse(response.success, 'API call failed');

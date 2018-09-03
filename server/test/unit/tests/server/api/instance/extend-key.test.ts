@@ -12,7 +12,7 @@ export function extendKeyTest() {
 		testParams(it, uris, '/api/instance/extend_key', {
 			count: 'number',
 			instance_id: 'string',
-			oldToken: 'string'
+			old_token: 'string'
 		}, {}, {}, {});
 		it('throws an error if token is invalid', async () => {
 			const config = await genUserAndDb({
@@ -29,7 +29,7 @@ export function extendKeyTest() {
 			const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
 				instance_id: instance_id.toHexString(),
 				count: config.count++,
-				oldToken: 'someinvalidtoken'
+				old_token: 'someinvalidtoken'
 			}));
 
 			server.kill();
@@ -53,7 +53,7 @@ export function extendKeyTest() {
 				unencrypted: {
 					count: config.count++,
 					instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
-					oldToken: 'someinvalidtoken'
+					old_token: 'someinvalidtoken'
 				},
 				server: server,
 				publicKey: server_public_key

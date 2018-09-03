@@ -402,8 +402,8 @@ export function instanceTwofactorTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isFalse(data.u2fRequired, 'no further authentication is required');
-				if (data.u2fRequired) return;
+				assert.isFalse(data.u2f_required, 'no further authentication is required');
+				if (data.u2f_required) return;
 				assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 				const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key);
 				assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -417,7 +417,7 @@ export function instanceTwofactorTest() {
 					publicKey: server_public_key
 				}, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
-					oldToken: authToken!,
+					old_token: authToken!,
 					count: config.count++
 				}));
 			
@@ -549,8 +549,8 @@ export function instanceTwofactorTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isFalse(data.u2fRequired, 'no further authentication is required');
-				if (data.u2fRequired) return;
+				assert.isFalse(data.u2f_required, 'no further authentication is required');
+				if (data.u2f_required) return;
 				assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 				const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key!);
 				assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -564,7 +564,7 @@ export function instanceTwofactorTest() {
 					publicKey: server_public_key
 				}, '/api/instance/extend_key', {
 					instance_id: instance_id!,
-					oldToken: authToken!,
+					old_token: authToken!,
 					count: config.count++
 				}));
 				config.count = 0;
@@ -766,8 +766,8 @@ export function instanceTwofactorTest() {
 					return;
 				}
 				const data = response.data;
-				assert.isFalse(data.u2fRequired, 'no further authentication is required');
-				if (data.u2fRequired) return;
+				assert.isFalse(data.u2f_required, 'no further authentication is required');
+				if (data.u2f_required) return;
 				assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
 				const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key!);
 				assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
@@ -781,7 +781,7 @@ export function instanceTwofactorTest() {
 					publicKey: server_public_key
 				}, '/api/instance/extend_key', {
 					instance_id: instance_id!,
-					oldToken: authToken!,
+					old_token: authToken!,
 					count: config.count++
 				}));
 				config.count = 0;

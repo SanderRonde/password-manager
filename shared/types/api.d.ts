@@ -193,7 +193,7 @@ export declare namespace APIRoutes {
 			/**
 			 * Whether further U2F authentication is required (true in this case)
 			 */
-			u2fRequired: true;	
+			u2f_required: true;	
 			/**
 			 * The request that has to be solved
 			 */
@@ -201,7 +201,7 @@ export declare namespace APIRoutes {
 			/**
 			 * A token to identify the request
 			 */
-			u2fToken: U2FToken;
+			u2f_token: U2FToken;
 			/**
 			 * The solved challenge
 			 */
@@ -210,7 +210,7 @@ export declare namespace APIRoutes {
 			/**
 			 * Whether further U2F authentication is required (false in this case)
 			 */
-			u2fRequired: false;
+			u2f_required: false;
 			/**
 			 * The auth token that can be used to make API requests. Encrypted with instance key
 			 */
@@ -246,7 +246,7 @@ export declare namespace APIRoutes {
 			/**
 			 * The login token assigned at login
 			 */
-			oldToken: APIToken;
+			old_token: APIToken;
 			/**
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */
