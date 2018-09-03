@@ -27,7 +27,8 @@ export function passwordUpdateTest() {
 			u2f_enabled: 'boolean',
 			encrypted: 'string',
 			twofactor_token: 'string',
-			username: 'string'
+			username: 'string',
+			u2f_token: 'string'
 		});
 		it('password can be updated', async () => {
 			const config = await genUserAndDb({

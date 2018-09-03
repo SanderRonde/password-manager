@@ -626,6 +626,14 @@ export declare namespace APIRoutes {
 				 */
 				algorithm: EncryptionAlgorithm;
 			}>;
+			/**
+			 * The response to the U2F request
+			 */
+			response: U2FSignResponse;
+			/**
+			 * A U2F token
+			 */
+			u2f_token: U2FToken;
 		}): JSONResponse<{}>;
 
 		/**
@@ -682,6 +690,14 @@ export declare namespace APIRoutes {
 			 * A 2FA token, only required if 2FA is enabled for this password
 			 */
 			twofactor_token: string;
+			/**
+			 * The response to the U2F request
+			 */
+			response: U2FSignResponse;
+			/**
+			 * A U2F token
+			 */
+			u2f_token: U2FToken;
 		}): JSONResponse<{
 			/**
 			 * The password data. Encrypted with instance public key and user password

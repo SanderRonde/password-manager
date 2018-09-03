@@ -58,11 +58,11 @@ function mapObj<T extends Object, R>(obj: T, fn: (key: keyof T, val: T[keyof T])
 export function testParams<R extends keyof APIFns>(test: typeof it, uris: string[], route: R, required: {
 	[key in keyof GetRequired<APIFns[R]>]: 'string'|'boolean'|'number'|'array';
 }, optional: {
-	[key in keyof GetOptional<APIFns[R]>]: 'string'|'boolean'|'number'|'array';
+	[key in keyof GetOptional<APIFns[R]>]?: 'string'|'boolean'|'number'|'array';
 }, encrypted: {
 	[key in keyof GetEncrypted<APIFns[R]>]: 'string'|'boolean'|'number'|'array';
 }, optionalEncrypted: {
-	[key in keyof GetOptionalEncrypted<APIFns[R]>]: 'string'|'boolean'|'number'|'array';
+	[key in keyof GetOptionalEncrypted<APIFns[R]>]?: 'string'|'boolean'|'number'|'array';
 }) {
 	// Test missing params
 	test(`no params for route "${route}"`, async () => {
@@ -208,9 +208,9 @@ export function testParams<R extends keyof APIFns>(test: typeof it, uris: string
 	for (const wrongType in optional) {
 		test(`wrong type for unencrypted optional param "${wrongType}"`, async () => {
 			const { config, done } = await doServerSetupAndBreakdown(uris);
-			const unencryptedArgs = {...mapObj(required, (_, val) => getFillerType(val)) as object, ...{
-				[wrongType]: getWrongType(optional[wrongType])
-			}} as {
+			const unencryptedArgs = {...mapObj(required, (_, val) => getFillerType(val)) as object, ...optional[wrongType] !== undefined ?{
+				[wrongType]: getWrongType(optional[wrongType]!)
+			} : {}} as {
 				[key in keyof GetRequired<APIFns[R]>]: any;
 			};
 			const encryptedArgs: {
@@ -238,9 +238,9 @@ export function testParams<R extends keyof APIFns>(test: typeof it, uris: string
 			const unencryptedArgs = mapObj(required, (_, val) => getFillerType(val)) as {
 				[key in keyof GetRequired<APIFns[R]>]: any;
 			};
-			const encryptedArgs = {...mapObj(encrypted, (_, val) => getFillerType(val)) as object, ...{
-				[wrongType]: getWrongType(optionalEncrypted[wrongType])
-			}} as {
+			const encryptedArgs = {...mapObj(encrypted, (_, val) => getFillerType(val)) as object, ...optionalEncrypted[wrongType] !== undefined ? {
+				[wrongType]: getWrongType(optionalEncrypted[wrongType]!)
+			} : {}} as {
 				[key in keyof GetEncrypted<APIFns[R]>]: any;
 			};
 			const response = JSON.parse(await doServerAPIRequest({

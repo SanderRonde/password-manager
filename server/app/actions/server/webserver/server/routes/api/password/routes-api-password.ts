@@ -364,11 +364,17 @@ export class RoutesApiPassword {
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 				algorithm: EncryptionAlgorithm;
 			}>;
+			response: u2f.U2FSignResponse;
+			u2f_token: U2FToken;
 		}>({
 			unencrypted: ['instance_id'], 
 			encrypted: ['token', 'count', 'password_id']
 		}, {
-			encrypted: ['encrypted', 'twofactor_enabled', 'websites', 'twofactor_token', 'username', 'u2f_enabled']
+			encrypted: [
+				'encrypted', 'twofactor_enabled', 'websites',
+				'twofactor_token', 'username', 'u2f_enabled',
+				'response', 'u2f_token'
+			]
 		}, async (toCheck, { 
 			token, 
 			instance_id, 
@@ -379,7 +385,9 @@ export class RoutesApiPassword {
 			websites,
 			count,
 			username,
-			u2f_enabled
+			u2f_enabled,
+			response,
+			u2f_token
 		}) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
@@ -412,6 +420,9 @@ export class RoutesApiPassword {
 			}, {
 				val: 'u2f_enabled',
 				type: 'boolean'
+			}, {
+				val: 'u2f_token',
+				type: 'string'
 			}])) return;
 
 			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
@@ -437,6 +448,41 @@ export class RoutesApiPassword {
 
 			if (!this._verify2FAIfEnabled(twofactor_secret, twofactor_token,
 				password, res)) return;
+
+			const {
+				u2f_enabled: u2f_was_enabled
+			} = this.server.database.Crypto.dbDecryptPasswordRecord(password);
+			if (u2f_was_enabled) {
+				if (decryptedInstance.u2f === null) {
+					res.status(200);
+					res.json({
+						success: false,
+						ERR: API_ERRS.INVALID_CREDENTIALS,
+						error: 'u2f not set up for this instance'
+					});
+					return;
+				}
+
+				if (!response || !u2f_token) {
+					this._respondInvalidCredentials(res);
+					return;
+				}
+
+				const verifiedToken = this.server.Auth.verifyU2FToken(u2f_token,
+					instance_id);
+				if (!verifiedToken.isValid || verifiedToken.type !== 'verify') {
+					this._respondInvalidCredentials(res);
+					return;
+				}
+
+				const registration = decryptedInstance.u2f;
+				const verifiedResponse = u2f.checkSignature(verifiedToken.request,
+					response, registration.publicKey);
+				if (!verifiedResponse.successful) {
+					this._respondInvalidCredentials(res);
+					return;
+				}
+			}
 
 			const mappedWebsites = Array.isArray(websites) ? await Promise.all(websites.map(async ({ url: websiteURL, favicon }) => {
 				const host = url.parse(websiteURL).hostname || url.parse(websiteURL).host || websiteURL;

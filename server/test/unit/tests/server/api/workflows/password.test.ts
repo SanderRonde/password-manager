@@ -323,7 +323,7 @@ export function workflowPasswordTest() {
 			const initialPassword = {
 				websites: [genURL(), genURL(), genURL()],
 				twofactorEnabled: Math.random() > 0.5,
-				u2fEnabled: Math.random() > 0.5,
+				u2fEnabled: false,
 				encrypted: encrypt({
 					username: genRandomString(25),
 					password: genRandomString(25),
@@ -932,7 +932,7 @@ export function workflowPasswordTest() {
 				const initialPassword = {
 					websites: [genURL(), genURL(), genURL()],
 					twofactorEnabled: Math.random() > 0.5,
-					u2fEnabled: Math.random() > 0.5,
+					u2fEnabled: false,
 					encrypted: encrypt({
 						username: genRandomString(25),
 						password: genRandomString(25),
