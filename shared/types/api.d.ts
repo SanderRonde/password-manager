@@ -94,7 +94,7 @@ export interface APIFns {
 	'/api/user/genresetkey': typeof APIRoutes.Account.regenkey;
 
 	/**
-	 * Login through the dasboard
+	 * Login through the dashboard
 	 */
 	'/api/dashboard/login': typeof APIRoutes.Dashboard.login;
 }
@@ -511,6 +511,10 @@ export declare namespace APIRoutes {
 			 */
 			username: string;
 			/**
+			 * Whether U2F should be enabled for this password
+			 */
+			u2f_enabled: boolean;
+			/**
 			 * Whether 2FA should be enabled for this password
 			 */
 			twofactor_enabled: boolean;
@@ -588,6 +592,10 @@ export declare namespace APIRoutes {
 			 * The username for this website
 			 */
 			username: string;
+			/**
+			 * Whether U2F should be enabled for this password
+			 */
+			u2f_enabled: boolean;
 			/**
 			 * Whether 2FA should be enabled for this password
 			 */
@@ -758,9 +766,13 @@ export declare namespace APIRoutes {
 					favicon: string|null;
 				}[];
 				/**
-				 * Whether 2FA is enabled for this instance
+				 * Whether 2FA is enabled for this password
 				 */
 				twofactor_enabled: boolean;
+				/**
+				 * Whether U2F is enabled for this password
+				 */
+				u2f_enabled: boolean;
 			}>, InstancePublicKey>;
 		}>;
 
@@ -819,6 +831,10 @@ export declare namespace APIRoutes {
 				 * Whether 2Fa is enabled for this password
 				 */
 				twofactor_enabled: boolean;
+				/**
+				 * Whether U2F is enabled for this password
+				 */
+				u2f_enabled: boolean;
 			}[]>, InstancePublicKey>;
 		}>;
 
@@ -877,6 +893,10 @@ export declare namespace APIRoutes {
 				 * Whether 2Fa is enabled for this password
 				 */
 				twofactor_enabled: boolean;
+				/**
+				 * Whether U2F is enabled for this password
+				 */
+				u2f_enabled: boolean;
 			}[]>, InstancePublicKey>;
 		}>;
 	}
@@ -937,7 +957,7 @@ export declare namespace APIRoutes {
 
 	export namespace Dashboard {
 		/**
-		 * Login through the dasboard
+		 * Login through the dashboard
 		 */
 		export function login(params: {
 			/**

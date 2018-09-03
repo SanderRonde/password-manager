@@ -35,9 +35,11 @@ export function passwordGetMetaTest() {
 			const password = genRandomString(2);
 			const notes = [genRandomString(10), genRandomString(10), genRandomString(10)]
 			const twofactorEnabled = false;
+			const u2fEnabled = false;
 			const passwordId = await setPasword({
 				websites,
 				twofactor_enabled: twofactorEnabled,
+				u2f_enabled: u2fEnabled,
 				username,
 				password,
 				notes,
@@ -81,6 +83,7 @@ export function passwordGetMetaTest() {
 				assert.strictEqual(actualNote.exact, expectedNote, 'exact urls match');
 			}
 			assert.strictEqual(parsed.twofactor_enabled, twofactorEnabled, 'twofactor enabled is the same');
+			assert.strictEqual(parsed.u2f_enabled, u2fEnabled, 'u2f enabled is the same');
 		});
 		it('fails if auth token is wrong', async () => {
 			const secret = speakeasy.generateSecret({
@@ -98,6 +101,7 @@ export function passwordGetMetaTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -134,6 +138,7 @@ export function passwordGetMetaTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -171,6 +176,7 @@ export function passwordGetMetaTest() {
 			await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		

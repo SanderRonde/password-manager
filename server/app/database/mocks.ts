@@ -147,6 +147,7 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 					_id: new mongo.ObjectId() as TypedObjectID<EncryptedPassword>,
 					user_id: userId!,
 					twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+					u2f_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 					username: encrypt('someusername', dbpw, ENCRYPTION_ALGORITHM),
 					websites: [{
 						exact: encrypt('www.google.com/login', dbpw, ENCRYPTION_ALGORITHM),
@@ -162,6 +163,7 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 					_id: new mongo.ObjectId() as TypedObjectID<EncryptedPassword>,
 					user_id: userId!,
 					twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
+					u2f_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
 					username: encrypt('someusername2', dbpw, ENCRYPTION_ALGORITHM),
 					websites: [{
 						exact: encrypt('www.reddit.com/r/random', dbpw, ENCRYPTION_ALGORITHM),
@@ -429,7 +431,8 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 			exact: 'www.google.com/login',
 			favicon: null
 		}],
-		twofactor_enabled: false
+		twofactor_enabled: false,
+		u2f_enabled: false
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		username: 'somefacebookuser',
@@ -446,7 +449,8 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 			exact: 'www.whatsapp.com/somelogin',
 			favicon: null
 		}],
-		twofactor_enabled: false
+		twofactor_enabled: false,
+		u2f_enabled: false
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		username: 'other.email@google.com',
@@ -455,7 +459,8 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 			exact: 'www.google.com/login',
 			favicon: null
 		}],
-		twofactor_enabled: true
+		twofactor_enabled: true,
+		u2f_enabled: true
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		username: 'redditusername',
@@ -464,7 +469,8 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 			exact: 'www.reddit.com/login',
 			favicon: null
 		}],
-		twofactor_enabled: false
+		twofactor_enabled: false,
+		u2f_enabled: true
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		username: 'username',
@@ -476,6 +482,7 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 						genRandomString(50)}`,
 			favicon: null
 		}],
-		twofactor_enabled: false
+		twofactor_enabled: false,
+		u2f_enabled: false
 	}]), 'dev_public_key');
 }

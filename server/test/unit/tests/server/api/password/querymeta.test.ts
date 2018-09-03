@@ -36,25 +36,29 @@ export function passwordQueryMetaTest() {
 				username: genRandomString(20),
 				password: genRandomString(20),
 				notes: [genRandomString(10), genRandomString(10), genRandomString(10)],
-				twofactorEnabled: false
+				twofactorEnabled: false,
+				u2f_enabled: false
 			}, {
 				websites: [genURL(), genURL()],
 				username: genRandomString(20),
 				password: genRandomString(20),
 				notes: [genRandomString(10), genRandomString(10), genRandomString(10)],
-				twofactorEnabled: true
+				twofactorEnabled: true,
+				u2f_enabled: false
 			}, {
 				websites: [genURL(), genURL(matchingHost)],
 				username: genRandomString(20),
 				password: genRandomString(20),
 				notes: [genRandomString(10), genRandomString(10), genRandomString(10)],
-				twofactorEnabled: true
+				twofactorEnabled: true,
+				u2f_enabled: false
 			}, {
 				websites: [genURL(matchingHost), genURL(matchingHost)],
 				username: genRandomString(20),
 				password: genRandomString(20),
 				notes: [genRandomString(10), genRandomString(10), genRandomString(10)],
-				twofactorEnabled: true
+				twofactorEnabled: true,
+				u2f_enabled: false
 			}].map((val, index) => {
 				return {...val, index };
 			});
@@ -63,6 +67,7 @@ export function passwordQueryMetaTest() {
 				passwordIds.push(await setPasword({
 					websites: pw.websites,
 					twofactor_enabled: pw.twofactorEnabled,
+					u2f_enabled: pw.u2f_enabled,
 					notes: pw.notes,
 					username: pw.username,
 					password: pw.password

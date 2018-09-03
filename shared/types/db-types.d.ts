@@ -345,6 +345,10 @@ export interface EncryptedPassword {
 	 */
 	twofactor_enabled: EncodedString<DatabaseEncryptedWithSalt<boolean>>;
 	/**
+	 * (encrypted) Whether U2F is enabled for this password
+	 */
+	u2f_enabled: EncodedString<DatabaseEncryptedWithSalt<boolean>>;
+	/**
 	 * (encrypted) Data that is encrypted with the user's 
 	 * 	master password and as such is inaccessible to the server
 	 */
@@ -402,6 +406,10 @@ export interface DecryptedPassword {
 	 * Whether 2FA is enabled for this password
 	 */
 	twofactor_enabled: boolean;
+	/**
+	 * Whether U2F is enabled for this password
+	 */
+	u2f_enabled: boolean;
 	/**
 	 * Data that is encrypted with the user's 
 	 * 	master password and as such is inaccessible to the server

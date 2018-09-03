@@ -31,25 +31,28 @@ function genPassword(websites: {
     host: string;
     exact: string;
     favicon: string|null;
-}[], twofactorEnabled: boolean) {
+}[], twofactorEnabled: boolean, u2fEnabled: boolean) {
 	return {
 		id: getIncrementedId() as any,
 		websites: websites,
 		username: genRandomString(25),
-		twofactor_enabled: twofactorEnabled
+		twofactor_enabled: twofactorEnabled,
+		u2f_enabled: u2fEnabled
 	}
 }
 
 function genGooglePassword({
 	twofactorEnabled = false,
+	u2fEnabled = false,
 	noFavicon = false
 }: {
 	twofactorEnabled?: boolean;
+	u2fEnabled?: boolean;
 	noFavicon?: boolean;
 } = {}): MetaPasswords[0] {
 	return genPassword([{...googleWebsite, ...noFavicon ? {
 		favicon: null
-	} : {}}], twofactorEnabled)
+	} : {}}], twofactorEnabled, u2fEnabled)
 }
 
 function range<T>(from: number, to: number, fn: () => T): T[] {
@@ -68,7 +71,14 @@ export function getDevPasswords() {
 	return (generated = [
 		genGooglePassword(),
 		genGooglePassword(),
-		genPassword([{...googleWebsite}, {...redditWebsite}], false),
+		genPassword([{...googleWebsite}, {...redditWebsite}], false, false),
+		genGooglePassword({
+			u2fEnabled: true,
+			twofactorEnabled: true
+		}),
+		genGooglePassword({
+			u2fEnabled: true
+		}),
 		genGooglePassword({
 			twofactorEnabled: true
 		}),

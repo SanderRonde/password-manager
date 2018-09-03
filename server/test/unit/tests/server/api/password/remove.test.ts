@@ -33,6 +33,7 @@ export function passwordRemoveTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -81,6 +82,7 @@ export function passwordRemoveTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: true,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -131,6 +133,7 @@ export function passwordRemoveTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -182,6 +185,7 @@ export function passwordRemoveTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -218,6 +222,7 @@ export function passwordRemoveTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -255,6 +260,7 @@ export function passwordRemoveTest() {
 			await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		

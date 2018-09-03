@@ -38,6 +38,7 @@ export function passwordGetTest() {
 			const passwordId = await setPasword({
 				websites,
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username,
 				password,
 				notes,
@@ -101,6 +102,7 @@ export function passwordGetTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: true,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -147,6 +149,7 @@ export function passwordGetTest() {
 			const passwordId = await setPasword({
 				websites,
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username,
 				password,
 				notes,
@@ -214,6 +217,7 @@ export function passwordGetTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -250,6 +254,7 @@ export function passwordGetTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -287,6 +292,7 @@ export function passwordGetTest() {
 			await setPasword({
 				websites: [],
 				twofactor_enabled: false,
+				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
