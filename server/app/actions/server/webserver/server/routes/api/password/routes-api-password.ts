@@ -1,9 +1,9 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord, EncryptedAsset, EncryptedAccount } from "../../../../../../../../../shared/types/db-types";
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
 import { UnstringifyObjectIDs, APIToken } from "../../../../../../../../../shared/types/crypto";
+import { SERVER_ROOT, MAX_FILE_BYTES, APP_ID } from "../../../../../../../lib/constants";
 import { filterUndefined } from "../../../../../../../database/libs/db-manipulation";
 import { API_ERRS, APIReturns } from "../../../../../../../../../shared/types/api";
-import { SERVER_ROOT, MAX_FILE_BYTES } from "../../../../../../../lib/constants";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { genTimeBasedString } from "../../../../../../../lib/util";
 import { ServerResponse } from "../../../modules/ratelimit";
@@ -13,6 +13,7 @@ import * as mongo from 'mongodb'
 import * as icojs from 'icojs';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as u2f from 'u2f';
 import * as url from 'url'
 
 export class RoutesApiPassword {
@@ -633,7 +634,7 @@ export class RoutesApiPassword {
 			if (!this._verify2FAIfEnabled(account.twofactor_secret, twofactor_token,
 				password, res)) return;
 
-			const { encrypted, websites, twofactor_enabled, username } = this.server.database.Crypto
+			const { encrypted, websites, twofactor_enabled, username, u2f_enabled } = this.server.database.Crypto
 				.dbDecryptPasswordRecord(password);
 			res.status(200);
 			res.json({
@@ -651,6 +652,7 @@ export class RoutesApiPassword {
 						}),
 						username,
 						twofactor_enabled: twofactor_enabled,
+						u2f_enabled: u2f_enabled,
 						encrypted: encrypted
 					}), decryptedInstance.public_key)
 				}
@@ -695,6 +697,12 @@ export class RoutesApiPassword {
 
 			const { websites, twofactor_enabled, username, u2f_enabled } = this.server.database.Crypto
 				.dbDecryptPasswordRecord(password);
+
+
+			const request = u2f_enabled ? u2f.request(APP_ID) : null;
+			const u2fToken = u2f_enabled ? this.server.Auth.genU2FToken(instance_id,
+				decryptedInstance.user_id.toHexString(), 'verify', request!) : null;
+
 			res.status(200);
 			res.json({
 				success: true,
@@ -711,7 +719,9 @@ export class RoutesApiPassword {
 						}),
 						username,
 						twofactor_enabled: twofactor_enabled,
-						u2f_enabled: u2f_enabled
+						u2f_enabled: u2f_enabled,
+						request: request,
+						u2f_token: u2fToken
 					}), decryptedInstance.public_key)
 				}
 			});

@@ -772,7 +772,57 @@ export declare namespace APIRoutes {
 				/**
 				 * Whether U2F is enabled for this password
 				 */
-				u2f_enabled: boolean;
+				u2f_enabled: true;
+				/**
+				 * The request that has to be solved
+				 */
+				request: U2FRequest;
+				/**
+				 * A token to identify the request
+				 */
+				u2f_token: U2FToken;
+			}|{
+				/**
+				 * The ID of the password
+				 */
+				id: P;
+				/**
+				 * The username of the website (or group)
+				 */
+				username: string;
+				/**
+				 * The websites for which this password ID works
+				 */
+				websites: {
+					/**
+					 * The hostname of the URL
+					 */
+					host: string;
+					/**
+					 * The exact URL
+					 */
+					exact: string;
+					/**
+					 * The path to the favicon for this website
+					 */
+					favicon: string|null;
+				}[];
+				/**
+				 * Whether 2FA is enabled for this password
+				 */
+				twofactor_enabled: boolean;
+				/**
+				 * Whether U2F is enabled for this password
+				 */
+				u2f_enabled: false;
+				/**
+				 * The request that has to be solved
+				 */
+				request: null;
+				/**
+				 * A token to identify the request
+				 */
+				u2f_token: null;
 			}>, InstancePublicKey>;
 		}>;
 
