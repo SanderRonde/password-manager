@@ -97,7 +97,7 @@ export function passwordSetTest() {
 			const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
 				dbpw);
 			assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			assert.strictEqual(decryptedU2fEnabled, expectedU2FEnabled, 'U2F enabled is the same');
+			assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled since U2F is not set up');
 
 			const actualWebsites = password.websites.map(({ exact, host }) => {
 				return {

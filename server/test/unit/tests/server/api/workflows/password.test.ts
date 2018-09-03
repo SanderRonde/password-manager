@@ -125,7 +125,7 @@ export function workflowPasswordTest() {
 				const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
 					dbpw);
 				assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-				assert.strictEqual(decryptedU2fEnabled, expectedU2FEnabled, 'U2F enabled is the same');
+				assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled since U2F is not set up');
 
 				const actualWebsites = password.websites.map(({ exact, host }) => {
 					return {
@@ -389,7 +389,7 @@ export function workflowPasswordTest() {
 				const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
 					dbpw);
 				assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-				assert.strictEqual(decryptedU2fEnabled, expectedU2FEnabled, 'U2F enabled is the same');
+				assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled since U2F is not set up');
 
 				const actualWebsites = password.websites.map(({ exact, host }) => {
 					return {
@@ -487,7 +487,7 @@ export function workflowPasswordTest() {
 				const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
 					dbpw);
 				assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-				assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled');
+				assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled since U2F is not set up');
 
 				assert.strictEqual(decrypt(password.username, dbpw), expectedUsername,
 					'username was updated');
@@ -713,7 +713,7 @@ export function workflowPasswordTest() {
 				const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
 					dbpw);
 				assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-				assert.strictEqual(decryptedU2fEnabled, expectedU2FEnabled, 'U2F enabled is the same');
+				assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled since U2F is not set up');
 
 				const actualWebsites = password.websites.map(({ exact, host }) => {
 					return {
@@ -932,7 +932,7 @@ export function workflowPasswordTest() {
 				const initialPassword = {
 					websites: [genURL(), genURL(), genURL()],
 					twofactorEnabled: Math.random() > 0.5,
-					u2fEnabled: false,
+					u2fEnabled: Math.random() > 0.5,
 					encrypted: encrypt({
 						username: genRandomString(25),
 						password: genRandomString(25),
@@ -998,7 +998,7 @@ export function workflowPasswordTest() {
 					const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
 						dbpw);
 					assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-					assert.strictEqual(decryptedU2fEnabled, expectedU2FEnabled, 'U2F enabled is the same');
+					assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled since U2F is not set up');
 
 					const actualWebsites = password.websites.map(({ exact, host }) => {
 						return {
@@ -1096,7 +1096,7 @@ export function workflowPasswordTest() {
 					const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
 						dbpw);
 					assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-					assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled');
+					assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled since U2F is not set up');
 
 					assert.strictEqual(decrypt(password.username, dbpw), expectedUsername,
 						'username was updated');
