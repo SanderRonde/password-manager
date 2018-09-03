@@ -1,6 +1,6 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord, EncryptedAsset, EncryptedAccount } from "../../../../../../../../../shared/types/db-types";
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
-import { UnstringifyObjectIDs, APIToken } from "../../../../../../../../../shared/types/crypto";
+import { UnstringifyObjectIDs, APIToken, U2FToken } from "../../../../../../../../../shared/types/crypto";
 import { SERVER_ROOT, MAX_FILE_BYTES, APP_ID } from "../../../../../../../lib/constants";
 import { filterUndefined } from "../../../../../../../database/libs/db-manipulation";
 import { API_ERRS, APIReturns } from "../../../../../../../../../shared/types/api";
@@ -30,12 +30,7 @@ export class RoutesApiPassword {
 
 			if (!password || instance.user_id.toHexString() !== password.user_id.toHexString()) {
 				//Either the password is non-existent or it isn't theirs
-				res.status(200);
-				res.json({
-					success: false,
-					error: 'failed',
-					ERR: API_ERRS.INVALID_CREDENTIALS
-				});
+				this._respondInvalidCredentials(res);
 				return { password: null }
 			}
 			return {
@@ -265,12 +260,7 @@ export class RoutesApiPassword {
 				});
 
 			if (account === null) {
-				res.status(200);
-				res.json({
-					success: false,
-					error: 'invalid credentials',
-					ERR: API_ERRS.INVALID_CREDENTIALS
-				});
+				this._respondInvalidCredentials(res);
 				return;
 			}
 
@@ -588,21 +578,40 @@ export class RoutesApiPassword {
 		})(req, res, next);
 	}
 
+	private _respondInvalidCredentials(res: ServerResponse) {
+		res.status(200);
+		res.json({
+			success: false,
+			ERR: API_ERRS.INVALID_CREDENTIALS,
+			error: 'invalid credentials'
+		});
+	}
+
 	public get(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
 		}, {}, {
 			count: number;
 			token: APIToken;
-			password_id: StringifiedObjectId<EncryptedPassword>;	
+			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
-			twofactor_token: string;	
+			twofactor_token: string;
+			response: u2f.U2FSignResponse;
+			u2f_token: U2FToken;
 		}>({
 			unencrypted: ['instance_id'],
 			encrypted: ['token', 'count', 'password_id']
 		}, {
-			encrypted: ['twofactor_token']
-		}, async (toCheck, { count, token, instance_id, password_id, twofactor_token }) => {
+			encrypted: ['twofactor_token', 'response' ,'u2f_token']
+		}, async (toCheck, { 
+			count, 
+			token, 
+			instance_id, 
+			password_id, 
+			twofactor_token,
+			response,
+			u2f_token
+		}) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -618,12 +627,15 @@ export class RoutesApiPassword {
 			}, {
 				val: 'count',
 				type: 'number'
+			}, {
+				val: 'u2f_token',
+				type: 'string'
 			}])) return;
 
-			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res, true)) return;
 
 			const { decryptedInstance, accountPromise } = 
-				await this.server.Router.verifyAndGetInstance(instance_id, res);
+				await this.server.Router.verifyAndGetInstance(instance_id, res, true);
 			if (decryptedInstance === null || accountPromise === null) return;
 
 			const { password } = await this._getPasswordIfOwner(password_id,
@@ -636,6 +648,39 @@ export class RoutesApiPassword {
 
 			const { encrypted, websites, twofactor_enabled, username, u2f_enabled } = this.server.database.Crypto
 				.dbDecryptPasswordRecord(password);
+
+			if (u2f_enabled) {
+				if (decryptedInstance.u2f === null) {
+					res.status(200);
+					res.json({
+						success: false,
+						ERR: API_ERRS.INVALID_CREDENTIALS,
+						error: 'u2f not set up for this instance'
+					});
+					return;
+				}
+
+				if (!response || !u2f_token) {
+					this._respondInvalidCredentials(res);
+					return;
+				}
+
+				const verifiedToken = this.server.Auth.verifyU2FToken(u2f_token,
+					instance_id);
+				if (!verifiedToken.isValid || verifiedToken.type !== 'verify') {
+					this._respondInvalidCredentials(res);
+					return;
+				}
+
+				const registration = decryptedInstance.u2f;
+				const verifiedResponse = u2f.checkSignature(verifiedToken.request,
+					response, registration.publicKey);
+				if (!verifiedResponse.successful) {
+					this._respondInvalidCredentials(res);
+					return;
+				}
+			}
+
 			res.status(200);
 			res.json({
 				success: true,
@@ -703,7 +748,7 @@ export class RoutesApiPassword {
 				u2f.request(APP_ID, decryptedInstance.u2f.keyHandle) : null;
 			const u2fToken = decryptedInstance.u2f !== null && u2f_enabled ? 
 				this.server.Auth.genU2FToken(instance_id,
-				decryptedInstance.user_id.toHexString(), 'verify', request!) : null;
+					decryptedInstance.user_id.toHexString(), 'verify', request!) : null;
 
 			res.status(200);
 			res.json({

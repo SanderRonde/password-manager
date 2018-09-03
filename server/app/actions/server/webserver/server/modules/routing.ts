@@ -288,12 +288,13 @@ export class WebserverRouter {
 		}
 
 	public verifyLoginToken(token: APIToken, count: number, 
-		instanceId: StringifiedObjectId<EncryptedInstance>, res: ServerResponse) {
+		instanceId: StringifiedObjectId<EncryptedInstance>, res: ServerResponse,
+		vague: boolean = false) {
 			if (!this.parent.Auth.verifyAPIToken(token, count, instanceId)) {
 				res.status(200);
 				res.json({
 					success: false,
-					error: 'invalid token',
+					error: vague ? 'invalid credentials' : 'invalid token',
 					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 				return false;

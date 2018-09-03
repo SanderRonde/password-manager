@@ -161,7 +161,7 @@ export class RoutesAPIInstanceU2f {
 			if (instance === null || decryptedInstance === null || accountPromise === null) return;
 
 			const verifiedToken = this.server.Auth.verifyU2FToken(token,
-				instance._id.toHexString());1
+				instance._id.toHexString());
 			if (!verifiedToken.isValid) {
 				res.status(200);
 				res.json({
