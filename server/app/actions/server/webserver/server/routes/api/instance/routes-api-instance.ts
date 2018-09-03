@@ -176,7 +176,7 @@ export class RoutesApiInstance {
 			}
 		const u2fConfig = decryptedInstance.u2f;
 		if (u2fConfig !== null) {
-			const request = u2f.request(APP_ID);
+			const request = u2f.request(APP_ID, u2fConfig.keyHandle);
 			const u2fToken = this.server.Auth.genU2FToken(
 				instance._id.toHexString(), decryptedInstance.user_id.toHexString(),
 				'verify', request);

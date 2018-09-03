@@ -700,7 +700,7 @@ export class RoutesApiPassword {
 
 
 			const request = decryptedInstance.u2f !== null && u2f_enabled ? 
-				u2f.request(APP_ID) : null;
+				u2f.request(APP_ID, decryptedInstance.u2f.keyHandle) : null;
 			const u2fToken = decryptedInstance.u2f !== null && u2f_enabled ? 
 				this.server.Auth.genU2FToken(instance_id,
 				decryptedInstance.user_id.toHexString(), 'verify', request!) : null;

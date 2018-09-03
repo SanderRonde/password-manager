@@ -125,7 +125,7 @@ export class RoutesAPIInstanceU2f {
 				return;
 			};
 
-			const request = u2f.request(APP_ID);
+			const request = u2f.request(APP_ID, decryptedInstance.u2f.keyHandle);
 			const token = this.server.Auth.genU2FToken(instance._id.toHexString(),
 				decryptedInstance.user_id.toHexString(), 'disable', request);
 

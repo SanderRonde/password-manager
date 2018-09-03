@@ -15,7 +15,7 @@ declare module "u2f" {
 		signatureData: string;
 	}
 
-	export function request(appId: string): U2FRequest;
+	export function request(appId: string, keyHandle?: string): U2FRequest;
 	export function checkRegistration(request: U2FRequest, response: U2FRegisterResponse): {
 		successful: true;
 		publicKey: string;
