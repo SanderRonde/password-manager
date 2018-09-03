@@ -137,7 +137,7 @@ self.addEventListener('fetch', (event) => {
 			if (navigator.onLine) {
 				event.respondWith(race(
 					renderTheme(caches.match('/dashboard_offline')),
-					fetch('/dasboard', {
+					fetch('/dashboard', {
 						credentials: 'include'
 					})
 				));
