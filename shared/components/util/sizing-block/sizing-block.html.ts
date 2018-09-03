@@ -4,6 +4,10 @@ import { html } from 'lit-html';
 
 export const SizingBlockHTML = new TemplateFn<SizingBlock>((_props) => {
 	return html`
-		<div></div>
+		<div id="sizer">
+			<div id="content">
+				<slot></slot>
+			</div>
+		</div>
 	`
 }, CHANGE_TYPE.PROP);
