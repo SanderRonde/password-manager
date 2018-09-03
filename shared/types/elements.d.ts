@@ -8,6 +8,7 @@ import { MaterialInput } from "../components/util/material-input/material-input"
 import { ThemeSelector } from "../components/util/theme-selector/theme-selector";
 import { LoadableBlock } from "../components/util/loadable-block/loadable-block";
 import { InfiniteList } from "../components/util/infinite-list/infinite-list";
+import { SizingBlock } from "../components/util/sizing-block/sizing-block";
 import { PaperButton } from "../components/util/paper-button/paper-button";
 import { LoginWeb } from "../components/entrypoints/web/login/login-web";
 import { PaperToast } from "../components/util/paper-toast/paper-toast";
@@ -21,6 +22,7 @@ declare global {
 	type HTMLIconButtonElement = IconButton;
 	type HTMLPaperToastElement = PaperToast;
 	type HTMLPaperButtonElement = PaperButton;
+	type HTMLSizingBlockElement = SizingBlock;
 	type HTMLLoadableBlockElement = LoadableBlock;
 	type HTMLMaterialInputElement = MaterialInput;
 	type HTMLThemeSelectorElement = ThemeSelector;
