@@ -5,8 +5,10 @@ import { html } from 'lit-html';
 export const PasswordDetailHTML = new TemplateFn<PasswordDetail>((_props) => {
 	return html`
 		<div>
-			<md-card id="passwordFocus" level="3">
-				Select something
+			<md-card level="3">
+				<sizing-block>
+					Select something
+				</sizing-block>
 			</md-card>
 		</div>
 	`
