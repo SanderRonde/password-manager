@@ -13,7 +13,7 @@ function prefixWithWWW(url: string) {
 }
 export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>((props, _, html) => {
 	return html`
-		<md-card id="container" level="2"
+		<md-card id="container" level="3"
 			padding-vertical="0"
 			padding-horizontal="0"
 			custom-css="${props.selected ? invertedCardCSS : noCustomCSS}"
