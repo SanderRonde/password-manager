@@ -40,6 +40,7 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 			},
 			username: PROP_TYPE.STRING,
 			twofactor_enabled: PROP_TYPE.BOOL,
+			u2f_enabled: PROP_TYPE.BOOL,
 			selected: {
 				type: PROP_TYPE.BOOL,
 				value: false,

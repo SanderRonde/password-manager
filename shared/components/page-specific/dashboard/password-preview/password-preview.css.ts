@@ -55,7 +55,7 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (prop
 			justify-content: flex-end;
 		}
 
-		#arrow, #twofactorEnabled {
+		#arrow, #twofactorEnabled, #u2fEnabled {
 			display: -webkit-flex;
 			display: flex;
 			flex-direction: column;
@@ -63,7 +63,7 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (prop
 			justify-content: center;
 		}
 
-		.noIcon, #twofactorEnabled {
+		.noIcon, #twofactorEnabled, #u2fEnabled {
 			transition: fill 300ms ease-in-out;
 			fill: ${props.selected ?
 				changeOpacity(theme.textOnNonbackground, 70) :

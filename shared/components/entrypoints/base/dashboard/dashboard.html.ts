@@ -31,6 +31,7 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, 
 									websites="password.websites"
 									username="password.username"
 									twofactor_enabled="password.twofactor_enabled"
+									u2f_enabled="password.u2f_enabled"
 									selected="password_data.selected"
 									index="_index"
 									ref="_this"

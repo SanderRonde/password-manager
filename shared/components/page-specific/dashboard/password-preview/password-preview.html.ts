@@ -4,6 +4,7 @@ import { LockClosedUnfilled } from '../../../icons/lockClosed/lockClosed';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { invertedCardCSS, noCustomCSS } from './password-preview.css';
 import { PasswordPreview } from './password-preview';
+import { Key } from '../../../icons/key/key';
 
 function prefixWithWWW(url: string) {
 	if (url.startsWith('www.')) {
@@ -47,9 +48,14 @@ export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>((props, _, ht
 					})}
 				</div>
 				<div id="pointer">
+					${props.u2f_enabled ? html`<div id="u2fEnabled"
+							title="U2F is enabled for this password"
+						>
+							${Key}
+						</div>` : html``}
 					${props.twofactor_enabled ? 
 						html`<div id="twofactorEnabled"
-							title="Twofactor authentication is enabled for this website"
+							title="Twofactor authentication is enabled for this password"
 						>
 							${LockClosedUnfilled}
 						</div>` : html``}
