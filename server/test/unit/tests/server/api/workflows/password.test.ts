@@ -455,7 +455,8 @@ export function workflowPasswordTest() {
 					}),
 					twofactor_enabled: expected2FAEnabled,
 					encrypted: expectedEncrypted,
-					username: expectedUsername
+					username: expectedUsername,
+					u2f_enabled: false
 				}));
 
 				assert.isTrue(response.success, 'API call succeeded');
@@ -482,6 +483,11 @@ export function workflowPasswordTest() {
 					dbpw);
 				assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 				assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+
+				const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
+					dbpw);
+				assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+				assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled');
 
 				assert.strictEqual(decrypt(password.username, dbpw), expectedUsername,
 					'username was updated');
@@ -1058,7 +1064,8 @@ export function workflowPasswordTest() {
 						}),
 						twofactor_enabled: expected2FAEnabled,
 						encrypted: expectedEncrypted,
-						username: expectedUsername
+						username: expectedUsername,
+						u2f_enabled: false
 					}));
 
 					assert.isTrue(response.success, 'API call succeeded');
@@ -1085,6 +1092,11 @@ export function workflowPasswordTest() {
 						dbpw);
 					assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 					assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
+
+					const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
+						dbpw);
+					assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
+					assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled');
 
 					assert.strictEqual(decrypt(password.username, dbpw), expectedUsername,
 						'username was updated');
