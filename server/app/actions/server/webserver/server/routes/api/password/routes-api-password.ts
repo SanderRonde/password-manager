@@ -302,10 +302,13 @@ export class RoutesApiPassword {
 				}
 			}[];
 
+			//Check if U2F is enabled for the instance
+			const u2fEnabledOnInstance = decryptedInstance.u2f !== null;
+
 			//All don't exist
 			const record: EncryptedPassword = {
 				user_id: account._id,
-				u2f_enabled: this.server.database.Crypto.dbEncryptWithSalt(u2f_enabled),
+				u2f_enabled: this.server.database.Crypto.dbEncryptWithSalt(u2fEnabledOnInstance && u2f_enabled),
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled),
 				websites: filteredWebsites.map(({ host, exact, favicon }) => {
 					return {
@@ -522,11 +525,14 @@ export class RoutesApiPassword {
 				}
 			}[];
 
+			//Check if U2F is enabled for the instance
+			const u2fEnabledOnInstance = decryptedInstance.u2f !== null;
+
 			if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
 				_id: new mongo.ObjectId(password_id)
 			}, filterUndefined({
 				u2f_enabled: typeof u2f_enabled === 'boolean' ? 
-					this.server.database.Crypto.dbEncryptWithSalt(u2f_enabled) : undefined,
+					this.server.database.Crypto.dbEncryptWithSalt(u2fEnabledOnInstance && u2f_enabled) : undefined,
 				twofactor_enabled: typeof twofactor_enabled === 'boolean' ?
 					this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled) : undefined,
 				websites: Array.isArray(filteredWebsites) ?
