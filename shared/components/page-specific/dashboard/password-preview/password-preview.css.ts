@@ -7,19 +7,12 @@ import { html } from 'lit-html';
 export const invertedCardCSS = new TemplateFn<PasswordPreview>((_props, theme) => {
 	return html`<style>
 		#shadow {
-			transition: background-color 300ms ease-in-out;
 			background-color: ${theme.oppositeBackground};
 			color: ${theme.textOnNonbackground};
 		}
 	</style>`;
 }, CHANGE_TYPE.THEME);
-export const noCustomCSS = new TemplateFn<PasswordPreview>(_ => html`
-	<style>
-		#shadow {
-			transition: background-color 300ms ease-in-out;
-		}
-	</style>
-`, CHANGE_TYPE.NEVER);
+export const noCustomCSS = new TemplateFn<PasswordPreview>(null, CHANGE_TYPE.NEVER);
 
 export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (props, theme) {
 	return html`

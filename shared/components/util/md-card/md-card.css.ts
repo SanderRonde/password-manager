@@ -30,6 +30,8 @@ function assertNumber(value: any, fallback: number): number {
 export const MDCardCSS = new TemplateFn<MDCard>((props, theme) => {
 	return html`<style>
 		#shadow {
+			transition: background-color 300ms ease-in-out,
+				color 300ms ease-in-out;
 			${
 				`background-color: ${theme.card};
 				color: ${theme.textOnBackground};
