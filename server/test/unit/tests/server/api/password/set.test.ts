@@ -94,7 +94,7 @@ export function passwordSetTest() {
 			assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
 
-			const decryptedU2fEnabled = decryptWithSalt(password.twofactor_enabled,
+			const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
 				dbpw);
 			assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			assert.strictEqual(decryptedU2fEnabled, expectedU2FEnabled, 'U2F enabled is the same');
