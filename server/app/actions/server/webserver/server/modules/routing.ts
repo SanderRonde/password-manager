@@ -5,11 +5,12 @@ import { getStores, ServerResponse, APIResponse } from "./ratelimit";
 import { APIToken } from "../../../../../../../shared/types/crypto";
 import { API_ERRS } from "../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../database/database";
-import { DEFAULT_THEME } from "../../../../../lib/constants";
+import { DEFAULT_THEME, APP_ID } from "../../../../../lib/constants";
 import { Webserver } from "../webserver";
 import * as speakeasy from 'speakeasy'
 import * as express from 'express'
 import * as mongo from 'mongodb'
+import * as u2f from 'u2f';
 
 type ResponseCapturedRequestHandler = (req: express.Request,
 	res: ServerResponse, next: express.NextFunction) => any;
@@ -386,6 +387,37 @@ export class WebserverRouter {
 			}
 		}
 	}
+
+	private _genRequest(config: {
+		keyHandle: string;
+		publicKey: string;
+	}, instanceId: StringifiedObjectId<EncryptedInstance>, 
+		userId: StringifiedObjectId<EncryptedAccount>, type: 'verify'|'enable'|'disable') {
+			const request = u2f.request(APP_ID, config.keyHandle);
+			const u2fToken = this.parent.Auth.genU2FToken(
+				instanceId, userId, type, request);
+			return {
+				request,
+				u2fToken
+			}
+		}
+
+	public genRequests(config: {
+		main: {
+			keyHandle: string;
+			publicKey: string;
+		};
+		backup: {
+			keyHandle: string;
+			publicKey: string;
+		}
+	}, instanceId: StringifiedObjectId<EncryptedInstance>, 
+		userId: StringifiedObjectId<EncryptedAccount>, type: 'verify'|'enable'|'disable' = 'verify') {
+			return {
+				main: this._genRequest(config.main, instanceId, userId, type),
+				backup: this._genRequest(config.backup, instanceId, userId, type)
+			}
+		}
 
 	private _doBind<P extends any, K extends keyof P>(parent: P, key: K) {
 		return (parent[key] as Function).bind(parent);

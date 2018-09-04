@@ -1,9 +1,9 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord, EncryptedAsset, EncryptedAccount } from "../../../../../../../../../shared/types/db-types";
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
 import { UnstringifyObjectIDs, APIToken, U2FToken } from "../../../../../../../../../shared/types/crypto";
-import { SERVER_ROOT, MAX_FILE_BYTES, APP_ID } from "../../../../../../../lib/constants";
 import { filterUndefined } from "../../../../../../../database/libs/db-manipulation";
 import { API_ERRS, APIReturns } from "../../../../../../../../../shared/types/api";
+import { SERVER_ROOT, MAX_FILE_BYTES } from "../../../../../../../lib/constants";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { genTimeBasedString } from "../../../../../../../lib/util";
 import { ServerResponse } from "../../../modules/ratelimit";
@@ -479,12 +479,14 @@ export class RoutesApiPassword {
 				}
 
 				const registration = decryptedInstance.u2f;
-				const verifiedResponse = u2f.checkSignature(verifiedToken.request,
-					response, registration.publicKey);
-				if (!verifiedResponse.successful) {
-					this._respondInvalidCredentials(res);
-					return;
-				}
+
+				if (!u2f.checkSignature(verifiedToken.request!, response as u2f.U2FSignResponse, 
+						registration.main.publicKey).successful && 
+					!u2f.checkSignature(verifiedToken.request!, response as u2f.U2FSignResponse, 
+						registration.backup.publicKey).successful) {
+							this._respondInvalidCredentials(res);
+							return;
+						}
 			}
 
 			const mappedWebsites = Array.isArray(websites) ? await Promise.all(websites.map(async ({ url: websiteURL, favicon }) => {
@@ -725,12 +727,13 @@ export class RoutesApiPassword {
 				}
 
 				const registration = decryptedInstance.u2f;
-				const verifiedResponse = u2f.checkSignature(verifiedToken.request,
-					response, registration.publicKey);
-				if (!verifiedResponse.successful) {
-					this._respondInvalidCredentials(res);
-					return;
-				}
+				if (!u2f.checkSignature(verifiedToken.request!, response as u2f.U2FSignResponse, 
+						registration.main.publicKey).successful && 
+					!u2f.checkSignature(verifiedToken.request!, response as u2f.U2FSignResponse, 
+						registration.backup.publicKey).successful) {
+							this._respondInvalidCredentials(res);
+							return;
+						}
 			}
 
 			res.status(200);
@@ -795,13 +798,6 @@ export class RoutesApiPassword {
 			const { websites, twofactor_enabled, username, u2f_enabled } = this.server.database.Crypto
 				.dbDecryptPasswordRecord(password);
 
-
-			const request = decryptedInstance.u2f !== null && u2f_enabled ? 
-				u2f.request(APP_ID, decryptedInstance.u2f.keyHandle) : null;
-			const u2fToken = decryptedInstance.u2f !== null && u2f_enabled ? 
-				this.server.Auth.genU2FToken(instance_id,
-					decryptedInstance.user_id.toHexString(), 'verify', request!) : null;
-
 			res.status(200);
 			res.json({
 				success: true,
@@ -819,8 +815,9 @@ export class RoutesApiPassword {
 						username,
 						twofactor_enabled: twofactor_enabled,
 						u2f_enabled: u2f_enabled,
-						request: request,
-						u2f_token: u2fToken
+						requests: decryptedInstance.u2f !== null ? 
+							this.server.Router.genRequests(decryptedInstance.u2f,
+								instance_id, decryptedInstance.user_id.toHexString()) : null,
 					}), decryptedInstance.public_key)
 				}
 			});

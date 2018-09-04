@@ -195,13 +195,36 @@ export declare namespace APIRoutes {
 			 */
 			u2f_required: true;	
 			/**
-			 * The request that has to be solved
+			 * The requests, one of which has to be solved
 			 */
-			request: U2FRequest;
-			/**
-			 * A token to identify the request
-			 */
-			u2f_token: U2FToken;
+			requests: {
+				/**
+				 * The main request
+				 */
+				main: {
+					/**
+					 * The request that has to be solved
+					 */
+					request: U2FRequest;
+					/**
+					 * A token to identify the request
+					 */
+					u2f_token: U2FToken;
+				}
+				/**
+				 * A backup request
+				 */
+				backup: {
+					/**
+					 * The request that has to be solved
+					 */
+					request: U2FRequest;
+					/**
+					 * A token to identify the request
+					 */
+					u2f_token: U2FToken;
+				}
+			}
 			/**
 			 * The solved challenge
 			 */
@@ -385,13 +408,36 @@ export declare namespace APIRoutes {
 				message: 'state unchanged (was already set)'
 			}|{
 				/**
-				 * The token that can be used to confirm this change
+				 * The requests, one of which has to be solved
 				 */
-				token: U2FToken;
-				/**
-				 * The request that needs to be verified
-				 */
-				request: U2FRequest
+				requests: {
+					/**
+					 * The main request
+					 */
+					main: {
+						/**
+						 * The request that has to be solved
+						 */
+						request: U2FRequest;
+						/**
+						 * A token to identify the request
+						 */
+						u2f_token: U2FToken;
+					}
+					/**
+					 * A backup request
+					 */
+					backup: {
+						/**
+						 * The request that has to be solved
+						 */
+						request: U2FRequest;
+						/**
+						 * A token to identify the request
+						 */
+						u2f_token: U2FToken;
+					}
+				}
 			}>;
 
 			/**
@@ -414,13 +460,36 @@ export declare namespace APIRoutes {
 				message: 'state unchanged (was already set)';
 			}|{
 				/**
-				 * The token that can be used to confirm this change
+				 * The requests, one of which has to be solved
 				 */
-				token: U2FToken;
-				/**
-				 * The request that needs to be verified
-				 */
-				request: U2FRequest
+				requests: {
+					/**
+					 * The main request
+					 */
+					main: {
+						/**
+						 * The request that has to be solved
+						 */
+						request: U2FRequest;
+						/**
+						 * A token to identify the request
+						 */
+						u2f_token: U2FToken;
+					}
+					/**
+					 * A backup request
+					 */
+					backup: {
+						/**
+						 * The request that has to be solved
+						 */
+						request: U2FRequest;
+						/**
+						 * A token to identify the request
+						 */
+						u2f_token: U2FToken;
+					}
+				}
 			}>;
 
 			/**
@@ -431,15 +500,24 @@ export declare namespace APIRoutes {
 				 * The id of the instance assigned at registration
 				 */
 				instance_id: StringifiedObjectId<EncryptedInstance>;
+			}, encrypted: {}, optional: {
 				/**
-				 * The response to the request
+				 * The main response to the request
 				 */
-				response: U2FSignResponse|U2FRegisterResponse;
+				mainResponse: U2FSignResponse|U2FRegisterResponse;
 				/**
-				 * The token associated witht his intent
+				 * The backup response to the request
 				 */
-				token: U2FToken;
-			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{}>;
+				backupResponse: U2FSignResponse|U2FRegisterResponse;
+				/**
+				 * The main token associated with this intent
+				 */
+				mainToken: U2FToken;
+				/**
+				 * The backup token associated with this intent
+				 */
+				backupToken: U2FToken;
+			}, optionalEncrypted: {}): JSONResponse<{}>;
 
 			/**
 			 * Verify 2FA when logging in
@@ -449,15 +527,24 @@ export declare namespace APIRoutes {
 				 * The id of the instance assigned at registration
 				 */
 				instance_id: StringifiedObjectId<EncryptedInstance>;
+			}, encrypted: {}, optional: {
 				/**
-				 * The response to the request
+				 * The main response to the request
 				 */
-				response: U2FSignResponse|U2FRegisterResponse;
+				mainResponse: U2FSignResponse|U2FRegisterResponse;
 				/**
-				 * The token associated witht his intent
+				 * The backup response to the request
 				 */
-				token: U2FToken;
-			}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+				backupResponse: U2FSignResponse|U2FRegisterResponse;
+				/**
+				 * The main token associated with this intent
+				 */
+				mainToken: U2FToken;
+				/**
+				 * The backup token associated with this intent
+				 */
+				backupToken: U2FToken;
+			}, optionalEncrypted: {}): JSONResponse<{
 				/**
 				 * A login token that can be used for the /api/password API
 				 */
@@ -790,13 +877,36 @@ export declare namespace APIRoutes {
 				 */
 				u2f_enabled: boolean;
 				/**
-				 * The request that has to be solved
+				 * The requests, one of which has to be solved
 				 */
-				request: U2FRequest|null;
-				/**
-				 * A token to identify the request
-				 */
-				u2f_token: U2FToken|null;
+				requests: {
+					/**
+					 * The main request
+					 */
+					main: {
+						/**
+						 * The request that has to be solved
+						 */
+						request: U2FRequest;
+						/**
+						 * A token to identify the request
+						 */
+						u2f_token: U2FToken;
+					}
+					/**
+					 * A backup request
+					 */
+					backup: {
+						/**
+						 * The request that has to be solved
+						 */
+						request: U2FRequest;
+						/**
+						 * A token to identify the request
+						 */
+						u2f_token: U2FToken;
+					}
+				}|null;
 			}>, InstancePublicKey>;
 		}>;
 

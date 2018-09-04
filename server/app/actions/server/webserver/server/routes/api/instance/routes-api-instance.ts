@@ -6,11 +6,9 @@ import { API_ERRS } from "../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../database/database";
 import { RoutesAPIInstanceU2f } from "./u2f/routes-api-instance-u2f";
 import { ServerResponse } from "../../../modules/ratelimit";
-import { APP_ID } from "../../../../../../../lib/constants";
 import { sendEmail } from "../../../../../../../lib/util";
 import { Webserver } from "../../../webserver";
 import * as express from 'express'
-import * as u2f from 'u2f';
 
 export class RoutesApiInstance {
 	public Twofactor = new RoutesAPIInstanceTwofactor(this.server);
@@ -176,14 +174,10 @@ export class RoutesApiInstance {
 			}
 		const u2fConfig = decryptedInstance.u2f;
 		if (u2fConfig !== null) {
-			const request = u2f.request(APP_ID, u2fConfig.keyHandle);
-			const u2fToken = this.server.Auth.genU2FToken(
-				instance._id.toHexString(), decryptedInstance.user_id.toHexString(),
-				'verify', request);
 			return {
 				u2f_required: true,
-				request: request,
-				u2f_token: u2fToken,
+				requests: this.server.Router.genRequests(u2fConfig,
+					instance._id.toHexString(), decryptedInstance.user_id.toHexString()),
 				challenge: solved
 			}
 		}

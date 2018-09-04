@@ -253,14 +253,26 @@ export type EncryptedInstance = {
 	 * (encrypted) Data related to the u2f configuration, or null if disabled
 	 */
 	u2f: EncodedString<DatabaseEncryptedWithSalt<EncodedString<{
-		/**
-		 * The u2f keyhandle
-		 */
-		keyHandle: string;
-		/**
-		 * The u2f public key
-		 */
-		publicKey: string;
+		main: {
+			/**
+			 * The u2f keyhandle
+			 */
+			keyHandle: string;
+			/**
+			 * The u2f public key
+			 */
+			publicKey: string;
+		};
+		backup: {
+			/**
+			 * The u2f keyhandle
+			 */
+			keyHandle: string;
+			/**
+			 * The u2f public key
+			 */
+			publicKey: string;
+		}
 	}>|null>>;
 };
 
@@ -291,15 +303,27 @@ export type DecryptedInstance = {
 	/**
 	 * Data related to the u2f configuration, or null if disabled
 	 */
-	u2f:  {
-		/**
-		 * The u2f keyhandle
-		 */
-		keyHandle: string;
-		/**
-		 * The u2f public key
-		 */
-		publicKey: string;
+	u2f: {
+		main: {
+			/**
+			 * The u2f keyhandle
+			 */
+			keyHandle: string;
+			/**
+			 * The u2f public key
+			 */
+			publicKey: string;
+		};
+		backup: {
+			/**
+			 * The u2f keyhandle
+			 */
+			keyHandle: string;
+			/**
+			 * The u2f public key
+			 */
+			publicKey: string;
+		}
 	}|null;
 }
 

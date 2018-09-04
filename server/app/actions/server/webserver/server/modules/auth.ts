@@ -212,12 +212,6 @@ export class WebserverAuth {
 	}
 
 	public genU2FToken(instance: StringifiedObjectId<EncryptedInstance>,
-		account: StringifiedObjectId<EncryptedAccount>, type: 'disable'|'verify',
-		request: U2FRequest): U2FToken;
-	public genU2FToken(instance: StringifiedObjectId<EncryptedInstance>,
-		account: StringifiedObjectId<EncryptedAccount>, type: 'enable',
-		request: U2FRequest): U2FToken;
-	public genU2FToken(instance: StringifiedObjectId<EncryptedInstance>,
 		account: StringifiedObjectId<EncryptedAccount>, type: 'enable'|'disable'|'verify',
 		request: U2FRequest): U2FToken {
 				const token = this._genRandomToken();

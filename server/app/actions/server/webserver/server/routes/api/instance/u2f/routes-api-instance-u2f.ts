@@ -61,16 +61,25 @@ export class RoutesAPIInstanceU2f {
 				return;
 			}
 
-			const request = u2f.request(APP_ID);
-			const token = this.server.Auth.genU2FToken(instance._id.toHexString(),
-				decryptedInstance.user_id.toHexString(), 'enable', request);
+			const mainRequest = u2f.request(APP_ID);
+			const backupRequest = u2f.request(APP_ID);
 
 			res.status(200);
 			res.json({
 				success: true,
 				data: {
-					token: token,
-					request: request
+					requests: {
+						main: {
+							request: mainRequest,
+							u2fToken: this.server.Auth.genU2FToken(instance._id.toHexString(),
+								decryptedInstance.user_id.toHexString(), 'enable', mainRequest)
+						},
+						backup: {
+							request: backupRequest,
+							u2fToken: this.server.Auth.genU2FToken(instance._id.toHexString(),
+								decryptedInstance.user_id.toHexString(), 'enable', backupRequest)
+						}
+					}
 				}
 			});
 		})(req, res, next);
@@ -125,16 +134,12 @@ export class RoutesAPIInstanceU2f {
 				return;
 			};
 
-			const request = u2f.request(APP_ID, decryptedInstance.u2f.keyHandle);
-			const token = this.server.Auth.genU2FToken(instance._id.toHexString(),
-				decryptedInstance.user_id.toHexString(), 'disable', request);
-
 			res.status(200);
 			res.json({
 				success: true,
 				data: {
-					token: token,
-					request: request
+					requests: this.server.Router.genRequests(decryptedInstance.u2f,
+						instance._id.toHexString(), decryptedInstance.user_id.toHexString(), 'disable')
 				}
 			});
 		})(req, res, next);
@@ -143,11 +148,16 @@ export class RoutesAPIInstanceU2f {
 	public confirm(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
-			response: u2f.U2FSignResponse|u2f.U2FRegisterResponse;
-			token: U2FToken;
-		}, {}, {}, {}>({
-			unencrypted: ['instance_id', 'token', 'response']
-		}, {}, async (toCheck, { instance_id, token, response }) => {
+		}, {
+			mainResponse: u2f.U2FSignResponse|u2f.U2FRegisterResponse;
+			backupResponse: u2f.U2FSignResponse|u2f.U2FRegisterResponse;
+			mainToken: U2FToken;
+			backupToken: U2FToken;
+		}, {}, {}>({
+			unencrypted: ['instance_id']
+		}, {
+			unencrypted: ['mainToken', 'backupToken', 'mainResponse', 'backupResponse']
+		}, async (toCheck, { instance_id, mainToken, backupToken, mainResponse, backupResponse }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
 				type: 'string'
@@ -160,9 +170,11 @@ export class RoutesAPIInstanceU2f {
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
 			if (instance === null || decryptedInstance === null || accountPromise === null) return;
 
-			const verifiedToken = this.server.Auth.verifyU2FToken(token,
-				instance._id.toHexString());
-			if (!verifiedToken.isValid) {
+			const verifiedTokenMain = mainToken ? this.server.Auth.verifyU2FToken(mainToken,
+				instance._id.toHexString()) : { isValid: false, type: 'verify', request: null }
+			const verifiedTokenBackup = backupToken ? this.server.Auth.verifyU2FToken(backupToken,
+				instance._id.toHexString()) : { isValid: false, type: 'verify', request: null };
+			if (!verifiedTokenMain.isValid || !verifiedTokenBackup.isValid) {
 				res.status(200);
 				res.json({
 					success: false,
@@ -172,7 +184,7 @@ export class RoutesAPIInstanceU2f {
 				return;
 			}
 
-			if (verifiedToken.type === 'verify') {
+			if (verifiedTokenMain.type === 'verify') {
 				res.status(200);
 				res.json({
 					success: false,
@@ -182,10 +194,12 @@ export class RoutesAPIInstanceU2f {
 				return;
 			}
 
-			if (verifiedToken.type === 'enable') {
-				const verifiedResponse = u2f.checkRegistration(verifiedToken.request,
-					response as u2f.U2FRegisterResponse);
-				if (!verifiedResponse.successful) {
+			if (verifiedTokenMain.type === 'enable') {
+				const verifiedResponseMain = u2f.checkRegistration(verifiedTokenMain.request!,
+					mainResponse as u2f.U2FRegisterResponse);
+				const verifiedResponseBackup = u2f.checkRegistration(verifiedTokenBackup.request!,
+					backupResponse as u2f.U2FRegisterResponse);
+				if (!verifiedResponseMain.successful || !verifiedResponseBackup.successful) {
 					res.status(200);
 					res.json({
 						success: false,
@@ -200,14 +214,32 @@ export class RoutesAPIInstanceU2f {
 					_id: instance._id
 				}, {
 					u2f: this.server.database.Crypto.dbEncryptWithSalt(JSON.stringify({
-						keyHandle: verifiedResponse.keyHandle,
-						publicKey: verifiedResponse.publicKey,
+						main: {
+							keyHandle: verifiedResponseMain.keyHandle,
+							publicKey: verifiedResponseMain.publicKey,
+						},
+						backup: {
+							keyHandle: verifiedResponseBackup.keyHandle,
+							publicKey: verifiedResponseBackup.publicKey,
+						}
 					} as {
-						keyHandle: string;
-						publicKey: string;
+						main: {
+							keyHandle: string;
+							publicKey: string;
+						}
+						backup: {
+							keyHandle: string;
+							publicKey: string;
+						}
 					}) as EncodedString<{
-						keyHandle: string;
-						publicKey: string;
+						main: {
+							keyHandle: string;
+							publicKey: string;
+						}
+						backup: {
+							keyHandle: string;
+							publicKey: string;
+						}
 					}>)
 				})) {
 					res.status(500);
@@ -226,9 +258,11 @@ export class RoutesAPIInstanceU2f {
 			} else {
 				//Disable
 				const registration = decryptedInstance.u2f!;
-				const verifiedResponse = u2f.checkSignature(verifiedToken.request,
-					response as u2f.U2FSignResponse, registration.publicKey);
-				if (!verifiedResponse.successful) {
+				const verifiedResponseMain = u2f.checkSignature(verifiedTokenMain.request!,
+					mainResponse as u2f.U2FSignResponse, registration.main.publicKey);
+				const verifiedResponseBackup = u2f.checkSignature(verifiedTokenBackup.request!,
+					backupResponse as u2f.U2FSignResponse, registration.backup.publicKey);
+				if (!verifiedResponseMain.successful && !verifiedResponseBackup.successful) {
 					res.status(200);
 					res.json({
 						success: false,
@@ -297,27 +331,28 @@ export class RoutesAPIInstanceU2f {
 			const verifiedToken = this.server.Auth.verifyU2FToken(token,
 				instance._id.toHexString());
 			if (verifiedToken.isValid) {
-				const verifiedResponse = u2f.checkSignature(verifiedToken.request,
-					response as u2f.U2FSignResponse, registration.publicKey);
-				if (verifiedResponse.successful) {
-					//This is a login attempt
-					res.status(200);
-					res.json({
-						success: true,
-						data: {
-							auth_token: encryptWithPublicKey(
-								this.server.Auth.genLoginToken(instance_id, 
-								instance.user_id.toHexString()), publicKey)
-						}
-					});
-				} else {
-					res.status(200);
-					res.json({
-						success: false,
-						error: 'invalid response',
-						ERR: API_ERRS.INVALID_CREDENTIALS
-					});
-				}
+				if (u2f.checkSignature(verifiedToken.request!, response as u2f.U2FSignResponse, 
+						registration.main.publicKey).successful || 
+					u2f.checkSignature(verifiedToken.request!, response as u2f.U2FSignResponse, 
+						registration.backup.publicKey).successful) {
+						//This is a login attempt
+						res.status(200);
+						res.json({
+							success: true,
+							data: {
+								auth_token: encryptWithPublicKey(
+									this.server.Auth.genLoginToken(instance_id, 
+									instance.user_id.toHexString()), publicKey)
+							}
+						});
+					} else {
+						res.status(200);
+						res.json({
+							success: false,
+							error: 'invalid response',
+							ERR: API_ERRS.INVALID_CREDENTIALS
+						});
+					}
 			} else {
 				res.status(200);
 				res.json({
