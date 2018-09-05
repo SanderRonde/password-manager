@@ -57,6 +57,11 @@ export const CustomDashboardCSS = {
 		#contentContainer {
 			overflow-y: hidden;
 		}
+
+		.container {
+			margin-bottom: 20px;
+			margin-left: 5px;
+		}
 	</style>`, CHANGE_TYPE.NEVER)
 }
 

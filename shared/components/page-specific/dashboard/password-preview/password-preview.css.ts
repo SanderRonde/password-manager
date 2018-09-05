@@ -21,8 +21,6 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (prop
 
 		#container {
 			display: block;
-			margin-left: 5px;
-			margin-bottom: 20px;
 			cursor: pointer;
 			-webkit-user-select: none;
 			-moz-user-select: none;
