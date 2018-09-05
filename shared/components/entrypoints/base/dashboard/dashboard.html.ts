@@ -39,9 +39,12 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, 
 							</template>
 						</infinite-list>
 					</div>
-					<password-detail id="passwordFocus"
-						selected="${this.selectedPassword}"
-					></password-detail>
+					<div id="passwordDetail">
+						<div id="passwordDetailTop"></div>
+						<password-detail id="passwordFocus"
+							selected="${this.selectedPassword}"
+						></password-detail>
+					</div>
 				</div>
 			</horizontal-centerer>
 			<theme-selector id="themeSelector"></theme-selector>

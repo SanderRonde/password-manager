@@ -16,6 +16,7 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 	private _isInitialDetailViewIntersectCall: boolean = true;
 	@bindToClass
 	private _detailViewIntersect() {
+		console.log('hey');
 		if (this._isInitialDetailViewIntersectCall) {
 			this._isInitialDetailViewIntersectCall = false;
 			return;
@@ -25,7 +26,7 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 
 		if (isScrolledUp) {
 			this._passwordFocusIsFixed = true;
-			this.$.passwordFocus.classList.add('fixed');
+			this.$.passwordDetail.classList.add('fixed');
 		}
 	}
 	
@@ -33,7 +34,7 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 	private _listIntersect(entries: IntersectionObserverEntry[]) {
 		if (entries[0].intersectionRatio) {
 			this._passwordFocusIsFixed = false;
-			this.$.passwordFocus.classList.remove('fixed');
+			this.$.passwordDetail.classList.remove('fixed');
 		}
 	}
 
@@ -44,7 +45,7 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 	private _observers = this._intersectionObserverSupported ? {
 		detailView: new IntersectionObserver(this._detailViewIntersect, {
 			root: null,
-			rootMargin: `-${PW_VIEW_SCROLL + TITLE_BAR_HEIGHT}px 0px 0px 0px`
+			rootMargin: `-${PW_VIEW_SCROLL}px 0px 0px 0px`
 		}),
 		list: new IntersectionObserver(this._listIntersect, {
 			root: null,
@@ -57,11 +58,11 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 	private _scroll() {
 		if (this._passwordFocusIsFixed && document.documentElement.scrollTop <= MAX_DOC_SCROLL) {
 			this._passwordFocusIsFixed = false;
-			this.$.passwordFocus.classList.remove('fixed');
+			this.$.passwordDetail.classList.remove('fixed');
 		} else if (!this._passwordFocusIsFixed && 
 			this.$.passwordFocus.getBoundingClientRect().top <= PW_VIEW_SCROLL) {
 				this._passwordFocusIsFixed = true;
-				this.$.passwordFocus.classList.add('fixed');
+				this.$.passwordDetail.classList.add('fixed');
 			}
 	}
 
@@ -83,13 +84,13 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 	}
 
 	postRender() {
-		if (isNewElement(this.$.passwordFocus)) {
-			this._detailViewWasScrolledUp = this.$.passwordFocus.getBoundingClientRect().top < 0;
+		if (isNewElement(this.$.passwordDetailTop)) {
+			this._detailViewWasScrolledUp = this.$.passwordDetailTop.getBoundingClientRect().top < 0;
 			if (this._intersectionObserverSupported) {
 				if (this._observed && this._observed.detailView) {
 					this._observers!.detailView.unobserve(this._observed.detailView);
 				}
-				this._observers!.detailView.observe(this.$.passwordFocus);
+				this._observers!.detailView.observe(this.$.passwordDetailTop);
 				this._observed = this._observed || {} as Partial<{
 					detailView: HTMLElement;
 					list: HTMLElement;
@@ -97,7 +98,7 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 					detailView: HTMLElement;
 					list: HTMLElement;
 				};
-				this._observed.detailView = this.$.passwordFocus;
+				this._observed.detailView = this.$.passwordDetailTop;
 			}
 		}
 		if (isNewElement(this.$.passwordTop)) {

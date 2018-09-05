@@ -115,13 +115,13 @@ export const DashboardCSS = new TemplateFn<Dashboard>((_props, theme) => {
 			background-color: grey;
 		}
 
-		#passwordFocus {
+		#passwordDetail {
 			max-height: calc(80vh - 70px);
 			margin-left: 520px;
 			position: absolute;
 		}
 
-		#passwordFocus.fixed {
+		#passwordDetail.fixed {
 			position: fixed;
 			${`margin-top: -${PAGE_TOP - PW_VIEW_SCROLL}px;`}
 		}
