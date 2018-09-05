@@ -16,7 +16,6 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 	private _isInitialDetailViewIntersectCall: boolean = true;
 	@bindToClass
 	private _detailViewIntersect() {
-		console.log('hey');
 		if (this._isInitialDetailViewIntersectCall) {
 			this._isInitialDetailViewIntersectCall = false;
 			return;
