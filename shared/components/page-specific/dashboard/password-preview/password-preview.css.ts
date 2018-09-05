@@ -20,6 +20,8 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (prop
 		<style>
 
 		#container {
+			display: block;
+			margin-left: 5px;
 			margin-bottom: 20px;
 			cursor: pointer;
 			-webkit-user-select: none;
@@ -35,7 +37,7 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (prop
 			flex-direction: row;
 			-webkit-justify-content: space-between;
 			justify-content: space-between;
-			width: 480px;
+			width: 475px;
 			padding: 5px 0;
 		}
 
