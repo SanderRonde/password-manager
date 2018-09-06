@@ -55,9 +55,12 @@ export class SizingBlock extends ConfigurableWebComponent<SizingBlockIDMap> {
 		if (height === this._currentHeight) {
 			return;
 		}
+		const prevHeight = this._currentHeight;
 
 		await this._animateHeight(this._currentHeight, height);
-		this._currentHeight = height;
+		if (this._currentHeight === prevHeight) {
+			this._currentHeight = height;
+		}
 	}
 
 	getSize() {
