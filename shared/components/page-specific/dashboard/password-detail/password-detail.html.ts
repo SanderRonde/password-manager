@@ -3,15 +3,15 @@ import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { PasswordDetail } from './password-detail';
 import { html } from 'lit-html';
 
-export const PasswordDetailHTML = new TemplateFn<PasswordDetail>((_props) => {
+export const PasswordDetailHTML = new TemplateFn<PasswordDetail>((props) => {
 	return html`
 		<div>
 			<md-card level="3" 
 				padding-vertical="0"
 				padding-horizontal="0"
 			>
-				<sizing-block>
-					<div id="noneSelectedView">
+				<sizing-block id="sizer">
+					<div id="noneSelectedView" class="view visible">
 						<vertical-centerer>
 							<horizontal-centerer>
 								<div id="noneSelectedContent">
@@ -24,6 +24,9 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>((_props) => {
 								</div>
 							</horizontal-centerer>
 						</vertical-centerer>
+					</div>
+					<div id="selectedView" class="view">
+						
 					</div>
 				</sizing-block>
 			</md-card>

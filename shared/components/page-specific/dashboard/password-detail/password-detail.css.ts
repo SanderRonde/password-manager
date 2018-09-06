@@ -1,8 +1,9 @@
 import { PasswordDetail, NONE_SELECTED_VIEW_HEIGHT } from './password-detail';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { html } from 'lit-html';
 import { changeOpacity } from '../../../../lib/webcomponent-util';
+import { html } from 'lit-html';
 
+export const VIEW_FADE_TIME = 300;
 export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) => {
 	return html`<style>
 		#noneSelectedView {
@@ -18,6 +19,17 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) 
 			font-weight: 500;
 			text-align: center;
 			color: ${changeOpacity(theme.textOnBackground, 60)};
+		}
+
+		.view {
+			display: none;
+			opacity: 0;
+			transition: ${VIEW_FADE_TIME}ms ease-in-out;
+		}
+
+		.view.visible {
+			display: block;
+			opacity: 1;
 		}
 	</style>`
 }, CHANGE_TYPE.ALWAYS);
