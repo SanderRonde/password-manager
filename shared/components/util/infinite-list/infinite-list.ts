@@ -376,6 +376,10 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 	}[] = [];
 	private _createContainers() {
 		//Calculate the amount of containers
+		this._containers.map((container) => {
+			container.element.remove();
+		});
+
 		const containers = this._itemsPerViewport();
 		this._containers = Array(containers).fill('').map((_, index) => {
 			const el = document.createElement('div');
