@@ -268,11 +268,11 @@ function createProxyLevel(obj: any, path: string|'*', nextLevels: (string|'*')[]
 		},
 		deleteProperty(_obj, prop) {
 			if (Reflect.has(obj, prop)) {
-				const deleted = Reflect.deleteProperty(obj, prop);
+				Reflect.deleteProperty(obj, prop);
 				callback();
-				return deleted;
+				return true;
 			}
-			return false;
+			return true;
 		}
 	});
 	if (nextLevels.length && Reflect.has(obj, path)) {
@@ -283,10 +283,14 @@ function createProxyLevel(obj: any, path: string|'*', nextLevels: (string|'*')[]
 
 function watchObject(obj: any, path: (string|'*')[], callback: () => void) {
 	if (typeof obj !== 'object' || obj === undefined || obj === null) {
-		return;
+		return obj;
 	}
 	if (path.indexOf('**') !== -1 && path.length > 1) {
 		throw new Error('Attempting to watch object through ** and more path operators')
+	}
+	if (typeof Proxy === 'undefined') {
+		console.warn('Attempted to watch object while proxy method is not supported');
+		return obj;
 	}
 
 	if (path[0] === '**') {
@@ -294,6 +298,59 @@ function watchObject(obj: any, path: (string|'*')[], callback: () => void) {
 	} else {
 		return createProxyLevel(obj, path[0], path.slice(1), callback);
 	}
+}
+
+function watchArray<T>(arr: T[], path: (string|'*')[], callback: () => void): T[] {
+	if (!Array.isArray(arr) || arr === undefined || arr === null) {
+		return arr;
+	}
+	if (path.indexOf('**') !== -1 && path.length > 1) {
+		throw new Error('Attempting to watch object through ** and more path operators')
+	}
+	if (typeof Proxy === 'undefined') {
+		console.warn('Attempted to watch array while proxy method is not supported');
+		return arr;
+	}
+
+	return new Proxy(arr, {
+		set(arr, property, value) {
+			if (typeof property === 'symbol' ||
+				(typeof property !== 'number' &&
+				!/^\d+$/.test(property))) {
+					arr[property as keyof typeof arr] = value;
+					return true;
+				}
+			const index = ~~property;
+
+			if (path.length === 0) {
+				//Only watch the setting of values
+				arr[index] = value;
+				callback();
+				return true;
+			}
+
+			//Watch the values themselves as well
+			arr[index] = watchObject(value, path, callback);
+			callback();
+			return true;
+		},
+		deleteProperty(arr, property) {
+			if (typeof property === 'symbol' ||
+				(typeof property !== 'number' &&
+				!/^\d+$/.test(property))) {
+					if (Reflect.has(arr, property)) {
+						Reflect.deleteProperty(arr, property);
+					}
+					return true;
+				}
+
+			if (Reflect.has(arr, property)) {
+				Reflect.deleteProperty(arr, property);
+			}
+			callback();
+			return true;
+		}
+	});
 }
 
 function casingToDashes(name: string) {
@@ -468,8 +525,12 @@ export function defineProps<P extends {
 			},
 			set(value) {
 				const original = value;
-				if (typeof value === 'object' && watchProperties.length > 0) {
+				if (typeof value === 'object' && !Array.isArray(value) && watchProperties.length > 0) {
 					value = watchObject(value, watchProperties, () => {
+						element.renderToDOM(CHANGE_TYPE.PROP)
+					});
+				} else if (watch && Array.isArray(value)) {
+					value = watchArray(value, [], () => {
 						element.renderToDOM(CHANGE_TYPE.PROP)
 					});
 				}
@@ -482,6 +543,7 @@ export function defineProps<P extends {
 					setter(originalSetAttr, originalRemoveAttr, propName, 
 						isPrivate ? '_' : original, mapType);
 				}
+
 				if (watch) {
 					element.renderToDOM(CHANGE_TYPE.PROP);
 				}
