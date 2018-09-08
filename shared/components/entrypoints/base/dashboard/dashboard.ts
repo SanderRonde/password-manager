@@ -45,7 +45,7 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 	});
 
 	public get selectedPassword() {
-		if (!this.props.selected ||
+		if (typeof this.props.selected !== 'number' ||
 			this.props.selected === -1 || 
 			!this.props.metaPasswords || 
 			this.props.metaPasswords.length === 0) {
