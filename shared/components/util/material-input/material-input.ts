@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, config, listen } from '../../../lib/webcomponent-util';
+import { defineProps, PROP_TYPE, config, listen, isNewElement } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { MaterialInputIDMap } from './material-input-querymap';
 import { MaterialInputHTML } from './material-input.html';
@@ -176,43 +176,45 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 	}
 
 	postRender() {
-		this.$.input = this.$.input;
-		this.$.container = this.$.container;
 		if (this.$.input && this.$.container) {
 			this._validityState = this.valid;
 
-			listen(this, 'input', 'keydown', (e) => {
-				window.setTimeout(() => {
-					if (this.$.input) {
-						this.props.value = this.$.input.value;
-					}
-					if (this._validityState !== this.valid) {
-						this._validityState = this.valid;
-						this.fire('valid', this.valid);
-					}
-					this.fire('keydown', e)
-				}, 0);
-			});
+			if (isNewElement(this.$.input)) {
+				listen(this, 'input', 'keydown', (e) => {
+					window.setTimeout(() => {
+						if (this.$.input) {
+							this.props.value = this.$.input.value;
+						}
+						if (this._validityState !== this.valid) {
+							this._validityState = this.valid;
+							this.fire('valid', this.valid);
+						}
+						this.fire('keydown', e)
+					}, 0);
+				});
 
-			if (this.$.input.hasAttribute('placeholder')) {
-				this.$.container.classList.add('has-placeholder');
-			}
-			listen(this, 'input', 'input', this._updateClasses);
-			listen(this, 'input', 'focus', this._onFocus);
-			listen(this, 'input', 'blur', this._onBlur);
-			listen(this, 'input', 'reset', this._onReset);
-			if (this._maxRows !== -1) {
-				listen(this, 'input', 'keydown', this._onKeyDown);
-			}
+				if (this.$.input.hasAttribute('placeholder')) {
+					this.$.container.classList.add('has-placeholder');
+				}
 
-			const isInvalid = this.$.container.classList.contains('is-invalid');
-			this._updateClasses();
-			if (isInvalid) {
-				this.$.container.classList.add('is-invalid');
-			}
-			if (this.$.input.hasAttribute('autofocus')) {
-				this.$.container.focus();
-				this._checkFocus();
+				listen(this, 'input', 'input', this._updateClasses);
+				listen(this, 'input', 'focus', this._onFocus);
+				listen(this, 'input', 'blur', this._onBlur);
+				listen(this, 'input', 'reset', this._onReset);
+				if (this._maxRows !== -1) {
+					listen(this, 'input', 'keydown', this._onKeyDown);
+				}
+
+				if (this.$.input.hasAttribute('autofocus')) {
+					this.$.container.focus();
+					this._checkFocus();
+				}
+				
+				const isInvalid = this.$.container.classList.contains('is-invalid');
+				this._updateClasses();
+				if (isInvalid) {
+					this.$.container.classList.add('is-invalid');
+				}
 			}
 		}
 	}
