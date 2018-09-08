@@ -35,7 +35,7 @@ export const LoginHTML = new TemplateFn<Login>((props) => {
 								autoFocus label="Password"></material-input>
 							<material-input id="twofactorInput" name="twofactor"
 								type="tel" autoComplete="off" fill
-								pattern="\d{6}" error="Enter a 6-digit code"
+								pattern="\\d{6}" error="Enter a 6-digit code"
 								title="Twofactor authentication token (if enabled for the account)"
 								autoFocus label="2FA Token (if enabled)"></material-input>
 							<div id="buttonPositioner">
