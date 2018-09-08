@@ -57,6 +57,16 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 		}
 	});
 
+	constructor() {
+		super();
+
+		this.listen('propChange', (key, _prevVal, newValue) => {
+			if (key === 'value') {
+				this.set(newValue, true);
+			}
+		});
+	}
+
 	get value() {
 		return this.props.value;
 	}
@@ -75,9 +85,11 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 		this._updateClasses();
 	}
 
-	set(value: string) {
+	set(value: string, skipSet: boolean = false) {
 		this.$.input!.value = value || '';
-		this.props.value = value || '';
+		if (!skipSet) {
+			this.props.value = value || '';
+		}
 
 		const prevValidState = this._validityState;
 		this._updateClasses();
