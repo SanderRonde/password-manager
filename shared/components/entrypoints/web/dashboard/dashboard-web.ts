@@ -7,6 +7,7 @@ import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { DashboardCSS } from '../../base/dashboard/dashboard.css';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { MasterPassword } from '../../../../types/db-types';
+import { CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { ENTRYPOINT } from '../../../../types/shared-types';
 import { config } from '../../../../lib/webcomponent-util';
 import { Remove } from '../../../../types/serviceworker';
@@ -21,11 +22,20 @@ export class DashboardWeb extends Dashboard {
 	private _data!: Remove<GlobalControllerData['loginData'], 'password' & {
 		decrypt_hash: Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>;	
 	}>;
-	private _count: number = 0;
-	private _upCount() {
-		const count = this._count;
-		this._count = count + 1;
-		return count;
+
+	public get loginData() {
+		if (this._data) {
+			return {
+				instance_id: this._data.instance_id,
+				server_public_key: this._data.server_public_key,
+				auth_token: this._data.login_auth
+			};
+		}
+		return {
+			instance_id: '' as any,
+			server_public_key: '' as any,
+			auth_token: '' as any
+		}
 	}
 
 	private _failNoCredentials(message: string) {
