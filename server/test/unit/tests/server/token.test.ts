@@ -57,8 +57,12 @@ export function tokenTest() {
 
 			//Extend token
 			const extendedToken = await (async () => {
-				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
+				const response = JSON.parse(await doServerAPIRequest({ 
+					port: http,
+					publicKey: server_public_key
+				}, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
+				}, {
 					count: 0,
 					old_token: initialToken!
 				}));
@@ -77,8 +81,12 @@ export function tokenTest() {
 
 			//Extend token again
 			await (async () => {
-				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
+				const response = JSON.parse(await doServerAPIRequest({ 
+					port: http,
+					publicKey: server_public_key
+				}, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
+				}, {
 					count: 1,
 					old_token: initialToken!
 				}));
@@ -152,8 +160,12 @@ export function tokenTest() {
 
 			//Extend token
 			const extendedToken = await (async () => {
-				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
+				const response = JSON.parse(await doServerAPIRequest({ 
+					port: http,
+					publicKey: server_public_key
+				}, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
+				}, {
 					count: 0,
 					old_token: initialToken!
 				}));
@@ -172,8 +184,12 @@ export function tokenTest() {
 
 			//Use wrong count
 			await (async () => {
-				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
+				const response = JSON.parse(await doServerAPIRequest({ 
+					port: http,
+					publicKey: server_public_key
+				}, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
+				}, {
 					count: 0,
 					old_token: initialToken!
 				}));
@@ -284,8 +300,12 @@ export function tokenTest() {
 
 			//Extend token
 			const extendedToken = await (async () => {
-				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
-					instance_id: instance_id.toHexString(),
+				const response = JSON.parse(await doServerAPIRequest({ 
+					port: http,
+					publicKey: server_public_key
+				}, '/api/instance/extend_key', {
+					instance_id: instance_id.toHexString()
+				}, {
 					count: 0,
 					old_token: initialToken!
 				}));
@@ -304,8 +324,12 @@ export function tokenTest() {
 
 			//Use wrong instance id
 			await (async () => {
-				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
-					instance_id: secondInstance!,
+				const response = JSON.parse(await doServerAPIRequest({ 
+					port: http,
+					publicKey: server_public_key
+				}, '/api/instance/extend_key', {
+					instance_id: secondInstance!
+				}, {
 					count: 1,
 					old_token: initialToken!
 				}));
