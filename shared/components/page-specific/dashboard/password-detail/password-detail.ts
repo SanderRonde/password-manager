@@ -42,11 +42,14 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		return 500 + (password.websites.length * 200);
 	}
 
-	private _hideAll() {
+	private async _hideAll() {
 		this.$$('.view').forEach((view) => {
 			view.classList.remove('visible');
 		});
-		return wait(VIEW_FADE_TIME);
+		await wait(VIEW_FADE_TIME);
+		this.$$('.view').forEach((view) => {
+			view.classList.remove('displayed');
+		});
 	}
 
 	private _cancelCurrentAnimation: null|(() => void) = null;
@@ -60,6 +63,8 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		if (stop) return;
 		await this.$.sizer.setSize(newSize);
 		if (stop) return;
+		between && between();
+		this.$[view].classList.add('displayed');
 		this.$[view].classList.add('visible');
 		await wait(VIEW_FADE_TIME);
 		this._cancelCurrentAnimation = null;

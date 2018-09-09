@@ -24,11 +24,14 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) 
 		.view {
 			display: none;
 			opacity: 0;
-			transition: ${VIEW_FADE_TIME}ms ease-in-out;
+			transition: opacity ${VIEW_FADE_TIME}ms ease-in-out;
+		}
+
+		.view.displayed {
+			display: block;
 		}
 
 		.view.visible {
-			display: block;
 			opacity: 1;
 		}
 	</style>`

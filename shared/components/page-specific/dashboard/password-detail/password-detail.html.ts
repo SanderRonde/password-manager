@@ -11,7 +11,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>((_props) => {
 				padding-horizontal="0"
 			>
 				<sizing-block id="sizer">
-					<div id="noneSelectedView" class="view visible">
+					<div id="noneSelectedView" class="view visible displayed">
 						<vertical-centerer>
 							<horizontal-centerer>
 								<div id="noneSelectedContent">
