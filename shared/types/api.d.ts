@@ -266,6 +266,7 @@ export declare namespace APIRoutes {
 			 * The id of the instance assigned at registration
 			 */
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, encrypted: {
 			/**
 			 * The login token assigned at login
 			 */
@@ -274,7 +275,7 @@ export declare namespace APIRoutes {
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */
 			count: number;
-		}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+		}, optional: {}, optionalEncrypted: {}): JSONResponse<{
 			/**
 			 * The new auth token. Encrypted with instance public key
 			 */

@@ -269,10 +269,12 @@ export class RoutesApiInstance {
 	public extendKey(req: express.Request, res: ServerResponse, next: express.NextFunction) {
 		this.server.Router.requireParams<{
 			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, {}, {
 			old_token: APIToken;
 			count: number;
-		}, {}, {}, {}>({
-			unencrypted: ['instance_id', 'old_token', 'count']
+		}, {}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['old_token', 'count']
 		}, {}, async (toCheck, { count, instance_id, old_token }) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
