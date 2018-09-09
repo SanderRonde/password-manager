@@ -152,7 +152,7 @@ export class LoginWeb extends Login {
 			this.$.button.setState('success');
 			PaperToast.create({
 				content: 'Loading dashboard...',
-				duration: PaperToast.DURATION.FOREVER,
+				duration: 1000,
 				buttons: [PaperToast.BUTTONS.HIDE]
 			});
 			await this._proceedToDashboard({ 
