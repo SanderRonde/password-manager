@@ -43,6 +43,7 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, 
 						<div id="passwordDetailTop"></div>
 						<password-detail id="passwordFocus"
 							selected="${this.selectedPassword}"
+							auth-data="${this.loginData}"
 						></password-detail>
 					</div>
 				</div>

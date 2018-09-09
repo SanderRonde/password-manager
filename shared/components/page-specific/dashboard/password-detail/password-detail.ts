@@ -23,7 +23,8 @@ export const NONE_SELECTED_VIEW_HEIGHT = Math.min(window.innerHeight, 580);
 export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap> {
 	props = defineProps(this, {
 		priv: {
-			selected: ComplexType<MetaPasswords[0]>()
+			selected: ComplexType<MetaPasswords[0]>(),
+			authData: ComplexType<PasswordDetailData>()
 		}
 	});
 

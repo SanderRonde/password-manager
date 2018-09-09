@@ -1,9 +1,9 @@
 import { PasswordPreview, PasswordPreviewHost } from '../../../page-specific/dashboard/password-preview/password-preview';
-import { PasswordDetail } from '../../../page-specific/dashboard/password-detail/password-detail';
+import { PasswordDetail, PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { defineProps, ComplexType, PROP_TYPE } from '../../../../lib/webcomponent-util';
-import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
+import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { DashboardScrollManager } from './dashboard-scroll-manager';
 import { WebComponentBase } from "../../../../lib/webcomponents";
@@ -42,6 +42,8 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		}
 	});
 
+	public abstract get loginData(): PasswordDetailData;
+	
 	public get selectedPassword() {
 		if (typeof this.props.selected !== 'number' ||
 			this.props.selected === -1 || 
