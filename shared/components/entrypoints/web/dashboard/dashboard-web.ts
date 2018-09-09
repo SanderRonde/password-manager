@@ -15,7 +15,7 @@ import { Remove } from '../../../../types/serviceworker';
 	is: 'dashboard-page',
 	css: DashboardCSS,
 	html: DashboardHTML,
-	dependencies: DashboarDependencies
+	dependencies: [...DashboarDependencies, PaperToast]
 })
 export class DashboardWeb extends Dashboard { 
 	private _data!: Remove<GlobalControllerData['loginData'], 'password' & {

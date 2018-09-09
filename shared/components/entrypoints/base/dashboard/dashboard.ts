@@ -6,7 +6,6 @@ import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { DashboardScrollManager } from './dashboard-scroll-manager';
-import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { WebComponentBase } from "../../../../lib/webcomponents";
 import { PublicKeyDecrypted } from '../../../../types/db-types';
 import { APISuccessfulReturns } from '../../../../types/api';
@@ -16,7 +15,6 @@ import * as devPasswords from './dev-passwords';
 export type MetaPasswords = PublicKeyDecrypted<APISuccessfulReturns['/api/password/allmeta']['encrypted']>;
 export const DashboarDependencies: (typeof WebComponentBase)[] = [
 	MaterialInput,
-	PaperToast,
 	InfiniteList,
 	ThemeSelector,
 	HorizontalCenterer,
