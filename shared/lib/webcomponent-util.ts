@@ -1005,3 +1005,7 @@ export function createDisposableWindowListener<E extends keyof WindowEventMap>(
 			window.removeEventListener(event, listener);
 		}
 	}
+
+export function repeat(size: number) {
+	return new Array(size).fill(0);
+}
