@@ -1,6 +1,8 @@
 import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TYPE, WebComponentComplexValueManager } from './webcomponents';
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './listeners';
+import { PaperToast } from '../components/util/paper-toast/paper-toast';
 import { supportsPassive } from "./listeners";
+import { API_ERRS } from '../types/api';
 
 // From https://github.com/JedWatson/classnames
 
@@ -1008,4 +1010,45 @@ export function createDisposableWindowListener<E extends keyof WindowEventMap>(
 
 export function repeat(size: number) {
 	return new Array(size).fill(0);
+}
+
+export function reportDefaultResponseErrors(response: {
+	success:false;
+	ERR: API_ERRS;
+	error: string;
+}, paperToast: typeof PaperToast) {
+	switch (response.ERR) {
+		case API_ERRS.CLIENT_ERR:
+			paperToast.create({
+				content: 'Failed to send request',
+				buttons: [paperToast.BUTTONS.HIDE]
+			});
+			break;
+		case API_ERRS.INVALID_CREDENTIALS:
+			paperToast.create({
+				content: 'Invalid credentials',
+				buttons: [paperToast.BUTTONS.HIDE]
+			});
+			break;
+		case API_ERRS.INVALID_PARAM_TYPES:
+		case API_ERRS.MISSING_PARAMS:
+		case API_ERRS.NO_REQUEST_BODY:
+			paperToast.create({
+				content: 'Invalid request',
+				buttons: [paperToast.BUTTONS.HIDE]
+			});
+			break;
+		case API_ERRS.SERVER_ERROR:
+			paperToast.create({
+				content: 'Server error',
+				buttons: [paperToast.BUTTONS.HIDE]
+			});
+			break;
+		case API_ERRS.TOO_MANY_REQUESTS:
+			paperToast.create({
+				content: 'Too many requests',
+				buttons: [paperToast.BUTTONS.HIDE]
+			});
+			break;
+	}
 }

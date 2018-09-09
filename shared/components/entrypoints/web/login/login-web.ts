@@ -1,5 +1,5 @@
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey } from '../../../../lib/browser-crypto';
-import { config, cancelTimeout, wait, createCancellableTimeout } from '../../../../lib/webcomponent-util';
+import { config, cancelTimeout, wait, createCancellableTimeout, reportDefaultResponseErrors } from '../../../../lib/webcomponent-util';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { Login, LoginDependencies } from '../../base/login/login';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
@@ -66,40 +66,8 @@ export class LoginWeb extends Login {
 					})
 			};
 			if (res.response.success === false) {
-				switch (res.response.ERR) {
-					case API_ERRS.CLIENT_ERR:
-						PaperToast.create({
-							content: 'Failed to send request',
-							buttons: [PaperToast.BUTTONS.HIDE]
-						});
-						break;
-					case API_ERRS.INVALID_CREDENTIALS:
-						PaperToast.create({
-							content: 'Invalid credentials',
-							buttons: [PaperToast.BUTTONS.HIDE]
-						});
-						break;
-					case API_ERRS.INVALID_PARAM_TYPES:
-					case API_ERRS.MISSING_PARAMS:
-					case API_ERRS.NO_REQUEST_BODY:
-						PaperToast.create({
-							content: 'Invalid request',
-							buttons: [PaperToast.BUTTONS.HIDE]
-						});
-						break;
-					case API_ERRS.SERVER_ERROR:
-						PaperToast.create({
-							content: 'Server error',
-							buttons: [PaperToast.BUTTONS.HIDE]
-						});
-						break;
-					case API_ERRS.TOO_MANY_REQUESTS:
-						PaperToast.create({
-							content: 'Too many requests',
-							buttons: [PaperToast.BUTTONS.HIDE]
-						});
-						break;
-				}
+				reportDefaultResponseErrors(res.response,
+					PaperToast);
 			}
 			return res;
 		} catch(e) {
