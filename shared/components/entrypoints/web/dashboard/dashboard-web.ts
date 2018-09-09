@@ -97,7 +97,7 @@ export class DashboardWeb extends Dashboard {
 		}, '/api/password/allmeta', {
 			instance_id: this._data.instance_id
 		}, {
-			count: this._upCount(),
+			count: this.getRoot().getRequestCount(),
 			token: this._data.login_auth,
 			password_hash: verifyHashed
 		});
