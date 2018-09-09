@@ -1,5 +1,6 @@
 import { defineProps, PROP_TYPE, config, wait, awaitMounted } from '../../../lib/webcomponent-util';
-import { StringifiedObjectId, EncryptedInstance } from '../../../types/db-types';
+import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../types/crypto';
+import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../types/db-types';
 import { ANIMATE_TIME } from '../../util/loadable-block/loadable-block.css';
 import { LoadableBlock } from '../../util/loadable-block/loadable-block';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
@@ -10,7 +11,6 @@ import { GlobalControllerCSS } from './global-controller.css';
 import { doClientAPIRequest } from '../../../lib/apirequests';
 import { ENTRYPOINT } from '../../../types/shared-types';
 import { Dashboard } from '../base/dashboard/dashboard';
-import { APIToken } from '../../../types/crypto';
 import { API_ERRS } from '../../../types/api';
 import { Login } from '../base/login/login';
 
@@ -21,6 +21,9 @@ export interface GlobalControllerData {
 		instance_id: StringifiedObjectId<EncryptedInstance>;
 		private_key: string;
 		server_public_key: string;
+	};
+	decryptHash: {
+		hash: Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>;
 	}
 }
 

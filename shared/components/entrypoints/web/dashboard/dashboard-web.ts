@@ -75,6 +75,11 @@ export class DashboardWeb extends Dashboard {
 		}
 		const { newData, verifyHashed } = data;
 		this._data = newData as any;
+		this.getRoot().storeData('decryptHash', {
+			hash: newData.decrypt_hash
+		});
+
+		this.renderToDOM(CHANGE_TYPE.PROP);
 
 		if (this._globalProperties.password_meta) {
 			const decrypted = decryptWithPrivateKey(
