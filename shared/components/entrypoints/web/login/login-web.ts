@@ -150,6 +150,7 @@ export class LoginWeb extends Login {
 			}
 
 		const root = this.getRoot();
+		root.setAPIToken(auth_token);
 		root.storeData('loginData', {
 			password,
 			server_public_key,

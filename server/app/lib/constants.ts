@@ -23,6 +23,7 @@ export const TEST_DB_URI = 'mongodb://127.0.0.1:27017/__pwmanager_test_db';
 export const AUTH_TOKEN_EXPIRE_TIME = 1000 * 60 * 18;
 /**
  * The time in which a dashboard comm token expires (3 hours)
+ * Should be kept in sync with shared/components/entrypoints/global/global-controller.ts
  */
 export const COMM_TOKEN_DEFAULT_EXPIRE_TIME = 1000 * 60 * 60 * 3;
 /**
