@@ -2,6 +2,8 @@ type EncodedString<T> = string & {
 	__type: T;
 }
 
+type DecodedString<T> = T extends EncodedString<infer R> ? R : void;
+
 interface JSON {
 	/**
 	 * Converts a JavaScript Object Notation (JSON) string into an object.
