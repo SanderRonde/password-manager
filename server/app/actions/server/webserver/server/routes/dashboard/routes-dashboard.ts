@@ -42,6 +42,7 @@ export class RoutesDashboard {
 
 		await render(res, {
 			data: {
+				isWeb: true,
 				page: ENTRYPOINT.LOGIN,
 				theme: this.server.Router.getTheme(req, res),
 				comm_token: token,
@@ -57,6 +58,7 @@ export class RoutesDashboard {
 	public async login_offline(_req: express.Request, res: ServerResponse) {
 		await render(res, {
 			data: {
+				isWeb: true,
 				page: ENTRYPOINT.LOGIN
 			},
 			rootElement: 'login-page',
@@ -94,6 +96,7 @@ export class RoutesDashboard {
 		const dashboardData = await this._getDashboarData(req);
 		await render(res, {
 			data: {
+				isWeb: true,
 				...dashboardData !== undefined ? {
 					password_meta: dashboardData
 				} : {},
@@ -112,6 +115,7 @@ export class RoutesDashboard {
 	public async dashboard_offline(_req: express.Request, res: ServerResponse) {
 		await render(res, {
 			data: {
+				isWeb: true,
 				page: ENTRYPOINT.DASHBOARD
 			},
 			rootElement: 'dashboard-page',

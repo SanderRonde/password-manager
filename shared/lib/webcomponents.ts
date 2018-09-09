@@ -404,6 +404,7 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		this._isRoot = this.hasAttribute('_root');
 		this._globalProperties = {...{
 			theme: 'light',
+			isWeb: location.protocol === 'http:' || location.protocol === 'https:'
 		}, ...this._getGlobalProperties()};
 		this._registerToParent();
 	}
