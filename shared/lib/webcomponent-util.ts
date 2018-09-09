@@ -1021,13 +1021,15 @@ export function reportDefaultResponseErrors(response: {
 		case API_ERRS.CLIENT_ERR:
 			paperToast.create({
 				content: 'Failed to send request',
-				buttons: [paperToast.BUTTONS.HIDE]
+				buttons: [paperToast.BUTTONS.HIDE],
+				duration: 5000
 			});
 			break;
 		case API_ERRS.INVALID_CREDENTIALS:
 			paperToast.create({
 				content: 'Invalid credentials',
-				buttons: [paperToast.BUTTONS.HIDE]
+				buttons: [paperToast.BUTTONS.HIDE],
+				duration: 5000
 			});
 			break;
 		case API_ERRS.INVALID_PARAM_TYPES:
@@ -1035,19 +1037,22 @@ export function reportDefaultResponseErrors(response: {
 		case API_ERRS.NO_REQUEST_BODY:
 			paperToast.create({
 				content: 'Invalid request',
-				buttons: [paperToast.BUTTONS.HIDE]
+				buttons: [paperToast.BUTTONS.HIDE],
+				duration: 5000
 			});
 			break;
 		case API_ERRS.SERVER_ERROR:
 			paperToast.create({
 				content: 'Server error',
-				buttons: [paperToast.BUTTONS.HIDE]
+				buttons: [paperToast.BUTTONS.HIDE],
+				duration: 5000
 			});
 			break;
 		case API_ERRS.TOO_MANY_REQUESTS:
 			paperToast.create({
 				content: 'Too many requests',
-				buttons: [paperToast.BUTTONS.HIDE]
+				buttons: [paperToast.BUTTONS.HIDE],
+				duration: 5000
 			});
 			break;
 	}

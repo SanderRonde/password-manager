@@ -170,7 +170,8 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 					PaperToast.create({
 						content: 'Failed to send API token extension request, ' +
 							'it will time out in 3 minutes',
-						buttons: [PaperToast.BUTTONS.HIDE]
+						buttons: [PaperToast.BUTTONS.HIDE],
+						duration: 5000
 					});
 					break;
 				case API_ERRS.INVALID_CREDENTIALS:
@@ -178,20 +179,23 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 						PaperToast.create({
 							content: 'Periodical API token renewal attempted to extend' + 
 								' an expired token, all keys for this instance are terminated',
-							buttons: [PaperToast.BUTTONS.HIDE]
+							buttons: [PaperToast.BUTTONS.HIDE],
+							duration: 5000
 						});
 					} else if (response.error === 'attempt to extend invalid token') {
 						PaperToast.create({
 							content: 'Your API token was invalidated. This means someone' +
 								' intercepted one of your API tokens through your internet traffic. ' +
 								'Take this very seriously.',
-							buttons: [PaperToast.BUTTONS.HIDE]
+							buttons: [PaperToast.BUTTONS.HIDE],
+							duration: 10000
 						});
 					} else {
 						PaperToast.create({
 							content: 'Invalid credentials for extending API token, ' +
 								'it will time out in 3 minutes',
-							buttons: [PaperToast.BUTTONS.HIDE]
+							buttons: [PaperToast.BUTTONS.HIDE],
+							duration: 5000
 						});
 					}
 					break;
@@ -201,14 +205,16 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 					PaperToast.create({
 						content: 'Failed to send API token extension request, ' +
 							'it will time out in 3 minutes',
-						buttons: [PaperToast.BUTTONS.HIDE]
+						buttons: [PaperToast.BUTTONS.HIDE],
+						duration: 10000
 					});
 					break;
 				case API_ERRS.SERVER_ERROR:
 					PaperToast.create({
 						content: 'A server error occurred when sending API token' +
 							' extension request, it will time out in 3 minutes',
-						buttons: [PaperToast.BUTTONS.HIDE]
+						buttons: [PaperToast.BUTTONS.HIDE],
+						duration: 10000
 					});
 					break;
 				case API_ERRS.TOO_MANY_REQUESTS:
@@ -216,7 +222,8 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 						content: 'The server responded with "too many requests"' +
 							' when sending API token extension request,' +
 							' it will time out in 3 minutes',
-						buttons: [PaperToast.BUTTONS.HIDE]
+						buttons: [PaperToast.BUTTONS.HIDE],
+						duration: 10000
 					});
 					break;
 			}
