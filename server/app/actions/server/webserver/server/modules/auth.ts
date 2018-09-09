@@ -164,7 +164,13 @@ export class WebserverAuth {
 
 	public extendLoginToken(oldToken: APIToken, count: number, 
 		instance: StringifiedObjectId<EncryptedInstance>,
-		account: StringifiedObjectId<EncryptedAccount>) {
+		account: StringifiedObjectId<EncryptedAccount>): {
+			success: true;
+			token: APIToken;
+		}|{
+			success: false;
+			reason: string;
+		} {
 			const isReused = this._isTokenReused(oldToken, account);
 			if (!isReused && this.verifyAPIToken(oldToken, count, instance)) {
 					//Delete old token
@@ -172,9 +178,17 @@ export class WebserverAuth {
 					this._expiredTokens.add(oldToken);
 
 					//Create new token
-					return this.genLoginToken(instance, account);
+					return {
+						success: true,
+						token: this.genLoginToken(instance, account)
+					}
 				}
-			return false;
+			return {
+				success: false,
+				reason: isReused ? 
+					'attempt to extend expired token' :
+					'attempt to extend invalid token'
+			};
 		}
 
 	public invalidateToken(token: APIToken, instance: StringifiedObjectId<EncryptedInstance>) {

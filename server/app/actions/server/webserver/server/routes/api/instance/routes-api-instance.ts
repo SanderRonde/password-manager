@@ -295,11 +295,11 @@ export class RoutesApiInstance {
 
 			const newToken = this.server.Auth.extendLoginToken(old_token, count,
 				instance_id, instance.user_id.toHexString());
-			if (newToken === false) {
+			if (newToken.success === false) {
 				res.status(200);
 				res.json({
 					success: false,
-					error: 'invalid key',
+					error: newToken.reason,
 					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 			} else {
@@ -307,7 +307,7 @@ export class RoutesApiInstance {
 				res.json({
 					success: true,
 					data: {
-						auth_token: encryptWithPublicKey(newToken, publicKey)
+						auth_token: encryptWithPublicKey(newToken.token, publicKey)
 					}
 				});
 			}
