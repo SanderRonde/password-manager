@@ -186,8 +186,12 @@ export function authenticationWorkflowTest() {
 				return token;
 			})();
 			await (async () => {	
-				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
-					instance_id: instance_id.toHexString(),
+				const response = JSON.parse(await doServerAPIRequest({ 
+					port: http,
+					publicKey: server_public_key
+				}, '/api/instance/extend_key', {
+					instance_id: instance_id.toHexString()
+				}, {
 					count: config.count++,
 					old_token: token!
 				}));
@@ -209,6 +213,7 @@ export function authenticationWorkflowTest() {
 				http, 
 				userpw, 
 				uri, 
+				server_public_key
 			} = config;
 			uris.push(uri);
 
@@ -278,8 +283,12 @@ export function authenticationWorkflowTest() {
 				return token;
 			})();
 			const newToken = await (async () => {	
-				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
-					instance_id: instanceId!,
+				const response = JSON.parse(await doServerAPIRequest({ 
+					port: http,
+					publicKey: server_public_key
+				}, '/api/instance/extend_key', {
+					instance_id: instanceId!
+				}, {
 					count: config.count++,
 					old_token: token!
 				}));

@@ -10,10 +10,11 @@ export function extendKeyTest() {
 	parallel('Extend Key', () => {
 		const uris = captureURIs();
 		testParams(it, uris, '/api/instance/extend_key', {
-			count: 'number',
 			instance_id: 'string',
+		}, {}, {
+			count: 'number',
 			old_token: 'string'
-		}, {}, {}, {});
+		}, {});
 		it('throws an error if token is invalid', async () => {
 			const config = await genUserAndDb({
 				account_twofactor_enabled: false
@@ -22,12 +23,17 @@ export function extendKeyTest() {
 			const { 
 				http, 
 				uri, 
-				instance_id
+				instance_id,
+				server_public_key
 			} = config;
 			uris.push(uri);
 
-			const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/extend_key', {
-				instance_id: instance_id.toHexString(),
+			const response = JSON.parse(await doServerAPIRequest({ 
+				port: http,
+				publicKey: server_public_key
+			}, '/api/instance/extend_key', {
+				instance_id: instance_id.toHexString()
+			}, {
 				count: config.count++,
 				old_token: 'someinvalidtoken'
 			}));
@@ -49,11 +55,12 @@ export function extendKeyTest() {
 			await testInvalidCredentials({
 				route: '/api/instance/extend_key',
 				port: http,
-				encrypted: {},
-				unencrypted: {
+				encrypted: {
+					old_token: 'someinvalidtoken',
 					count: config.count++,
-					instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
-					old_token: 'someinvalidtoken'
+				},
+				unencrypted: {
+					instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
 				},
 				server: server,
 				publicKey: server_public_key

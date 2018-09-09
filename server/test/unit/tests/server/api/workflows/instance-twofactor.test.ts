@@ -416,7 +416,8 @@ export function instanceTwofactorTest() {
 					port: http,
 					publicKey: server_public_key
 				}, '/api/instance/extend_key', {
-					instance_id: instance_id.toHexString(),
+					instance_id: instance_id.toHexString()
+				}, {
 					old_token: authToken!,
 					count: config.count++
 				}));
@@ -561,9 +562,10 @@ export function instanceTwofactorTest() {
 			await (async () => {	
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
-					publicKey: server_public_key
+					publicKey: server_public_key!
 				}, '/api/instance/extend_key', {
-					instance_id: instance_id!,
+					instance_id: instance_id!
+				}, {
 					old_token: authToken!,
 					count: config.count++
 				}));
@@ -778,9 +780,10 @@ export function instanceTwofactorTest() {
 			await (async () => {	
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
-					publicKey: server_public_key
+					publicKey: server_public_key!
 				}, '/api/instance/extend_key', {
-					instance_id: instance_id!,
+					instance_id: instance_id!
+				}, {
 					old_token: authToken!,
 					count: config.count++
 				}));
