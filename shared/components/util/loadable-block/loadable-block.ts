@@ -23,7 +23,8 @@ export class LoadableBlock extends ConfigurableWebComponent<LoadableBlockIDMap> 
 				type: PROP_TYPE.STRING,
 				exactType:  '' as 'big'|'medium'|'regular'
 			},
-			spinnerDimensions: PROP_TYPE.NUMBER
+			spinnerDimensions: PROP_TYPE.NUMBER,
+			clickThrough: PROP_TYPE.BOOL
 		}
 	});
 

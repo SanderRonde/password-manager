@@ -4,7 +4,7 @@ import { html } from 'lit-html';
 
 export const GlobalControllerHTML = new TemplateFn<GlobalController>(() => {
 	return html`
-		<loadable-block spinner-size="big" id="loadable">
+		<loadable-block spinner-size="big" id="loadable" click-through>
 			<div>
 				<slot id="slotContent"></slot>
 				<div id="content"></div>
