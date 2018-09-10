@@ -355,6 +355,19 @@ function watchArray<T>(arr: T[], path: (string|'*')[], callback: () => void): T[
 	});
 }
 
+function dashesToCasing(name: string) {
+	let newStr = '';
+	for (let i = 0; i < name.length; i++) {
+		if (name[i] === '-') {
+			newStr += name[i + 1].toUpperCase();
+			i++;
+		} else {
+			newStr += name[i];
+		}
+	}
+	return newStr;
+}
+
 function casingToDashes(name: string) {
 	let newStr = '';
 	for (const char of name) {
@@ -438,23 +451,24 @@ export function defineProps<P extends {
 	Object.defineProperty(element, 'setAttribute', {
 		get() {
 			return (key: string, val: string) => {
-				if (keyMap.has(key as (typeof keys)[0]['key'])) {
-					const { watch, isPrivate, mapType, strict } = keyMap.get(key as (typeof keys)[0]['key'])!;
+				const casingKey = dashesToCasing(key)
+				if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
+					const { watch, isPrivate, mapType, strict } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
 
-					const prevVal = (propValues as any)[key];
+					const prevVal = (propValues as any)[casingKey];
 					const newVal = getterWithVal(element, val, strict, mapType);
-					element.fire('beforePropChange', key, prevVal, newVal);
-					(propValues as any)[key] = newVal;
-					element.fire('propChange', key, prevVal, newVal);
+					element.fire('beforePropChange', casingKey, prevVal, newVal);
+					(propValues as any)[casingKey] = newVal;
+					element.fire('propChange', casingKey, prevVal, newVal);
 					if (watch) {
 						element.renderToDOM(CHANGE_TYPE.PROP);
 					}
 					if (isPrivate) {
-						originalSetAttr(key, '_');
+						originalSetAttr(casingKey, '_');
 						return;
 					}
 				} else {
-					(propValues as any)[key] = val;
+					(propValues as any)[casingKey] = val;
 				}
 				originalSetAttr(key, val);
 			};
@@ -463,14 +477,15 @@ export function defineProps<P extends {
 	Object.defineProperty(element, 'removeAttribute', {
 		get() {
 			return (key: string) => {
-				if (keyMap.has(key as (typeof keys)[0]['key'])) {
-					const { watch, coerce, mapType } = keyMap.get(key as (typeof keys)[0]['key'])!;
+				const casingKey = dashesToCasing(key);
+				if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
+					const { watch, coerce, mapType } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
 
-					const prevVal = (propValues as any)[key];
+					const prevVal = (propValues as any)[casingKey];
 					const newVal = coerce ? getCoerced(undefined, mapType) : undefined;
-					element.fire('beforePropChange', key, prevVal, newVal);
-					(propValues as any)[key] = newVal;
-					element.fire('propChange', key, prevVal, newVal);
+					element.fire('beforePropChange', casingKey, prevVal, newVal);
+					(propValues as any)[casingKey] = newVal;
+					element.fire('propChange', casingKey, prevVal, newVal);
 					if (watch) {
 						element.renderToDOM(CHANGE_TYPE.PROP);
 					}
