@@ -83,8 +83,10 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 	private async _setContent(state: 'success'|'failure'|'loading'|'regular') {
 		const bcr = this.$.button.getBoundingClientRect();
 			
-		this.$.button.style.width = bcr.width + 'px';
-		this.$.button.style.height = bcr.height + 'px';
+		if (bcr.width !== 0 && bcr.height !== 0) {
+			this.$.button.style.width = bcr.width + 'px';
+			this.$.button.style.height = bcr.height + 'px';
+		}
 
 		await this._fadeOutCurrentContent();
 		this._hideAll();
