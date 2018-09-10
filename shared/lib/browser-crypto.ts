@@ -164,9 +164,6 @@ export function encrypt<T, K extends string, A extends EncryptionAlgorithm>(data
 
 	//Encrypt the data with the AES key
 	const aes = new ModeOfOperation.ctr(aesKey);
-	console.log(utils.utf8.toBytes(
-		JSON.stringify(data)
-	));
 	const encryptedData = aes.encrypt(utils.utf8.toBytes(
 		JSON.stringify(data)
 	));
