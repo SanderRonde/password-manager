@@ -75,5 +75,48 @@ export function cryptoBrowserTest() {
 			const decrypted = browserCrypto.hybdridDecrypt(encrypted, privateKey);
 			assert.strictEqual(decrypted, input, 'decrypted value is the same as input');
 		});
+		it('regular AES encryption works', () => {
+			const input = genRandomString(25);
+			const key = genRandomString(25);
+			assert.doesNotThrow(() => {
+				browserCrypto.encrypt(input, key, 'aes-256-ctr');
+			}, 'encryption does not throw error');
+		});
+		it('values encrypted with AES can be decrypted', () => {
+			const input = genRandomString(25);
+			const key = genRandomString(25);
+			const encrypted = browserCrypto.encrypt(input, key, 'aes-256-ctr');
+
+			const decrypted = browserCrypto.decrypt(encrypted, key);
+			assert.strictEqual(decrypted, input,
+				'decrypted matches original value');
+		});
+		it('values encrypted with AES can be decrypted when the key is longer than 32 chars', () => {
+			const input = genRandomString(25);
+			const key = genRandomString(40);
+			const encrypted = browserCrypto.encrypt(input, key, 'aes-256-ctr');
+
+			const decrypted = browserCrypto.decrypt(encrypted, key);
+			assert.strictEqual(decrypted, input,
+				'decrypted matches original value');
+		});
+		it('values encrypted with AES can be decrypted when the key is less than 32 chars', () => {
+			const input = genRandomString(25);
+			const key = genRandomString(20);
+			const encrypted = browserCrypto.encrypt(input, key, 'aes-256-ctr');
+
+			const decrypted = browserCrypto.decrypt(encrypted, key);
+			assert.strictEqual(decrypted, input,
+				'decrypted matches original value');
+		});
+		it('values encrypted with AES can be decrypted when the key is exactly 32 chars', () => {
+			const input = genRandomString(25);
+			const key = genRandomString(32);
+			const encrypted = browserCrypto.encrypt(input, key, 'aes-256-ctr');
+
+			const decrypted = browserCrypto.decrypt(encrypted, key);
+			assert.strictEqual(decrypted, input,
+				'decrypted matches original value');
+		});
 	});
 }
