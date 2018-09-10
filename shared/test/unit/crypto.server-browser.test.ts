@@ -24,7 +24,7 @@ export function cryptoServerBrowserTest() {
 					'padding is the same as expected');
 		});
 		it('hashing functions are the same', () => {
-			const base = 'somevalue';
+			const base = genRandomString(25);
 			assert.strictEqual(browserCrypto.hash(base),
 				serverCrypto.hash(base),
 					'hashed values are the same');
