@@ -67,8 +67,13 @@ export class SizingBlock extends ConfigurableWebComponent<SizingBlockIDMap> {
 		return this._currentHeight;
 	}
 
-	mounted() {
-		this._currentHeight = this.$.sizer.getBoundingClientRect().height;
-		this.$.sizer.style.height = px(this._currentHeight);
+	async mounted() {
+		let size = this.$.sizer.getBoundingClientRect().height;
+		if (size === 0) {
+			await wait(1000);
+			size = this.$.sizer.getBoundingClientRect().height;
+		}
+		this._currentHeight = size;
+		this.$.sizer.style.height = px(size);
 	}
 }
