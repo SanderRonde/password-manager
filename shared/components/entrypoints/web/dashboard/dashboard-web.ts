@@ -103,7 +103,7 @@ export class DashboardWeb extends Dashboard {
 			instance_id: this._data.instance_id
 		}, {
 			count: this.getRoot().getRequestCount(),
-			token: this._data.login_auth,
+			token: this.getRoot().getAPIToken(),
 			password_hash: verifyHashed
 		});
 		if (res.success === false) {
