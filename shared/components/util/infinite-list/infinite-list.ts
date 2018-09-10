@@ -101,7 +101,10 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 
 	private __cumulativeItemSizes: number[]|null = null;
 	private _genItemSizeArrs() {
-		if (this.__itemSizes || !this.props.data || !this.props.itemSize) return;
+		if ((this.__itemSizes && this.__itemSizes.length === this.props.data.length) 
+			|| !this.props.data || !this.props.itemSize) {
+				return;
+			}
 		this.__itemSizes = this.props.data.map((data) => {
 			return this.props.itemSize(data, {
 				isMin: false
