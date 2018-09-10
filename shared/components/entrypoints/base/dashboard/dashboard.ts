@@ -101,7 +101,7 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 
 	private async _getPwMeta() {
 		const pwMeta = await this._getPasswordMeta();
-		if (!pwMeta) {
+		if (!pwMeta || (pwMeta.length === 0 && document.body.classList.contains('dev'))) {
 			if (document.body.classList.contains('dev')) {
 				this.props.metaPasswords = devPasswords.getDevPasswords();
 			}
