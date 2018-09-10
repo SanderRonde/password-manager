@@ -66,6 +66,7 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 	}
 
 	mounted() {
+		super.mounted();
 		if (!this._intersectionObserverSupported) {
 			this._disposables.push(createDisposableWindowListener('scroll', () => {
 				if (this._currentAnimationFrame) return;
