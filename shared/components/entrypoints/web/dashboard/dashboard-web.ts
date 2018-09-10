@@ -125,4 +125,8 @@ export class DashboardWeb extends Dashboard {
 			return null;
 		}
 	}
+
+	mounted() {
+		super.mounted();
+	}
 }
