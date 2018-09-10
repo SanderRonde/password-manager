@@ -1,4 +1,4 @@
-import { APIFns, APIArgs, APIReturns } from "../types/api";
+import { APIFns, APIArgs, APIReturns, API_ERRS } from "../types/api";
 import { encryptWithPublicKey } from "./browser-crypto";
 
 export function doHTTPRequest<R>(url: string, method: 'GET'|'POST', data: any): Promise<R> {
@@ -61,7 +61,11 @@ export async function doClientAPIRequest<K extends keyof APIFns>({ publicKey }: 
 }, path: K,args: APIArgs[K][0], encrypted?: APIArgs[K][1]): Promise<APIReturns[K]> {
 	const keys = Object.getOwnPropertyNames(encrypted || {});
 	if (keys.length && !publicKey) {
-		throw new Error('Missing public key for encryption');
+		return Promise.resolve({
+			success: false as false,
+			ERR: API_ERRS.CLIENT_ERR,
+			error: 'missing public key'
+		});
 	}
 	const data = {...filterUndefined(args) as Object, ...(keys.length && publicKey ? {
 		encrypted: encryptWithPublicKey(filterUndefined(encrypted), publicKey)
