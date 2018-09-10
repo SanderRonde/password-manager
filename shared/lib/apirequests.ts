@@ -36,6 +36,20 @@ export function doHTTPRequest<R>(url: string, method: 'GET'|'POST', data: any): 
 	}
 }
 
+type UndefinedRemoved<T> = {
+	[P in keyof T]: Exclude<T[P], undefined>;
+};
+
+export function filterUndefined<T>(obj: T): UndefinedRemoved<T> {
+	const copied: Partial<T> = {};
+	for (const key in obj) {
+		if (obj[key] !== undefined) {
+			copied[key] = obj[key];
+		}
+	}
+	return copied as UndefinedRemoved<T>;
+}
+
 export async function doClientAPIRequest<K extends keyof APIFns>({ publicKey }: {
 	publicKey: string;
 }, path: K,args: APIArgs[K][0], encrypted: APIArgs[K][1]): Promise<APIReturns[K]>;
@@ -49,8 +63,8 @@ export async function doClientAPIRequest<K extends keyof APIFns>({ publicKey }: 
 	if (keys.length && !publicKey) {
 		throw new Error('Missing public key for encryption');
 	}
-	const data = {...args as Object, ...(keys.length && publicKey ? {
-		encrypted: encryptWithPublicKey(encrypted, publicKey)
+	const data = {...filterUndefined(args) as Object, ...(keys.length && publicKey ? {
+		encrypted: encryptWithPublicKey(filterUndefined(encrypted), publicKey)
 	} : {})};
 
 	const baseURL = `${location.protocol}//${location.host}`;
