@@ -287,6 +287,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		this._definePage(page);
 		const el = this._addNewPage(page);
 		this.$.loadable.load();
+		await wait(500);
 		await Promise.all([
 			awaitMounted(el),
 			wait(ANIMATE_TIME)
