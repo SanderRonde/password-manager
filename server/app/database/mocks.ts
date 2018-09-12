@@ -1,11 +1,14 @@
 import { MongoCallback, FilterQuery, CommonOptions, DeleteWriteOpResultObject, FindAndModifyWriteOpResultObject, FindOneAndReplaceOption, InsertOneWriteOpResult, CollectionInsertOneOptions, FindOneOptions } from 'mongodb';
-import { TypedObjectID, EncryptedAccount, MongoRecord, EncryptedInstance, EncryptedPassword, StringifiedObjectId } from './../../../shared/types/db-types';
+import { TypedObjectID, EncryptedAccount, MongoRecord, EncryptedInstance, EncryptedPassword, StringifiedObjectId, EncryptedAsset } from './../../../shared/types/db-types';
 import { encrypt, hash, pad, encryptWithSalt, genRSAKeyPair, encryptWithPublicKey } from '../lib/crypto';
-import { DEFAULT_EMAIL, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH } from '../lib/constants';
+import { DEFAULT_EMAIL, ENCRYPTION_ALGORITHM, RESET_KEY_LENGTH, SERVER_ROOT } from '../lib/constants';
+import { UnstringifyObjectIDs } from '../../../shared/types/crypto';
 import { APISuccessfulReturns } from '../../../shared/types/api';
 import { genRandomString } from '../lib/util';
 import { Database } from './database';
 import * as mongo from 'mongodb'
+import * as fs from 'fs-extra';
+import * as path from 'path';
 
 interface TypedCursor<C> {
 	toArray(): Promise<C[]>;
@@ -69,6 +72,93 @@ export interface TypedCollection<C = any> {
 	insertOne(docs: Object, options: CollectionInsertOneOptions, callback: MongoCallback<InsertOneWriteOpResult>): void;	
 }
 
+let incrementedIds: number = 0;
+	function getIncrementedId() {
+		return `idabcde${incrementedIds++}`;
+	}
+
+const googleWebsite = {
+	host: 'google.com',
+	exact: 'https://www.google.com/login',
+	favicon: '/icons/google.png',
+};
+
+const redditWebsite = {
+	host: 'reddit.com',
+	exact: 'https://www.reddit.com/login',
+	favicon: '/icons/reddit.png'
+}
+
+function genPassword(websites: {
+    host: string;
+    exact: string;
+    favicon: string|null;
+}[], twofactorEnabled: boolean, u2fEnabled: boolean) {
+	return {
+		id: getIncrementedId() as any,
+		websites: websites,
+		username: genRandomString(25),
+		twofactor_enabled: twofactorEnabled,
+		u2f_enabled: u2fEnabled
+	}
+}
+
+function genGooglePassword({
+	twofactorEnabled = false,
+	u2fEnabled = false,
+	noFavicon = false
+}: {
+	twofactorEnabled?: boolean;
+	u2fEnabled?: boolean;
+	noFavicon?: boolean;
+} = {}): {
+	id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
+	username: string;
+	websites: {
+		host: string;
+		exact: string;
+		favicon: string|null;
+	}[];
+	twofactor_enabled: boolean;
+	u2f_enabled: boolean;
+} {
+	return genPassword([{...googleWebsite, ...noFavicon ? {
+		favicon: null
+	} : {}}], twofactorEnabled, u2fEnabled)
+}
+
+function range<T>(from: number, to: number, fn: () => T): T[] {
+	const arr: T[] = [];
+	for (let i = from; i < to; i++) {
+		arr.push(fn());
+	}
+	return arr;
+}
+
+function getDevPasswords() {
+	return [
+		genGooglePassword(),
+		genGooglePassword(),
+		genGooglePassword({
+			u2fEnabled: true,
+			twofactorEnabled: true
+		}),
+		genGooglePassword({
+			u2fEnabled: true
+		}),
+		genGooglePassword({
+			twofactorEnabled: true
+		}),
+		genPassword([{...googleWebsite}, {...redditWebsite}], false, false),
+		genGooglePassword({
+			noFavicon: true
+		}),
+		...range(0, 200, () => {
+			return genGooglePassword()
+		})
+	]
+}
+
 export class MockMongoCollection<R> implements TypedCollection<R> {
 	collectionName: string;
 	namespace = '';
@@ -121,7 +211,7 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 				let userId: TypedObjectID<EncryptedAccount>;
 				await this._parent.collection('users').done;
 				this._parent.collection('users').find().toArray((_err, userRecord) => {
-					userId = (userRecord as any)._id;
+					userId = userRecord[0]._id;
 				});
 
 				const { publicKey } = genRSAKeyPair();
@@ -143,40 +233,73 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 					userId = (userRecord as any)._id;
 				});
 
-				const passwords: MongoRecord<EncryptedPassword>[] = [{
-					_id: new mongo.ObjectId() as TypedObjectID<EncryptedPassword>,
-					user_id: userId!,
-					twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
-					u2f_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
-					username: encrypt('someusername', dbpw, ENCRYPTION_ALGORITHM),
-					websites: [{
-						exact: encrypt('www.google.com/login', dbpw, ENCRYPTION_ALGORITHM),
-						host: encrypt('www.google.com', dbpw, ENCRYPTION_ALGORITHM),
-						favicon: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
-					}],
-					encrypted: encrypt(encrypt({
-						password: 'smepw',
-						notes: []
-					}, hash(pad(pw, 'masterpwdecrypt')),
-						ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
-				}, {
-					_id: new mongo.ObjectId() as TypedObjectID<EncryptedPassword>,
-					user_id: userId!,
-					twofactor_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
-					u2f_enabled: encryptWithSalt(false, dbpw, ENCRYPTION_ALGORITHM),
-					username: encrypt('someusername2', dbpw, ENCRYPTION_ALGORITHM),
-					websites: [{
-						exact: encrypt('www.reddit.com/r/random', dbpw, ENCRYPTION_ALGORITHM),
-						host: encrypt('www.reddit.com', dbpw, ENCRYPTION_ALGORITHM),
-						favicon: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
-					}],
-					encrypted: encrypt(encrypt({
-						password: 'smepw2',
-						notes: []
-					}, hash(pad(pw, 'masterpwdecrypt')),
-						ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
-				}];
+				await this._parent.collection('assets').done;
+				const icons: MongoRecord<EncryptedAsset>[] = [];
+				this._parent.collection('assets').find().toArray((_err, record) => {
+					icons.push(...record);
+				});
+
+				const passwords: MongoRecord<EncryptedPassword>[] = getDevPasswords().map((password): MongoRecord<EncryptedPassword> => {
+					return {
+						_id: new mongo.ObjectId() as TypedObjectID<EncryptedPassword>,
+						user_id: userId!,
+						twofactor_enabled: encryptWithSalt(password.twofactor_enabled, dbpw, ENCRYPTION_ALGORITHM),
+						u2f_enabled: encryptWithSalt(password.u2f_enabled, dbpw, ENCRYPTION_ALGORITHM),
+						username: encrypt(password.username, dbpw, ENCRYPTION_ALGORITHM),
+						websites: password.websites.map((website) => {
+							const favicon = website.favicon === null ? null :
+								icons[Math.floor(Math.random() * icons.length)]._id.toHexString();
+							return {
+								exact: encrypt(website.exact, dbpw, ENCRYPTION_ALGORITHM),
+								host: encrypt(website.host, dbpw, ENCRYPTION_ALGORITHM),
+								favicon: encrypt(favicon, dbpw, ENCRYPTION_ALGORITHM)
+							}
+						}),
+						encrypted: encrypt(encrypt({
+							password: 'somepw' + genRandomString(10),
+							notes: []
+						}, hash(pad(pw, 'masterpwdecrypt')),
+							ENCRYPTION_ALGORITHM), dbpw, ENCRYPTION_ALGORITHM)
+					}
+				});
 				this._records.push(...passwords);
+			} else if (name === 'assets') {
+				let userId: TypedObjectID<EncryptedAccount>;
+				await this._parent.collection('users').done;
+				this._parent.collection('users').find().toArray((_err, userRecord) => {
+					userId = userRecord[0]._id;
+				});
+
+				//Create the images
+				const icons = [{
+					icon: 'google.png',
+					host: 'www.google.com'
+				}, {
+					icon: 'reddit.png',
+					host: 'www.reddit.com'
+				}];
+				const iconPaths = icons.map(({ icon: iconName }) => {
+					return path.join(SERVER_ROOT, this._parent.parent.config.assets || './',
+						'icons/', iconName)
+				});
+				await Promise.all(icons.map(({ icon: iconName }, index) => {
+					return fs.copy(
+						path.join(__dirname, 
+							`../actions/server/webserver/server/development/icons/${iconName}`),
+							iconPaths[index]);
+				}));
+
+				const records: MongoRecord<EncryptedAsset>[] = icons.map((icon, index): MongoRecord<EncryptedAsset> => {
+					return {
+						_id: new mongo.ObjectId() as TypedObjectID<EncryptedAsset>,
+						host: encrypt(icon.host, dbpw, ENCRYPTION_ALGORITHM),
+						by_user_id: encrypt({
+							[userId.toHexString()]: iconPaths[index]
+						}, dbpw, ENCRYPTION_ALGORITHM),
+						default: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
+					}
+				});
+				this._records.push(...records);
 			}
 		}
 	}
