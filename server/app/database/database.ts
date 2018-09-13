@@ -3,12 +3,13 @@ import { EncryptedAccount, EncryptedInstance, EncryptedPassword, MongoRecord, En
 import { exitWith, readPassword, getDBFromURI } from '../lib/util';
 import { DatabaseManipulation } from './libs/db-manipulation';
 import { DatabaseEncryption } from './libs/db-encryption';
+import { ServerConfig } from '../actions/server/server';
 import { MockMongoDb, TypedCollection } from './mocks';
 import * as mongo from 'mongodb'
 
 export async function getDatabase(dbPath: string, password: string|undefined, 
-	quitOnError: boolean, useMockDb: boolean): Promise<Database> {
-		const instance = await new Database(dbPath, quitOnError, useMockDb).init();
+	quitOnError: boolean, useMockDb: boolean, config: ServerConfig = {} as any): Promise<Database> {
+		const instance = await new Database(dbPath, quitOnError, useMockDb, config).init();
 
 		if (password !== undefined) {
 			if (await instance.Crypto.canDecrypt(password)) {
@@ -52,10 +53,11 @@ export class Database {
 	public Crypto: DatabaseEncryption;
 	public Manipulation: DatabaseManipulation;
 
-	constructor(private _dbPath: string, private _quitOnError: boolean, private _mockDb: boolean) { 
-		this.Crypto = new DatabaseEncryption(this);
-		this.Manipulation = new DatabaseManipulation(this);
-	}
+	constructor(private _dbPath: string, private _quitOnError: boolean, private _mockDb: boolean,
+		public config: ServerConfig) { 
+			this.Crypto = new DatabaseEncryption(this);
+			this.Manipulation = new DatabaseManipulation(this);
+		}
 
 	public async init() {
 		if (this._initialized) {

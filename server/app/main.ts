@@ -57,15 +57,17 @@ export function initCommander(handledHolder: {
 					if (!email) {
 						exitWith('Please supply the email of the account to edit through -a or --account');
 					} else {
-						await Account.CreateAccount.createAccount(email, await getDatabase(databasePath, dbPassword, true, false));
+						await Account.CreateAccount.createAccount(email, 
+							await getDatabase(databasePath, dbPassword, true, false));
 					}
 					break;
 				case 'delete':
 					if (!email) {
 						exitWith('Please supply the email of the account to edit through -a or --account');
 					} else {
-						await Account.DeleteAccount.deleteAccount(email, await getDatabase(databasePath, dbPassword, true, false),
-							debug);
+						await Account.DeleteAccount.deleteAccount(email, 
+							await getDatabase(databasePath, dbPassword, true, false),
+								debug);
 					}
 					break;
 				default:
@@ -159,7 +161,7 @@ export function initCommander(handledHolder: {
 					' this means all requests are redirected to a non-existent server');
 			}
 			Server.run(await getDatabase(settings.database, settings.password, false, 
-				settings.databaseless), settings as ServerConfig);
+				settings.databaseless, settings as ServerConfig), settings as ServerConfig);
 		});
 
 	commander
