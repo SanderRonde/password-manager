@@ -1,20 +1,29 @@
-import { PasswordDetail, NONE_SELECTED_VIEW_HEIGHT } from './password-detail';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { changeOpacity } from '../../../../lib/webcomponent-util';
+import { PasswordDetail } from './password-detail';
 import { html } from 'lit-html';
 
 export const VIEW_FADE_TIME = 300;
+export const STATIC_VIEW_HEIGHT = Math.min(window.innerHeight, 580);
 export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) => {
 	return html`<style>
-		#noneSelectedView {
-			height: ${NONE_SELECTED_VIEW_HEIGHT}px;
+		#noneSelectedView, #twofactorRequiredView, #u2fRequiredView, #failedView, #loadingView {
+			height: ${STATIC_VIEW_HEIGHT}px;
 		}
 
-		#noneSelectedLock {
+		.staticIcon {
+			fill: ${changeOpacity(theme.textOnBackground, 70)};
+		}
+
+		#failedView .staticIcon {
+			fill: ${theme.error};
+		}
+
+		.lowerOpacityIcon {
 			fill: ${changeOpacity(theme.textOnBackground, 25)};
 		}
 
-		#noneSelectedText {
+		.viewIconText {
 			font-size: 150%;
 			font-weight: 500;
 			text-align: center;
@@ -33,6 +42,27 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) 
 
 		.view.visible {
 			opacity: 1;
+		}
+
+		#u2fKeyIcon {
+			margin-top: -100px;
+		}
+
+		#twofactorInput {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+		}
+
+		.twofactorDigit {
+			border: 2px solid #666666;
+			height: 30px;
+			width: 30px;
+			display: inline-block;
+			border-radius: 5px;
+			margin: 0 1px;
+			font-size: 150%;
+			text-align: center;
 		}
 	</style>`
 }, CHANGE_TYPE.ALWAYS);
