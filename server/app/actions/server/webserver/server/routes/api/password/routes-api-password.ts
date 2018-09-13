@@ -1,11 +1,11 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord, EncryptedAsset, EncryptedAccount } from "../../../../../../../../../shared/types/db-types";
-import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, EncryptionAlgorithm } from "../../../../../../../lib/crypto";
-import { UnstringifyObjectIDs, APIToken, U2FToken } from "../../../../../../../../../shared/types/crypto";
+import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, genRSAKeyPair, encrypt, hash, pad } from "../../../../../../../lib/crypto";
+import { UnstringifyObjectIDs, APIToken, U2FToken, EncryptionAlgorithm } from "../../../../../../../../../shared/types/crypto";
+import { SERVER_ROOT, MAX_FILE_BYTES, ENCRYPTION_ALGORITHM } from "../../../../../../../lib/constants";
 import { filterUndefined } from "../../../../../../../database/libs/db-manipulation";
+import { genTimeBasedString, genRandomString } from "../../../../../../../lib/util";
 import { API_ERRS, APIReturns } from "../../../../../../../../../shared/types/api";
-import { SERVER_ROOT, MAX_FILE_BYTES } from "../../../../../../../lib/constants";
 import { COLLECTIONS } from "../../../../../../../database/database";
-import { genTimeBasedString } from "../../../../../../../lib/util";
 import { ServerResponse } from "../../../modules/ratelimit";
 import { Webserver } from "../../../webserver";
 import * as express from 'express'
@@ -685,6 +685,38 @@ export class RoutesApiPassword {
 				val: 'u2f_token',
 				type: 'string'
 			}])) return;
+
+			if (this.server.config.development && password_id.startsWith('idabcde')) {
+				const keys = genRSAKeyPair();
+
+				res.status(200);
+				res.json({
+					success: true,
+					data: {
+						encrypted: encryptWithPublicKey(JSON.stringify({
+							id: password_id,
+							websites: [{
+								host: 'www.google.com',
+								exact: 'www.google.com/login',
+								favicon: null
+							}],
+							username: 'username',
+							twofactor_enabled: false,
+							u2f_enabled: false,
+							encrypted: encrypt({
+								password: 'websitepassword' + genRandomString(10),
+								notes: new Array(Math.floor(Math.random() * 10)).fill(0).map(() => {
+									return genRandomString(25)
+								})
+							}, hash(pad('defaultpassword', 'masterpwdecrypt')), ENCRYPTION_ALGORITHM)
+						}), keys.publicKey),
+						privateKey: keys.privateKey,
+						hashed: hash(pad('defaultpassword', 'masterpwdecrypt')),
+						padded: pad('defaultpassword', 'masterpwdecrypt')
+					}
+				});
+				return;
+			}
 
 			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res, true)) return;
 
