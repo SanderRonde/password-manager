@@ -2,6 +2,7 @@ export { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlg
 import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey, HybridEncrypted, PublicKeyEncrypted } from "../../../shared/types/db-types";
 import { Encrypted, ERRS, SaltEncrypted, EncryptionAlgorithm, Hashed, HashingAlgorithms } from '../../../shared/types/crypto'
 import { Padded, Paddings } from "../../../shared/types/crypto";
+import { utils, ModeOfOperation, padding } from 'aes-js';
 import { JSEncrypt } from '../libraries/jsencrypt'
 import { genRandomString } from './util';
 import * as crypto from 'crypto'
@@ -82,40 +83,57 @@ export function decryptBuffer<T extends string, A extends EncryptionAlgorithm, K
 	return plaintext.toString() + decipher.final() as T;
 }
 
-export function encrypt<T, A extends EncryptionAlgorithm, K extends string>(data: T, key: K, algorithm: A): EncodedString<{
+function get32LengthKey(key: string) {
+	if (key.length > 32) {
+		return utils.utf8.toBytes(key.slice(0, 32));
+	} else if (key.length < 32) {
+		return padding.pkcs7.pad(
+			utils.utf8.toBytes(key));
+	} else {
+		return utils.utf8.toBytes(key);
+	}
+}
+
+export function encrypt<T, K extends string, A extends EncryptionAlgorithm>(data: T, key: K, algorithm: A): EncodedString<{
 	data: Encrypted<EncodedString<T>, K, A>;
 	algorithm: A;
 }> {
-	const iv = crypto.randomBytes(16);
-	const plaintext = Buffer.from(JSON.stringify(data));
-	const enckey = hash(key).slice(0, 32);
-	const cipher = crypto.createCipheriv(algorithm, enckey, iv);
-	const ciphertext = cipher.update(plaintext);
-	const finalText = Buffer.concat([iv, ciphertext, cipher.final()]);
+	//Generate an AES key of length 32
+	const aesKey = get32LengthKey(key) as any;
+
+	//Encrypt the data with the AES key
+	const aes = new ModeOfOperation.ctr(aesKey);
+	const encryptedData = aes.encrypt(utils.utf8.toBytes(
+		JSON.stringify(data)
+	));
 
 	return JSON.stringify({
-		data: finalText.toString('base64'),
-		algorithm: algorithm
-	 } as {
+		data: utils.hex.fromBytes(encryptedData as any) as
+			Encrypted<EncodedString<T>, K>,
+		algorithm
+	}) as EncodedString<{
 		data: Encrypted<EncodedString<T>, K, A>;
 		algorithm: A;
-	});
+	}>;
 }
 
-export function decrypt<T, A extends EncryptionAlgorithm, K extends string>(encrypted: EncodedString<{
+export function decrypt<T, K extends string, A extends EncryptionAlgorithm>(encrypted: EncodedString<{
 	data: Encrypted<EncodedString<T>, K, A>;
 	algorithm: A;
 }>, key: K): T|ERRS.INVALID_DECRYPT {
 	try {
-		const { data, algorithm } = JSON.parse(encrypted);
-		const input = Buffer.from(data, 'base64');
-		const iv = input.slice(0, 16);
-		const ciphertext = input.slice(16);
-		const decipher = crypto.createDecipheriv(algorithm, hash(key).slice(0, 32), iv);
-		const plaintext = decipher.update(ciphertext);
-		
-		const final = plaintext.toString() + decipher.final();
-		return JSON.parse(final);
+		const parsedMeta = JSON.parse(encrypted);
+		if (parsedMeta.algorithm !== 'aes-256-ctr') {
+			return ERRS.INVALID_DECRYPT;
+		}
+
+		//Generate an AES key of length 32
+		const aesKey = get32LengthKey(key) as any;
+
+		const aes = new ModeOfOperation.ctr(aesKey);
+		const decryptedData = utils.utf8.fromBytes(
+			aes.decrypt(utils.hex.toBytes(parsedMeta.data)) as Bytes<EncodedString<T>>);
+		return JSON.parse(decryptedData);
 	} catch(e) {
 		return ERRS.INVALID_DECRYPT;
 	}

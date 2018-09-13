@@ -61,5 +61,27 @@ export function cryptoServerBrowserTest() {
 			const decrypted = serverCrypto.hybdridDecrypt(encrypted, privateKey);
 			assert.strictEqual(decrypted, input, 'decrypted value is the same as input');
 		});
+		it('data encrypted by the server can be decrypted by the client', () => {
+			const input = genRandomString(25);
+			const key = genRandomString(25);
+
+			const encrypted = serverCrypto.encrypt(input, key, 'aes-256-ctr');
+			const decrypted = browserCrypto.decrypt(encrypted, key);
+			assert.notStrictEqual(decrypted, serverCrypto.ERRS.INVALID_DECRYPT,
+				'is not invalid decrypt');
+			assert.strictEqual(decrypted, input,
+				'input and decrypted are the same');
+		});
+		it('data encrypted by the client can be decrypted by the server', () => {
+			const input = genRandomString(25);
+			const key = genRandomString(25);
+
+			const encrypted = browserCrypto.encrypt(input, key, 'aes-256-ctr');
+			const decrypted = serverCrypto.decrypt(encrypted, key);
+			assert.notStrictEqual(decrypted, serverCrypto.ERRS.INVALID_DECRYPT,
+				'is not invalid decrypt');
+			assert.strictEqual(decrypted, input,
+				'input and decrypted are the same');
+		});
 	});
 }

@@ -1,9 +1,8 @@
 import { InstancePublicKey, ServerPublicKey, RSAEncrypted, ServerPrivateKey, HybridEncrypted, PublicKeyEncrypted } from "../types/db-types";
 import { HashingAlgorithms, Hashed, ERRS, Padded, Paddings, Encrypted, EncryptionAlgorithm  } from "../types/crypto";
-import { utils, ModeOfOperation, padding } from 'aes-js';
+import { utils, ModeOfOperation, padding, Bytes } from 'aes-js';
 import { JSEncrypt } from '../libraries/jsencrypt'
 import { sha512, sha512_256 } from 'js-sha512';
-import { Bytes } from "aes-js";
 
 function getHashingFunction(algorithm: HashingAlgorithms) {
 	switch (algorithm) {
@@ -169,7 +168,7 @@ export function encrypt<T, K extends string, A extends EncryptionAlgorithm>(data
 	));
 
 	return JSON.stringify({
-		data: utils.hex.fromBytes(encryptedData as Bytes<Encrypted<EncodedString<T>, string>>) as
+		data: utils.hex.fromBytes(encryptedData as any) as
 			Encrypted<EncodedString<T>, K>,
 		algorithm
 	}) as EncodedString<{
