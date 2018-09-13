@@ -213,8 +213,8 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		if (response.success) {
 			//Decrypt with public key
 			const publicKeyDecrypted = decryptWithPrivateKey(response.data.encrypted,
-				document.body.classList.contains('dev') ?
-					(response.data as any).privateKey : clientPrivateKey);
+				clientPrivateKey || (document.body.classList.contains('dev') ?
+					(response.data as any).privateKey : clientPrivateKey));
 			if (publicKeyDecrypted === ERRS.INVALID_DECRYPT) {
 				this._failDecryptServerResponse();
 				return;
