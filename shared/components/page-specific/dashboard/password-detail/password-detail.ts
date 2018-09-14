@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors } from '../../../../lib/webcomponent-util';
+import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors, listenIfNew } from '../../../../lib/webcomponent-util';
 import { PasswordDetailHTML, passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey } from '../../../../types/db-types';
 import { PasswordDetailCSS, VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
@@ -18,7 +18,6 @@ import { PasswordDetailIDMap } from './password-detail-querymap';
 import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { ENTRYPOINT } from '../../../../types/shared-types';
 import { APIToken, ERRS } from '../../../../types/crypto';
-import { listenIfNew } from '../../../../lib/IDMap';
 import { U2FSignResponse } from 'u2f';
 
 export interface PasswordDetailData {
