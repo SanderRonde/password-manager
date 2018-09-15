@@ -1,4 +1,6 @@
 # Password Manager
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSanderRonde%2Fpassword-manager.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FSanderRonde%2Fpassword-manager?ref=badge_shield)
+
 
 A fairly straight-forward password manager.
 
@@ -9,3 +11,6 @@ The code for all components lives in the same directory. This allows easy re-usi
 ## Building
 
 Building happens through the shared gulp file so there's no need to cd into directories. First of all install the dependencies by running `./scripts/install-dependencies.(sh/bat)` depending on your platform. You can then build the project by running `yarn build`.
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSanderRonde%2Fpassword-manager.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FSanderRonde%2Fpassword-manager?ref=badge_large)
