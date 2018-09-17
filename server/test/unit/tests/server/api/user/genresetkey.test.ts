@@ -44,7 +44,7 @@ export function userGenResetKeyTest() {
 				},
 				server: server,
 				publicKey: server_public_key,
-				err: API_ERRS.MISSING_PARAMS
+				err: API_ERRS.INVALID_CREDENTIALS
 			});
 		});
 		it('rejects if password is wrong', async () => {

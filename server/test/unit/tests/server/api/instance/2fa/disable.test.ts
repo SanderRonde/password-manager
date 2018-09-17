@@ -210,7 +210,7 @@ export function twofactorDisableTest() {
 				},
 				server: server,
 				publicKey: server_public_key,
-				err: API_ERRS.MISSING_PARAMS
+				err: API_ERRS.INVALID_CREDENTIALS
 			});
 		});
 	});
