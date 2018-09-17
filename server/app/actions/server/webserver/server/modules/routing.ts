@@ -199,8 +199,8 @@ export class WebserverRouter {
 							res.status(200);
 							res.json({
 								success: false,
-								error: 'missing parameters',
-								ERR: API_ERRS.MISSING_PARAMS
+								error: 'invalid credentials',
+								ERR: API_ERRS.INVALID_CREDENTIALS
 							});
 							return;
 						}
