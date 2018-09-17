@@ -232,7 +232,10 @@ export function tokenTest() {
 			} = config;
 			uris.push(uri);
 
-			const { instanceId: secondInstance } = await (async  () => {
+			const { 
+				instanceId: secondInstance,
+				serverPublicKey
+			} = await (async  () => {
 				const keyPair = genRSAKeyPair();
 				const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/register', {
 					email: DEFAULT_EMAIL,
@@ -326,7 +329,7 @@ export function tokenTest() {
 			await (async () => {
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
-					publicKey: server_public_key
+					publicKey: serverPublicKey!
 				}, '/api/instance/extend_key', {
 					instance_id: secondInstance!
 				}, {
