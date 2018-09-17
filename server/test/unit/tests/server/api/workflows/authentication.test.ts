@@ -213,7 +213,6 @@ export function authenticationWorkflowTest() {
 				http, 
 				userpw, 
 				uri, 
-				server_public_key
 			} = config;
 			uris.push(uri);
 
@@ -285,7 +284,7 @@ export function authenticationWorkflowTest() {
 			const newToken = await (async () => {	
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
-					publicKey: server_public_key
+					publicKey: serverPublicKey!
 				}, '/api/instance/extend_key', {
 					instance_id: instanceId!
 				}, {
