@@ -32,38 +32,49 @@ export function supportsPassive() {
 }
 function doListen<I extends {
 	[key: string]: HTMLElement;
-}, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, type: 'element' | 'identifier', element: HTMLElement, id: string, event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
-	const boundListener = listener.bind(base);
-	if (!listenedToElements.has(base)) {
-		listenedToElements.set(base, {
-			identifiers: new Map(),
-			elements: new Map(),
-			self: new Map()
-		});
+}, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, type: 'element' | 'identifier', 
+	element: HTMLElement, id: string, event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, 
+	options?: boolean | AddEventListenerOptions) {
+		const boundListener = listener.bind(base);
+		if (!listenedToElements.has(base)) {
+			listenedToElements.set(base, {
+				identifiers: new Map(),
+				elements: new Map(),
+				self: new Map()
+			});
+		}
+		const { elements: elementIDMap, identifiers: identifiersMap } = listenedToElements.get(base)!;
+		const usedMap = type === 'element' ?
+			elementIDMap : identifiersMap;
+		if (!usedMap.has(id)) {
+			usedMap.set(id, {
+				element,
+				map: new Map()
+			});
+		}
+		const { map: eventIDMap, element: listenedToElement } = usedMap.get(id)!;
+		if (!eventIDMap.has(event)) {
+			eventIDMap.set(event, boundListener);
+		} else {
+			listenedToElement.removeEventListener(event, eventIDMap.get(event)!);
+		}
+		if (listenedToElement !== element) {
+			//A new element was listened to instead, remove all listeners
+			for (const listenedToEvent of eventIDMap.keys()) {
+				listenedToElement.removeEventListener(listenedToEvent, 
+					eventIDMap.get(listenedToEvent)!);
+				eventIDMap.delete(listenedToEvent);
+			}
+			//Update element
+			usedMap.get(id)!.element = element;
+		}
+
+		if (options !== undefined && options !== null && supportsPassive) {
+			element.addEventListener(event, boundListener, options);
+		} else {
+			element.addEventListener(event, boundListener);
+		}
 	}
-	const { elements: elementIDMap, identifiers: identifiersMap } = listenedToElements.get(base)!;
-	const usedMap = type === 'element' ?
-		elementIDMap : identifiersMap;
-	if (!usedMap.has(id)) {
-		usedMap.set(id, {
-			element,
-			map: new Map()
-		});
-	}
-	const { map: eventIDMap } = usedMap.get(id)!;
-	if (!eventIDMap.has(event)) {
-		eventIDMap.set(event, boundListener);
-	}
-	else {
-		element.removeEventListener(event, eventIDMap.get(event)!);
-	}
-	if (options !== undefined && options !== null && supportsPassive) {
-		element.addEventListener(event, boundListener, options);
-	}
-	else {
-		element.addEventListener(event, boundListener);
-	}
-}
 export function listen<I extends {
 	[key: string]: HTMLElement;
 }, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, id: keyof T['$'], event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
