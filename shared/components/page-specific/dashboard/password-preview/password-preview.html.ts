@@ -5,6 +5,7 @@ import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { invertedCardCSS, noCustomCSS } from './password-preview.css';
 import { PasswordPreview } from './password-preview';
 import { Key } from '../../../icons/key/key';
+import { inlineListener } from '../../../../lib/webcomponent-util';
 
 function prefixWithWWW(url: string) {
 	if (url.startsWith('www.')) {
@@ -12,12 +13,13 @@ function prefixWithWWW(url: string) {
 	}
 	return `www.${url}`;
 }
-export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>((props, _, html) => {
+export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>(function (props, _, html) {
 	return html`
 		<md-card id="container" level="3"
 			padding-vertical="0"
 			padding-horizontal="0"
 			custom-css="${props.selected ? invertedCardCSS : noCustomCSS}"
+			on-click="${inlineListener(this.containerClick, this)}"
 		>
 			<div id="content">
 				<div id="websites">

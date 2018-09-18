@@ -1,4 +1,4 @@
-import { config, defineProps, PROP_TYPE, ComplexType, createNumberList, any, listenWithIdentifier, isNewElement, listen, wait, listenIfNew, createDisposableWindowListener } from '../../../lib/webcomponent-util';
+import { config, defineProps, PROP_TYPE, ComplexType, createNumberList, any, listenWithIdentifier, isNewElement, listen, wait, createDisposableWindowListener } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { InfiniteListIDMap } from './infinite-list-querymap';
 import { TemplateResult, html, render } from 'lit-html';
@@ -637,58 +637,67 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 		return this._inferredItemSize * virtualIndex;
 	}
 
+	@bindToClass
+	public async focusCapturerKeydown(e: KeyboardEvent) {
+		const { virtual, element } = this._selectedItem!;
+
+		let newVirtual = 0;
+		if (e.keyCode === 38) { //Arrow up
+			newVirtual = Math.max(0, virtual! - 1);
+		} else if (e.keyCode === 40) { //Arrow down
+			newVirtual = Math.min(this.props.data.length,
+				virtual! + 1);
+		}
+
+		//Scroll into view
+		if (this._containers[Math.floor(this._containers.length / 2)].virtual! >= newVirtual) {
+			//It's before the current one, scroll up
+			this._scrolled = this._getStartOffset(newVirtual);
+		} else {
+			//Scroll down
+			this._scrolled = this._usedViewportHeight! +
+				this._getStartOffset(newVirtual - 1);
+		}
+
+		await wait(50);
+		this._setSelectedItem(newVirtual, element);
+	}
+
+	@bindToClass
+	public contentContainerScroll() {
+		requestAnimationFrame(() => {
+			this._render(false);
+		});
+	}
+
+	@bindToClass
+	public async contentContainerKeyPress(e: KeyboardEvent) {
+		if (!this._selectedItem) {
+			return;
+		}
+
+		const { virtual, element } = this._selectedItem;
+
+		let newVirtual = 0;
+		if (e.keyCode === 38) { //Arrow up
+			newVirtual = Math.max(0, virtual! - 1);
+		} else if (e.keyCode === 40) { //Arrow down
+			newVirtual = Math.min(this.props.data.length,
+				virtual! + 1);
+		}
+
+		this._setSelectedItem(newVirtual, element);
+	}
+
 	postRender() {
 		this._setListItemSize();
-		listenIfNew(this, 'focusCapturer', 'keydown', async (e) => {
-			const { virtual, element } = this._selectedItem!;
-
-			let newVirtual = 0;
-			if (e.keyCode === 38) { //Arrow up
-				newVirtual = Math.max(0, virtual! - 1);
-			} else if (e.keyCode === 40) { //Arrow down
-				newVirtual = Math.min(this.props.data.length,
-					virtual! + 1);
-			}
-
-			//Scroll into view
-			if (this._containers[Math.floor(this._containers.length / 2)].virtual! >= newVirtual) {
-				//It's before the current one, scroll up
-				this._scrolled = this._getStartOffset(newVirtual);
-			} else {
-				//Scroll down
-				this._scrolled = this._usedViewportHeight! +
-					this._getStartOffset(newVirtual - 1);
-			}
-
-			await wait(50);
-			this._setSelectedItem(newVirtual, element);
-		});
 		if (isNewElement(this.$.contentContainer)) {
 			this._setContainerSize();
 			if (!this.props.window) {
 				listen(this, 'contentContainer', 'scroll', () => {
-					requestAnimationFrame(() => {
-						this._render(false);
-					});
+					this.contentContainerScroll();
 				});
 			}
-			listen(this, 'contentContainer', 'keypress', async (e) => {
-				if (!this._selectedItem) {
-					return;
-				}
-
-				const { virtual, element } = this._selectedItem;
-
-				let newVirtual = 0;
-				if (e.keyCode === 38) { //Arrow up
-					newVirtual = Math.max(0, virtual! - 1);
-				} else if (e.keyCode === 40) { //Arrow down
-					newVirtual = Math.min(this.props.data.length,
-						virtual! + 1);
-				}
-
-				this._setSelectedItem(newVirtual, element);
-			});
 		}
 		this._startRender();
 	}

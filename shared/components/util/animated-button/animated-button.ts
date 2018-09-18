@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, isNewElement, defineProps, PROP_TYPE, wait, listenIfNew } from '../../../lib/webcomponent-util';
+import { config, isNewElement, defineProps, PROP_TYPE, wait } from '../../../lib/webcomponent-util';
 import { AnimatedButtonCSS, FADE_IN_OUT_TIME, COLOR_FADE_TIME } from './animated-button.css';
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
@@ -131,6 +131,11 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 		this.$.button.removeAttribute('disabled');
 	}
 
+	@bindToClass
+	public onButtonClick(e: MouseEvent) {
+		this.fire('click', e);
+	}
+
 	postRender() {
 		if (this.$.button && isNewElement(this.$.button)) {
 			if (this.$.button.classList.contains('mdl-js-ripple-effect')) {
@@ -149,12 +154,6 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 
 				(<any>this as RippleEffect).applyRipple();
 			}
-
-			listenIfNew(this, 'button', 'mouseup', this.blurHandler, true);
-			listenIfNew(this, 'button', 'mouseleave', this.blurHandler, true);
-			listenIfNew(this, 'button', 'click', (e) => {
-				this.fire('click', e);
-			}, true);
 		}
 	}
 }

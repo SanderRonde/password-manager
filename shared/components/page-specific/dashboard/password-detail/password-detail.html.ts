@@ -1,11 +1,11 @@
 import { LockClosedUnfilledSize, LockClosedSize } from '../../../icons/lockClosed/lockClosed';
+import { AnimatedButton } from '../../../util/animated-button/animated-button';
+import { repeat, inlineListener } from '../../../../lib/webcomponent-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Cross, CrossSize } from '../../../icons/cross/cross';
-import { repeat } from '../../../../lib/webcomponent-util';
 import { PasswordDetail } from './password-detail';
 import { KeySize } from '../../../icons/key/key';
 import { html } from 'lit-html';
-import { AnimatedButton } from '../../../util/animated-button/animated-button';
 
 export const passwordDetailDataSymbol = Symbol('passwordDetailData');
 export const passwordDetailDataStore: {
@@ -72,6 +72,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 									<animated-button flat id="retryButton"
 										custom-css="${retryButtonCustomCSS}"
 										aria-label="Retry getting password"
+										on-click="${inlineListener(this.retryRequest, this)}"
 									>Failed, click to retry</animated-button>
 								</div>
 							</horizontal-centerer>

@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, isNewElement, defineProps, PROP_TYPE, changeOpacity, listenIfNew } from '../../../lib/webcomponent-util';
+import { config, isNewElement, defineProps, PROP_TYPE, changeOpacity } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
 import { PaperButtonIDMap } from './paper-button-querymap';
@@ -37,33 +37,45 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 	get __customCSS() {
 		if (this.props.color || this.props.background || this.props.rippleColor) {
 			return html`<style>
-				${this.props.color ? html`<style>
-					#button {
-						color: ${this.props.color};
-					}
-				</style>` : ''}
-				${this.props.background ? html`<style>
-					#button {
-						background: ${this.props.background};
-						background-color: ${this.props.background};
-					}
-				</style>` : ''}
-				${this.props.rippleColor ? html`<style>
-					#button .mdl-ripple {
-						background: ${this.props.rippleColor};
-						background-color: ${this.props.rippleColor};
-					}
-
-					:host #button:active {
-						background-color: ${changeOpacity(this.props.rippleColor, 30)}
-					}
-				</style>` : ''}
+				${this.props.color ? this.getColorCustomCSS() : ''}
+				${this.props.background ? this.getBackgroundCustomCSS() : ''}
+				${this.props.rippleColor ? this.getRippleColorCustomCSS() : ''}
 			</style>`
 		}
 		return html`<style></style>`;
 	}
 
 	private rippleElement: HTMLElement|null = null;
+	private getRippleColorCustomCSS(): any {
+		return html`<style>
+			#button .mdl-ripple {
+				background: ${this.props.rippleColor};
+				background-color: ${this.props.rippleColor};
+			}
+
+			:host #button:active {
+				background-color: ${changeOpacity(this.props.rippleColor, 30)}
+			}
+		</style>`;
+	}
+
+	private getBackgroundCustomCSS(): any {
+		return html`<style>
+			#button {
+				background: ${this.props.background};
+				background-color: ${this.props.background};
+			}
+		</style>`;
+	}
+
+	private getColorCustomCSS(): any {
+		return html`<style>
+			#button {
+				color: ${this.props.color};
+			}
+		</style>`;
+	}
+
 	get container() {
 		return this.$.button;
 	}
@@ -79,6 +91,11 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 
 	enable() {
 		this.$.button.removeAttribute('disabled');
+	}
+
+	@bindToClass
+	public buttonClick(e: MouseEvent) {
+		this.fire('click', e);
 	}
 
 	postRender() {
@@ -99,12 +116,6 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 
 				(<any>this as RippleEffect).applyRipple();
 			}
-
-			listenIfNew(this, 'button', 'mouseup', this.blurHandler, true);
-			listenIfNew(this, 'button', 'mouseleave', this.blurHandler, true);
-			listenIfNew(this, 'button', 'click', (e) => {
-				this.fire('click', e);
-			}, true);
 		}
 	}
 }

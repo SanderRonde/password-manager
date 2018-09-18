@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, defineProps, PROP_TYPE, ComplexType, isNewElement, listen } from '../../../../lib/webcomponent-util';
+import { config, defineProps, PROP_TYPE, ComplexType, isNewElement } from '../../../../lib/webcomponent-util';
 import { MetaPasswords, MetaPasswordsPreviewData } from '../../../entrypoints/base/dashboard/dashboard';
 import { ConfigurableWebComponent, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
@@ -8,6 +8,7 @@ import { rippleEffect, RippleEffect } from '../../../../mixins/ripple';
 import { PasswordPreviewIDMap } from './password-preview-querymap';
 import { PasswordPreviewHTML } from './password-preview.html';
 import { PasswordPreviewCSS } from './password-preview.css';
+import { bindToClass } from '../../../../lib/decorators';
 import { MDCard } from '../../../util/md-card/md-card';
 
 export interface PasswordPreviewHost {
@@ -73,6 +74,39 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		this.$.container.renderToDOM(CHANGE_TYPE.THEME);
 	}
 
+	@bindToClass
+	public containerClick() {
+		const isSelected = !this.props.selected;
+		const list = this.props.ref;
+
+		//Deselect all other items data-wise
+		list.mapData((data) => {
+			if (data !== null) {
+				data.selected = false;
+			}
+			return data;
+		});
+
+		//Deselect all other items
+		list.rendered.forEach((renderedItem: PasswordPreview) => {
+			renderedItem.deselect && renderedItem.deselect();
+		});
+
+		//Update list data
+		list.updateItemData(this.props.index, {
+			selected: isSelected
+		});
+
+		this.props.selected = isSelected;
+
+		//Signal to dashboard that the selected item changed
+		this.props.ref.props.ref.props.selected = isSelected ?
+			this.props.index : -1;
+
+		//Rerender card
+		this.$.container.renderToDOM(CHANGE_TYPE.THEME);
+	}
+
 	postRender() {
 		if (isNewElement(this.$.container)) {
 			(() => {
@@ -88,39 +122,6 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 
 				(<any>this as RippleEffect).applyRipple();
 			})();
-
-
-			listen(this, 'container', 'click', () => {
-				const isSelected = !this.props.selected;
-				const list = this.props.ref;
-	
-				//Deselect all other items data-wise
-				list.mapData((data) => {
-					if (data !== null) {
-						data.selected = false;
-					}
-					return data;
-				});
-	
-				//Deselect all other items
-				list.rendered.forEach((renderedItem: PasswordPreview) => {
-					renderedItem.deselect && renderedItem.deselect();
-				});
-	
-				//Update list data
-				list.updateItemData(this.props.index, {
-					selected: isSelected
-				});
-	
-				this.props.selected = isSelected;
-	
-				//Signal to dashboard that the selected item changed
-				this.props.ref.props.ref.props.selected = isSelected ?
-					this.props.index : -1;
-	
-				//Rerender card
-				this.$.container.renderToDOM(CHANGE_TYPE.THEME);
-			});
 		}
 	}
 }

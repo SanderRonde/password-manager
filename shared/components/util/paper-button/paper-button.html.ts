@@ -1,5 +1,5 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { classNames } from '../../../lib/webcomponent-util';
+import { classNames, inlineListener } from '../../../lib/webcomponent-util';
 import { PaperButton } from "./paper-button";
 import { html } from "lit-html";
 
@@ -10,7 +10,11 @@ export const PaperButtonHTML = new TemplateFn<PaperButton>(function(props) {
 			'mdl-button', 'mdl-js-button', {
 				'mdl-button--raised': !props.flat,
 				'mdl-js-ripple-effect': !props.noRipple
-			 })}" label="${props.ariaLabel}">
+			})}" label="${props.ariaLabel}"
+			on-mouseup="${inlineListener(this.blurHandler, this, true)}"
+			on-mouseleave="${inlineListener(this.blurHandler, this, true)}"
+			on-click="${inlineListener(this.buttonClick, this, true)}"
+		>
 			<slot></slot>
 			<span>${props.content}</span>
 		</button>`;

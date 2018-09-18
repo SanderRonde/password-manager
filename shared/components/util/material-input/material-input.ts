@@ -77,12 +77,12 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 
 	disable() {
 		this.$.input!.disabled = true;
-		this._updateClasses();
+		this.updateClasses();
 	}
 
 	enable() {
 		this.$.input!.disabled = false;
-		this._updateClasses();
+		this.updateClasses();
 	}
 
 	set(value: string, skipSet: boolean = false) {
@@ -92,7 +92,7 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 		}
 
 		const prevValidState = this._validityState;
-		this._updateClasses();
+		this.updateClasses();
 
 		if (prevValidState !== this.valid) {
 			this.fire('valid', this.valid);
@@ -105,7 +105,7 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 	}
 
 	@bindToClass
-	private _updateClasses() {
+	public updateClasses() {
 		this._checkDisabled();
 		this._checkValidity();
 		this._checkDirty();
@@ -142,18 +142,18 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 	}
 
 	@bindToClass
-	private _onFocus() {
+	public onFocus() {
 		this.$.container!.classList.add('is-focused');
 	}
 
 	@bindToClass
-	private _onBlur() {
+	public onBlur() {
 		this.$.container!.classList.remove('is-focused');
 	}
 
 	@bindToClass
-	private _onReset() {
-		this._updateClasses();
+	public onReset() {
+		this.updateClasses();
 	}
 
 	@bindToClass
@@ -175,32 +175,29 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 		}
 	}
 
+	@bindToClass
+	public inputKeyDown(e: KeyboardEvent) {
+		window.setTimeout(() => {
+			if (this.$.input) {
+				this.props.value = this.$.input.value;
+			}
+			if (this._validityState !== this.valid) {
+				this._validityState = this.valid;
+				this.fire('valid', this.valid);
+			}
+			this.fire('keydown', e)
+		}, 0);
+	}
+
 	postRender() {
 		if (this.$.input && this.$.container) {
 			this._validityState = this.valid;
 
 			if (isNewElement(this.$.input)) {
-				listen(this, 'input', 'keydown', (e) => {
-					window.setTimeout(() => {
-						if (this.$.input) {
-							this.props.value = this.$.input.value;
-						}
-						if (this._validityState !== this.valid) {
-							this._validityState = this.valid;
-							this.fire('valid', this.valid);
-						}
-						this.fire('keydown', e)
-					}, 0);
-				});
-
 				if (this.$.input.hasAttribute('placeholder')) {
 					this.$.container.classList.add('has-placeholder');
 				}
 
-				listen(this, 'input', 'input', this._updateClasses);
-				listen(this, 'input', 'focus', this._onFocus);
-				listen(this, 'input', 'blur', this._onBlur);
-				listen(this, 'input', 'reset', this._onReset);
 				if (this._maxRows !== -1) {
 					listen(this, 'input', 'keydown', this._onKeyDown);
 				}
@@ -211,7 +208,7 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 				}
 				
 				const isInvalid = this.$.container.classList.contains('is-invalid');
-				this._updateClasses();
+				this.updateClasses();
 				if (isInvalid) {
 					this.$.container.classList.add('is-invalid');
 				}

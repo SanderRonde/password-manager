@@ -1,9 +1,9 @@
+import { classNames, inlineListener } from "../../../lib/webcomponent-util";
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { classNames } from "../../../lib/webcomponent-util";
 import { MaterialInput } from "./material-input";
 import { html } from "lit-html";
 
-export const MaterialInputHTML = new TemplateFn<MaterialInput>((props) => {
+export const MaterialInputHTML = new TemplateFn<MaterialInput>(function (props) {
 	return html`
 		<div id="container" class="${classNames(
 			'mdl-textfield', 'mdl-js-textfield', {
@@ -16,6 +16,11 @@ export const MaterialInputHTML = new TemplateFn<MaterialInput>((props) => {
 				<input class="mdl-textfield__input" type="${props.type}" 
 					id="input" value="${props.value}" 
 					pattern="${props.pattern}"
+					on-keydown="${inlineListener(this.inputKeyDown, this)}"
+					on-input="${inlineListener(this.updateClasses, this)}"
+					on-focus="${inlineListener(this.onFocus, this)}"
+					on-blur="${inlineListener(this.onBlur, this)}"
+					on-reset="${inlineListener(this.onReset, this)}"
 					aria-labelledby="label">
 				<slot class="iconSlot" name="postIcon"></slot>
 			</div>

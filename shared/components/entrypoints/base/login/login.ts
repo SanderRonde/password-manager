@@ -1,5 +1,5 @@
 /// <reference path="../../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, isDefined, isNewElement, getCookie, listenIfNew } from '../../../../lib/webcomponent-util'
+import { defineProps, PROP_TYPE, isDefined, getCookie } from '../../../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
@@ -134,7 +134,7 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	}
 
 	@bindToClass
-	private _updateValidity() {
+	public updateValidity() {
 		if (this._getInputData().valid) {
 			this.$.button.enable();
 		} else {
@@ -143,21 +143,10 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	}
 
 	@bindToClass
-	private _onSubmit(e: KeyboardEvent) {
+	public onSubmit(e: KeyboardEvent) {
 		//Enter
 		if (e.keyCode === 13 && this._getInputData().valid) {
 			this.onLogin();
-		}
-	}
-
-	postRender() {
-		listenIfNew(this, 'button', 'click', this.onLogin);
-		listenIfNew(this, 'lockButton', 'click', this.handleEmailRememberToggle);
-		for (const input of [this.$.emailInput, this.$.passwordInput, this.$.twofactorInput]) {
-			if (isNewElement(input)) {
-				input.listen('valid', this._updateValidity);
-				input.listen('keydown', this._onSubmit)
-			}
 		}
 	}
 }

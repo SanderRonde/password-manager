@@ -3,6 +3,7 @@ import { CheckmarkSize } from "../../icons/checkmark/checkmark";
 import { CrossSize } from "../../icons/cross/cross";
 import { AnimatedButton } from "./animated-button";
 import { html } from "lit-html";
+import { inlineListener } from '../../../lib/webcomponent-util';
 
 export const AnimatedButtonHTML = new TemplateFn<AnimatedButton>(function (props) {
 	const Checkmark = CheckmarkSize(35);
@@ -11,6 +12,9 @@ export const AnimatedButtonHTML = new TemplateFn<AnimatedButton>(function (props
 	return html`
 		<button id="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
 			label="${props.ariaLabel}"
+			on-mouseup="${inlineListener(this.blurHandler, this, true)}"
+			on-mouseleave="${inlineListener(this.blurHandler, this, true)}"
+			on-click="${inlineListener(this.onButtonClick, this, true)}"
 		>
 			<div id="content">
 				<span id="regularContent" class="visible">

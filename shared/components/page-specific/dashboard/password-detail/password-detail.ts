@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors, listenIfNew } from '../../../../lib/webcomponent-util';
+import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors } from '../../../../lib/webcomponent-util';
 import { PasswordDetailHTML, passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey } from '../../../../types/db-types';
 import { PasswordDetailCSS, VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
@@ -19,6 +19,7 @@ import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { ENTRYPOINT } from '../../../../types/shared-types';
 import { APIToken, ERRS } from '../../../../types/crypto';
 import { U2FSignResponse } from 'u2f';
+import { bindToClass } from '../../../../lib/decorators';
 
 export interface PasswordDetailData {
 	instance_id: StringifiedObjectId<EncryptedInstance>;
@@ -259,7 +260,8 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		this._getPasswordDetails();
 	}
 
-	private _retryRequest() {
+	@bindToClass
+	public retryRequest() {
 		if (this.$.retryButton.getState() === 'loading') {
 			return;
 		}
@@ -290,9 +292,5 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				});
 			});
 		}
-
-		listenIfNew(this, 'retryButton', 'click', () => {
-			this._retryRequest();
-		});
 	}
 }

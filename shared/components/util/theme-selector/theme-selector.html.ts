@@ -1,5 +1,5 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
-import { classNames } from '../../../lib/webcomponent-util';
+import { classNames, inlineListener } from '../../../lib/webcomponent-util';
 import { ColorSize } from '../../icons/color/color';
 import { theme } from '../../theming/theme/theme';
 import { ThemeSelector } from "./theme-selector";
@@ -39,7 +39,9 @@ export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function() {
 					`
 				})}
 			</div>
-			<icon-button aria-label="Change theme" id="button" fill="text">${ColorSize(30, 30)}</icon-button>
+			<icon-button aria-label="Change theme" id="button" fill="text"
+				on-click="${inlineListener(this.toggleAnimation, this)}"
+				>${ColorSize(30, 30)}</icon-button>
 		</div>
 	`
 }, CHANGE_TYPE.THEME);

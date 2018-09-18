@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, isNewElement, defineProps, PROP_TYPE, listenIfNew, listenWithIdentifier } from "../../../lib/webcomponent-util";
+import { config, isNewElement, defineProps, PROP_TYPE, listenWithIdentifier } from "../../../lib/webcomponent-util";
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { ThemeSelectorIDMap } from "./theme-selector-querymap";
 import { VALID_THEMES_T } from '../../../types/shared-types';
@@ -37,7 +37,6 @@ export class ThemeSelector extends ConfigurableWebComponent<ThemeSelectorIDMap> 
 	}
 
 	postRender() {
-		listenIfNew(this, 'button', 'click', this._toggleAnimation);
 		if (isNewElement(this.$.themes)) {
 			const themes = [...this.$.themes.querySelectorAll('.theme')];
 			for (let i in themes) {
@@ -69,7 +68,7 @@ export class ThemeSelector extends ConfigurableWebComponent<ThemeSelectorIDMap> 
 
 	private _isVisible: boolean = false;
 	@bindToClass
-	private _toggleAnimation() {
+	public toggleAnimation() {
 		if (this._isVisible) {
 			this._animateOut();
 		} else {
