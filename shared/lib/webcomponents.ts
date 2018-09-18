@@ -26,7 +26,7 @@ abstract class WebComponentDefiner extends elementBase {
 	/**
 	 * Any dependencies this component depends on
 	 */
-	public static dependencies: typeof WebComponentBase[] = [];
+	public static dependencies: (typeof WebComponentBase|null)[] = [];
 	/**
 	 * A tuple consisting of the name of the component and its class
 	 */
@@ -82,7 +82,7 @@ abstract class WebComponentDefiner extends elementBase {
 		}
 
 		for (const dependency of this.dependencies) {
-			dependency.define(false);
+			dependency && dependency.define(false);
 		}
 		if (!this.is) {
 			throw new Error('No component definition given (name and class)')

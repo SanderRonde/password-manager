@@ -630,7 +630,7 @@ export function genIsAccessor(name: string, component: () => typeof WebComponent
 export interface WebComponentConfiguration {
 	is: string;
 	css: TemplateFn;
-	dependencies?: typeof WebComponentBase[];
+	dependencies?: (typeof WebComponentBase|null)[];
 	html: TemplateFn;
 }
 export function config(config: WebComponentConfiguration) {
