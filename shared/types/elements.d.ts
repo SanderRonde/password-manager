@@ -33,4 +33,38 @@ declare global {
 	type HTMLVerticalCentererElement = VerticalCenterer;
 	type HTMLInfiniteListElement = InfiniteList<any, any, any>;
 	type HTMLHorizontalCentererElement = HorizontalCenterer;
+
+	type WebComponentElements = MDCard & {
+		name: 'md-card'
+	}|LoginWeb & {
+		name: 'login-web'
+	}|IconButton & {
+		name: 'icon-button'
+	}|PaperToast & {
+		name: 'paper-toast'
+	}|PaperButton & {
+		name: 'paper-button'
+	}|SizingBlock & {
+		name: 'sizing-block'
+	}|LoadableBlock & {
+		name: 'loadable-block'
+	}|MaterialInput & {
+		name: 'material-input'
+	}|ThemeSelector & {
+		name: 'theme-selector'
+	}|AnimatedButton & {
+		name: 'animated-button'
+	}|PasswordDetail & {
+		name: 'password-detail'
+	}|LoadingSpinner & {
+		name: 'loading-spinner'
+	}|PasswordPreview & {
+		name: 'password-preview'
+	}|VerticalCenterer & {
+		name: 'vertical-centerer'
+	}|InfiniteList<any,any,any> & {
+		name: 'infinite-list'
+	}|HorizontalCenterer & {
+		name: 'horizontal-centerer'
+	};
 }
