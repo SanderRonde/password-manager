@@ -35,6 +35,10 @@ abstract class WebComponentDefiner extends elementBase {
 	 * Any hooks that should be called after the constructor
 	 */
 	protected _connectedHooks = [] as (() => void)[];
+	/**
+	 * All defined webcomponents
+	 */
+	protected static defined: string[] = [];
 
 	constructor() {
 		super();
@@ -53,6 +57,7 @@ abstract class WebComponentDefiner extends elementBase {
 		component: WebComponent<any, any>;
 		constructed: Promise<void>;
 	}[] = [];
+	protected _definer = WebComponentDefiner;
 	protected static async listenForFinished(component: WebComponent<any, any>, isConstructed: Promise<void>) {
 		if (this._finished) {
 			await isConstructed;
@@ -89,6 +94,7 @@ abstract class WebComponentDefiner extends elementBase {
 			throw new Error('No class given for component');
 		}
 		define(this.is.name, this.is.component);
+		this.defined.push(this.is.name);
 
 		this._finishLoad();
 	}
