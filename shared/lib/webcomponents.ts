@@ -1,8 +1,8 @@
 import { GlobalController } from '../components/entrypoints/global/global-controller';
 import { GlobalProperties, Theme, DEFAULT_THEME } from '../types/shared-types';
 import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
-import { theme } from '../components/theming/theme/theme';
 import { TemplateResult, render, html } from 'lit-html';
+import { theme } from '../components/theming/theme/theme';
 import { removeAllElementListeners } from './listeners';
 import { bindToClass } from './decorators';
 
@@ -602,6 +602,10 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 		return `${WebComponentComplexValueManager.refPrefix}${refIndex}`;
 	}
 
+	private static _isDirective(value: any) {
+		return value && value.__litDirective === true;
+	}
+
 	@bindToClass
 	public complexHTML(strings: TemplateStringsArray, ...values: any[]) {
 		values = values.map((value) => {
@@ -615,9 +619,10 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 				!(value instanceof TemplateResult)) {
 					return this._genRef(value);
 				}
-			if (typeof value === 'function') {
-				return this._genRef(value);
-			}
+			if (typeof value === 'function' && 
+				!WebComponentComplexValueManager._isDirective(value)) {
+					return this._genRef(value);
+				}
 			return value;
 		});
 		return html(strings, ...values);
