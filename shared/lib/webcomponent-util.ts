@@ -1076,18 +1076,21 @@ export function reportDefaultResponseErrors(response: {
 }
 
 let listenerIdIndex = 0;
-const inlineListenersContext = {};
+const eventContexts: Map<string, Object> = new Map();
 const inlineListenerBases: WeakMap<WebComponent<any>, Map<string, WeakMap<Function, string>>> =
 	new WeakMap();
 export function inlineListener<B extends WebComponent<any>>(listener: Function, base?: B) {
 	return directive<AttributePart>((part) => {
-		if (isNewElement(part.element as HTMLElement, inlineListenersContext)) {
-			const [ prefix, event, ...rest ] = part.name.split('-');
-			if (rest.length > 0) {
-				console.warn('Attempting to use inline listener without specifying event');
-				return;
-			}
-
+		const [ prefix, event, ...rest ] = part.name.split('-');
+		if (rest.length > 0) {
+			console.warn('Attempting to use inline listener without specifying event');
+			return;
+		}
+		if (!eventContexts.get(event)) {
+			eventContexts.set(event, {});
+		}
+		const eventScope = eventContexts.get(event);
+		if (isNewElement(part.element as HTMLElement, eventScope)) {
 			if (prefix === 'on') {
 				if (!base) {
 					console.warn('Attempting to listen to event without a component base');
