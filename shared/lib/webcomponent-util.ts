@@ -1,7 +1,9 @@
 import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TYPE, WebComponentComplexValueManager } from './webcomponents';
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './listeners';
 import { PaperToast } from '../components/util/paper-toast/paper-toast';
-import { supportsPassive } from "./listeners";
+import { supportsPassive, isNewElement, listenWithIdentifier } from "./listeners";
+import { directive, AttributePart } from 'lit-html';
+import { listenToComponent } from './IDMap';
 import { API_ERRS } from '../types/api';
 
 // From https://github.com/JedWatson/classnames
@@ -1071,4 +1073,47 @@ export function reportDefaultResponseErrors(response: {
 			});
 			break;
 	}
+}
+
+let listenerIdIndex = 0;
+const inlineListenersContext = {};
+const inlineListenerBases: WeakMap<WebComponent<any>, Map<string, WeakMap<Function, string>>> =
+	new WeakMap();
+export function inlineListener<B extends WebComponent<any>>(listener: Function, base?: B) {
+	return directive<AttributePart>((part) => {
+		if (isNewElement(part.element as HTMLElement, inlineListenersContext)) {
+			const [ prefix, event, ...rest ] = part.name.split('-');
+			if (rest.length > 0) {
+				console.warn('Attempting to use inline listener without specifying event');
+				return;
+			}
+
+			if (prefix === 'on') {
+				if (!base) {
+					console.warn('Attempting to listen to event without a component base');
+					return;
+				}
+
+				if (!inlineListenerBases.get(base)) {
+					inlineListenerBases.set(base, new Map());
+				}
+				const baseMap = inlineListenerBases.get(base)!;
+				if (!baseMap.get(event)) {
+					baseMap.set(event, new WeakMap());
+				}
+				const eventMap = baseMap.get(event)!;
+				if (!eventMap.has(listener)) {
+					eventMap.set(listener, `__inline_listener${listenerIdIndex++}`);
+				}
+				
+				listenWithIdentifier(base, part.element as HTMLElement, eventMap.get(listener)!,
+					event as any, listener as any);
+			} else if (prefix === 'wc') {
+				listenToComponent(part.element as WebComponent<any>, 
+					event as any, listener as any);
+			} else {
+				console.warn('Attempting to use inline listener without specifying event');
+			}
+		}
+	});
 }
