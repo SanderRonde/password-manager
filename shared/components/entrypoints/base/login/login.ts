@@ -100,7 +100,6 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 
 	@bindToClass
 	handleEmailRememberToggle() {
-		console.log('YOOOO');
 		const wasEnabled = this.props.emailRemembered;
 		this.props.emailRemembered = !wasEnabled;
 		if (wasEnabled) {
