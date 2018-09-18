@@ -1,9 +1,8 @@
 import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TYPE, WebComponentComplexValueManager } from './webcomponents';
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './listeners';
+import { supportsPassive, isNewElement, listenWithIdentifier, listenToComponent } from "./listeners";
 import { PaperToast } from '../components/util/paper-toast/paper-toast';
-import { supportsPassive, isNewElement, listenWithIdentifier } from "./listeners";
 import { directive, AttributePart } from 'lit-html';
-import { listenToComponent } from './IDMap';
 import { API_ERRS } from '../types/api';
 
 // From https://github.com/JedWatson/classnames
