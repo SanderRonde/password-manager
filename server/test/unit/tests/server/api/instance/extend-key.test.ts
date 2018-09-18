@@ -34,7 +34,7 @@ export function extendKeyTest() {
 			}, '/api/instance/extend_key', {
 				instance_id: instance_id.toHexString()
 			}, {
-				count: config.count++,
+				count: 0,
 				old_token: 'someinvalidtoken'
 			}));
 
@@ -57,7 +57,7 @@ export function extendKeyTest() {
 				port: http,
 				encrypted: {
 					old_token: 'someinvalidtoken',
-					count: config.count++,
+					count: 0,
 				},
 				unencrypted: {
 					instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>

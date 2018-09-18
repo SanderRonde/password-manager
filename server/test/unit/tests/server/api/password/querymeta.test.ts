@@ -28,7 +28,7 @@ export function passwordQueryMetaTest() {
 			const { http, uri, server_public_key, instance_private_key } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 
 			const matchingHost = `www.${genRandomString(20)}.${genRandomString(3)}`;
 			const expectedPasswords = [{
@@ -71,7 +71,7 @@ export function passwordQueryMetaTest() {
 					notes: pw.notes,
 					username: pw.username,
 					password: pw.password
-				}, token!, config));
+				}, token, count++, config));
 			}
 
 			const response = JSON.parse(await doServerAPIRequest({ 
@@ -81,7 +81,7 @@ export function passwordQueryMetaTest() {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
-				count: config.count++,
+				count: count++,
 				url: `http${
 					Math.random() > 0.5 ? 's' : ''
 				}://${
@@ -156,7 +156,7 @@ export function passwordQueryMetaTest() {
 					instance_id: config.instance_id.toHexString()
 				},
 				encrypted: {
-					count: config.count++,
+					count: 0,
 					token: 'wrongtoken',
 					url: genURL()
 				},
@@ -176,7 +176,7 @@ export function passwordQueryMetaTest() {
 			const { http, uri, server_public_key } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 			await testInvalidCredentials({
 				route: '/api/password/querymeta',
 				port: http,
@@ -184,7 +184,7 @@ export function passwordQueryMetaTest() {
 					instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
 				},
 				encrypted: {
-					count: config.count++,
+					count: count++,
 					token: token!,
 					url: genURL()
 				},

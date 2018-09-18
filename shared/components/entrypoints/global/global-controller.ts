@@ -1,5 +1,5 @@
 import { defineProps, PROP_TYPE, config, wait, awaitMounted } from '../../../lib/webcomponent-util';
-import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../types/crypto';
+import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding, ERRS } from '../../../types/crypto';
 import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../types/db-types';
 import { ANIMATE_TIME } from '../../util/loadable-block/loadable-block.css';
 import { LoadableBlock } from '../../util/loadable-block/loadable-block';
@@ -13,6 +13,7 @@ import { ENTRYPOINT } from '../../../types/shared-types';
 import { Dashboard } from '../base/dashboard/dashboard';
 import { API_ERRS } from '../../../types/api';
 import { Login } from '../base/login/login';
+import { decryptWithPrivateKey } from '../../../lib/browser-crypto';
 
 export interface GlobalControllerData {
 	loginData: {
@@ -131,9 +132,10 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 	}
 
 	private _token: APIToken|null = null;
-	setAPIToken(token: APIToken) {
+	setAPIToken(token: APIToken, count: number) {
 		const prevToken = this._token;
 		this._token = token;
+		this._requestCount = count;
 
 		if (prevToken === null) {
 			setInterval(() => {
@@ -162,8 +164,21 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 			count: this.getRequestCount()
 		});
 		if (response.success) {
-			this._token = response.data.auth_token
-			this._requestCount = 0;
+			const decryptedToken = decryptWithPrivateKey(response.data.auth_token,
+				data.private_key);
+			const decryptedCount = decryptWithPrivateKey(response.data.count,
+				data.private_key);
+			if (decryptedToken === ERRS.INVALID_DECRYPT || decryptedCount === ERRS.INVALID_DECRYPT) {
+				PaperToast.create({
+					content: 'Failed to decrypt serve response, API token will not be' +
+						' extended and will time out in 3 minutes',
+					buttons: [PaperToast.BUTTONS.HIDE],
+					duration: 10000
+				});
+				return;
+			}
+			this._token = decryptedToken;
+			this._requestCount = decryptedCount;
 		} else {
 			switch (response.ERR) {
 				case API_ERRS.CLIENT_ERR:

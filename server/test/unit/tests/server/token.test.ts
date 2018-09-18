@@ -27,7 +27,7 @@ export function tokenTest() {
 			uris.push(uri);
 
 			//Log in
-			const initialToken = await (async () => {
+			const { token: initialToken, count } = await (async () => {
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -41,18 +41,36 @@ export function tokenTest() {
 
 				assert.isTrue(response.success, 'API call succeeded');
 				if (!response.success) {
-					return;
+					return {
+						token: null, count: null
+					};
 				}
 				const data = response.data;
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
-				if (data.u2f_required) return;
+				if (data.u2f_required) return {
+					token: null, count: null
+				};
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+				const count = decryptWithPrivateKey(data.count, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-				if (token === ERRS.INVALID_DECRYPT) return;
+				if (token === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (count === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
 				assert.strictEqual(typeof token, 'string', 'token is a string');
-
-				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
+				return {
+					token, count
+				};
 			})();
 
 			//Extend token
@@ -63,7 +81,7 @@ export function tokenTest() {
 				}, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
 				}, {
-					count: 0,
+					count: count!,
 					old_token: initialToken!
 				}));
 
@@ -87,7 +105,7 @@ export function tokenTest() {
 				}, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
 				}, {
-					count: 1,
+					count: (count!) + 1,
 					old_token: initialToken!
 				}));
 
@@ -130,7 +148,7 @@ export function tokenTest() {
 			uris.push(uri);
 
 			//Log in
-			const initialToken = await (async () => {
+			const { token: initialToken, count } = await (async () => {
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -144,18 +162,36 @@ export function tokenTest() {
 
 				assert.isTrue(response.success, 'API call succeeded');
 				if (!response.success) {
-					return;
+					return {
+						token: null, count: null
+					};
 				}
 				const data = response.data;
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
-				if (data.u2f_required) return;
+				if (data.u2f_required) return {
+					token: null, count: null
+				};
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+				const count = decryptWithPrivateKey(data.count, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-				if (token === ERRS.INVALID_DECRYPT) return;
+				if (token === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (count === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
 				assert.strictEqual(typeof token, 'string', 'token is a string');
-
-				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
+				return {
+					token, count
+				};
 			})();
 
 			//Extend token
@@ -166,7 +202,7 @@ export function tokenTest() {
 				}, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString(),
 				}, {
-					count: 0,
+					count: count!,
 					old_token: initialToken!
 				}));
 
@@ -273,7 +309,7 @@ export function tokenTest() {
 			})();
 
 			//Log in
-			const initialToken = await (async () => {
+			const { token: initialToken, count } = await (async () => {
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -287,18 +323,36 @@ export function tokenTest() {
 
 				assert.isTrue(response.success, 'API call succeeded');
 				if (!response.success) {
-					return;
+					return {
+						token: null, count: null
+					};
 				}
 				const data = response.data;
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
-				if (data.u2f_required) return;
+				if (data.u2f_required) return {
+					token: null, count: null
+				};
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+				const count = decryptWithPrivateKey(data.count, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-				if (token === ERRS.INVALID_DECRYPT) return;
+				if (token === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (count === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
 				assert.strictEqual(typeof token, 'string', 'token is a string');
-
-				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
+				return {
+					token, count
+				};
 			})();
 
 			//Extend token
@@ -309,7 +363,7 @@ export function tokenTest() {
 				}, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString()
 				}, {
-					count: 0,
+					count: count!,
 					old_token: initialToken!
 				}));
 
@@ -333,7 +387,7 @@ export function tokenTest() {
 				}, '/api/instance/extend_key', {
 					instance_id: secondInstance!
 				}, {
-					count: 1,
+					count: (count!) + 1,
 					old_token: initialToken!
 				}));
 

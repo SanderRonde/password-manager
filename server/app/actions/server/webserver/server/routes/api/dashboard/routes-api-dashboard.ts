@@ -101,13 +101,13 @@ export class RoutesAPIDashboard {
 			if (!loginData) {
 				return;
 			}
-			const token = loginData.auth_token!;
 
 			res.status(200);
 			res.json({
 				success: true,
 				data: {
-					auth_token: token,
+					auth_token: loginData.auth_token!,
+					count: loginData.count!,
 					id: encryptWithPublicKey(
 						decryptedInstanceData.id, public_key),
 					server_public_key: encryptWithPublicKey(

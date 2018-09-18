@@ -20,7 +20,7 @@ async function doInstanceCreateRequest(config: UserAndDbData) {
 	});
 }
 
-async function doAPIRequest(token: APIToken, config: UserAndDbData) {
+async function doAPIRequest(token: APIToken, config: UserAndDbData, count: number) {
 	return await doServerPostRequest({ 
 		port: config.http, 
 		publicKey: config.server_public_key
@@ -28,7 +28,7 @@ async function doAPIRequest(token: APIToken, config: UserAndDbData) {
 		instance_id: config.instance_id.toHexString(),
 	}, {
 		token: token,
-		count: config.count++,
+		count: count,
 		url: genURL()
 	});
 }
@@ -197,17 +197,20 @@ export function rateLimitTest() {
 			});
 			uris.push(config.uri);
 
-			const token = (await getLoginToken(config))!;
+			let { token, count } = (await getLoginToken(config))! as {
+				token: string;
+				count: number;
+			};
 
 			const startTime = Date.now();
 			for (let i = 0; i < 10; i++) {
 				await assertMaxDuration(async () => {
-					assertSucceedsAndIsNotRatelimited(await doAPIRequest(token, config));
+					assertSucceedsAndIsNotRatelimited(await doAPIRequest(token, config, count++));
 				}, 0, 250, 'first 10 requests are still fast');
 			}
 			for (let i = 0; i < 10 && Date.now() - startTime < getSpedupTime(20000); i++) {
 				await assertMaxDuration(async () => {
-					assertSucceedsAndIsNotRatelimited(await doAPIRequest(token, config));
+					assertSucceedsAndIsNotRatelimited(await doAPIRequest(token, config, count++));
 				}, 800, Infinity, 'later requests are ratelimited');
 			}	
 

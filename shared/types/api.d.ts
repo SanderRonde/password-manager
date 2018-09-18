@@ -239,6 +239,10 @@ export declare namespace APIRoutes {
 			 */
 			auth_token: PublicKeyEncrypted<APIToken, InstancePublicKey>;	
 			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: PublicKeyEncrypted<number, InstancePublicKey>;
+			/**
 			 * The solved challenge
 			 */
 			challenge: C;
@@ -280,6 +284,10 @@ export declare namespace APIRoutes {
 			 * The new auth token. Encrypted with instance public key
 			 */
 			auth_token: PublicKeyEncrypted<APIToken, InstancePublicKey>;
+			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: PublicKeyEncrypted<number, InstancePublicKey>;
 		}>;
 
 		export namespace Twofactor {
@@ -1133,6 +1141,10 @@ export declare namespace APIRoutes {
 			 * The auth token that can be used to make API requests. Encrypted with instance key
 			 */
 			auth_token: PublicKeyEncrypted<APIToken, InstancePublicKey>;	
+			/**
+			 * The index of the used command. Used to prevent replay attacks and token interception
+			 */
+			count: PublicKeyEncrypted<number, InstancePublicKey>;
 		}>;
 	}
 }

@@ -30,7 +30,7 @@ export function passwordGetTest() {
 			const { http, uri, server_public_key, instance_private_key, userpw } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 
 			const websites = [genURL(), genURL()]
 			const username = genRandomString(20);
@@ -43,7 +43,7 @@ export function passwordGetTest() {
 				username,
 				password,
 				notes,
-			}, token!, config);
+			}, token, count++, config);
 
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
@@ -52,7 +52,7 @@ export function passwordGetTest() {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
-				count: config.count++,
+				count: count++,
 				password_id: passwordId!
 			}));
 
@@ -98,7 +98,7 @@ export function passwordGetTest() {
 			const { http, uri, server_public_key } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 
 			const passwordId = await setPasword({
 				websites: [],
@@ -107,7 +107,7 @@ export function passwordGetTest() {
 				username: 'username',
 				password: 'password',
 				notes: []		
-			}, token!, config);
+			}, token, count++, config);
 
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
@@ -116,7 +116,7 @@ export function passwordGetTest() {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
-				count: config.count++,
+				count: count++,
 				password_id: passwordId!
 			}));
 
@@ -141,7 +141,7 @@ export function passwordGetTest() {
 			const { http, uri, server_public_key, instance_private_key, userpw } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 
 			const websites = [genURL(), genURL()]
 			const username = genRandomString(20);
@@ -154,7 +154,7 @@ export function passwordGetTest() {
 				username,
 				password,
 				notes,
-			}, token!, config);
+			}, token, count++, config);
 
 			const response = JSON.parse(await doServerAPIRequest({ 
 				port: http,
@@ -163,7 +163,7 @@ export function passwordGetTest() {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
-				count: config.count++,
+				count: count++,
 				password_id: passwordId!,
 				twofactor_token: speakeasy.totp({
 					secret: secret.base32,
@@ -214,7 +214,7 @@ export function passwordGetTest() {
 			const { http, uri, server_public_key } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
@@ -222,7 +222,7 @@ export function passwordGetTest() {
 				username: 'username',
 				password: 'password',
 				notes: []		
-			}, token!, config);
+			}, token, count++, config);
 
 			await testInvalidCredentials({
 				route: '/api/password/get',
@@ -231,7 +231,7 @@ export function passwordGetTest() {
 					instance_id: config.instance_id.toHexString()
 				},
 				encrypted: {
-					count: config.count++,
+					count: count++,
 					token: 'wrongtoken',
 					password_id: passwordId!
 				},
@@ -251,7 +251,7 @@ export function passwordGetTest() {
 			const { http, uri, server_public_key } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
@@ -259,7 +259,7 @@ export function passwordGetTest() {
 				username: 'username',
 				password: 'password',
 				notes: []		
-			}, token!, config);
+			}, token, count++, config);
 
 			await testInvalidCredentials({
 				route: '/api/password/get',
@@ -268,7 +268,7 @@ export function passwordGetTest() {
 					instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
 				},
 				encrypted: {
-					count: config.count++,
+					count: count++,
 					token: token!,
 					password_id: passwordId!
 				},
@@ -289,7 +289,7 @@ export function passwordGetTest() {
 			const { http, uri, server_public_key } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 			await setPasword({
 				websites: [],
 				twofactor_enabled: false,
@@ -297,7 +297,7 @@ export function passwordGetTest() {
 				username: 'username',
 				password: 'password',
 				notes: []		
-			}, token!, config);
+			}, token, count++, config);
 
 			await testInvalidCredentials({
 				route: '/api/password/get',
@@ -306,7 +306,7 @@ export function passwordGetTest() {
 					instance_id: config.instance_id.toHexString()
 				},
 				encrypted: {
-					count: config.count++,
+					count: count++,
 					token: token!,
 					password_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>
 				},

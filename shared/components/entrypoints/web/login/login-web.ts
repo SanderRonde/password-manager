@@ -97,18 +97,21 @@ export class LoginWeb extends Login {
 
 		//Decrypt data
 		const {
-			instance_id, server_public_key, auth_token
+			instance_id, server_public_key, auth_token, count
 		} = {
 			instance_id: decryptWithPrivateKey(
 				response.data.id, privateKey),
 			server_public_key: decryptWithPrivateKey(
 				response.data.server_public_key, privateKey),
 			auth_token: decryptWithPrivateKey(
-				response.data.auth_token, privateKey)
+				response.data.auth_token, privateKey),
+			count: decryptWithPrivateKey(
+				response.data.count, privateKey)
 		}
 		if (instance_id === ERRS.INVALID_DECRYPT ||
 			server_public_key === ERRS.INVALID_DECRYPT ||
-			auth_token === ERRS.INVALID_DECRYPT) {
+			auth_token === ERRS.INVALID_DECRYPT ||
+			count === ERRS.INVALID_DECRYPT) {
 				PaperToast.hideAll();
 				PaperToast.create({
 					content: 'Failed to decrypt data, please try again',
@@ -118,7 +121,7 @@ export class LoginWeb extends Login {
 			}
 
 		const root = this.getRoot();
-		root.setAPIToken(auth_token);
+		root.setAPIToken(auth_token, count);
 		root.storeData('loginData', {
 			password,
 			server_public_key,

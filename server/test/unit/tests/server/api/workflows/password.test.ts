@@ -28,7 +28,7 @@ export function workflowPasswordTest() {
 			} = config;
 			uris.push(uri);
 
-			const token = await (async () => {
+			let { token, count } = (await (async () => {
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -48,13 +48,20 @@ export function workflowPasswordTest() {
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
 				if (data.u2f_required) return;
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+				const count = decryptWithPrivateKey(data.count, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-				if (token === ERRS.INVALID_DECRYPT) return;
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (token === ERRS.INVALID_DECRYPT || count === ERRS.INVALID_DECRYPT) {
+					return;
+				}
 				assert.strictEqual(typeof token, 'string', 'token is a string');
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
 
 				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
-			})();
+				return {
+					token, count
+				};
+			})())!;
 
 			const initialPassword = {
 				websites: [genURL(), genURL(), genURL()],
@@ -81,7 +88,7 @@ export function workflowPasswordTest() {
 					instance_id: config.instance_id.toHexString()
 				}, {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					websites: expectedWebsites.map((website) => {
 						return {
 							url: website,
@@ -180,7 +187,7 @@ export function workflowPasswordTest() {
 					instance_id: config.instance_id.toHexString()
 				}, {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					password_id: passwordId!,
 					websites: expectedWebsites.map((website) => {
 						return {
@@ -256,7 +263,7 @@ export function workflowPasswordTest() {
 					instance_id: config.instance_id.toHexString()
 				}, {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					password_id: passwordId!
 				}));
 			
@@ -292,7 +299,7 @@ export function workflowPasswordTest() {
 			} = config;
 			uris.push(uri);
 
-			const token = await (async () => {
+			let { token, count } = (await (async () => {
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -312,13 +319,20 @@ export function workflowPasswordTest() {
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
 				if (data.u2f_required) return;
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+				const count = decryptWithPrivateKey(data.count, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-				if (token === ERRS.INVALID_DECRYPT) return;
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (token === ERRS.INVALID_DECRYPT || count === ERRS.INVALID_DECRYPT) {
+					return;
+				}
 				assert.strictEqual(typeof token, 'string', 'token is a string');
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
 
 				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
-			})();
+				return {
+					token, count
+				}
+			})())!;
 
 			const initialPassword = {
 				websites: [genURL(), genURL(), genURL()],
@@ -345,7 +359,7 @@ export function workflowPasswordTest() {
 					instance_id: config.instance_id.toHexString()
 				}, {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					websites: expectedWebsites.map((website) => {
 						return {
 							url: website,
@@ -445,7 +459,7 @@ export function workflowPasswordTest() {
 					instance_id: config.instance_id.toHexString()
 				}, {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					password_id: passwordId!,
 					websites: expectedWebsites.map((website) => {
 						return {
@@ -527,7 +541,7 @@ export function workflowPasswordTest() {
 					instance_id: config.instance_id.toHexString()
 				}, {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					password_id: passwordId!
 				}));
 				
@@ -567,7 +581,7 @@ export function workflowPasswordTest() {
 					instance_id: config.instance_id.toHexString()
 				}, {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					password_id: passwordId!
 				}));
 			
@@ -616,7 +630,7 @@ export function workflowPasswordTest() {
 			} = config;
 			uris.push(uri);
 
-			const token = await (async () => {
+			let { token, count } = (await (async () => {
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -636,13 +650,20 @@ export function workflowPasswordTest() {
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
 				if (data.u2f_required) return;
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+				const count = decryptWithPrivateKey(data.count, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-				if (token === ERRS.INVALID_DECRYPT) return;
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (token === ERRS.INVALID_DECRYPT || count === ERRS.INVALID_DECRYPT) {
+					return;
+				}
 				assert.strictEqual(typeof token, 'string', 'token is a string');
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
 
 				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
-			})();
+				return {
+					token, count
+				};
+			})())!;
 
 			const initialPassword = {
 				websites: [genURL(), genURL(), genURL()],
@@ -669,7 +690,7 @@ export function workflowPasswordTest() {
 					instance_id: config.instance_id.toHexString()
 				}, {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					websites: expectedWebsites.map((website) => {
 						return {
 							url: website,
@@ -768,7 +789,7 @@ export function workflowPasswordTest() {
 					instance_id: config.instance_id.toHexString()
 				}, {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					password_id: passwordId!,
 					websites: expectedWebsites.map((website) => {
 						return {
@@ -844,7 +865,7 @@ export function workflowPasswordTest() {
 					instance_id: config.instance_id.toHexString()
 				}, {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					password_hash: hash(pad(userpw, 'masterpwverify'))
 				}));
 			
@@ -900,7 +921,7 @@ export function workflowPasswordTest() {
 				} = config;
 				uris.push(uri);
 
-				const token = await (async () => {
+				let { token, count } = (await (async () => {
 					const challenge = genRandomString(25);
 					const response = JSON.parse(await doServerAPIRequest({ 
 						port: http,
@@ -918,15 +939,22 @@ export function workflowPasswordTest() {
 					}
 					const data = response.data;
 					assert.isFalse(data.u2f_required, 'no further authentication is required');
-				if (data.u2f_required) return;
+					if (data.u2f_required) return;
 					const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+					const count = decryptWithPrivateKey(data.count, instance_private_key);
 					assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-					if (token === ERRS.INVALID_DECRYPT) return;
+					assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+					if (token === ERRS.INVALID_DECRYPT || count === ERRS.INVALID_DECRYPT) {
+						return;
+					}
 					assert.strictEqual(typeof token, 'string', 'token is a string');
+					assert.strictEqual(typeof count, 'number', 'type of count is number');
 
 					assert.strictEqual(data.challenge, challenge, 'challenge matches');
-					return token;
-				})();
+					return {
+						token, count
+					};
+				})())!;
 
 				const matchingHost = `www.${genRandomString(20)}.${genRandomString(3)}`;
 				const initialPassword = {
@@ -954,7 +982,7 @@ export function workflowPasswordTest() {
 						instance_id: config.instance_id.toHexString()
 					}, {
 						token: token!,
-						count: config.count++,
+						count: count++,
 						websites: expectedWebsites.map((website) => {
 							return {
 								url: website,
@@ -1054,7 +1082,7 @@ export function workflowPasswordTest() {
 						instance_id: config.instance_id.toHexString()
 					}, {
 						token: token!,
-						count: config.count++,
+						count: count++,
 						password_id: passwordId!,
 						websites: expectedWebsites.map((website) => {
 							return {
@@ -1136,7 +1164,7 @@ export function workflowPasswordTest() {
 						instance_id: config.instance_id.toHexString()
 					}, {
 						token: token!,
-						count: config.count++,
+						count: count++,
 						password_hash: hash(pad(userpw, 'masterpwverify'))
 					}));
 						
@@ -1180,7 +1208,7 @@ export function workflowPasswordTest() {
 						instance_id: config.instance_id.toHexString()
 					}, {
 						token: token!,
-						count: config.count++,
+						count: count++,
 						url: `http${
 							Math.random() > 0.5 ? 's' : ''
 						}://${
@@ -1246,7 +1274,7 @@ export function workflowPasswordTest() {
 						instance_id: config.instance_id.toHexString()
 					}, {
 						token: token!,
-						count: config.count++,
+						count: count++,
 						password_id: queryResults![0].id
 					}));
 				

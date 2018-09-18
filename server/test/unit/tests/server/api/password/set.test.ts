@@ -33,7 +33,7 @@ export function passwordSetTest() {
 			const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 
 			const expectedWebsites = [genURL(), genURL(), genURL()];
 			const expected2FAEnabled = Math.random() > 0.5;
@@ -51,7 +51,7 @@ export function passwordSetTest() {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
-				count: config.count++,
+				count: count++,
 				websites: expectedWebsites.map((website) => {
 					return {
 						url: website,
@@ -145,7 +145,7 @@ export function passwordSetTest() {
 				},
 				encrypted: {
 					token: 'someinvalidtoken',
-					count: config.count++,
+					count: 0,
 					websites: [],
 					twofactor_enabled: false,
 					u2f_enabled: false,
@@ -167,7 +167,7 @@ export function passwordSetTest() {
 				account_twofactor_enabled: true,
 			});
 			const server = await createServer(config);
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 			const { http, uri, server_public_key } = config;
 			uris.push(uri);
 
@@ -179,7 +179,7 @@ export function passwordSetTest() {
 				},
 				encrypted: {
 					token: token!,
-					count: config.count++,
+					count: count++,
 					websites: [],
 					twofactor_enabled: false,
 					u2f_enabled: false,

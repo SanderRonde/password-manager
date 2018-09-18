@@ -113,7 +113,6 @@ export interface UserAndDbData {
 	uri: string;
 	logServerOutput?: boolean;
 	enableRateLimit?: boolean;
-	count: number;
 }
 
 export interface MockConfig {
@@ -150,8 +149,7 @@ export async function genUserAndDb(config: MockConfig = {}): Promise<UserAndDbDa
 		userpw,
 		dbpw,
 		uri,
-		http: await getFreePort(30000, 50000),
-		count: 0
+		http: await getFreePort(30000, 50000)
 	}
 }
 
@@ -355,13 +353,23 @@ export async function getLoginToken(config: UserAndDbData) {
 	assert.isFalse(data.u2f_required, 'no further authentication is required');
 	if (data.u2f_required) return;
 	const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+	const count = decryptWithPrivateKey(data.count, instance_private_key);
 	assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
-	if (token === ERRS.INVALID_DECRYPT) return;
+	if (token === ERRS.INVALID_DECRYPT) {
+		return;
+	}
+	assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+	if (count === ERRS.INVALID_DECRYPT) {
+		return;
+	}
 	assert.strictEqual(typeof token, 'string', 'token is a string');
+	assert.strictEqual(typeof count, 'number', 'type of count is number');
 
 	assert.strictEqual(data.challenge, challenge, 'challenge matches');
 
-	return token;
+	return {
+		token, count
+	};
 }
 
 export function genURL(host: string = `www.${genRandomString(20)}.${genRandomString(3)}`) {
@@ -379,7 +387,7 @@ export async function setPasword(toSet: {
 	username: string;
 	password: string;
 	notes: string[];
-}, token: string, config: UserAndDbData) {
+}, token: string, count: number, config: UserAndDbData) {
 	const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
 
 	const expectedWebsites = toSet.websites.map((website) => {
@@ -407,7 +415,7 @@ export async function setPasword(toSet: {
 		twofactor_enabled: expected2FAEnabled,
 		u2f_enabled: expectedU2FEnabled,
 		encrypted: expectedEncrypted,
-		count: config.count++,
+		count: count,
 		username: expectedUsername
 	}));
 

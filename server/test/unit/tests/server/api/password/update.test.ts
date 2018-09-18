@@ -38,8 +38,7 @@ export function passwordUpdateTest() {
 			const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
-
+			let { token, count } = (await getLoginToken(config))!;
 
 			const passwordId = await setPasword({
 				websites: [],
@@ -48,7 +47,7 @@ export function passwordUpdateTest() {
 				username: 'username',
 				password: 'password',
 				notes: []		
-			}, token!, config);
+			}, token, count++, config);
 
 			const expectedWebsites = [genURL(), genURL(), genURL()];
 			const expected2FAEnabled = Math.random() > 0.5;
@@ -66,7 +65,7 @@ export function passwordUpdateTest() {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
-				count: config.count++,
+				count: count++,
 				password_id: passwordId!,
 				websites: expectedWebsites.map((website) => {
 					return {
@@ -153,7 +152,7 @@ export function passwordUpdateTest() {
 			const { http, uri, server_public_key, userpw } = config;
 			uris.push(uri);
 
-			const loginToken = await getLoginToken(config);
+			let { token: loginToken, count } = (await getLoginToken(config))!;
 
 			const passwordId = await setPasword({
 				websites: [],
@@ -162,7 +161,7 @@ export function passwordUpdateTest() {
 				username: 'username',
 				password: 'password',
 				notes: []		
-			}, loginToken!, config);
+			}, loginToken, count++, config);
 
 			const expectedWebsites = [genURL(), genURL(), genURL()];
 			const expected2FAEnabled = Math.random() > 0.5;
@@ -181,7 +180,7 @@ export function passwordUpdateTest() {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: loginToken!,
-				count: config.count++,
+				count: count++,
 				password_id: passwordId!,
 				websites: expectedWebsites.map((website) => {
 					return {
@@ -215,7 +214,7 @@ export function passwordUpdateTest() {
 			const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 
 			const passwordId = await setPasword({
 				websites: [],
@@ -224,7 +223,7 @@ export function passwordUpdateTest() {
 				username: 'username',
 				password: 'password',
 				notes: []		
-			}, token!, config);
+			}, token, count++, config);
 
 			const expectedWebsites = [genURL(), genURL(), genURL()];
 			const expected2FAEnabled = Math.random() > 0.5;
@@ -243,7 +242,7 @@ export function passwordUpdateTest() {
 				instance_id: config.instance_id.toHexString()
 			}, {
 				token: token!,
-				count: config.count++,
+				count: count++,
 				password_id: passwordId!,
 				websites: expectedWebsites.map((website) => {
 					return {
@@ -338,7 +337,7 @@ export function passwordUpdateTest() {
 				encrypted: {
 					password_id: 'someid' as StringifiedObjectId<EncryptedPassword>,
 					token: 'someinvalidtoken',
-					count: config.count++,
+					count: 0,
 					websites: [],
 					twofactor_enabled: false,
 					u2f_enabled: false,
@@ -360,7 +359,7 @@ export function passwordUpdateTest() {
 				account_twofactor_enabled: true,
 			});
 			const server = await createServer(config);
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 			const { http, uri, server_public_key } = config;
 			uris.push(uri);
 
@@ -373,7 +372,7 @@ export function passwordUpdateTest() {
 				encrypted: {
 					password_id: 'someid' as StringifiedObjectId<EncryptedPassword>,
 					token: token!,
-					count: config.count++,
+					count: count,
 					websites: [],
 					username: 'someusername',
 					twofactor_enabled: false,
@@ -396,7 +395,7 @@ export function passwordUpdateTest() {
 				account_twofactor_enabled: true,
 			});
 			const server = await createServer(config);
-			const token = await getLoginToken(config);
+			let { token, count } = (await getLoginToken(config))!;
 			const { http, uri, server_public_key, instance_id } = config;
 			uris.push(uri);
 
@@ -409,7 +408,7 @@ export function passwordUpdateTest() {
 				encrypted: {
 					password_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 					token: token!,
-					count: config.count++,
+					count: count++,
 					websites: [],
 					twofactor_enabled: false,
 					u2f_enabled: false,

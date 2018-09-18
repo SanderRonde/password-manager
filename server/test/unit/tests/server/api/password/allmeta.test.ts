@@ -28,7 +28,7 @@ export function passwordAllmetaTest() {
 			const { http, uri, server_public_key, instance_private_key, userpw } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			let { count, token } = (await getLoginToken(config))!;
 
 			const expectedPasswords = [{
 				websites: [genURL(), genURL()],
@@ -53,7 +53,7 @@ export function passwordAllmetaTest() {
 					username: expectedPasswords[0].username,
 					password: expectedPasswords[0].password,
 					notes: expectedPasswords[0].notes
-				}, token!, config), 
+				}, token, count++, config), 
 				await setPasword({
 					websites: expectedPasswords[1].websites,
 					twofactor_enabled: expectedPasswords[1].twofactorEnabled,
@@ -61,7 +61,7 @@ export function passwordAllmetaTest() {
 					username: expectedPasswords[1].username,
 					password: expectedPasswords[1].password,
 					notes: expectedPasswords[1].notes
-				}, token!, config)
+				}, token, count++, config)
 			];
 
 			const response = JSON.parse(await doServerAPIRequest({ 
@@ -70,7 +70,7 @@ export function passwordAllmetaTest() {
 			}, '/api/password/allmeta', {
 				instance_id: config.instance_id.toHexString()
 			}, {
-				count: config.count++,
+				count: count++,
 				token: token!,
 				password_hash: hash(pad(userpw, 'masterpwverify'))
 			}));
@@ -127,7 +127,7 @@ export function passwordAllmetaTest() {
 					instance_id: config.instance_id.toHexString()
 				},
 				encrypted: {
-					count: config.count++,
+					count: 0,
 					token: 'wrongtoken',
 					password_hash: hash(pad(userpw, 'masterpwverify'))
 				},
@@ -147,7 +147,7 @@ export function passwordAllmetaTest() {
 			const { http, uri, server_public_key, userpw } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			const { token, count } = (await getLoginToken(config))!;
 			await testInvalidCredentials({
 				route: '/api/password/allmeta',
 				port: http,
@@ -155,7 +155,7 @@ export function passwordAllmetaTest() {
 					instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>
 				},
 				encrypted: {
-					count: config.count++,
+					count: count,
 					token: token!,
 					password_hash: hash(pad(userpw, 'masterpwverify'))
 				},
@@ -176,7 +176,7 @@ export function passwordAllmetaTest() {
 			const { http, uri, server_public_key } = config;
 			uris.push(uri);
 
-			const token = await getLoginToken(config);
+			const { token, count } = (await getLoginToken(config))!;
 			await testInvalidCredentials({
 				route: '/api/password/allmeta',
 				port: http,
@@ -184,8 +184,8 @@ export function passwordAllmetaTest() {
 					instance_id: config.instance_id.toHexString()
 				},
 				encrypted: {
-					count: config.count++,
-					token: token!,
+					count: count,
+					token: token,
 					password_hash: hash(pad('wrongpassword', 'masterpwverify'))
 				},
 				server: server,

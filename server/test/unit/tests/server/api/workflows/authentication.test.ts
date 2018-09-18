@@ -80,8 +80,11 @@ export function authenticationWorkflowTest() {
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
 				if (data.u2f_required) return;
 				const token = decryptWithPrivateKey(data.auth_token, clientPrivateKey!);
+				const count = decryptWithPrivateKey(data.count, clientPrivateKey!);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 				assert.strictEqual(typeof token, 'string', 'token is a string');
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
 
 				assert.strictEqual(data.challenge, challenge, 'challenge matches');
 			})();
@@ -156,7 +159,7 @@ export function authenticationWorkflowTest() {
 			} = config;
 			uris.push(uri);
 
-			const token = await (async () => {	
+			const { token, count } = await (async () => {	
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -170,20 +173,40 @@ export function authenticationWorkflowTest() {
 				
 				assert.isTrue(response.success, 'API call succeeded');
 				if (!response.success) {
-					return;
+					return {
+						token: null,
+						count: null
+					};
 				}
 				const data = response.data;
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
-				if (data.u2f_required) return;
+				if (data.u2f_required) return {
+					token: null,
+					count: null
+				};
 				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+				const count = decryptWithPrivateKey(data.count, instance_private_key);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 				if (token === ERRS.INVALID_DECRYPT) {
-					return;
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (count === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
 				}
 				assert.strictEqual(typeof token, 'string', 'token is a string');
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
 			
 				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
+				return {
+					token, count
+				};
 			})();
 			await (async () => {	
 				const response = JSON.parse(await doServerAPIRequest({ 
@@ -192,7 +215,7 @@ export function authenticationWorkflowTest() {
 				}, '/api/instance/extend_key', {
 					instance_id: instance_id.toHexString()
 				}, {
-					count: config.count++,
+					count: count!,
 					old_token: token!
 				}));
 			
@@ -252,7 +275,7 @@ export function authenticationWorkflowTest() {
 					serverPublicKey: server_key
 				}
 			})();
-			const token = await (async () => {
+			const { token, count } = await (async () => {
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -266,20 +289,40 @@ export function authenticationWorkflowTest() {
 
 				assert.isTrue(response.success, 'API call succeeded');
 				if (!response.success) {
-					return;
+					return {
+						token: null,
+						count: null
+					};
 				}
 				const data = response.data;
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
-				if (data.u2f_required) return;
+				if (data.u2f_required) return {
+					token: null,
+					count: null
+				};
 				const token = decryptWithPrivateKey(data.auth_token, clientPrivateKey!);
+				const count = decryptWithPrivateKey(data.count, clientPrivateKey!);
 				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
 				if (token === ERRS.INVALID_DECRYPT) {
-					return;
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (count === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
 				}
 				assert.strictEqual(typeof token, 'string', 'token is a string');
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
 
 				assert.strictEqual(data.challenge, challenge, 'challenge matches');
-				return token;
+				return {
+					token, count
+				};
 			})();
 			const newToken = await (async () => {	
 				const response = JSON.parse(await doServerAPIRequest({ 
@@ -288,7 +331,7 @@ export function authenticationWorkflowTest() {
 				}, '/api/instance/extend_key', {
 					instance_id: instanceId!
 				}, {
-					count: config.count++,
+					count: count!,
 					old_token: token!
 				}));
 			

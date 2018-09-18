@@ -95,13 +95,16 @@ export class WebserverAuth {
 	public genLoginToken(instance: StringifiedObjectId<EncryptedInstance>,
 		account: StringifiedObjectId<EncryptedAccount>) {
 			const token = this._genRandomToken();
+			const count = Math.floor(Math.random() * 1000000);
 			this._loginTokens.set(token, {
 				instance,
 				account,
 				expires: Date.now() + AUTH_TOKEN_EXPIRE_TIME,
-				count: 0
+				count: count
 			});
-			return token;
+			return {
+				token, count
+			};
 		}
 
 	private _invalidateInstanceTokens(account: StringifiedObjectId<EncryptedAccount>) {
@@ -166,7 +169,10 @@ export class WebserverAuth {
 		instance: StringifiedObjectId<EncryptedInstance>,
 		account: StringifiedObjectId<EncryptedAccount>): {
 			success: true;
+			token: {
 			token: APIToken;
+				count: number;
+			};
 		}|{
 			success: false;
 			reason: string;

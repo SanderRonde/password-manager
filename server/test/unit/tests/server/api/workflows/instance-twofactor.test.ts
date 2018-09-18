@@ -381,7 +381,7 @@ export function instanceTwofactorTest() {
 			} = config;
 			uris.push(uri);
 
-			const authToken = await (async () => {	
+			const { token: authToken, count } = await (async () => {	
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -399,16 +399,36 @@ export function instanceTwofactorTest() {
 				
 				assert.isTrue(response.success, 'API call succeeded');
 				if (!response.success) {
-					return;
+					return {
+						token: null, count: null
+					};
 				}
 				const data = response.data;
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
-				if (data.u2f_required) return;
-				assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
-				const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key);
-				assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-				if (decrypted === ERRS.INVALID_DECRYPT) return;
-				return decrypted;
+				if (data.u2f_required) return {
+					token: null, count: null
+				};
+				const token = decryptWithPrivateKey(data.auth_token, instance_private_key);
+				const count = decryptWithPrivateKey(data.count, instance_private_key);
+				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (token === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (count === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.strictEqual(typeof token, 'string', 'token is a string');
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
+				return {
+					token, count
+				};
 			})();
 			//Check if it's valid by extending the key
 			await (async () => {	
@@ -419,7 +439,7 @@ export function instanceTwofactorTest() {
 					instance_id: instance_id.toHexString()
 				}, {
 					old_token: authToken!,
-					count: config.count++
+					count: count!
 				}));
 			
 				server.kill();
@@ -529,7 +549,7 @@ export function instanceTwofactorTest() {
 				if (decrypt === ERRS.INVALID_DECRYPT) return;
 				assert.strictEqual(decrypt, true, '2FA is now enabled');
 			})();
-			const authToken = await (async () => {	
+			const { token: authToken, count } = await (async () => {	
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -547,16 +567,36 @@ export function instanceTwofactorTest() {
 				
 				assert.isTrue(response.success, 'API call succeeded');
 				if (!response.success) {
-					return;
+					return {
+						token: null, count: null
+					};
 				}
 				const data = response.data;
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
-				if (data.u2f_required) return;
-				assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
-				const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key!);
-				assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-				if (decrypted === ERRS.INVALID_DECRYPT) return;
-				return decrypted;
+				if (data.u2f_required) return {
+					token: null, count: null
+				};
+				const token = decryptWithPrivateKey(data.auth_token, instance_private_key!);
+				const count = decryptWithPrivateKey(data.count, instance_private_key!);
+				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (token === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (count === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.strictEqual(typeof token, 'string', 'token is a string');
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
+				return {
+					token, count
+				};
 			})();
 			//Check if it's valid by extending the key
 			await (async () => {	
@@ -567,9 +607,8 @@ export function instanceTwofactorTest() {
 					instance_id: instance_id!
 				}, {
 					old_token: authToken!,
-					count: config.count++
+					count: count!
 				}));
-				config.count = 0;
 				
 				assert.isTrue(response.success, 'API call succeeded')
 				if (!response.success) {
@@ -597,7 +636,7 @@ export function instanceTwofactorTest() {
 				assert.isTrue(response.success, 'API call succeeded');
 				if (!response.success) return;
 				const data = response.data;
-			assert.isFalse(!!(data as {
+				assert.isFalse(!!(data as {
 					message: 'state unchanged (was already set)'
 				}).message, 'state is not unchanged');
 				if ((data as {
@@ -747,7 +786,7 @@ export function instanceTwofactorTest() {
 				if (decrypt === ERRS.INVALID_DECRYPT) return;
 				assert.strictEqual(decrypt, true, '2FA is now enabled');
 			})();
-			const authToken = await (async () => {
+			const { token: authToken, count } = await (async () => {
 				const challenge = genRandomString(25);
 				const response = JSON.parse(await doServerAPIRequest({ 
 					port: http,
@@ -765,16 +804,36 @@ export function instanceTwofactorTest() {
 				
 				assert.isTrue(response.success, 'API call succeeded');
 				if (!response.success) {
-					return;
+					return {
+						token: null, count: null
+					};
 				}
 				const data = response.data;
 				assert.isFalse(data.u2f_required, 'no further authentication is required');
-				if (data.u2f_required) return;
-				assert.strictEqual(typeof data.auth_token, 'string', 'auth token is a string');
-				const decrypted = decryptWithPrivateKey(data.auth_token, instance_private_key!);
-				assert.notStrictEqual(decrypted, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-				if (decrypted === ERRS.INVALID_DECRYPT) return;
-				return decrypted;
+				if (data.u2f_required) return {
+					token: null, count: null
+				};
+				const token = decryptWithPrivateKey(data.auth_token, instance_private_key!);
+				const count = decryptWithPrivateKey(data.count, instance_private_key!);
+				assert.notStrictEqual(token, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (token === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.notStrictEqual(count, ERRS.INVALID_DECRYPT, 'is not invalid decrypt');
+				if (count === ERRS.INVALID_DECRYPT) {
+					return {
+						token: null,
+						count: null
+					};
+				}
+				assert.strictEqual(typeof token, 'string', 'token is a string');
+				assert.strictEqual(typeof count, 'number', 'type of count is number');
+				return {
+					token, count
+				};
 			})();
 			//Check if it's valid by extending the key
 			await (async () => {	
@@ -785,9 +844,8 @@ export function instanceTwofactorTest() {
 					instance_id: instance_id!
 				}, {
 					old_token: authToken!,
-					count: config.count++
+					count: count!
 				}));
-				config.count = 0;
 				
 				assert.isTrue(response.success, 'API call succeeded')
 				if (!response.success) {

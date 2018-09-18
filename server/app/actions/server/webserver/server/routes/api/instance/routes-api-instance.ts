@@ -182,10 +182,12 @@ export class RoutesApiInstance {
 			}
 		}
 
+		const token = this.server.Auth.genLoginToken(
+			instance._id.toHexString(), account._id.toHexString());
 		return {
 			u2f_required: false,
-			auth_token: encryptWithPublicKey(this.server.Auth.genLoginToken(
-				instance._id.toHexString(), account._id.toHexString()), publicKey),
+			auth_token: encryptWithPublicKey(token.token, publicKey),
+			count: encryptWithPublicKey(token.count, publicKey),
 			challenge: solved
 		}
 	}
@@ -249,11 +251,12 @@ export class RoutesApiInstance {
 			const { instance } = await this.server.Router.verifyAndGetInstance(instance_id, res);
 			if (!instance) return;
 
-			if (!this.server.Auth.invalidateToken(token, instance._id.toHexString())) {
+			const result = this.server.Auth.invalidateToken(token, instance._id.toHexString());
+			if (!result) {
 				res.status(200);
 				res.json({
 					success: false,
-					error: 'invalid credentials',
+					error: 'invalid credentials is-invalid' + result,
 					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 			} else {
@@ -307,7 +310,8 @@ export class RoutesApiInstance {
 				res.json({
 					success: true,
 					data: {
-						auth_token: encryptWithPublicKey(newToken.token, publicKey)
+						auth_token: encryptWithPublicKey(newToken.token.token, publicKey),
+						count: encryptWithPublicKey(newToken.token.count, publicKey)
 					}
 				});
 			}
