@@ -2,6 +2,7 @@ import { PasswordPreview } from "../components/page-specific/dashboard/password-
 import { PasswordDetail } from "../components/page-specific/dashboard/password-detail/password-detail";
 import { HorizontalCenterer } from "../components/util/horizontal-centerer/horizontal-centerer";
 import { VerticalCenterer } from "../components/util/vertical-centerer/vertical-centerer";
+import { DashboardWeb } from "../components/entrypoints/web/dashboard/dashboard-web";
 import { AnimatedButton } from "../components/util/animated-button/animated-button";
 import { LoadingSpinner } from "../components/util/loading-spinner/loading-spinner";
 import { MaterialInput } from "../components/util/material-input/material-input";
@@ -21,6 +22,7 @@ declare global {
 	type HTMLLoginElement = LoginWeb;
 	type HTMLIconButtonElement = IconButton;
 	type HTMLPaperToastElement = PaperToast;
+	type HTMLDashboardElement = DashboardWeb;
 	type HTMLPaperButtonElement = PaperButton;
 	type HTMLSizingBlockElement = SizingBlock;
 	type HTMLLoadableBlockElement = LoadableBlock;
@@ -38,6 +40,8 @@ declare global {
 		name: 'md-card'
 	}|LoginWeb & {
 		name: 'login-web'
+	}|DashboardWeb & {
+		name: 'dashboard-web'
 	}|IconButton & {
 		name: 'icon-button'
 	}|PaperToast & {
