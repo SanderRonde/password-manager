@@ -75,13 +75,18 @@ export function listenWithIdentifier<I extends {
 }, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, element: HTMLElement, identifier: string, event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
 	doListen(base, 'identifier', element, identifier, event, listener, options);
 }
-const usedElements: WeakSet<HTMLElement> = new WeakSet();
-export function isNewElement(element: HTMLElement) {
+const defaultContext = {};
+const usedElements: WeakMap<any, WeakSet<HTMLElement>> = new WeakMap();
+export function isNewElement(element: HTMLElement, context: Object = defaultContext) {
 	if (!element)
 		return false;
-	const has = usedElements.has(element);
+	if (!usedElements.has(context)) {
+		usedElements.set(context, new WeakSet());
+	}
+	const currentContext = usedElements.get(context)!;
+	const has = currentContext.has(element);
 	if (!has) {
-		usedElements.add(element);
+		currentContext.add(element);
 	}
 	return !has;
 }
