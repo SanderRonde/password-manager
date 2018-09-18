@@ -141,11 +141,11 @@ export class WebserverAuth {
 			}
 
 			if (match.instance !== instance ||
-				(match.count !== COUNT.ANY_COUNT && match.count !== count)) {
+				(count !== COUNT.ANY_COUNT && match.count !== count)) {
 					this._loginTokens.delete(token);
 					return false;
 				}
-			if (match.count !== COUNT.ANY_COUNT) {
+			if (count !== COUNT.ANY_COUNT) {
 				this.incrementCount(token);
 			}
 			return true;
