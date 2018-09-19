@@ -230,7 +230,7 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 				let userId: TypedObjectID<EncryptedAccount>;
 				await this._parent.collection('users').done;
 				this._parent.collection('users').find().toArray((_err, userRecord) => {
-					userId = (userRecord as any)._id;
+					userId = userRecord[0]._id;
 				});
 
 				await this._parent.collection('assets').done;
