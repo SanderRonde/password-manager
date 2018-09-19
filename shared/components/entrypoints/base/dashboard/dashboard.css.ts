@@ -142,5 +142,10 @@ export const DashboardCSS = new TemplateFn<Dashboard>((_props, theme) => {
 		#passwordFocus {
 			display: block;
 		}
+
+		#noPasswords {
+			font-size: 130%;
+			font-weight: 500;
+		}
 	</style>`
 }, CHANGE_TYPE.THEME);

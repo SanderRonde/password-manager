@@ -20,24 +20,29 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, 
 				<div id="pageContainer">
 					<div id="passwordList">
 						<div id="passwordTop"></div>
-						<infinite-list custom-css="${CustomDashboardCSS.infiniteList}" 
-							window id="infiniteList" data-name="password" 
-							item-size="${this.getItemSize}"
-							ref="${this}"
-							data="${props.metaPasswords || []}"
-						>
-							<template slot="template">
-								<password-preview id="password.id"
-									websites="password.websites"
-									username="password.username"
-									twofactor_enabled="password.twofactor_enabled"
-									u2f_enabled="password.u2f_enabled"
-									selected="password_data.selected"
-									index="_index"
-									ref="_this"
-								></password-preview>
-							</template>
-						</infinite-list>
+						${props.metaPasswords && props.metaPasswords.length === 0 ?
+							html`<md-card id="noPasswords" level="3">
+								No passwords, click the add button to add some
+							</md-card>` : html`
+								<infinite-list custom-css="${CustomDashboardCSS.infiniteList}" 
+									window id="infiniteList" data-name="password" 
+									item-size="${this.getItemSize}"
+									ref="${this}"
+									data="${props.metaPasswords || []}"
+								>
+									<template slot="template">
+										<password-preview id="password.id"
+											websites="password.websites"
+											username="password.username"
+											twofactor_enabled="password.twofactor_enabled"
+											u2f_enabled="password.u2f_enabled"
+											selected="password_data.selected"
+											index="_index"
+											ref="_this"
+										></password-preview>
+									</template>
+								</infinite-list>`
+							}
 					</div>
 					<div id="passwordDetail">
 						<div id="passwordDetailTop"></div>
