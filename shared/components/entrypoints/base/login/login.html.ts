@@ -18,8 +18,8 @@ export const LoginHTML = new TemplateFn<Login>(function (props, _) {
 								type="email" title="Account's email"
 								error="Please enter a valid email address"
 								autoComplete="username" fill required
-								on-valid="${inlineListener(this.updateValidity, this)}"
-								on-keydown="${inlineListener(this.onSubmit, this)}"
+								wc-valid="${inlineListener(this.updateValidity, this)}"
+								wc-keydown="${inlineListener(this.onSubmit, this)}"
 								autoFocus label="Email"
 							>
 								<icon-button tabIndex="-1" slot="postIcon"
@@ -37,15 +37,15 @@ export const LoginHTML = new TemplateFn<Login>(function (props, _) {
 								type="password" title="Account password"
 								error="Please enter a password"
 								autoComplete="password" fill required
-								on-valid="${inlineListener(this.updateValidity, this)}"
-								on-keydown="${inlineListener(this.onSubmit, this)}"
+								wc-valid="${inlineListener(this.updateValidity, this)}"
+								wc-keydown="${inlineListener(this.onSubmit, this)}"
 								autoFocus label="Password"></material-input>
 							<material-input id="twofactorInput" name="twofactor"
 								type="tel" autoComplete="off" fill
 								pattern="\\d{6}" error="Enter a 6-digit code"
 								title="Twofactor authentication token (if enabled for the account)"
-								on-valid="${inlineListener(this.updateValidity, this)}"
-								on-keydown="${inlineListener(this.onSubmit, this)}"
+								wc-valid="${inlineListener(this.updateValidity, this)}"
+								wc-keydown="${inlineListener(this.onSubmit, this)}"
 								autoFocus label="2FA Token (if enabled)"></material-input>
 							<div id="buttonPositioner">
 								<animated-button aria-label="Submit form" id="button" 
