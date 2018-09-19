@@ -774,14 +774,17 @@ export class RoutesApiPassword {
 				data: {
 					encrypted: encryptWithPublicKey(JSON.stringify({
 						id: password._id.toHexString(),
-						websites: websites.map((website) => {
+						websites: await Promise.all(websites.map(async (website) => {
+							const assetPath = website.favicon === null ?
+									null : await this._getAssetPath(website.favicon!, 
+										decryptedInstance.user_id.toHexString());
 							return {
 								host: website.host,
 								exact: website.exact,
 								favicon: website.favicon === null ? null :
-									'/' + path.relative(this.server.assetPath, website.favicon)
+									'/' + path.relative(this.server.assetPath, assetPath!)
 							}
-						}),
+						})),
 						username,
 						twofactor_enabled: twofactor_enabled,
 						u2f_enabled: u2f_enabled,
@@ -836,14 +839,17 @@ export class RoutesApiPassword {
 				data: {
 					encrypted: encryptWithPublicKey(JSON.stringify({
 						id: password._id.toHexString(),
-						websites: websites.map((website) => {
+						websites: await Promise.all(websites.map(async (website) => {
+							const assetPath = website.favicon === null ?
+									null : await this._getAssetPath(website.favicon!, 
+										decryptedInstance.user_id.toHexString());
 							return {
 								host: website.host,
 								exact: website.exact,
 								favicon: website.favicon === null ? null :
-									'/' + path.relative(this.server.assetPath, website.favicon)
+									'/' + path.relative(this.server.assetPath, assetPath!)
 							}
-						}),
+						})),
 						username,
 						twofactor_enabled: twofactor_enabled,
 						u2f_enabled: u2f_enabled,
@@ -855,6 +861,24 @@ export class RoutesApiPassword {
 			});
 		})(req, res, next);
 	}
+
+	private async _getAssetPath(id: StringifiedObjectId<EncryptedAsset>, 
+		userId: StringifiedObjectId<EncryptedAccount>): Promise<string|null> {
+			const encryptedAsset = await this.server.database.Manipulation.findOne(
+				COLLECTIONS.ASSETS, {
+					_id: id
+				});
+			if (encryptedAsset === null) {
+				return null;
+			}
+
+			const decryptedAsset = this.server.database.Crypto.dbDecryptAssetRecord(
+				encryptedAsset);
+			if (userId in decryptedAsset.by_user_id) {
+				return decryptedAsset.by_user_id[userId];
+			}
+			return decryptedAsset.default || null;
+		}
 
 	public async doGetAllMeta(instanceId: StringifiedObjectId<EncryptedInstance>, password: {
 		skip: true;
@@ -936,24 +960,26 @@ export class RoutesApiPassword {
 			data: {
 				success: true,
 				data: {
-					encrypted: encryptWithPublicKey(JSON.stringify(passwords.map((password) => {
+					encrypted: encryptWithPublicKey(JSON.stringify(await Promise.all(passwords.map(async (password) => {
 						const decrypted = this.server.database.Crypto
 							.dbDecryptPasswordRecord(password);
 						return {
 							id: password._id.toHexString(),
 							username: decrypted.username,
-							websites: decrypted.websites.map((website) => {
+							websites: await Promise.all(decrypted.websites.map(async (website) => {
+								const assetPath = website.favicon === null ?
+									null : await this._getAssetPath(website.favicon!, account._id.toHexString());
 								return {
 									host: website.host,
 									exact: website.exact,
 									favicon: website.favicon === null ? null :
-										'/' + path.relative(this.server.assetPath, website.favicon)
+										'/' + path.relative(this.server.assetPath, assetPath!)
 								}
-							}),
+							})),
 							twofactor_enabled: decrypted.twofactor_enabled,
 							u2f_enabled: decrypted.u2f_enabled
 						}
-					})), decryptedInstance.public_key)
+					}))), decryptedInstance.public_key)
 				}
 			}
 		}
@@ -1071,24 +1097,26 @@ export class RoutesApiPassword {
 			res.json({
 				success: true,
 				data: {
-					encrypted: encryptWithPublicKey(JSON.stringify(passwords.map((password) => {
+					encrypted: encryptWithPublicKey(JSON.stringify(await Promise.all(passwords.map(async (password) => {
 						const decrypted = this.server.database.Crypto
 							.dbDecryptPasswordRecord(password);
 						return {
 							id: password._id.toHexString(),
 							username: decrypted.username,
-							websites: decrypted.websites.map((website) => {
+							websites: await Promise.all(decrypted.websites.map(async (website) => {
+								const assetPath = website.favicon === null ?
+									null : await this._getAssetPath(website.favicon!, account._id.toHexString());
 								return {
 									host: website.host,
 									exact: website.exact,
 									favicon: website.favicon === null ? null :
-										'/' + path.relative(this.server.assetPath, website.favicon)
+										'/' + path.relative(this.server.assetPath, assetPath!)
 								}
-							}),
+							})),
 							twofactor_enabled: decrypted.twofactor_enabled,
 							u2f_enabled: decrypted.u2f_enabled
 						}
-					})), decryptedInstance.public_key)
+					}))), decryptedInstance.public_key)
 				}
 			});
 		})(req, res, next);
