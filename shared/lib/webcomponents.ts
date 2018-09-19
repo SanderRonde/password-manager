@@ -187,7 +187,6 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 			} else {
 				this._template = null;
 			}
-			this._template = this._fn ? (this._fn as any)() : null;
 		} else {
 			this._changeOn = this._changeType,
 			this._template = this._fn as any
