@@ -162,30 +162,44 @@ export type TemplateFnConfig = {
 	template: TemplateRenderFunction<any>
 };
 export class TemplateFn<T extends WebComponent<any, any> = any> {
-	private _changeOn: CHANGE_TYPE;
-	private _template: (TemplateRenderFunction<T>)|TemplateResult|null;
+	private _changeOn!: CHANGE_TYPE;
+	private _template!: (TemplateRenderFunction<T>)|TemplateResult|null;
+	private _initialized: boolean = false;
 
-	constructor(fn: (TemplateRenderFunction<T>)|null,
-		changeType: CHANGE_TYPE.NEVER);
-	constructor(fn: (TemplateRenderFunction<T>),
-		changeType: CHANGE_TYPE.ALWAYS);
-	constructor(fn: (TemplateRenderFunction<T>),
-		changeType: CHANGE_TYPE.PROP);
-	constructor(fn: (TemplateRenderFunction<T>),
-		changeType: CHANGE_TYPE.THEME);
-	constructor(fn: (TemplateRenderFunction<T>)|null,
-		changeType: CHANGE_TYPE) { 
-		if (changeType === CHANGE_TYPE.NEVER) {
-				this._changeOn = CHANGE_TYPE.NEVER,
-				//Args don't matter here as they aren't used
-				this._template = fn ? (fn as any)() : null;
+	constructor(_fn: (TemplateRenderFunction<T>)|null,
+		_changeType: CHANGE_TYPE.NEVER);
+	constructor(_fn: (TemplateRenderFunction<T>),
+		_changeType: CHANGE_TYPE.ALWAYS);
+	constructor(_fn: (TemplateRenderFunction<T>),
+		_changeType: CHANGE_TYPE.PROP);
+	constructor(_fn: (TemplateRenderFunction<T>),
+		_changeType: CHANGE_TYPE.THEME);
+	constructor(private _fn: (TemplateRenderFunction<T>)|null,
+		private _changeType: CHANGE_TYPE) { }
+
+	private _doInitialRender(component: T) {
+		if (this._changeType === CHANGE_TYPE.NEVER) {
+			//Args don't matter here as they aren't used
+			this._changeOn = CHANGE_TYPE.NEVER;
+			if (this._fn) {
+				this._template = typeSafeCall(this._fn as any,
+					component) as any;
 			} else {
-				this._changeOn = changeType,
-				this._template = fn as any
+				this._template = null;
+			}
+			this._template = this._fn ? (this._fn as any)() : null;
+		} else {
+			this._changeOn = this._changeType,
+			this._template = this._fn as any
 		}
 	}
 
 	public render(changeType: CHANGE_TYPE, component: T) {
+		if (!this._initialized) {
+			this._doInitialRender(component);
+			this._initialized = true;
+		}
+
 		if (!componentTemplateMap.has(component)) {
 			componentTemplateMap.set(component, new WeakMap());
 		}
