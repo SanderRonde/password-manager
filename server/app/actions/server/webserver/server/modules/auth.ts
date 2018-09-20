@@ -179,16 +179,16 @@ export class WebserverAuth {
 		} {
 			const isReused = this._isTokenReused(oldToken, account);
 			if (!isReused && this.verifyAPIToken(oldToken, count, instance)) {
-					//Delete old token
-					this._loginTokens.delete(oldToken);
-					this._expiredTokens.add(oldToken);
+				//Delete old token
+				this._loginTokens.delete(oldToken);
+				this._expiredTokens.add(oldToken);
 
-					//Create new token
-					return {
-						success: true,
-						token: this.genLoginToken(instance, account)
-					}
+				//Create new token
+				return {
+					success: true,
+					token: this.genLoginToken(instance, account)
 				}
+			}
 			return {
 				success: false,
 				reason: isReused ? 
@@ -234,16 +234,16 @@ export class WebserverAuth {
 	public genU2FToken(instance: StringifiedObjectId<EncryptedInstance>,
 		account: StringifiedObjectId<EncryptedAccount>, type: 'enable'|'disable'|'verify',
 		request: U2FRequest): U2FToken {
-				const token = this._genRandomToken();
-				this._u2fTokens.set(token, {
-					instance,
-					account,
-					type,
-					request,
-					expires: Date.now() + (1000 * 60 * 10)
-				});
-				return token;
-			}
+			const token = this._genRandomToken();
+			this._u2fTokens.set(token, {
+				instance,
+				account,
+				type,
+				request,
+				expires: Date.now() + (1000 * 60 * 10)
+			});
+			return token;
+		}
 
 	public verifyU2FToken(token: U2FToken, instance: StringifiedObjectId<EncryptedInstance>): {
 		isValid: true;
