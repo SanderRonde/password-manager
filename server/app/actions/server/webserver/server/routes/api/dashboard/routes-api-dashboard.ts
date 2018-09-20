@@ -80,7 +80,7 @@ export class RoutesAPIDashboard {
 				db_public_key: public_key,
 				public_key: keyPair.publicKey,
 				expires: Date.now() + COMM_TOKEN_DEFAULT_EXPIRE_TIME
-			}, res);
+			}, res, true);
 			if (!instanceData) return;
 
 			//Decrypt the instance data

@@ -18,7 +18,8 @@ export class RoutesApiInstance {
 
 	private static readonly nearInfinity = Date.now() + (1000 * 60 * 60 * 24 * 365 * 1000);
 	public async doRegister({
-		email, password, public_key, expires = RoutesApiInstance.nearInfinity, 
+		email, password, public_key,
+		expires = RoutesApiInstance.nearInfinity, 
 		db_public_key = public_key
 	}: {
 		email: string;
@@ -26,7 +27,7 @@ export class RoutesApiInstance {
 		db_public_key?: string;
 		password: Hashed<Padded<MasterPassword, MasterPasswordVerificationPadding>>;
 		expires?: number
-	}, res: ServerResponse) {
+	}, res: ServerResponse, isDashboard: boolean = false) {
 		const auth = await this.server.Router.checkEmailPassword(
 			email, password, res);
 		if (auth === false) {
@@ -58,9 +59,10 @@ export class RoutesApiInstance {
 				return;
 			}
 		
-		
-		sendEmail(this.server.config, auth.email,
-			'New instance registered', 'A new instance was registered to your email');
+		if (!isDashboard) {
+			sendEmail(this.server.config, auth.email,
+				'New instance registered', 'A new instance was registered to your email');
+		}
 		return {
 			id: encryptWithPublicKey(result.toHexString(), public_key),
 			server_key: encryptWithPublicKey(serverPublicKey, public_key)
