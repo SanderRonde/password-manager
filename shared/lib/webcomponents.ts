@@ -669,6 +669,7 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends WebComponentComplexValueManager<E> {
 	private __hasCustomCSS: boolean|null = null;
 	private _noCustomCSS: TemplateFn = new TemplateFn(null, CHANGE_TYPE.NEVER);
+	public abstract isMounted: boolean;
 
 	protected _hasCustomCSS() {
 		if (this.__hasCustomCSS !== null) {
@@ -677,7 +678,10 @@ abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends 
 		if (!this.hasAttribute('custom-css') ||
 			!this.getParentRef(this.getAttribute('custom-css')!)) {
 				//No custom CSS applies
-				return (this.__hasCustomCSS = false);
+				if (this.isMounted) {
+					this.__hasCustomCSS = false;
+				}
+				return false;
 			}
 
 		return (this.__hasCustomCSS = true);
