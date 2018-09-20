@@ -40,7 +40,7 @@ function getEntrypointValue(entrypoint: ENTRYPOINT) {
 }
 
 //Should be kept in sync with server/app/lib/constants.ts
-const AUTH_TOKEN_EXPIRE_TIME = 1000 * 60 * 18
+const AUTH_TOKEN_EXPIRE_TIME = 1000 * 60 * 15;
 
 @config({
 	is: 'global-controller',
