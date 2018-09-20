@@ -20,7 +20,10 @@
         "strictNullChecks": true,
         "declaration": true,
 		"sourceMap": true,
-		"composite": true
+		"composite": true,
+        "plugins": [{
+            "name": "typescript-lit-html-plugin"
+        }]
 	},
     "compileOnSave": true,
     "allowJs": true,

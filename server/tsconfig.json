@@ -18,7 +18,10 @@
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
         "strictNullChecks": true,
-        "composite": true
+        "composite": true,
+        "plugins": [{
+            "name": "typescript-lit-html-plugin"
+        }]
 	}, 
     "allowJs": true,
     "compileOnSave": true,
