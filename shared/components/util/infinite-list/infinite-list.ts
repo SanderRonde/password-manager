@@ -711,6 +711,7 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 
 	async mounted() {
 		this._genTemplateGetter();
+		this._render(true);
 		this._disposables.push(
 			createDisposableWindowListener('resize', this._onWindowResize));
 		if (this.props.window) {
