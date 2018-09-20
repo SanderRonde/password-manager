@@ -121,7 +121,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 							<material-input id="passwordUsername" name="username"
 								type="text" title="Account username"
 								autoComplete="off" fill label="username"
-								value="${(props.selected && props.selected.username) || '?'}"
+								value="${(props.selectedDisplayed && props.selectedDisplayed.username) || '?'}"
 							>
 							</material-input>
 							<material-input id="passwordPassword" name="password"
@@ -133,7 +133,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 							></material-input>
 						</div>
 						<div id="passwordWebsites">
-							${(((props.selected && props.selected.websites) || [])
+							${(((props.selectedDisplayed && props.selectedDisplayed.websites) || [])
 								.concat(props.addedWebsites || [])).map((website) => {
 									return html`
 										<div class="passwordWebsite">

@@ -44,6 +44,7 @@ export interface PasswordDetailData {
 export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap> {
 	props = defineProps(this, {
 		priv: {
+			selectedDisplayed: ComplexType<MetaPasswords[0]>(),
 			selected: ComplexType<MetaPasswords[0]>(),
 			addedWebsites: {
 				type: ComplexType<MetaPasswords[0]['websites']>(),
@@ -106,6 +107,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	private async _selectedChange(oldValue: MetaPasswords[0]|null, newValue: MetaPasswords[0]|null) {
 		if (oldValue && newValue && oldValue.id === newValue.id) {
 			//Just a list update, nothing to change
+			this.props.selectedDisplayed = this.props.selected;
 			return;
 		}
 
@@ -122,8 +124,11 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			this._getPasswordDetails(newValue);
 		} else if (oldValue !== null) {
 			await this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT, () => {
+				this.props.selectedDisplayed = this.props.selected;
 				this.props.addedWebsites = [];
 			});
+		} else {
+			this.props.selectedDisplayed = this.props.selected;
 		}
 	}
 
@@ -166,6 +171,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	private async _getPasswordDetails(passwordMeta: MetaPasswords[0] = this.props.selected) {
 		if (passwordMeta.twofactor_enabled && this._authState.twofactorAuthentication === null) {
 			await this._animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
+				this.props.selectedDisplayed = this.props.selected;
 				this.$$('.twofactorDigit').forEach((el: HTMLInputElement) => {
 					el.value = '';
 				});
@@ -174,7 +180,9 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			firstDigit && firstDigit.focus();
 			return;
 		} else if (passwordMeta.u2f_enabled && this._authState.u2fAuthenticated === null) {
-			await this._animateView('u2fRequiredView', STATIC_VIEW_HEIGHT);
+			await this._animateView('u2fRequiredView', STATIC_VIEW_HEIGHT, () => {
+				this.props.selectedDisplayed = this.props.selected;
+			});
 			return;
 		}
 
@@ -199,7 +207,9 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		}
 
 		const [ , response ] = await Promise.all([
-			this._animateView('loadingView', STATIC_VIEW_HEIGHT),
+			this._animateView('loadingView', STATIC_VIEW_HEIGHT, () => {
+				this.props.selectedDisplayed = this.props.selected;
+			}),
 			doClientAPIRequest({
 				publicKey: this.props.authData.server_public_key
 			}, '/api/password/get', {
