@@ -46,6 +46,10 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 		if (!this.getRoot().getAttribute('prop_theme')) {
 			this._fetchData();
 		}
+		if (document.body.classList.contains('dev')) {
+			this.$.emailInput.set('some@email.com');
+			this.$.passwordInput.set('defaultpassword');
+		}
 	}
 
 	private _fetchData() {
