@@ -21,6 +21,8 @@ import { APIToken, ERRS } from '../../../../types/crypto';
 import { U2FSignResponse } from 'u2f';
 import { bindToClass } from '../../../../lib/decorators';
 
+const MIN_LOADING_TIME = 100;
+
 export interface PasswordDetailData {
 	instance_id: StringifiedObjectId<EncryptedInstance>;
 	server_public_key: ServerPublicKey;
@@ -206,20 +208,47 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			return;
 		}
 
-		const [ , response ] = await Promise.all([
-			this._animateView('loadingView', STATIC_VIEW_HEIGHT, () => {
-				this.props.selectedDisplayed = this.props.selected;
-			}),
-			doClientAPIRequest({
-				publicKey: this.props.authData.server_public_key
-			}, '/api/password/get', {
-				instance_id: this.props.authData.instance_id
-			},  {
-				token: this.getRoot().getAPIToken(),
-				password_id: this.props.selected.id,
-				count: this.getRoot().getRequestCount(),
-			})
-		]);
+		const request = doClientAPIRequest({
+			publicKey: this.props.authData.server_public_key
+		}, '/api/password/get', {
+			instance_id: this.props.authData.instance_id
+		},  {
+			token: this.getRoot().getAPIToken(),
+			password_id: this.props.selected.id,
+			count: this.getRoot().getRequestCount(),
+		});
+		if (this.$.selectedView.classList.contains('visible')) {
+			this.$.selectedView.classList.add('quickAnimate');
+
+			//Hide it for now
+			this.$.selectedView.classList.remove('visible');
+
+			const resolved = await Promise.race([
+				request, wait(MIN_LOADING_TIME)
+			]);
+
+			//Show it again
+			this.$.selectedView.classList.add('visible');
+			this.$.selectedView.classList.remove('quickAnimate');
+
+			if (!resolved) {
+				//Wait resolved, not the request, show loading view
+				await Promise.all([
+					this._animateView('loadingView', STATIC_VIEW_HEIGHT, () => {
+						this.props.selectedDisplayed = this.props.selected;
+					}),
+					request
+				]);
+			}
+		} else {
+			await Promise.all([
+				this._animateView('loadingView', STATIC_VIEW_HEIGHT, () => {
+					this.props.selectedDisplayed = this.props.selected;
+				}),
+				request
+			]);
+		}
+		const response = await request;
 		if (response.success) {
 			//Decrypt with public key
 			const publicKeyDecrypted = decryptWithPrivateKey(response.data.encrypted,

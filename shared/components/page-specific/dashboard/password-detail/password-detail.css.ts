@@ -36,6 +36,10 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) 
 			transition: opacity ${VIEW_FADE_TIME}ms ease-in-out;
 		}
 
+		.view.quickAnimate {
+			transition: opacity ${VIEW_FADE_TIME / 4}ms ease-in-out;
+		}
+
 		.view.displayed {
 			display: block;
 		}
