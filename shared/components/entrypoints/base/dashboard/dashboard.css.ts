@@ -116,7 +116,7 @@ export const DashboardCSS = new TemplateFn<Dashboard>((_props, theme) => {
 		}
 
 		#passwordList, #passwordFocus {
-			width: 490px;
+			width: 480px;
 			background-color: grey;
 		}
 
