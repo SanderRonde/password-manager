@@ -653,7 +653,7 @@ export function config(config: WebComponentConfiguration) {
 	}
 }
 
-export function wait(time: number) {
+export function wait(time: number): Promise<void> {
 	return new Promise((resolve) => {
 		setTimeout(() => {
 			resolve();
