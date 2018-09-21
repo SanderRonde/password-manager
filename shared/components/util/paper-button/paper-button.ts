@@ -30,22 +30,37 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 			ariaLabel: {
 				type: PROP_TYPE.STRING,
 				coerce: true
-			}
+			},
+			border: PROP_TYPE.BOOL,
+			borderColor: PROP_TYPE.STRING
 		}
 	});
 
 	get __customCSS() {
-		if (this.props.color || this.props.background || this.props.rippleColor) {
+		if (this.props.color || this.props.background || this.props.rippleColor || this.props.border) {
 			return html`<style>
 				${this.props.color ? this.getColorCustomCSS() : ''}
 				${this.props.background ? this.getBackgroundCustomCSS() : ''}
 				${this.props.rippleColor ? this.getRippleColorCustomCSS() : ''}
+				${this.props.borderColor ? this.getBorderColorCustomCSS() : ''}
 			</style>`
 		}
 		return html`<style></style>`;
 	}
 
 	private rippleElement: HTMLElement|null = null;
+	private getBorderColorCustomCSS(): any {
+		if (this.props.border) {
+			return html`
+				<style>
+					#button {
+						border: 2px solid ${this.props.borderColor};
+					}
+				</style>
+			`;
+		}
+		return '';
+	}
 	private getRippleColorCustomCSS(): any {
 		return html`<style>
 			#button .mdl-ripple {
