@@ -53,7 +53,8 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 				type: PROP_TYPE.STRING,
 				coerce: true
 			},
-			fill: PROP_TYPE.BOOL
+			fill: PROP_TYPE.BOOL,
+			disabled: PROP_TYPE.BOOL
 		}
 	});
 
@@ -76,11 +77,13 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 	}
 
 	disable() {
+		this.props.disabled = true;
 		this.$.input!.disabled = true;
 		this.updateClasses();
 	}
 
 	enable() {
+		this.props.disabled = false;
 		this.$.input!.disabled = false;
 		this.updateClasses();
 	}
@@ -106,18 +109,9 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 
 	@bindToClass
 	public updateClasses() {
-		this._checkDisabled();
 		this._checkValidity();
 		this._checkDirty();
 		this._checkFocus();
-	}
-
-	private _checkDisabled() {
-		if (this.$.input!.disabled) {
-			this.$.container!.classList.add('is-disabled');
-		} else {
-			this.$.container!.classList.remove('is-disabled');
-		}
 	}
 
 	private _checkValidity() {
@@ -187,6 +181,18 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 			}
 			this.fire('keydown', e)
 		}, 0);
+	}
+
+	layoutMounted() {
+		if (this.props.disabled && this.$.input) {
+			this.$.input.disabled = true;
+		}
+	}
+
+	mounted() {
+		if (this.props.disabled && this.$.input) {
+			this.$.input.disabled = true;
+		}
 	}
 
 	postRender() {
