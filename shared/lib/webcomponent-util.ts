@@ -780,7 +780,8 @@ function getColorRepresentation(color: string): ColorRepresentation {
 
 function toStringColor(color: ColorRepresentation) {
 	return `rgba(${color.r}, ${color.g}, ${color.b}, ${
-		color.a === 100 ? '1' : `0.${color.a}`	
+		color.a === 100 ? '1' : 
+			color.a < 10 ? `0.0${color.a}` : `0.${color.a}`	
 	})`;
 }
 
