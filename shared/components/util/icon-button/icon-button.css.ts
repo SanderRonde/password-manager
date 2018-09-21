@@ -1,8 +1,9 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { changeOpacity } from '../../../lib/webcomponent-util';
 import { IconButton } from './icon-button';
 import { html } from "lit-html";
 
-export const IconButtonCSS = new TemplateFn<IconButton>((_props, theme) => {
+export const IconButtonCSS = new TemplateFn<IconButton>((props, theme) => {
 	return html`<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.
@@ -252,13 +253,16 @@ export const IconButtonCSS = new TemplateFn<IconButton>((_props, theme) => {
 		}
 
 		* {
-			fill: ${theme.textOnBackground};
+			fill: ${changeOpacity(theme.textOnBackground, props.disabled ?
+				40 : 100)};
 		}
 		:host([fill="text"]) * {
-			fill: ${theme.textOnBackground}
+			fill: ${changeOpacity(theme.textOnBackground, props.disabled ?
+				40 : 100)}
 		}
 		:host([fill="nontext"]) * {
-			fill: ${theme.textOnNonbackground}
+			fill: ${changeOpacity(theme.textOnNonbackground, props.disabled ?
+				40 : 100)}
 		}
 	</style>`
-}, CHANGE_TYPE.THEME);
+}, CHANGE_TYPE.ALWAYS);

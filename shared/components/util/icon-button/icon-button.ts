@@ -21,7 +21,34 @@ export class IconButton extends ConfigurableWebComponent<IconButtonIDMap> {
 			ariaLabel: {
 				type: PROP_TYPE.STRING,
 				coerce: true
-			}
+			},
+			disabled: PROP_TYPE.BOOL
 		}
-	})
+	});
+
+	constructor() {
+		super();
+
+		this.listen('propChange', (name) => {
+			if (name === 'disabled') {
+				this._setButtonDisabledState();
+			}
+		});
+	}
+
+	layoutMounted() {
+		this._setButtonDisabledState();
+	}
+
+	mounted() {
+		this._setButtonDisabledState();
+	}
+
+	private _setButtonDisabledState() {
+		if (this.props.disabled) {
+			this.$.button.disabled = true;
+		} else {
+			this.$.button.disabled = false;
+		}
+	}
 }

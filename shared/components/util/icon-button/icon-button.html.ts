@@ -4,7 +4,7 @@ import { html } from "lit-html";
 
 export const IconButtonHTML = new TemplateFn<IconButton>((props) => {
 	return html`
-		<button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"
+		<button id="button" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"
 			aria-label="${props.ariaLabel}"
 		>
 			<slot></slot>
