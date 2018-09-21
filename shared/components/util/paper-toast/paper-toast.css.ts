@@ -1,5 +1,5 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { isDark } from '../../../lib/webcomponent-util';
+import { isDark, changeOpacity } from '../../../lib/webcomponent-util';
 import { PaperToast } from './paper-toast';
 import { html } from "lit-html";
 
@@ -24,7 +24,8 @@ export const PaperToastCSS = new TemplateFn<PaperToast>((_props, theme) => {
 			bottom: 0;
 			-webkit-transform: translateY(100px);
 			transform: translateY(100px);
-			background-color: ${isDark(theme.background) ? '#afafaf' : '#323232'};
+			background-color: ${changeOpacity(
+				isDark(theme.background) ? '#afafaf' : '#323232', 90)};
 			color: ${theme.textOnNonbackground};
 		}
 
