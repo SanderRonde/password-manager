@@ -6,13 +6,13 @@ let incrementedIds: number = 0;
 	}
 
 const googleWebsite = {
-	host: 'google.com',
+	host: 'www.google.com',
 	exact: 'https://www.google.com/login',
 	favicon: '/icons/google.png',
 };
 
 const redditWebsite = {
-	host: 'reddit.com',
+	host: 'www.reddit.com',
 	exact: 'https://www.reddit.com/login',
 	favicon: '/icons/reddit.png'
 }
