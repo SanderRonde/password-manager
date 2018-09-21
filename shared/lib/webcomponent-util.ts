@@ -2,7 +2,7 @@ import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TY
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './listeners';
 import { supportsPassive, isNewElement, listenWithIdentifier } from "./listeners";
 import { PaperToast } from '../components/util/paper-toast/paper-toast';
-import { directive, AttributePart } from 'lit-html';
+import { directive, AttributePart, DirectiveFn } from 'lit-html';
 import { API_ERRS } from '../types/api';
 
 // From https://github.com/JedWatson/classnames
@@ -1075,13 +1075,31 @@ export function reportDefaultResponseErrors(response: {
 	}
 }
 
+const directives: {
+	baseMap: WeakMap<WebComponent<any>, WeakMap<Function, DirectiveFn<AttributePart>>>;
+	fnMap: WeakMap<Function, DirectiveFn<AttributePart>>;
+} = {
+	baseMap: new WeakMap(),
+	fnMap: new WeakMap()
+};
+
 let listenerIdIndex = 0;
 const eventContexts: Map<string, Object> = new Map();
 const inlineListenerBases: WeakMap<WebComponent<any>, Map<string, WeakMap<Function, string>>> =
 	new WeakMap();
 export function inlineListener<B extends WebComponent<any>>(listener: Function, base?: B,
 	options?: boolean | AddEventListenerOptions) {
-		return directive<AttributePart>(async (part) => {
+		if (base && !directives.baseMap.has(base)) {
+			directives.baseMap.set(base, new WeakMap());
+		}
+		const fnMap = base ? 
+			directives.baseMap.get(base)! : directives.fnMap;
+		const match = fnMap.get(listener);
+		if (match) {
+			return match;
+		}
+
+		const generatedDirective = directive<AttributePart>(async (part) => {
 			const [ prefix, event, ...rest ] = part.name.split('-');
 			if (rest.length > 0) {
 				console.warn('Attempting to use inline listener without specifying event');
@@ -1122,4 +1140,6 @@ export function inlineListener<B extends WebComponent<any>>(listener: Function, 
 				}
 			}
 		});
+		fnMap.set(listener, generatedDirective);
+		return generatedDirective;
 	}
