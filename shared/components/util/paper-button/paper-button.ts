@@ -42,7 +42,7 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 				${this.props.color ? this.getColorCustomCSS() : ''}
 				${this.props.background ? this.getBackgroundCustomCSS() : ''}
 				${this.props.rippleColor ? this.getRippleColorCustomCSS() : ''}
-				${this.props.borderColor ? this.getBorderColorCustomCSS() : ''}
+				${this.props.borderColor || this.props.border ? this.getBorderColorCustomCSS() : ''}
 			</style>`
 		}
 		return html`<style></style>`;
@@ -50,16 +50,15 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 
 	private rippleElement: HTMLElement|null = null;
 	private getBorderColorCustomCSS(): any {
-		if (this.props.border) {
-			return html`
-				<style>
-					#button {
-						border: 2px solid ${this.props.borderColor};
-					}
-				</style>
-			`;
-		}
-		return '';
+		return html`
+			<style>
+				#button {
+					border: 2px solid ${this.props.borderColor || 
+						this.props.color || this.props.rippleColor ||
+						this.props.background || this.getTheme().primary.main};
+				}
+			</style>
+		`;
 	}
 	private getRippleColorCustomCSS(): any {
 		return html`<style>
