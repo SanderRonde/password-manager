@@ -1111,8 +1111,6 @@ export function inlineListener<B extends WebComponent<any>>(listener: Function, 
 			}
 			const eventScope = eventContexts.get(event);
 			if (isNewElement(part.element as HTMLElement, eventScope)) {
-				console.log('Starting to listen to element', part.element, 'with event',
-					event, 'and listener', listener);
 				if (prefix === 'on') {
 					if (!base) {
 						console.warn('Attempting to listen to event without a component base');
