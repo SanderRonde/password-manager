@@ -59,6 +59,7 @@ function rewriteEsModuleImports(file: string): string {
 		.replace(/import (.*) from ['"]js-sha512['"]/g, 'import $1 from \'/modules/js-sha512\'')
 		.replace(/import (.*) from ['"]aes-js['"]/g, 'import $1 from \'/modules/aes-js\'')
 		.replace(/import (.*) from ['"]tslib['"]/g, 'import $1 from \'/modules/tslib\'')
+		.replace(/import (.*) from ['"]u2f-api['"]/g, 'import $1 from \'/modules/u2f-api\'')
 		.replace(/import (.*) from ['"]lit-html['"]/g, 'import $1 from \'/modules/lit-html\'')
 		.replace(/import (.*) from ['"]lit-html\/lib\/lit-extended['"]/g, 'import $1 from \'/modules/lit-html/lib/lit-extended\'');
 }
@@ -155,6 +156,19 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 	], async (_req, res) => {
 		res.contentType('.js');
 		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/tslib/tslib.es6.js')));
+		res.end();
+	});
+	webserver.app.all([
+		'/modules/u2f-api',
+		'/modules/u2f-api.js',
+		'/modules/u2f-api/u2f-api.js'
+	], async (_req, res) => {
+		const result = await getWebpackPacked('u2fApi',
+			path.join(PROJECT_ROOT, 'node_modules/u2f-api/dist/lib/u2f-api.js'));
+		res.contentType('.js');
+		res.write(`${result};
+		const { ErrorCodes, ErrorNames, isSupported, ensureSupport, register, sign } = _u2fApi;
+		export { ErrorCodes, ErrorNames, isSupported, ensureSupport, register, sign }`);
 		res.end();
 	});
 	webserver.app.all([
