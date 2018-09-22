@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors } from '../../../../lib/webcomponent-util';
+import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors, findElementInPath } from '../../../../lib/webcomponent-util';
 import { PasswordDetailHTML, passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey } from '../../../../types/db-types';
 import { PasswordDetailCSS, VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
@@ -81,7 +81,35 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		});
 	}
 
-	private _getSelectedViewSize(password: MetaPasswords[0]) {
+	private static _isValidURL(url: string) {
+		try {
+			new URL(url);
+			return true;
+		} catch(e) {
+			return false;
+		}
+	}
+
+	public onLinkClick(e: MouseEvent & {
+		path: HTMLElement[];
+	}) {
+		const input = findElementInPath<MaterialInput>(e.path, 'material-input');
+		if (!input) {
+			PaperToast.create({
+				content: 'Failed to open link',
+				duration: 2500
+			});
+			return;
+		}
+
+		if (PasswordDetail._isValidURL(input.value)) {
+			window.open(input.value, '_blank');
+		} else {
+			window.open(`//${input.value}`, '_blank');
+		}
+	}
+
+	private static _getSelectedViewSize(password: MetaPasswords[0]) {
 		//Height without websites: 513
 		//Single website heigt: 156
 		//Size per website: 156 + 10px margin
@@ -145,7 +173,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		}
 	}
 
-	private _tryParse<T>(data: EncodedString<T>): {
+	private static _tryParse<T>(data: EncodedString<T>): {
 		success: true;
 		data: T;
 	}|{
@@ -248,7 +276,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				return;
 			}
 
-			const parseResult = this._tryParse(publicKeyDecrypted);
+			const parseResult = PasswordDetail._tryParse(publicKeyDecrypted);
 			if (parseResult.success === false) {
 				this._failDecryptServerResponse();
 				return;
@@ -386,7 +414,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				return;
 			}
 
-			const parseResult = this._tryParse(publicKeyDecrypted);
+			const parseResult = PasswordDetail._tryParse(publicKeyDecrypted);
 			if (parseResult.success === false) {
 				this._failDecryptServerResponse();
 				return;
@@ -405,7 +433,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			}
 			passwordDetailDataStore[passwordDetailDataSymbol] = decryptedPasswordData;
 
-			await this._animateView('selectedView', this._getSelectedViewSize(passwordMeta), () => {
+			await this._animateView('selectedView', PasswordDetail._getSelectedViewSize(passwordMeta), () => {
 				//This will re-render the DOM so no need to do it because of 
 				// selected password change
 				this.props.visibleWebsites = [];

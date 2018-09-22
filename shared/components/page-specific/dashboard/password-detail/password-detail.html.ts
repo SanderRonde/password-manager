@@ -7,6 +7,7 @@ import { Cross, CrossSize } from '../../../icons/cross/cross';
 import { PasswordDetail } from './password-detail';
 import { KeySize } from '../../../icons/key/key';
 import { html } from 'lit-html';
+import { Link } from '../../../icons/link/link';
 
 export const passwordDetailDataSymbol = Symbol('passwordDetailData');
 export const passwordDetailDataStore: {
@@ -197,14 +198,28 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 												autoComplete="off" fill label="url"
 												wc-keydown="${inlineListener(genHostUpdateFn(this, index))}"
 												value="${website.exact || ''}"
-											></material-input>
+											>
+												<icon-button tabIndex="-1" slot="postIcon"
+													aria-label="Open URL" title="Open URL"
+													on-click="${inlineListener(this.onLinkClick, this)}"
+												>
+													${Link}
+												</icon-button>
+											</material-input>
 											<material-input class="passwordWebsiteHost"
 												name="host" type="text" 
 												title="website host (determined from url above)"
 												autoComplete="off" fill label="host"
 												value="${website.host || ''}"
 												disabled
-											></material-input>
+											>
+												<icon-button tabIndex="-1" slot="postIcon"
+													aria-label="Open URL" title="Open URL"
+													on-click="${inlineListener(this.onLinkClick, this)}"
+												>
+													${Link}
+												</icon-button>
+											</material-input>
 										</div>
 										<div class="passwordWebsiteRemoveCenterer">
 											${arr.length === 1 ? 
