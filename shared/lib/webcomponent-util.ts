@@ -1148,3 +1148,26 @@ export function inlineListener<B extends WebComponent<any>>(listener: Function, 
 		fnMap.set(listener, generatedDirective);
 		return generatedDirective;
 	}
+
+export function findElementInPath<E extends HTMLElement>(path: HTMLElement[], query: string): E|null {
+	const isId = query.startsWith('#');
+	const isClass = query.startsWith('.');
+	const sliced = query.slice(1);
+	const isTag = !isId && !isClass;
+	const lowercase = query.toLowerCase();
+
+	if (query.split('#').length > 2 || query.split('.').length > 2 || 
+		query.split(' ').length > 1 || isId && isClass) {
+			console.warn('Only basic queries are allowed (single class, id or tagname)');
+			return null;
+		}
+
+	for (const el of path) {
+		if ((isId && el.id === sliced) ||
+			(isClass && el.classList.contains(sliced)) ||
+			(isTag && el.tagName && el.tagName.toLowerCase() === lowercase)) {
+				return el as E;
+			}
+	}
+	return null;
+}
