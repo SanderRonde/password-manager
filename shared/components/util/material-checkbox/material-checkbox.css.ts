@@ -614,6 +614,8 @@ export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((_props, the
 		.label {
 			display: inline-block;
 			margin-top: 13px;
+			cursor: pointer;
+			user-select: none;
 		}
 
 		.mdc-form-field {
