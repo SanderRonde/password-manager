@@ -19,9 +19,6 @@
         "strictPropertyInitialization": true,
         "strictNullChecks": true,
         "composite": true,
-        "plugins": [{
-            "name": "typescript-lit-html-plugin"
-        }]
 	}, 
     "compileOnSave": true,
     "allowJs": true,

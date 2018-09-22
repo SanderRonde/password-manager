@@ -21,10 +21,7 @@
         "importHelpers": true,
         "composite": true,
         "declaration": true,
-        "sourceMap": true,
-        "plugins": [{
-            "name": "typescript-lit-html-plugin"
-        }]
+        "sourceMap": true
 	},
     "compileOnSave": true,
     "allowJs": true,

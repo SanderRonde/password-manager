@@ -17,10 +17,7 @@
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
-        "strictNullChecks": true,
-        "plugins": [{
-            "name": "typescript-lit-html-plugin"
-        }]
+        "strictNullChecks": true
 	}, 
     "compileOnSave": true,
     "allowJs": true,
