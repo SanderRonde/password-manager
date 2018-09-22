@@ -625,4 +625,4 @@ export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((_props, the
 			justify-content: flex-start;
 		}
 	</style>`
-}, CHANGE_TYPE.PROP);
+}, CHANGE_TYPE.THEME);
