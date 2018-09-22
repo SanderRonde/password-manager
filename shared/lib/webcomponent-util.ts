@@ -212,6 +212,7 @@ interface DefinePropTypeConfig {
 	coerce?: boolean;
 	strict?: boolean;
 	isPrivate?: boolean;
+	reflectToSelf?: boolean;
 }
 
 function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): DefinePropTypeConfig {
@@ -224,6 +225,7 @@ function getDefinePropConfig(value: DefinePropTypes|DefinePropTypeConfig): Defin
 			watch: true,
 			strict: false,
 			isPrivate: false,
+			reflectToSelf: true,
 			type: value as DefinePropTypes
 		}
 	}
@@ -508,7 +510,8 @@ export function defineProps<P extends {
 			type: mapType,
 			strict = false,
 			isPrivate = false,
-			watchProperties = []
+			watchProperties = [],
+			reflectToSelf = false
 		} = getDefinePropConfig(value);
 
 		keyMap.set(key, {
@@ -516,7 +519,7 @@ export function defineProps<P extends {
 		});
 
 		const propName = casingToDashes(mapKey);
-		if (reflectToAttr) {
+		if (reflectToAttr && reflectToSelf) {
 			Object.defineProperty(element, mapKey, {
 				get() {
 					if (isPrivate) {
