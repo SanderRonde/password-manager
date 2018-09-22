@@ -15,6 +15,7 @@ import { LoginWeb } from "../components/entrypoints/web/login/login-web";
 import { PaperToast } from "../components/util/paper-toast/paper-toast";
 import { IconButton } from "../components/util/icon-button/icon-button";
 import { MDCard } from "../components/util/md-card/md-card";
+import { MaterialCheckbox } from "../components/util/material-checkbox/material-checkbox";
 
 declare global {
 	type HTMLMdCardElement = MDCard;
@@ -33,8 +34,11 @@ declare global {
 	type HTMLLoadingSpinnerElement = LoadingSpinner;
 	type HTMLPasswordPreviewElement = PasswordPreview;
 	type HTMLVerticalCentererElement = VerticalCenterer;
+	type HTMLMaterialCheckboxElement = MaterialCheckbox;
 	type HTMLInfiniteListElement = InfiniteList<any, any, any>;
 	type HTMLHorizontalCentererElement = HorizontalCenterer;
+
+	type HTMLPathElement = any;
 
 	type WebComponentElements = MDCard & {
 		name: 'md-card'
@@ -70,5 +74,7 @@ declare global {
 		name: 'infinite-list'
 	}|HorizontalCenterer & {
 		name: 'horizontal-centerer'
+	}|MaterialCheckbox & {
+		name: 'material-checkbox'
 	};
 }
