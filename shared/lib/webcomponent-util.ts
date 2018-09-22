@@ -84,7 +84,7 @@ function getterWithVal<R>(component: {
 }, value: string|null, strict: boolean, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R {
 	if (type === 'bool') {
 		if (strict) {
-			return value === 'true';
+			return (value + '') === 'true';
 		}
 		return isDefined(value);
 	} else {
