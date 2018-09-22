@@ -1,6 +1,7 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { MaterialCheckbox } from './material-checkbox';
 import { html } from 'lit-html';
+import { changeOpacity } from '../../../lib/webcomponent-util';
 
 export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((_props, theme) => {
 	return html`<style>
@@ -343,7 +344,7 @@ export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((_props, the
 			background-color: ${theme.accent.main} } }
 
 		.mdc-checkbox__native-control:enabled:not(:checked):not(:indeterminate) ~ .mdc-checkbox__background {
-		border-color: rgba(0, 0, 0, 0.54);
+		border-color: ${changeOpacity(theme.textOnBackground, 54)};
 		background-color: transparent; }
 
 		.mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
@@ -357,7 +358,7 @@ export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((_props, the
 
 		@-webkit-keyframes mdc-checkbox-fade-in-background-0 {
 		0% {
-			border-color: rgba(0, 0, 0, 0.54);
+			border-color: ${changeOpacity(theme.textOnBackground, 54)};
 			background-color: transparent; }
 		50% {
 			border-color: #018786;
@@ -369,7 +370,7 @@ export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((_props, the
 
 		@keyframes mdc-checkbox-fade-in-background-0 {
 		0% {
-			border-color: rgba(0, 0, 0, 0.54);
+			border-color: ${changeOpacity(theme.textOnBackground, 54)};
 			background-color: transparent; }
 		50% {
 			border-color: #018786;
@@ -388,7 +389,7 @@ export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((_props, the
 			/* @alternate */
 			background-color: ${theme.accent.main}; }
 		100% {
-			border-color: rgba(0, 0, 0, 0.54);
+			border-color: ${changeOpacity(theme.textOnBackground, 54)};
 			background-color: transparent; } }
 
 		@keyframes mdc-checkbox-fade-out-background-0 {
@@ -400,7 +401,7 @@ export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((_props, the
 			/* @alternate */
 			background-color: ${theme.accent.main}; }
 		100% {
-			border-color: rgba(0, 0, 0, 0.54);
+			border-color: ${changeOpacity(theme.textOnBackground, 54)};
 			background-color: transparent; } }
 
 		.mdc-checkbox--anim-unchecked-checked .mdc-checkbox__native-control:enabled ~ .mdc-checkbox__background, .mdc-checkbox--anim-unchecked-indeterminate .mdc-checkbox__native-control:enabled ~ .mdc-checkbox__background {
