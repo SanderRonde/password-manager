@@ -54,7 +54,12 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 				coerce: true
 			},
 			fill: PROP_TYPE.BOOL,
-			disabled: PROP_TYPE.BOOL
+			disabled: PROP_TYPE.BOOL,
+			multiline: PROP_TYPE.BOOL,
+			rows: {
+				type: PROP_TYPE.NUMBER,
+				value: 2
+			}
 		}
 	});
 

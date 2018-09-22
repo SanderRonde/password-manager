@@ -3,7 +3,7 @@ import { changeOpacity } from '../../../lib/webcomponent-util';
 import { MaterialInput } from './material-input';
 import { html } from "lit-html";
 
-export const MaterialInputCSS = new TemplateFn<MaterialInput>((_props, theme) => {
+export const MaterialInputCSS = new TemplateFn<MaterialInput>((props, theme) => {
 	return html`<style>
 		/** From https://github.com/google/material-design-lite/blob/mdl-1.x/src/textfield/_textfield.scss */
 		/**
@@ -60,7 +60,7 @@ export const MaterialInputCSS = new TemplateFn<MaterialInput>((_props, theme) =>
 			display: flex;
 			flex-direction: row;
 			justify-content: center;
-			height: 27px;
+			height: ${props.multiline ? 'auto' : '27px'};
 		}
 
 		.iconSlot {
@@ -68,6 +68,7 @@ export const MaterialInputCSS = new TemplateFn<MaterialInput>((_props, theme) =>
 			margin-top: -10px;
 		}
 		.mdl-textfield__input {
+			resize: none;
 			border: none;
 			display: inline-block;
 			font-size: 18px;
@@ -201,4 +202,4 @@ export const MaterialInputCSS = new TemplateFn<MaterialInput>((_props, theme) =>
 			bottom: 0;
 		}
 	</style>`
-}, CHANGE_TYPE.THEME);
+}, CHANGE_TYPE.ALWAYS);

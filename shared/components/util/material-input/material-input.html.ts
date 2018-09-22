@@ -14,15 +14,28 @@ export const MaterialInputHTML = new TemplateFn<MaterialInput>(function (props) 
 		)}">
 			<div id="mainInputContainer">
 				<slot class="iconSlot" name="preIcon"></slot>
-				<input class="mdl-textfield__input" type="${props.type}" 
-					id="input" value="${props.value}" 
-					pattern="${props.pattern}"
-					on-keydown="${inlineListener(this.inputKeyDown, this)}"
-					on-input="${inlineListener(this.updateClasses, this)}"
-					on-focus="${inlineListener(this.onFocus, this)}"
-					on-blur="${inlineListener(this.onBlur, this)}"
-					on-reset="${inlineListener(this.onReset, this)}"
-					aria-labelledby="label">
+				${props.multiline ? 
+					html`
+						<textarea class="mdl-textfield__input" type="${props.type}" 
+							id="input" rows="${props.rows}"
+							pattern="${props.pattern}"
+							on-keydown="${inlineListener(this.inputKeyDown, this)}"
+							on-input="${inlineListener(this.updateClasses, this)}"
+							on-focus="${inlineListener(this.onFocus, this)}"
+							on-blur="${inlineListener(this.onBlur, this)}"
+							on-reset="${inlineListener(this.onReset, this)}"
+							aria-labelledby="label">${props.value}</textarea>
+					` : html`
+						<input class="mdl-textfield__input" type="${props.type}" 
+							id="input" value="${props.value}" 
+							pattern="${props.pattern}"
+							on-keydown="${inlineListener(this.inputKeyDown, this)}"
+							on-input="${inlineListener(this.updateClasses, this)}"
+							on-focus="${inlineListener(this.onFocus, this)}"
+							on-blur="${inlineListener(this.onBlur, this)}"
+							on-reset="${inlineListener(this.onReset, this)}"
+							aria-labelledby="label">
+					`}
 				<slot class="iconSlot" name="postIcon"></slot>
 			</div>
 			<label id="label" class="mdl-textfield__label">${props.label}</label>
