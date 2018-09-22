@@ -1,6 +1,7 @@
 import { LockClosedUnfilledSize, LockClosedSize } from '../../../icons/lockClosed/lockClosed';
+import { repeat, inlineListener, changeOpacity } from '../../../../lib/webcomponent-util';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
-import { repeat, inlineListener } from '../../../../lib/webcomponent-util';
+import { MaterialInput } from '../../../util/material-input/material-input';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Cross, CrossSize } from '../../../icons/cross/cross';
 import { PasswordDetail } from './password-detail';
@@ -26,7 +27,61 @@ const retryButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => {
 	</style>`;
 }, CHANGE_TYPE.THEME);
 
-export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props, _, html) {
+const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => {
+	return html`<style>
+		#button .mdl-ripple {
+			background: ${theme.success};
+			background-color: ${theme.success};
+		}
+
+		:host #button:active {
+			background-color: ${changeOpacity(theme.success, 30)}
+		}
+
+		#button {
+			box-shadow: none;
+			background: transparent;
+			border: 2px solid ${theme.success};
+			color: ${theme.success};
+		}
+	</style>`;
+}, CHANGE_TYPE.THEME);
+
+function getHost(fullUrl: string) {
+	const originalUrl = fullUrl;
+	if (fullUrl.indexOf('http') !== 0) {
+		fullUrl = `http://${fullUrl}`;
+	}
+	try {
+		const constructedURL = new URL(fullUrl);
+		return constructedURL.hostname ||
+			constructedURL.host || originalUrl;
+	} catch(e) {
+		return originalUrl;
+	}
+}
+
+const hostUpdateFns: (() => void)[] = [];
+function genHostUpdateFn(container: PasswordDetail, index: number) {
+	if (hostUpdateFns[index]) {
+		return hostUpdateFns[index];
+	}
+	return (hostUpdateFns[index] = () => {
+		const websitesContainer = container.$.passwordWebsites;
+		const websites = websitesContainer.querySelectorAll('.passwordWebsite');
+		if (!websites.item(index)) {
+			return;
+		}
+		const urlInput = websites.item(index).querySelector('.passwordWebsiteExact') as MaterialInput;
+		const hostInput = websites.item(index).querySelector('.passwordWebsiteHost') as MaterialInput;
+		if (!hostInput || !urlInput) {
+			return;
+		}
+		hostInput.set(getHost(urlInput.value));
+	});
+}
+
+export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props, theme, html) {
 	return html`
 		<div>
 			<md-card level="3" 
@@ -133,35 +188,104 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 							></material-input>
 						</div>
 						<div id="passwordWebsites">
-							${(((props.selectedDisplayed && props.selectedDisplayed.websites) || [])
-								.concat(props.addedWebsites || [])).map((website) => {
-									return html`
-										<div class="passwordWebsite">
-											<div class="passwordWebsiteEditableFields">
-												<material-input class="passwordWebsiteExact"
-													name="url" type="text" title="website URL"
-													autoComplete="off" fill label="url"
-													value="${website.exact || ''}"
-												></material-input>
-												<material-input class="passwordWebsiteHost"
-													name="host" type="text" title="website host"
-													autoComplete="off" fill label="host"
-													value="${website.host || ''}"
-												></material-input>
-											</div>
-											<icon-button class="passwordWebsiteRemoveField"
-												tabIndex="-1" aria-label="Remove website"
-												title="Remove website"
-											>${Cross}</div>
+							${(props.visibleWebsites || []).map((website, index, arr) => {
+								return html`
+									<div class="passwordWebsite">
+										<div class="passwordWebsiteEditableFields">
+											<material-input class="passwordWebsiteExact"
+												name="url" type="text" title="website URL"
+												autoComplete="off" fill label="url"
+												wc-keydown="${inlineListener(genHostUpdateFn(this, index))}"
+												value="${website.exact || ''}"
+											></material-input>
+											<material-input class="passwordWebsiteHost"
+												name="host" type="text" 
+												title="website host (determined from url above)"
+												autoComplete="off" fill label="host"
+												value="${website.host || ''}"
+												disabled
+											></material-input>
 										</div>
-									`;
+										<div class="passwordWebsiteRemoveCenterer">
+											${arr.length === 1 ? 
+												html`
+													<icon-button class="passwordWebsiteRemoveField"
+														tabIndex="-1" aria-label="Last website can't be removed"
+														title="Last website can't be removed" disabled
+													>${Cross}</div>
+												` : html`
+													<icon-button class="passwordWebsiteRemoveField"
+														tabIndex="-1" aria-label="Remove website"
+														title="Remove website"
+													>${Cross}</div>
+												`}
+										</div>
+									</div>
+								`;
 							})}
+							<div id="addWebsiteCenterer">
+								<paper-button aria-label="Add website"
+									id="addWebsiteButton"
+									border-color="${theme.accent.main}"
+									color="${theme.accent.main}"
+									flat ripple-color="${theme.accent.weak}"
+								>Add website</paper-button>
+							</div>
 						</div>
-						<div id="passwordNotes">${passwordDetailDataStore[passwordDetailDataSymbol] ? 
-							passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n') : 
-								'no notes'
-						}</div>
-						<div id="passwordSettings"></div>
+						<div id="passwordNotes">
+							<div id="passwordNotesInput">
+								<material-input multiline id="noteInput" 
+									type="text" title="Notes" rows="4"
+									autoComplete="off" fill label="Notes" value="${
+										passwordDetailDataStore[passwordDetailDataSymbol] ? 
+											passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n') : 
+											''}"></material-input>
+							</div>
+						</div>
+						<div id="passwordSettings">
+							<div id="passwordSettingsLayout">
+								<div id="passwordSettings2fa">
+									<material-checkbox checked="${props.selectedDisplayed &&
+											props.selectedDisplayed.twofactor_enabled}">
+										Enable 2FA
+										<more-info info="${'2FA requires you to enter' +
+											' a code generated on a secondary device' +
+											' the moment you want to access this password.' +
+											' This improves security by proving you have' + 
+											' access to this secondary device.' + 
+											' To use 2FA, it needs to be set up for your' +
+											' account on the settings page.'}"></more-info>
+									</material-checkbox>
+								</div>
+								<div id="passwordSettingsu2f">
+									<material-checkbox checked="${props.selectedDisplayed &&
+											props.selectedDisplayed.u2f_enabled}">
+										Enable U2F
+										<more-info info="${'U2F requires you to' +
+											' connect a trusted device (usually a USB key)' + 
+											' to your computer. Since there is only one' +
+											' key out there that works for you and it\'s' + 
+											' in your possession, no-one else can read your' +
+											' passwords.' +
+											' To use 2FA, it needs to be set up for your' +
+											' account on the settings page.'}"></more-info>
+									</material-checkbox>
+								</div>
+							</div>
+						</div>
+						<div id="passwordButtons">
+							<paper-button aria-label="Discard" color="${theme.error}"
+								border border-color="${theme.error}" flat
+								ripple-color="${theme.error}"
+							>
+								Discard
+							</paper-button>
+							<animated-button aria-label="Save Changes" 
+								id="saveChanges"
+								custom-css="${saveChangesButtonCustomCSS}">
+								Save changes
+							</animated-button>
+						</div>
 					</div>
 				</sizing-block>
 			</md-card>

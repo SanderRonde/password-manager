@@ -5,6 +5,8 @@ import { PasswordDetailHTML, passwordDetailDataStore, passwordDetailDataSymbol }
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey } from '../../../../types/db-types';
 import { PasswordDetailCSS, VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
+import { MaterialCheckbox } from '../../../util/material-checkbox/material-checkbox';
+import { doClientAPIRequest, filterUndefined } from '../../../../lib/apirequests';
 import { decryptWithPrivateKey, decrypt } from '../../../../lib/browser-crypto';
 import { LoadingSpinner } from '../../../util/loading-spinner/loading-spinner';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
@@ -12,14 +14,15 @@ import { MetaPasswords } from '../../../entrypoints/base/dashboard/dashboard';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { SizingBlock } from '../../../util/sizing-block/sizing-block';
+import { APIToken, ERRS, U2FToken } from '../../../../types/crypto';
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { PasswordDetailIDMap } from './password-detail-querymap';
-import { doClientAPIRequest } from '../../../../lib/apirequests';
+import { MoreInfo } from '../../../util/more-info/more-info';
 import { ENTRYPOINT } from '../../../../types/shared-types';
-import { APIToken, ERRS } from '../../../../types/crypto';
-import { U2FSignResponse } from 'u2f';
 import { bindToClass } from '../../../../lib/decorators';
+import { isSupported, sign } from 'u2f-api';
+import { U2FSignResponse } from 'u2f';
 
 const MIN_LOADING_TIME = 100;
 
@@ -40,7 +43,9 @@ export interface PasswordDetailData {
 		IconButton,
 		PaperToast,
 		AnimatedButton,
-		LoadingSpinner
+		LoadingSpinner,
+		MaterialCheckbox,
+		MoreInfo
 	]
 })
 export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap> {
@@ -48,7 +53,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		priv: {
 			selectedDisplayed: ComplexType<MetaPasswords[0]>(),
 			selected: ComplexType<MetaPasswords[0]>(),
-			addedWebsites: {
+			visibleWebsites: {
 				type: ComplexType<MetaPasswords[0]['websites']>(),
 				value: []
 			},
@@ -57,9 +62,11 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	});
 
 	private _authState: {
+		u2fToken: null|U2FToken;
 		u2fAuthenticated: null|U2FSignResponse;
 		twofactorAuthentication: null|string;
 	} = {
+		u2fToken: null,
 		u2fAuthenticated: null,
 		twofactorAuthentication: null
 	};
@@ -75,7 +82,10 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	}
 
 	private _getSelectedViewSize(password: MetaPasswords[0]) {
-		return 500 + (password.websites.length * 200);
+		//Height without websites: 493
+		//Single website heigt: 156
+		//Size per website: 156 + 10px margin
+		return 493 + 156 + ((password.websites.length - 1) * (156 + 10));
 	}
 
 	private async _hideAll() {
@@ -119,6 +129,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 
 		if (newValue !== null) {
 			this._authState = {
+				u2fToken: null,
 				u2fAuthenticated: null,
 				twofactorAuthentication: null
 			};
@@ -127,7 +138,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		} else if (oldValue !== null) {
 			await this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT, () => {
 				this.props.selectedDisplayed = this.props.selected;
-				this.props.addedWebsites = [];
+				this.props.visibleWebsites = [];
 			});
 		} else {
 			this.props.selectedDisplayed = this.props.selected;
@@ -169,6 +180,116 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		});
 		this._showFailedView();
 	}
+	
+	private async _signU2F() {
+		const supported = await isSupported();
+		if (!supported) {
+			PaperToast.create({
+				content: 'U2F is not supported in your browser',
+				duration: 10000,
+				buttons: [PaperToast.BUTTONS.HIDE]
+			});
+			this._showFailedView();
+			return;
+		}
+
+		if (!this.props.authData.server_public_key || 
+			!this.props.authData.instance_id) {
+				PaperToast.create({
+					content: 'Failed to set up public and/or private key with server',
+					duration: 10000,
+					buttons: [PaperToast.BUTTONS.HIDE]
+				});
+				this._showFailedView();
+				return;
+			}
+
+		//Do the request
+		const clientPrivateKey = localStorage.getItem('instance_private_key');
+
+		if (!clientPrivateKey && !document.body.classList.contains('dev')) {
+			PaperToast.create({
+				content: 'Failed to set up public and/or private key with server' + 
+					(this._globalProperties.isWeb === 'true' ? 
+						', redirecting to login page...' :
+						', please delete this instance and create a new instance to fix it'),
+				buttons: [PaperToast.BUTTONS.HIDE],
+				duration: 10000
+			});
+			if (this._globalProperties.isWeb === 'true') {
+				this.getRoot().changePage(ENTRYPOINT.LOGIN);
+			}
+			this._showFailedView();
+			return;
+		}
+
+		const usedId = this.props.selected.id;
+		const response = await doClientAPIRequest({
+			publicKey: this.props.authData.server_public_key
+		}, '/api/password/getmeta', {
+			instance_id: this.props.authData.instance_id
+		}, {
+			token: this.getRoot().getAPIToken(),
+			count: this.getRoot().getRequestCount(),
+			password_id: usedId
+		});
+
+		if (usedId !== this.props.selected.id) {
+			return;
+		}
+
+		if (response.success) {
+			//Decrypt with public key
+			const publicKeyDecrypted = decryptWithPrivateKey(response.data.encrypted,
+				clientPrivateKey || (document.body.classList.contains('dev') ?
+					(response.data as any).privateKey : clientPrivateKey));
+			if (publicKeyDecrypted === ERRS.INVALID_DECRYPT) {
+				this._failDecryptServerResponse();
+				return;
+			}
+
+			const parseResult = this._tryParse(publicKeyDecrypted);
+			if (parseResult.success === false) {
+				this._failDecryptServerResponse();
+				return;
+			}
+			const publicKeyDecryptedParsed = parseResult.data;
+			const { signed, request } = await Promise.race([
+				new Promise<{
+					signed: U2FSignResponse;
+					request: U2FToken;
+				}>((resolve) => {
+					sign(publicKeyDecryptedParsed.requests!.main.request).then((signed) => {
+						resolve({
+							signed: signed as any,
+							request: publicKeyDecryptedParsed.requests!.main.u2f_token
+						});
+					});
+				}),
+				new Promise<{
+					signed: U2FSignResponse;
+					request: U2FToken;
+				}>((resolve) => {
+					sign(publicKeyDecryptedParsed.requests!.backup.request).then((signed) => {
+						resolve({
+							signed: signed as any,
+							request: publicKeyDecryptedParsed.requests!.backup.u2f_token
+						});
+					});
+				})
+			]);
+			
+			if (usedId !== this.props.selected.id) {
+				return;
+			}
+			this._authState.u2fAuthenticated = signed;
+			this._authState.u2fToken = request;
+			this._getPasswordDetails();
+		} else {
+			reportDefaultResponseErrors(response, PaperToast);
+			this._showFailedView();
+		}
+	}
 
 	private async _getPasswordDetails(passwordMeta: MetaPasswords[0] = this.props.selected) {
 		if (passwordMeta.twofactor_enabled && this._authState.twofactorAuthentication === null) {
@@ -184,15 +305,15 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		} else if (passwordMeta.u2f_enabled && this._authState.u2fAuthenticated === null) {
 			await this._animateView('u2fRequiredView', STATIC_VIEW_HEIGHT, () => {
 				this.props.selectedDisplayed = this.props.selected;
+				this._signU2F();
 			});
 			return;
 		}
 
 		//Do the request
-		const clientPublicKey = localStorage.getItem('instance_public_key');
 		const clientPrivateKey = localStorage.getItem('instance_private_key');
 
-		if ((!clientPublicKey || !clientPrivateKey) && !document.body.classList.contains('dev')) {
+		if (!clientPrivateKey && !document.body.classList.contains('dev')) {
 			PaperToast.create({
 				content: 'Failed to set up public and/or private key with server' + 
 					(this._globalProperties.isWeb === 'true' ? 
@@ -212,11 +333,17 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			publicKey: this.props.authData.server_public_key
 		}, '/api/password/get', {
 			instance_id: this.props.authData.instance_id
-		},  {
+		}, filterUndefined({
 			token: this.getRoot().getAPIToken(),
 			password_id: this.props.selected.id,
 			count: this.getRoot().getRequestCount(),
-		});
+			twofactor_token: this.props.selected.twofactor_enabled ?
+				this._authState.twofactorAuthentication! : undefined,
+			response: this.props.selected.u2f_enabled ?
+				this._authState.u2fAuthenticated! : undefined,
+			u2f_token: (this.props.selected.u2f_enabled ?
+				this._authState.u2fToken! : undefined)
+		}));
 		if (this.$.selectedView.classList.contains('visible')) {
 			this.$.selectedView.classList.add('quickAnimate');
 
@@ -281,7 +408,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			await this._animateView('selectedView', this._getSelectedViewSize(passwordMeta), () => {
 				//This will re-render the DOM so no need to do it because of 
 				// selected password change
-				this.props.addedWebsites = [];
+				this.props.visibleWebsites = [];
 			});
 		} else {
 			reportDefaultResponseErrors(response, PaperToast);
@@ -309,6 +436,13 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		this._getPasswordDetails();
 	}
 
+	preRender() {
+		if (this.props.selectedDisplayed && this.props.selectedDisplayed.websites &&
+			this.props.selectedDisplayed.websites.length !== this.props.visibleWebsites.length) {
+				this.props.visibleWebsites = JSON.parse(JSON.stringify(this.props.selectedDisplayed.websites));
+			}
+	}
+
 	postRender() {
 		const digits = <HTMLInputElement[]><any>this.$$('.twofactorDigit');
 		if (digits.length && isNewElement(digits[0])) {
@@ -326,6 +460,12 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 						} else {
 							//Select next one
 							digits[index + 1].focus();
+							
+							if (index === digits.length - 2) {
+								wait(50).then(() => {
+									this._submitTwofactorCode();
+								});
+							}
 						}
 					}
 				});

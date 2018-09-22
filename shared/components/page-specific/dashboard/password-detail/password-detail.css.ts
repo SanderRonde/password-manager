@@ -68,5 +68,50 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) 
 			font-size: 150%;
 			text-align: center;
 		}
+
+		#selectedView {
+			padding: 30px;
+		}
+
+		.passwordWebsite {
+			padding: 10px;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			border-radius: 5px;
+			background-color: ${changeOpacity(theme.accent.main, 5)};
+			border: 1px solid ${theme.accent.main};
+		}
+
+		.passwordWebsiteRemoveCenterer {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			margin-left: 20px;
+		}
+
+		#addWebsiteCenterer {
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-end;
+			margin-top: 10px;
+		}
+
+		#passwordSettingsLayout {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-around;
+		}
+
+		#passwordButtons {
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-end;
+			margin-top: 20px;
+		}
+
+		#saveChanges {
+			margin-left: 10px;
+		}
 	</style>`
 }, CHANGE_TYPE.ALWAYS);
