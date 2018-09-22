@@ -16,11 +16,13 @@ import { PaperToast } from "../components/util/paper-toast/paper-toast";
 import { IconButton } from "../components/util/icon-button/icon-button";
 import { MDCard } from "../components/util/md-card/md-card";
 import { MaterialCheckbox } from "../components/util/material-checkbox/material-checkbox";
+import { MoreInfo } from "../components/util/more-info/more-info";
 
 declare global {
 	type HTMLMdCardElement = MDCard;
 	type HTMLMDCardElement = MDCard;
 	type HTMLLoginElement = LoginWeb;
+	type HTMLMoreInfoElement = MoreInfo;
 	type HTMLIconButtonElement = IconButton;
 	type HTMLPaperToastElement = PaperToast;
 	type HTMLDashboardElement = DashboardWeb;
@@ -76,5 +78,7 @@ declare global {
 		name: 'horizontal-centerer'
 	}|MaterialCheckbox & {
 		name: 'material-checkbox'
+	}|MoreInfo & {
+		name: 'more-info'
 	};
 }
