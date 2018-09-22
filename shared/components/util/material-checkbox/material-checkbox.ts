@@ -29,8 +29,8 @@ export class MaterialCheckbox extends ConfigurableWebComponent<MaterialCheckboxI
 
 	@bindToClass
 	public onChanged() {
-		this.fire('change', this.isChecked, !this.isChecked);
 		this.props.checked = this.isChecked;
+		this.fire('change', this.isChecked, !this.isChecked);
 	}
 
 	get isChecked() {
