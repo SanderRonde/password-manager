@@ -1,10 +1,12 @@
 /// <reference path="../../../types/elements.d.ts" />
 
+import { config, defineProps, PROP_TYPE, listen } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { MaterialCheckboxIDMap } from './material-checkbox-querymap';
 import { MaterialCheckboxHTML } from './material-checkbox.html';
 import { MaterialCheckboxCSS } from './material-checkbox.css';
-import { config, defineProps, PROP_TYPE } from '../../../lib/webcomponent-util';
+import { bindToClass } from '../../../lib/decorators';
+import { isNewElement } from '../../../lib/IDMap';
 
 @config({
 	is: 'material-checkbox',
@@ -26,8 +28,10 @@ export class MaterialCheckbox extends ConfigurableWebComponent<MaterialCheckboxI
 		}
 	});
 
+	@bindToClass
 	public onChanged() {
 		this.fire('change', this.isChecked, !this.isChecked);
+		this.props.checked = this.isChecked;
 	}
 
 	get isChecked() {
@@ -36,14 +40,17 @@ export class MaterialCheckbox extends ConfigurableWebComponent<MaterialCheckboxI
 
 	set(checked: boolean) {
 		this.props.checked = checked;
-		this.$.checkbox.checked = checked;
 	}
 
-	layoutMounted() {
-		this.set(this.props.checked || false);
+	postRender() {
+		this.$.checkbox.checked = this.props.checked || false;
 	}
 
 	mounted() {
-		this.set(this.props.checked || false);
+		if (isNewElement(this.$.checkbox)) {
+			listen(this, 'checkbox', 'change', () => {
+				this.onChanged();
+			});
+		}
 	}
 }
