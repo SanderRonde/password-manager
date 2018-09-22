@@ -1085,8 +1085,9 @@ const directives: {
 
 let listenerIdIndex = 0;
 const eventContexts: Map<string, Object> = new Map();
-const inlineListenerBases: WeakMap<WebComponent<any>, Map<string, WeakMap<Function, string>>> =
-	new WeakMap();
+const inlineListenerBases: WeakMap<WebComponent<any>, 
+	WeakMap<HTMLElement, Map<string, 
+		WeakMap<Function, string>>>> = new WeakMap();
 export function inlineListener<B extends WebComponent<any>>(listener: Function, base?: B,
 	options?: boolean | AddEventListenerOptions) {
 		if (base && !directives.baseMap.has(base)) {
@@ -1110,6 +1111,8 @@ export function inlineListener<B extends WebComponent<any>>(listener: Function, 
 			}
 			const eventScope = eventContexts.get(event);
 			if (isNewElement(part.element as HTMLElement, eventScope)) {
+				console.log('Starting to listen to element', part.element, 'with event',
+					event, 'and listener', listener);
 				if (prefix === 'on') {
 					if (!base) {
 						console.warn('Attempting to listen to event without a component base');
@@ -1117,13 +1120,17 @@ export function inlineListener<B extends WebComponent<any>>(listener: Function, 
 					}
 
 					if (!inlineListenerBases.get(base)) {
-						inlineListenerBases.set(base, new Map());
+						inlineListenerBases.set(base, new WeakMap());
 					}
 					const baseMap = inlineListenerBases.get(base)!;
-					if (!baseMap.get(event)) {
-						baseMap.set(event, new WeakMap());
+					if (!baseMap.has(part.element as HTMLElement)) {
+						baseMap.set(part.element as HTMLElement, new Map());
 					}
-					const eventMap = baseMap.get(event)!;
+					const elementMap = baseMap.get(part.element as HTMLElement)!;
+					if (!elementMap.get(event)) {
+						elementMap.set(event, new WeakMap());
+					}
+					const eventMap = elementMap.get(event)!;
 					if (!eventMap.has(listener)) {
 						eventMap.set(listener, `__inline_listener${listenerIdIndex++}`);
 					}
