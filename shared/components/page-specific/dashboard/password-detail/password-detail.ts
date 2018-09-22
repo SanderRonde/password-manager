@@ -82,10 +82,10 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	}
 
 	private _getSelectedViewSize(password: MetaPasswords[0]) {
-		//Height without websites: 493
+		//Height without websites: 513
 		//Single website heigt: 156
 		//Size per website: 156 + 10px margin
-		return 493 + 156 + ((password.websites.length - 1) * (156 + 10));
+		return 513 + 156 + ((password.websites.length - 1) * (156 + 10));
 	}
 
 	private async _hideAll() {
