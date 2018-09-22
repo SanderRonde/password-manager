@@ -22,18 +22,19 @@ export class MaterialCheckbox extends ConfigurableWebComponent<MaterialCheckboxI
 			checked: {
 				type: PROP_TYPE.BOOL,
 				strict: true,
-				value: false
+				value: false,
+				reflectToSelf: false
 			}
 		}
 	});
 
 	@bindToClass
 	public onChanged() {
-		this.props.checked = this.isChecked;
-		this.fire('change', this.isChecked, !this.isChecked);
+		this.props.checked = this.checked;
+		this.fire('change', this.checked, !this.checked);
 	}
 
-	get isChecked() {
+	get checked() {
 		return this.$.checkbox.checked;
 	}
 

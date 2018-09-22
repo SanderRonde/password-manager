@@ -37,7 +37,8 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 				type: PROP_TYPE.STRING,
 				watch: false,
 				defaultValue: '',
-				coerce: true
+				coerce: true,
+				reflectToSelf: false
 			},
 			type: {
 				type: PROP_TYPE.STRING,
