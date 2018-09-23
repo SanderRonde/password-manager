@@ -26,11 +26,15 @@ self.addEventListener('install', (event) => {
 
 	event.waitUntil((async() => {
 		const cache = await caches.open(CACHE_NAME);
-		await cache.addAll([
+		await Promise.all([
 			...CACHE_STATIC, 
 			...CACHE_PAGES, 
 			...CACHE_COMPONENTS
-		]);
+		].map((url) => {
+			return cache.add(url).catch((err) => {
+				console.log('failed to fetch', url, err);
+			});
+		}));
 	})());
 });
 
