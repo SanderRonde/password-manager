@@ -51,8 +51,18 @@ function race<T>(...promises: Promise<T|undefined>[]): Promise<T> {
 				}
 			});
 		});
-		promises.reduce((a, b) => a.catch(() => b), Promise.reject())
-			.catch(() => reject(new Error('All requests failed')));
+		if (promises.length === 0) {
+			resolve();
+		} else if (promises.length === 1) {
+			promises[0].then((result) => {
+				resolve(result);
+			}).catch(() => {
+				reject(new Error('All requests failed'));
+			});
+		} else {
+			promises.reduce((a, b) => a.catch(() => b))
+				.catch(() => reject(new Error('All requests failed')));
+		}
 	});
 }
 
