@@ -382,10 +382,6 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		'dashboard.bundle.js'
 	));
 
-	const CACHE_STATIC = [
-		'/js/sw.js'
-	];
-	
 	const CACHE_PAGES = [
 		'/login_offline',
 		'/dashboard_offline'
@@ -417,15 +413,6 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		'cached files', async () => {
 			const versions = {};
 			await Promise.all([
-				Promise.all(CACHE_STATIC.map(async (static) => {
-					const filePath = path.join(__dirname, 
-						'server/app/actions/server/webserver/client/static/',
-						static.slice(1));
-					const content = await fs.readFile(filePath, {
-						encoding: 'utf8'
-					});
-					versions[static] = md5(content);
-				})),
 				Promise.all(CACHE_PAGES.map(async (page) => {
 					const { RoutesDashboard } = require('./server/app/actions/server/webserver/server/routes/dashboard/routes-dashboard');
 					const route = new RoutesDashboard({
