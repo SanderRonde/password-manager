@@ -24,6 +24,7 @@ export const PaperToastCSS = new TemplateFn<PaperToast>((_props, theme) => {
 			bottom: 0;
 			-webkit-transform: translateY(100px);
 			transform: translateY(100px);
+			z-index: 10000;
 			background-color: ${changeOpacity(
 				isDark(theme.background) ? '#afafaf' : '#323232', 90)};
 			color: ${theme.textOnNonbackground};
