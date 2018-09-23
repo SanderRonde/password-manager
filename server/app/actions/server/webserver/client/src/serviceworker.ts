@@ -125,6 +125,10 @@ self.addEventListener('fetch', (event) => {
 		return;
 	}
 
+	if (hostname !== location.origin) {
+		event.respondWith(fetch(event.request));
+		return;
+	}
 	switch (pathname) {
 		case '/':
 		case '/login':
