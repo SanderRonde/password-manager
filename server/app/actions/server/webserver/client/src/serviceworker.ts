@@ -133,7 +133,6 @@ self.addEventListener('fetch', (event) => {
 	}
 
 	if (hostname !== location.hostname) {
-		console.log('Fetching external', event.request);
 		event.respondWith(fetch(event.request));
 		return;
 	}
