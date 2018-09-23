@@ -8,7 +8,6 @@ declare const self: ServiceworkerSelf;
 const CACHE_NAME = 'password-manager';
 
 const CACHE_STATIC = [
-	'/js/sw.js',
 	'/versions.json'
 ];
 
