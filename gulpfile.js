@@ -342,6 +342,14 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 											'utils',
 											'padding',
 											'_arrayTest'
+										],
+										'node_modules/u2f-api/dist/index.js': [
+											'ErrorCodes',
+											'ErrorNames',
+											'isSupported',
+											'ensureSupport',
+											'register',
+											'sign'
 										]
 									}
 								})
