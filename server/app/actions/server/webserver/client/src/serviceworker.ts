@@ -56,6 +56,13 @@ function race<T>(...promises: Promise<T|undefined>[]): Promise<T> {
 	});
 }
 
+async function save(req: Request, res: Promise<Response>) {
+	const cache = await caches.open(CACHE_NAME);
+	const response = await res;
+	cache.put(req, response.clone());
+	return response;
+}
+
 async function fastest(req: Request) {
 	return race(caches.match(req), fetch(req, {
 		credentials: 'include'
@@ -126,6 +133,7 @@ self.addEventListener('fetch', (event) => {
 	}
 
 	if (hostname !== location.origin) {
+		console.log('Fetching external', event.request);
 		event.respondWith(fetch(event.request));
 		return;
 	}
@@ -153,11 +161,11 @@ self.addEventListener('fetch', (event) => {
 			}
 			break;
 		default:
-			if (hostname === location.origin) {
-				event.respondWith(fastest(event.request));
-			} else {
-				event.respondWith(fetch(event.request));
+			if (pathname.startsWith('/icon')) {
+				event.respondWith(save(event.request, fastest(event.request)));
+				return;
 			}
+			event.respondWith(fastest(event.request));
 	}
 });
 
