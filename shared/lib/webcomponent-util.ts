@@ -410,6 +410,7 @@ function watchValue(element: HTMLElement & {
 			element.renderToDOM(CHANGE_TYPE.PROP)
 		});
 	}
+	return value;
 }
 
 type DEFAULT_EVENTS = {
@@ -562,7 +563,7 @@ export function defineProps<P extends {
 			},
 			set(value) {
 				const original = value;
-				watchValue(element, value, watch, watchProperties);
+				value = watchValue(element, value, watch, watchProperties);
 
 				const prevVal = propValues[mapKey];
 				element.fire('beforePropChange', key, prevVal, value);
@@ -580,21 +581,23 @@ export function defineProps<P extends {
 		});
 		(async () => {
 			if (mapType !== complex) {
-				propValues[mapKey] = getter(element, propName, strict, mapType) as any;
-				watchValue(element, propValues[mapKey], watch, watchProperties);
+				propValues[mapKey] = watchValue(element, 
+					getter(element, propName, strict, mapType) as any, 
+					watch, watchProperties);
 			} else {
 				await hookIntoMount(element as any, () => {
 					if (!isPrivate || element.getAttribute(propName) !== '_') {
-						propValues[mapKey] = getter(element, propName, strict, mapType) as any;
-						watchValue(element, propValues[mapKey], watch, watchProperties);
+						propValues[mapKey] = watchValue(element, 
+							getter(element, propName, strict, mapType) as any, 
+							watch, watchProperties);
 					}
 				});
 			}
 			const defaultVal = defaultValue !== undefined ? 
 				defaultValue : defaultValue2;
 			if (defaultVal !== undefined && propValues[mapKey] === undefined) {
-				propValues[mapKey] = defaultVal as any;
-				watchValue(element, propValues[mapKey], watch, watchProperties);
+				propValues[mapKey] =
+					watchValue(element, defaultVal as any, watch, watchProperties);
 				await hookIntoMount(element as any, () => {
 					setter(originalSetAttr, originalRemoveAttr, propName, 
 						isPrivate ? '_' : defaultVal, mapType);
