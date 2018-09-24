@@ -82,6 +82,11 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		});
 	}
 
+	private async _sizeChange(websites: MetaPasswords[0]['websites']) {	
+		await this.$.sizer.setSize(PasswordDetail._getSelectedViewSize(
+			this.props.selectedDisplayed, websites));
+	}
+
 	private static _isValidURL(url: string) {
 		try {
 			new URL(url);
@@ -166,12 +171,28 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		this.props.passwordVisible = !this.props.passwordVisible;
 	}
 
-	private static _getSelectedViewSize(password: MetaPasswords[0]) {
-		//Height without websites: 513
-		//Single website height: 156
-		//Size per website: 156 + 10px margin
-		return 513 + 156 + ((password.websites.length - 1) * (156 + 10));
+	@bindToClass
+	public async addWebsite() {
+		const newWebsites = [...this.props.visibleWebsites, {
+			host: '',
+			exact: '',
+			favicon: null
+		}];
+		await this._sizeChange(newWebsites);
+		this.props.visibleWebsites.push({
+			host: '',
+			exact: '',
+			favicon: null
+		});
 	}
+
+	private static _getSelectedViewSize(password: MetaPasswords[0],
+		websites: MetaPasswords[0]['websites'] = (password && password.websites) || []) {
+			//Height without websites: 513
+			//Single website height: 156
+			//Size per website: 156 + 10px margin
+			return 513 + 156 + ((websites.length - 1) * (156 + 10));
+		}
 
 	private async _hideAll() {
 		this.$$('.view').forEach((view) => {
@@ -201,10 +222,17 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		this._cancelCurrentAnimation = null;
 	}
 
+	private _setSelected(item: MetaPasswords[0] = this.props.selected) {
+		this.props.selectedDisplayed = item;
+		if (item && item.websites) {
+			this.props.visibleWebsites = item.websites;
+		}
+	}
+
 	private async _selectedChange(oldValue: MetaPasswords[0]|null, newValue: MetaPasswords[0]|null) {
 		if (oldValue && newValue && oldValue.id === newValue.id) {
 			//Just a list update, nothing to change
-			this.props.selectedDisplayed = this.props.selected;
+			this._setSelected();
 			return;
 		}
 
@@ -221,12 +249,9 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 
 			this._getPasswordDetails(newValue);
 		} else if (oldValue !== null) {
-			await this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT, () => {
-				this.props.selectedDisplayed = this.props.selected;
-				this.props.visibleWebsites = [];
-			});
+			await this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
 		} else {
-			this.props.selectedDisplayed = this.props.selected;
+			this._setSelected();
 		}
 	}
 
@@ -379,7 +404,6 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	private async _getPasswordDetails(passwordMeta: MetaPasswords[0] = this.props.selected) {
 		if (passwordMeta.twofactor_enabled && this._authState.twofactorAuthentication === null) {
 			await this._animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
-				this.props.selectedDisplayed = this.props.selected;
 				this.$$('.twofactorDigit').forEach((el: HTMLInputElement) => {
 					el.value = '';
 				});
@@ -389,7 +413,6 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			return;
 		} else if (passwordMeta.u2f_enabled && this._authState.u2fAuthenticated === null) {
 			await this._animateView('u2fRequiredView', STATIC_VIEW_HEIGHT, () => {
-				this.props.selectedDisplayed = this.props.selected;
 				this._signU2F();
 			});
 			return;
@@ -446,17 +469,13 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			if (!resolved) {
 				//Wait resolved, not the request, show loading view
 				await Promise.all([
-					this._animateView('loadingView', STATIC_VIEW_HEIGHT, () => {
-						this.props.selectedDisplayed = this.props.selected;
-					}),
+					this._animateView('loadingView', STATIC_VIEW_HEIGHT),
 					request
 				]);
 			}
 		} else {
 			await Promise.all([
-				this._animateView('loadingView', STATIC_VIEW_HEIGHT, () => {
-					this.props.selectedDisplayed = this.props.selected;
-				}),
+				this._animateView('loadingView', STATIC_VIEW_HEIGHT),
 				request
 			]);
 		}
@@ -493,8 +512,8 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			await this._animateView('selectedView', PasswordDetail._getSelectedViewSize(passwordMeta), () => {
 				//This will re-render the DOM so no need to do it because of 
 				// selected password change
+				this._setSelected();
 				this.props.passwordVisible = false;
-				this.props.visibleWebsites = [];
 			});
 		} else {
 			reportDefaultResponseErrors(response, PaperToast);
@@ -520,13 +539,6 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 
 		this.$.retryButton.setState('loading');
 		this._getPasswordDetails();
-	}
-
-	preRender() {
-		if (this.props.selectedDisplayed && this.props.selectedDisplayed.websites &&
-			this.props.selectedDisplayed.websites.length !== this.props.visibleWebsites.length) {
-				this.props.visibleWebsites = JSON.parse(JSON.stringify(this.props.selectedDisplayed.websites));
-			}
 	}
 
 	postRender() {

@@ -79,6 +79,7 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) 
 			flex-direction: row;
 			justify-content: space-between;
 			border-radius: 5px;
+			margin-bottom: 10px;
 			background-color: ${changeOpacity(theme.accent.main, 5)};
 			border: 1px solid ${theme.accent.main};
 		}

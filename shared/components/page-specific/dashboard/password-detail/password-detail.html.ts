@@ -1,10 +1,10 @@
 import { LockClosedUnfilledSize, LockClosedSize } from '../../../icons/lockClosed/lockClosed';
-import { repeat, inlineListener, changeOpacity } from '../../../../lib/webcomponent-util';
+import { repeat, inlineListener, changeOpacity, mapArr } from '../../../../lib/webcomponent-util';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { Cross, CrossSize } from '../../../icons/cross/cross';
 import { Visible, VisibleHidden } from '../../../icons/visible/visible';
+import { Cross, CrossSize } from '../../../icons/cross/cross';
 import { Checkmark } from '../../../icons/checkmark/checkmark';
 import { PasswordDetail } from './password-detail';
 import { KeySize } from '../../../icons/key/key';
@@ -92,7 +92,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 				padding-vertical="0"
 				padding-horizontal="0"
 			>
-				<sizing-block id="sizer">
+				<sizing-block id="sizer" max-height="84vh">
 					<div id="noneSelectedView" class="view visible displayed">
 						<vertical-centerer>
 							<horizontal-centerer>
@@ -228,7 +228,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 							</material-input>
 						</div>
 						<div id="passwordWebsites">
-							${(props.visibleWebsites || []).map((website, index, arr) => {
+							${mapArr((props.visibleWebsites || []).map((website, index, arr) => {
 								return html`
 									<div class="passwordWebsite">
 										<div class="passwordWebsiteEditableFields">
@@ -276,13 +276,14 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 										</div>
 									</div>
 								`;
-							})}
+							}))}
 							<div id="addWebsiteCenterer">
 								<paper-button aria-label="Add website"
 									id="addWebsiteButton"
 									border-color="${theme.accent.main}"
 									color="${theme.accent.main}"
 									flat ripple-color="${theme.accent.weak}"
+									wc-click="${inlineListener(this.addWebsite)}"
 								>Add website</paper-button>
 							</div>
 						</div>
