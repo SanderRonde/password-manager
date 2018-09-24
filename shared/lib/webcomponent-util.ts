@@ -66,7 +66,7 @@ export function isDefined<U extends string>(value: null|undefined|U): value is U
 
 function getterWithVal<R>(component: {
 	getParentRef(ref: string): any;
-}, value: string|null, strict: boolean, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R;
+}, value: string|null, strict: boolean, type: 'string'|'number'|'bool'|typeof complex): boolean|string|number|undefined|R;
 function getterWithVal(component: {
 	getParentRef(ref: string): any;
 }, value: string|null, strict: boolean, type: 'bool'): boolean;
@@ -78,10 +78,10 @@ function getterWithVal(component: {
 }, value: string|null, strict: boolean, type: 'number'): number|undefined;
 function getterWithVal<R>(component: {
 	getParentRef(ref: string): any;
-}, value: string|null, strict: boolean, type: 'complex'): R|undefined;
+}, value: string|null, strict: boolean, type: typeof complex): R|undefined;
 function getterWithVal<R>(component: {
 	getParentRef(ref: string): any;
-}, value: string|null, strict: boolean, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R {
+}, value: string|null, strict: boolean, type: 'string'|'number'|'bool'|typeof complex): boolean|string|number|undefined|R {
 	if (type === 'bool') {
 		if (strict) {
 			return (value + '') === 'true';
@@ -91,7 +91,7 @@ function getterWithVal<R>(component: {
 		if (isDefined(value)) {
 			if (type === 'number') {
 				return ~~value;
-			} else if (type === 'complex') {
+			} else if (type === complex) {
 				if (value.startsWith(WebComponentComplexValueManager.refPrefix)) {
 					return component.getParentRef(value);
 				} else {
@@ -106,7 +106,7 @@ function getterWithVal<R>(component: {
 
 export function getter<R>(element: HTMLElement & {
 	getParentRef(ref: string): any;
-}, name: string, strict: boolean, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R;
+}, name: string, strict: boolean, type: 'string'|'number'|'bool'|typeof complex): boolean|string|number|undefined|R;
 export function getter(element: HTMLElement & {
 	getParentRef(ref: string): any;
 }, name: string, strict: boolean, type: 'bool'): boolean;
@@ -118,19 +118,19 @@ export function getter(element: HTMLElement & {
 }, name: string, strict: boolean, type: 'number'): number|undefined;
 export function getter<R>(element: HTMLElement & {
 	getParentRef(ref: string): any;
-}, name: string, strict: boolean, type: 'complex'): R|undefined;
+}, name: string, strict: boolean, type: typeof complex): R|undefined;
 export function getter<R>(element: HTMLElement & {
 	getParentRef(ref: string): any;
-}, name: string, strict: boolean, type: 'string'|'number'|'bool'|'complex'): boolean|string|number|undefined|R {
+}, name: string, strict: boolean, type: 'string'|'number'|'bool'|typeof complex): boolean|string|number|undefined|R {
 	return getterWithVal(element, element.getAttribute(name), strict, type);
 }
 
 export function setter(setAttrFn: (key: string, val: string) => void, 
 	removeAttrFn: (key: string) => void, name: string, 
-	value: string|boolean|number, type: 'string'|'number'|'bool'|'complex'): void;
+	value: string|boolean|number, type: 'string'|'number'|'bool'|typeof complex): void;
 export function setter(setAttrFn: (key: string, val: string) => void, 
 	removeAttrFn: (key: string) => void, name: string, 
-	value: any, type: 'complex'): void;
+	value: any, type: typeof complex): void;
 export function setter(setAttrFn: (key: string, val: string) => void, 
 	removeAttrFn: (key: string) => void, name: string, 
 	value: boolean, type: 'bool'): void;
@@ -142,7 +142,7 @@ export function setter(setAttrFn: (key: string, val: string) => void,
 	value: number, type: 'number'): void;
 export function setter(setAttrFn: (key: string, val: string) => void, 
 	removeAttrFn: (key: string) => void, name: string, 
-	value: string|boolean|number, type: 'string'|'number'|'bool'|'complex'): void {
+	value: string|boolean|number, type: 'string'|'number'|'bool'|typeof complex): void {
 		if (type === 'bool') {
 			const boolVal = value as boolean;
 			if (boolVal) {
@@ -152,7 +152,7 @@ export function setter(setAttrFn: (key: string, val: string) => void,
 			}
 		} else {
 			const strVal = value as string|number;
-			if (type === 'complex') {
+			if (type === complex) {
 				try {
 					setAttrFn(name, encodeURIComponent(JSON.stringify(strVal)));
 				} catch(e) {
@@ -193,12 +193,14 @@ export const enum PROP_TYPE {
 	NUMBER = 'number',
 	BOOL = 'bool'
 }
-type ComplexType<T> = 'complex' & {
+type ComplexType<T> = typeof complex & {
 	__data: T;
 };
 
+const complex = Symbol('complex type');
+
 export function ComplexType<T>(): ComplexType<T> {
-	return 'complex' as ComplexType<T>;
+	return complex as ComplexType<T>;
 }
 
 type DefinePropTypes = PROP_TYPE|ComplexType<any>;
@@ -571,7 +573,7 @@ export function defineProps<P extends {
 			}
 		});
 		(async () => {
-			if (mapType !== 'complex') {
+			if (mapType !== complex) {
 				propValues[mapKey] = getter(element, propName, strict, mapType) as any;
 			} else {
 				await hookIntoMount(element as any, () => {
@@ -588,7 +590,7 @@ export function defineProps<P extends {
 					setter(originalSetAttr, originalRemoveAttr, propName, 
 						isPrivate ? '_' : defaultVal, mapType);
 				});
-			} else if (isPrivate || mapType === 'complex') {
+			} else if (isPrivate || mapType === complex) {
 				await hookIntoMount(element as any, () => {
 					setter(originalSetAttr, originalRemoveAttr, propName,
 						isPrivate ? '_' : propValues[mapKey] as any, mapType);
