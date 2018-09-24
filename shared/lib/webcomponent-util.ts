@@ -2,7 +2,7 @@ import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TY
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './listeners';
 import { supportsPassive, isNewElement, listenWithIdentifier } from "./listeners";
 import { PaperToast } from '../components/util/paper-toast/paper-toast';
-import { directive, AttributePart, DirectiveFn } from 'lit-html';
+import { directive, AttributePart, DirectiveFn, TemplateResult } from 'lit-html';
 import { API_ERRS } from '../types/api';
 
 // From https://github.com/JedWatson/classnames
@@ -1193,9 +1193,9 @@ export function findElementInPath<E extends HTMLElement>(path: HTMLElement[], qu
  * Map an array but return an empty string if its length is 0
  * this avoids the inlining of a complex value 0-length array
  */
-export function mapArr(result: any[]) {
+export function mapArr(result: any[], fallback: string|TemplateResult = '') {
 	if (result.length === 0) {
-		return '';
+		return fallback;
 	}
 	return result;
 }
