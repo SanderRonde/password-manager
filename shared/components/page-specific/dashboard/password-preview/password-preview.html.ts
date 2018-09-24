@@ -5,7 +5,7 @@ import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { invertedCardCSS, noCustomCSS } from './password-preview.css';
 import { PasswordPreview } from './password-preview';
 import { Key } from '../../../icons/key/key';
-import { inlineListener } from '../../../../lib/webcomponent-util';
+import { inlineListener, mapArr } from '../../../../lib/webcomponent-util';
 
 function prefixWithWWW(url: string) {
 	if (url.startsWith('www.')) {
@@ -23,7 +23,7 @@ export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>(function (pro
 		>
 			<div id="content">
 				<div id="websites">
-					${(props.websites || []).map((website) => {
+					${mapArr((props.websites || []).map((website) => {
 						return html`
 							<div class="website">
 								<div class="icon">
@@ -47,7 +47,7 @@ export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>(function (pro
 								</div>
 							</div>
 						`
-					})}
+					}))}
 				</div>
 				<div id="pointer">
 					${props.u2f_enabled ? html`<div id="u2fEnabled"

@@ -1,5 +1,5 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
-import { classNames, inlineListener } from '../../../lib/webcomponent-util';
+import { classNames, inlineListener, mapArr } from '../../../lib/webcomponent-util';
 import { ColorSize } from '../../icons/color/color';
 import { theme } from '../../theming/theme/theme';
 import { ThemeSelector } from "./theme-selector";
@@ -10,7 +10,7 @@ export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function() {
 	return html`
 		<div id="container">
 			<div id="themes">
-				${Object.getOwnPropertyNames(theme).map((themeName: keyof typeof theme) => {
+				${mapArr(Object.getOwnPropertyNames(theme).map((themeName: keyof typeof theme) => {
 					const currentTheme = theme[themeName];
 					return html`
 						<div class="themeContainer">
@@ -37,7 +37,7 @@ export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function() {
 							})}"></div>
 						</div>
 					`
-				})}
+				}))}
 			</div>
 			<icon-button aria-label="Change theme" id="button" fill="text"
 				on-click="${inlineListener(this.toggleAnimation, this)}"
