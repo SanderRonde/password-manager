@@ -229,8 +229,9 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 						</div>
 						<div id="passwordWebsites">
 							${mapArr((props.visibleWebsites || []).map((website, index, arr) => {
+								console.log(arr, arr.length);
 								return html`
-									<div class="passwordWebsite">
+									<div class="passwordWebsite" data-index="${index}">
 										<div class="passwordWebsiteEditableFields">
 											<material-input class="passwordWebsiteExact"
 												name="url" type="text" title="website URL"
@@ -266,11 +267,13 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 													<icon-button class="passwordWebsiteRemoveField"
 														tabIndex="-1" aria-label="Last website can't be removed"
 														title="Last website can't be removed" disabled
+														on-click="${inlineListener(this.removeLastWebsite, this)}"
 													>${Cross}</div>
 												` : html`
 													<icon-button class="passwordWebsiteRemoveField"
 														tabIndex="-1" aria-label="Remove website"
 														title="Remove website"
+														on-click="${inlineListener(this.removeWebsite, this)}"
 													>${Cross}</div>
 												`}
 										</div>

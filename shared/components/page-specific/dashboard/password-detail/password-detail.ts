@@ -186,6 +186,35 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		});
 	}
 
+	@bindToClass
+	public async removeLastWebsite() {
+		PaperToast.create({
+			content: 'Last website can\'t be removed',
+			duration: 3500,
+			buttons: [PaperToast.BUTTONS.HIDE]
+		});
+	}
+
+	@bindToClass
+	public async removeWebsite(e: MouseEvent & {
+		path: HTMLElement[];
+	}) {
+		const container = findElementInPath(e.path, '.passwordWebsite');
+		const index = container && container.getAttribute('data-index');
+		if (!container || !index) {
+			PaperToast.create({
+				content: 'Failed to remove website',
+				duration: 3500,
+				buttons: [PaperToast.BUTTONS.HIDE]
+			});
+			return;
+		}
+
+		const newWebsites = [...this.props.visibleWebsites.slice(0, -1)];
+		this.props.visibleWebsites.splice(~~index, 1);
+		await this._sizeChange(newWebsites);
+	}
+
 	private static _getSelectedViewSize(password: MetaPasswords[0],
 		websites: MetaPasswords[0]['websites'] = (password && password.websites) || []) {
 			//Height without websites: 513
