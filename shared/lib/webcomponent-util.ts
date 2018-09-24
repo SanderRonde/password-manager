@@ -1181,7 +1181,7 @@ export function findElementInPath<E extends HTMLElement>(path: HTMLElement[], qu
 
 	for (const el of path) {
 		if ((isId && el.id === sliced) ||
-			(isClass && el.classList.contains(sliced)) ||
+			(isClass && el.classList && el.classList.contains(sliced)) ||
 			(isTag && el.tagName && el.tagName.toLowerCase() === lowercase)) {
 				return el as E;
 			}
