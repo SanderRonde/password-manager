@@ -398,6 +398,20 @@ function getCoerced(initial: any, mapType: DefinePropTypes) {
 	return initial;
 }
 
+function watchValue(element: HTMLElement & {
+	renderToDOM(type: CHANGE_TYPE): void;
+}, value: any, watch: boolean, watchProperties: string[]) {
+	if (typeof value === 'object' && !Array.isArray(value) && watchProperties.length > 0) {
+		value = watchObject(value, watchProperties, () => {
+			element.renderToDOM(CHANGE_TYPE.PROP)
+		});
+	} else if (watch && Array.isArray(value)) {
+		value = watchArray(value, [], () => {
+			element.renderToDOM(CHANGE_TYPE.PROP)
+		});
+	}
+}
+
 type DEFAULT_EVENTS = {
 	beforePropChange: {
 		args: [string, any, any];
@@ -548,15 +562,7 @@ export function defineProps<P extends {
 			},
 			set(value) {
 				const original = value;
-				if (typeof value === 'object' && !Array.isArray(value) && watchProperties.length > 0) {
-					value = watchObject(value, watchProperties, () => {
-						element.renderToDOM(CHANGE_TYPE.PROP)
-					});
-				} else if (watch && Array.isArray(value)) {
-					value = watchArray(value, [], () => {
-						element.renderToDOM(CHANGE_TYPE.PROP)
-					});
-				}
+				watchValue(element, value, watch, watchProperties);
 
 				const prevVal = propValues[mapKey];
 				element.fire('beforePropChange', key, prevVal, value);
@@ -575,10 +581,12 @@ export function defineProps<P extends {
 		(async () => {
 			if (mapType !== complex) {
 				propValues[mapKey] = getter(element, propName, strict, mapType) as any;
+				watchValue(element, propValues[mapKey], watch, watchProperties);
 			} else {
 				await hookIntoMount(element as any, () => {
 					if (!isPrivate || element.getAttribute(propName) !== '_') {
 						propValues[mapKey] = getter(element, propName, strict, mapType) as any;
+						watchValue(element, propValues[mapKey], watch, watchProperties);
 					}
 				});
 			}
@@ -586,6 +594,7 @@ export function defineProps<P extends {
 				defaultValue : defaultValue2;
 			if (defaultVal !== undefined && propValues[mapKey] === undefined) {
 				propValues[mapKey] = defaultVal as any;
+				watchValue(element, propValues[mapKey], watch, watchProperties);
 				await hookIntoMount(element as any, () => {
 					setter(originalSetAttr, originalRemoveAttr, propName, 
 						isPrivate ? '_' : defaultVal, mapType);
