@@ -1188,3 +1188,14 @@ export function findElementInPath<E extends HTMLElement>(path: HTMLElement[], qu
 	}
 	return null;
 }
+
+/**
+ * Map an array but return an empty string if its length is 0
+ * this avoids the inlining of a complex value 0-length array
+ */
+export function mapArr(result: any[]) {
+	if (result.length === 0) {
+		return '';
+	}
+	return result;
+}
