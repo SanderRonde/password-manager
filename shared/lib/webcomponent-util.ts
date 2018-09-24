@@ -325,20 +325,30 @@ function watchArray<T>(arr: T[], path: (string|'*')[], callback: () => void): T[
 				(typeof property !== 'number' &&
 				!/^\d+$/.test(property))) {
 					arr[property as keyof typeof arr] = value;
+					if (property === 'length') {
+						callback();
+					}
 					return true;
 				}
 			const index = ~~property;
 
+			//An item is replaced
+			const isChange = index < arr.length;
+
 			if (path.length === 0) {
 				//Only watch the setting of values
 				arr[index] = value;
-				callback();
+				if (isChange) {
+					callback();
+				}
 				return true;
 			}
 
 			//Watch the values themselves as well
 			arr[index] = watchObject(value, path, callback);
-			callback();
+			if (isChange) {
+				callback();
+			}
 			return true;
 		},
 		deleteProperty(arr, property) {
@@ -354,7 +364,6 @@ function watchArray<T>(arr: T[], path: (string|'*')[], callback: () => void): T[
 			if (Reflect.has(arr, property)) {
 				Reflect.deleteProperty(arr, property);
 			}
-			callback();
 			return true;
 		}
 	});
