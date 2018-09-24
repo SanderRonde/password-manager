@@ -129,7 +129,7 @@ export class LoginWeb extends Login {
 			private_key: privateKey,
 			instance_id: instance_id
 		});
-		root.changePage(ENTRYPOINT.DASHBOARD);
+		await root.changePage(ENTRYPOINT.DASHBOARD);
 	}
 
 	@bindToClass
@@ -153,9 +153,9 @@ export class LoginWeb extends Login {
 				localStorage.setItem('rememberedEmail', email || '');
 			}
 			this.$.button.setState('success');
-			PaperToast.create({
+			const toast = PaperToast.create({
 				content: 'Loading dashboard...',
-				duration: 1000,
+				duration: Infinity,
 				buttons: [PaperToast.BUTTONS.HIDE]
 			});
 			await this._proceedToDashboard({ 
@@ -163,6 +163,7 @@ export class LoginWeb extends Login {
 				response,
 				password: inputData.password
 			});
+			toast.hide();
 		} else {
 			this.$.button.setState('failure');
 			createCancellableTimeout(this, 'failure-button', () => {

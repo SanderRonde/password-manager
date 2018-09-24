@@ -48,6 +48,9 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 
 	show() {
 		this.classList.add('show');
+		if (this.props.duration === Infinity) {
+			return;
+		}
 		createCancellableTimeout(this, 'show', () => {
 			this.hide();
 		}, this.props.duration);
