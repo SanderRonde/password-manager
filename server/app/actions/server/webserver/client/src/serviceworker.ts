@@ -49,7 +49,7 @@ function race<T>(...promises: Promise<T|undefined>[]): Promise<T> {
 				if (result !== undefined) {
 					resolve(result);
 				}
-			});
+			}).catch(() => {});
 		});
 		if (promises.length === 0) {
 			resolve();
