@@ -4,10 +4,13 @@ import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Cross, CrossSize } from '../../../icons/cross/cross';
+import { Visible, VisibleHidden } from '../../../icons/visible/visible';
+import { Checkmark } from '../../../icons/checkmark/checkmark';
 import { PasswordDetail } from './password-detail';
 import { KeySize } from '../../../icons/key/key';
-import { html } from 'lit-html';
 import { Link } from '../../../icons/link/link';
+import { Copy } from '../../../icons/copy/copy';
+import { html } from 'lit-html';
 
 export const passwordDetailDataSymbol = Symbol('passwordDetailData');
 export const passwordDetailDataStore: {
@@ -179,14 +182,50 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 								autoComplete="off" fill label="username"
 								value="${(props.selectedDisplayed && props.selectedDisplayed.username) || '?'}"
 							>
+								<div slot="postIcon">
+									<icon-button tabIndex="-1" class="copy"
+										aria-label="Copy username" title="Copy username"
+										on-click="${inlineListener(this.copyCredential, this)}"
+									>
+										${Copy}
+									</icon-button>
+									<icon-button tabIndex="-1" class="copyDone"
+										aria-label="Copy username" title="Copy username"
+										on-click="${inlineListener(this.copyCredential, this)}"
+									>
+										${Checkmark}
+									</icon-button>
+								</div>
 							</material-input>
 							<material-input id="passwordPassword" name="password"
-								type="password" title="Account password"
+								type="${props.passwordVisible ? 'text' : 'password'}" title="Account password"
 								autoComplete="off" fill label="password"
 								value="${passwordDetailDataStore[passwordDetailDataSymbol] ?
 									passwordDetailDataStore[passwordDetailDataSymbol]!.password : 
 										'password'}"
-							></material-input>
+							>
+								<div slot="postIcon">
+									<icon-button tabIndex="-1"
+										aria-label="Copy username first and password 5s later" 
+										title="Copy username first and password 5s later"
+										on-click="${inlineListener(this.onToggleShowPasswordClick, this)}"
+									>
+										${props.passwordVisible ? Visible : VisibleHidden}
+									</icon-button>
+									<icon-button tabIndex="-1" class="copy"
+										aria-label="Copy username" title="Copy username"
+										on-click="${inlineListener(this.copyCredential, this)}"
+									>
+										${Copy}
+									</icon-button>
+									<icon-button tabIndex="-1" class="copyDone"
+										aria-label="Copy username" title="Copy username"
+										on-click="${inlineListener(this.copyCredential, this)}"
+									>
+										${Checkmark}
+									</icon-button>
+								</div>
+							</material-input>
 						</div>
 						<div id="passwordWebsites">
 							${(props.visibleWebsites || []).map((website, index, arr) => {

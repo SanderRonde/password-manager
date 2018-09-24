@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors, findElementInPath } from '../../../../lib/webcomponent-util';
+import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors, findElementInPath, PROP_TYPE } from '../../../../lib/webcomponent-util';
 import { PasswordDetailHTML, passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey } from '../../../../types/db-types';
 import { PasswordDetailCSS, VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
@@ -57,7 +57,8 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				type: ComplexType<MetaPasswords[0]['websites']>(),
 				value: []
 			},
-			authData: ComplexType<PasswordDetailData>()
+			authData: ComplexType<PasswordDetailData>(),
+			passwordVisible: PROP_TYPE.BOOL
 		}
 	});
 
@@ -109,9 +110,65 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		}
 	}
 
+	private _copyText(text: string) {
+		const el = document.createElement('textarea');  
+		el.value = text;                                
+		el.style.position = 'absolute';                
+		el.style.left = '-9999px';                      
+		document.body.appendChild(el);                  
+	
+		const selected =           
+			document.getSelection().rangeCount > 0        
+				? document.getSelection().getRangeAt(0)     
+				: false;                                    
+		el.select();                                    
+		document.execCommand('copy');                   
+		document.body.removeChild(el);                  
+		if (selected) {                                 
+			document.getSelection().removeAllRanges();    
+			document.getSelection().addRange(selected);   
+		}
+	}
+
+	private _copyMap: WeakMap<HTMLElement, number> = new WeakMap();
+
+	@bindToClass
+	public copyCredential(e: MouseEvent & {
+		path: HTMLElement[]
+	}) {
+		const input = findElementInPath<MaterialInput>(e.path, 'material-input');
+		if (!input) {
+			PaperToast.create({
+				content: 'Failed to copy text',
+				duration: 2500
+			});
+			return;
+		}
+		
+		this._copyText(input.value);
+
+		input.classList.add('done');
+		if (this._copyMap.has(input)) {
+			window.clearTimeout(this._copyMap.get(input));
+		}
+		
+		PaperToast.create({
+			content: 'Copied',
+			duration: 2500
+		});
+		this._copyMap.set(input, window.setTimeout(() => {
+			input.classList.remove('done');
+		}, 2500));
+	}
+
+	@bindToClass
+	public onToggleShowPasswordClick() {
+		this.props.passwordVisible = !this.props.passwordVisible;
+	}
+
 	private static _getSelectedViewSize(password: MetaPasswords[0]) {
 		//Height without websites: 513
-		//Single website heigt: 156
+		//Single website height: 156
 		//Size per website: 156 + 10px margin
 		return 513 + 156 + ((password.websites.length - 1) * (156 + 10));
 	}
@@ -436,6 +493,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			await this._animateView('selectedView', PasswordDetail._getSelectedViewSize(passwordMeta), () => {
 				//This will re-render the DOM so no need to do it because of 
 				// selected password change
+				this.props.passwordVisible = false;
 				this.props.visibleWebsites = [];
 			});
 		} else {

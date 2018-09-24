@@ -113,5 +113,21 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) 
 		#saveChanges {
 			margin-left: 10px;
 		}
+
+		material-input .copy {
+			display: inline-block;
+		}
+
+		material-input .copyDone {
+			display: none;
+		}
+
+		material-input.done .copy {
+			display: none;
+		}
+
+		material-input.done .copyDone {
+			display: inline-block;
+		}
 	</style>`
 }, CHANGE_TYPE.ALWAYS);
