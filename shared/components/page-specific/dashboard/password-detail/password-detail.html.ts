@@ -229,7 +229,6 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 						</div>
 						<div id="passwordWebsites">
 							${mapArr((props.visibleWebsites || []).map((website, index, arr) => {
-								console.log(arr, arr.length);
 								return html`
 									<div class="passwordWebsite" data-index="${index}">
 										<div class="passwordWebsiteEditableFields">
