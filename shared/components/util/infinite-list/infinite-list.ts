@@ -40,6 +40,11 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 				defaultValue: [],
 				isPrivate: true
 			},
+			defaultItemData: {
+				type: ComplexType<Partial<ID>>(),
+				defaultValue: null,
+				isPrivate: true
+			},
 			window: PROP_TYPE.BOOL,
 			itemSize: ComplexType<(data: D, special: {
 				isMin: boolean;
@@ -306,15 +311,17 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 		const templateString: any = strings;
 		templateString.raw = [...strings];
 		this._htmlTemplate = (data: D, itemData: ID, index: number, isTemplate: boolean) => {
+			const args = values.map((value) => {
+				if (value.type === 'path') {
+					return this._evaluateDataPath(data, 
+						itemData, value);	
+				} else {
+					return value.fn(data, itemData, index, isTemplate);
+				}
+			});
+			console.log('Rendering with args', args);
 			return this.complexHTML(templateString as TemplateStringsArray,
-				...values.map((value) => {
-					if (value.type === 'path') {
-						return this._evaluateDataPath(data, 
-							itemData, value);	
-					} else {
-						return value.fn(data, itemData, index, isTemplate);
-					}
-				}));
+				...args);
 		}
 	}
 
@@ -529,6 +536,9 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 		this._freeItem(freePhysical);
 
 		this._containers[freePhysical].virtual = virtual;
+		console.log('Rendering item into', this._containers[freePhysical].element,
+			'with props', this.props.data[virtual], 'and itemdata',
+			this._itemData![virtual]);
 		render(this._htmlTemplate(this.props.data[virtual],
 			this._itemData![virtual], virtual, false), this._containers[freePhysical].element);
 		this._containers[freePhysical].element.style.transform = 
@@ -559,13 +569,28 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 		}
 	}
 
+	private get _defaultItemData() {
+		if (typeof this.props.defaultItemData === 'object') {
+			if (!this.props.defaultItemData) {
+				return this.props.defaultItemData;
+			}
+			if (Array.isArray(this.props.defaultItemData)) {
+				return [...this.props.defaultItemData];
+			}
+			try {
+				return {...this.props.defaultItemData as Object};
+			} catch(e) {}
+		}
+		return this.props.defaultItemData;
+	}
+
 	private _startRender() {
 		if (!this.props.data) {
 			return;
 		}
 		if (this.props.data !== this._usedData) {
 			this._usedData = this.props.data;
-			this._itemData = this.props.data.map(_ => null);
+			this._itemData = this.props.data.map(_ => this._defaultItemData as ID);
 			this._setContainerSize();
 			this._render(true);
 			return;

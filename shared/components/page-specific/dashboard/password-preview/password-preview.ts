@@ -55,6 +55,16 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		}
 	});
 
+	constructor() {
+		super();
+		this.listen('propChange', (name, from, to) => {
+			if (name === 'selected') {
+				console.log('Changed from', from, 'to', to, this);
+				this.$.container.renderToDOM();
+			}
+		});
+	}
+
 	private rippleElement: HTMLElement|null = null;
 	protected get container() {
 		return this.$.content;
@@ -64,14 +74,14 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		if (this.props.selected) return;
 
 		this.props.selected = true;
-		this.$.container.renderToDOM(CHANGE_TYPE.THEME);
+		this.$.container.renderToDOM();
 	}
 
 	public deselect() {
 		if (!this.props.selected) return;
 
 		this.props.selected = false;
-		this.$.container.renderToDOM(CHANGE_TYPE.THEME);
+		this.$.container.renderToDOM();
 	}
 
 	@bindToClass

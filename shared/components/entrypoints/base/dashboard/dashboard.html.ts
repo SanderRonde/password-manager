@@ -28,6 +28,9 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, 
 									window id="infiniteList" data-name="password" 
 									item-size="${this.getItemSize}"
 									ref="${this}"
+									default-item-data="${{
+										selected: false
+									}}"
 									data="${props.metaPasswords || []}"
 								>
 									<template slot="template">
