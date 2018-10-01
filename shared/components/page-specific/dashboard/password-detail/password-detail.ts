@@ -32,6 +32,17 @@ export interface PasswordDetailData {
 	auth_token: APIToken;
 };
 
+interface PasswordDetailChanges {
+	username: string;
+	password: string;
+	notes: string[];
+	twofactor_enabled: boolean;
+	u2f_enabled: boolean;
+	websites: {
+		url: string
+	}[];
+}
+
 @config({
 	is: 'password-detail',
 	css: PasswordDetailCSS,
@@ -205,6 +216,77 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		const newWebsites = [...this.props.visibleWebsites.slice(0, -1)];
 		this.props.visibleWebsites.splice(~~index, 1);
 		await this._sizeChange(newWebsites);
+	}
+
+	@bindToClass
+	public async discardChanges() {
+		//Reset to default values
+		this._setSelected(this.props.selected);
+	}
+
+	private _getWebsites() {
+		const websiteElements = Array.prototype.slice.apply(
+			this.$.passwordWebsites.querySelectorAll('.passwordWebsite')) as HTMLElement[];
+		return websiteElements.map((element) => {
+			return {
+				url: (element.querySelector('.passwordWebsiteExact') as MaterialInput).value
+			}
+		});
+	}
+
+	private static _areSameString(str1: string, str2: string): boolean {
+		if (!str1 || !str2) {
+			return !str1 === !str2;
+		}
+		return str1.trim() === str2.trim();
+	}
+
+	private _hasChanged(changes: PasswordDetailChanges) {
+		if (!PasswordDetail._areSameString(this.props.selected.username,
+			changes.username)) {
+				return true;
+			}
+		if (!PasswordDetail._areSameString(changes.password,
+			passwordDetailDataStore[passwordDetailDataSymbol]!.password)) {
+				return true;
+			}
+		if (!PasswordDetail._areSameString(changes.notes.join('\n'),
+			passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n'))) {
+				return true;
+			}
+		if (this.props.selected.twofactor_enabled !== changes.twofactor_enabled) {
+			return true;
+		}
+		if (this.props.selected.u2f_enabled !== changes.u2f_enabled) {
+			return true;
+		}
+		if (this.props.selected.websites.length !== changes.websites.length) {
+			return true;
+		}
+		for (let i = 0; i < this.props.selected.websites.length; i++) {
+			if (!PasswordDetail._areSameString(
+				this.props.selected.websites[i].exact,
+				changes.websites[i].url)) {
+					return true;
+				}
+		}
+		return false;
+	}
+
+	@bindToClass
+	public async saveChanges() {
+		const newData: PasswordDetailChanges = {
+			username: this.$.passwordUsername.value,
+			password: this.$.passwordPassword.value,
+			notes: this.$.noteInput.value.split('\n'),
+			twofactor_enabled: this.$.passwordSettings2faCheckbox.checked,
+			u2f_enabled: this.$.passwordSettingsu2fCheckbox.checked,
+			websites: this._getWebsites()
+		};
+
+		if (!this._hasChanged(newData)) {
+			PaperToast.createHidable('No changes', PaperToast.DURATION.SHORT);
+		}
 	}
 
 	private static _getSelectedViewSize(password: MetaPasswords[0],
