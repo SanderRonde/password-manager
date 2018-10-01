@@ -103,7 +103,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		if (!input) {
 			PaperToast.create({
 				content: 'Failed to open link',
-				duration: 2500
+				duration: PaperToast.DURATION.SHORT
 			});
 			return;
 		}
@@ -145,7 +145,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		if (!input) {
 			PaperToast.create({
 				content: 'Failed to copy text',
-				duration: 2500
+				duration: PaperToast.DURATION.SHORT
 			});
 			return;
 		}
@@ -159,7 +159,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		
 		PaperToast.create({
 			content: 'Copied',
-			duration: 2500
+			duration: PaperToast.DURATION.SHORT
 		});
 		this._copyMap.set(input, window.setTimeout(() => {
 			input.classList.remove('done');
@@ -188,11 +188,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 
 	@bindToClass
 	public async removeLastWebsite() {
-		PaperToast.create({
-			content: 'Last website can\'t be removed',
-			duration: 3500,
-			buttons: [PaperToast.BUTTONS.HIDE]
-		});
+		PaperToast.createHidable('Last website can\'t be removed', 3500);
 	}
 
 	@bindToClass
@@ -202,11 +198,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		const container = findElementInPath(e.path, '.passwordWebsite');
 		const index = container && container.getAttribute('data-index');
 		if (!container || !index) {
-			PaperToast.create({
-				content: 'Failed to remove website',
-				duration: 3500,
-				buttons: [PaperToast.BUTTONS.HIDE]
-			});
+			PaperToast.createHidable('Failed to remove website', 3500);
 			return;
 		}
 
@@ -312,33 +304,25 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	}
 	
 	private _failDecryptServerResponse() {
-		PaperToast.create({
-			content: 'Failed to decrypt server response',
-			buttons: [PaperToast.BUTTONS.HIDE],
-			duration: 10000
-		});
+		PaperToast.createHidable('Failed to decrypt server response',
+			PaperToast.DURATION.LONG);
 		this._showFailedView();
 	}
 	
 	private async _signU2F() {
 		const supported = await isSupported();
 		if (!supported) {
-			PaperToast.create({
-				content: 'U2F is not supported in your browser',
-				duration: 10000,
-				buttons: [PaperToast.BUTTONS.HIDE]
-			});
+			PaperToast.createHidable('U2F is not supported in your browser',
+				PaperToast.DURATION.LONG);
 			this._showFailedView();
 			return;
 		}
 
 		if (!this.props.authData.server_public_key || 
 			!this.props.authData.instance_id) {
-				PaperToast.create({
-					content: 'Failed to set up public and/or private key with server',
-					duration: 10000,
-					buttons: [PaperToast.BUTTONS.HIDE]
-				});
+				PaperToast.createHidable(
+					'Failed to set up public and/or private key with server',
+					PaperToast.DURATION.LONG);
 				this._showFailedView();
 				return;
 			}
@@ -347,14 +331,12 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		const clientPrivateKey = localStorage.getItem('instance_private_key');
 
 		if (!clientPrivateKey && !document.body.classList.contains('dev')) {
-			PaperToast.create({
-				content: 'Failed to set up public and/or private key with server' + 
+			PaperToast.createHidable(
+				'Failed to set up public and/or private key with server' + 
 					(this._globalProperties.isWeb === 'true' ? 
 						', redirecting to login page...' :
 						', please delete this instance and create a new instance to fix it'),
-				buttons: [PaperToast.BUTTONS.HIDE],
-				duration: 10000
-			});
+				PaperToast.DURATION.LONG);
 			if (this._globalProperties.isWeb === 'true') {
 				this.getRoot().changePage(ENTRYPOINT.LOGIN);
 			}
@@ -451,14 +433,12 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		const clientPrivateKey = localStorage.getItem('instance_private_key');
 
 		if (!clientPrivateKey && !document.body.classList.contains('dev')) {
-			PaperToast.create({
-				content: 'Failed to set up public and/or private key with server' + 
+			PaperToast.createHidable(
+				'Failed to set up public and/or private key with server' + 
 					(this._globalProperties.isWeb === 'true' ? 
 						', redirecting to login page...' :
 						', please delete this instance and create a new instance to fix it'),
-				buttons: [PaperToast.BUTTONS.HIDE],
-				duration: 10000
-			});
+				PaperToast.DURATION.LONG);
 			if (this._globalProperties.isWeb === 'true') {
 				this.getRoot().changePage(ENTRYPOINT.LOGIN);
 			}

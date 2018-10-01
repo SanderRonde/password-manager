@@ -147,12 +147,8 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 	private async _refreshToken() {
 		const data = this.getData('loginData');
 		if (!data) {
-			PaperToast.create({
-				content: 'Failed to get server auth data, API token will not be' +
-					' extended and will time out in 3 minutes',
-				buttons: [PaperToast.BUTTONS.HIDE],
-				duration: 10000
-			});
+			PaperToast.createHidable('Failed to get server auth data, API token will not be' +
+				' extended and will time out in 3 minutes', PaperToast.DURATION.LONG);
 			return;
 		}
 		const response = await doClientAPIRequest({
@@ -169,12 +165,8 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 			const decryptedCount = decryptWithPrivateKey(response.data.count,
 				data.private_key);
 			if (decryptedToken === ERRS.INVALID_DECRYPT || decryptedCount === ERRS.INVALID_DECRYPT) {
-				PaperToast.create({
-					content: 'Failed to decrypt serve response, API token will not be' +
-						' extended and will time out in 3 minutes',
-					buttons: [PaperToast.BUTTONS.HIDE],
-					duration: 10000
-				});
+				PaperToast.createHidable('Failed to decrypt serve response, API token will not be' +
+					' extended and will time out in 3 minutes', PaperToast.DURATION.LONG);
 				return;
 			}
 			this._token = decryptedToken;
@@ -182,64 +174,37 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		} else {
 			switch (response.ERR) {
 				case API_ERRS.CLIENT_ERR:
-					PaperToast.create({
-						content: 'Failed to send API token extension request, ' +
-							'it will time out in 3 minutes',
-						buttons: [PaperToast.BUTTONS.HIDE],
-						duration: 5000
-					});
+					PaperToast.createHidable('Failed to send API token extension request, ' +
+						'it will time out in 3 minutes');
 					break;
 				case API_ERRS.INVALID_CREDENTIALS:
 					if (response.error === 'attempt to extend expired token') {
-						PaperToast.create({
-							content: 'Periodical API token renewal attempted to extend' + 
-								' an expired token, all keys for this instance are terminated',
-							buttons: [PaperToast.BUTTONS.HIDE],
-							duration: 5000
-						});
+						PaperToast.createHidable('Periodical API token renewal attempted to extend' +
+							' an expired token, all keys for this instance are terminated');
 					} else if (response.error === 'attempt to extend invalid token') {
-						PaperToast.create({
-							content: 'Your API token was invalidated. This means someone' +
-								' intercepted one of your API tokens through your internet traffic. ' +
-								'Take this very seriously.',
-							buttons: [PaperToast.BUTTONS.HIDE],
-							duration: 10000
-						});
+						PaperToast.createHidable('Your API token was invalidated. This means someone' +
+							' intercepted one of your API tokens through your internet traffic. ' +
+							'Take this very seriously.', PaperToast.DURATION.LONG);
 					} else {
-						PaperToast.create({
-							content: 'Invalid credentials for extending API token, ' +
-								'it will time out in 3 minutes',
-							buttons: [PaperToast.BUTTONS.HIDE],
-							duration: 5000
-						});
+						PaperToast.createHidable('Invalid credentials for extending API token, ' +
+							'it will time out in 3 minutes');
 					}
 					break;
 				case API_ERRS.INVALID_PARAM_TYPES:
 				case API_ERRS.MISSING_PARAMS:
 				case API_ERRS.NO_REQUEST_BODY:
-					PaperToast.create({
-						content: 'Failed to send API token extension request, ' +
-							'it will time out in 3 minutes',
-						buttons: [PaperToast.BUTTONS.HIDE],
-						duration: 10000
-					});
+					PaperToast.createHidable('Failed to send API token extension request, ' +
+						'it will time out in 3 minutes', PaperToast.DURATION.LONG);
 					break;
 				case API_ERRS.SERVER_ERROR:
-					PaperToast.create({
-						content: 'A server error occurred when sending API token' +
-							' extension request, it will time out in 3 minutes',
-						buttons: [PaperToast.BUTTONS.HIDE],
-						duration: 10000
-					});
+					PaperToast.createHidable('A server error occurred when sending API token' +
+						' extension request, it will time out in 3 minutes', 
+						PaperToast.DURATION.LONG);
 					break;
 				case API_ERRS.TOO_MANY_REQUESTS:
-					PaperToast.create({
-						content: 'The server responded with "too many requests"' +
-							' when sending API token extension request,' +
-							' it will time out in 3 minutes',
-						buttons: [PaperToast.BUTTONS.HIDE],
-						duration: 10000
-					});
+					PaperToast.createHidable('The server responded with "too many requests"' +
+						' when sending API token extension request,' +
+						' it will time out in 3 minutes', PaperToast.DURATION.LONG);
 					break;
 			}
 		}

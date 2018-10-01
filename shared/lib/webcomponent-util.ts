@@ -1062,41 +1062,21 @@ export function reportDefaultResponseErrors(response: {
 }, paperToast: typeof PaperToast) {
 	switch (response.ERR) {
 		case API_ERRS.CLIENT_ERR:
-			paperToast.create({
-				content: 'Failed to send request',
-				buttons: [paperToast.BUTTONS.HIDE],
-				duration: 5000
-			});
+			paperToast.createHidable('Failed to send request');
 			break;
 		case API_ERRS.INVALID_CREDENTIALS:
-			paperToast.create({
-				content: 'Invalid credentials',
-				buttons: [paperToast.BUTTONS.HIDE],
-				duration: 5000
-			});
+			paperToast.createHidable('Invalid credentials');
 			break;
 		case API_ERRS.INVALID_PARAM_TYPES:
 		case API_ERRS.MISSING_PARAMS:
 		case API_ERRS.NO_REQUEST_BODY:
-			paperToast.create({
-				content: 'Invalid request',
-				buttons: [paperToast.BUTTONS.HIDE],
-				duration: 5000
-			});
+			paperToast.createHidable('Invalid request');
 			break;
 		case API_ERRS.SERVER_ERROR:
-			paperToast.create({
-				content: 'Server error',
-				buttons: [paperToast.BUTTONS.HIDE],
-				duration: 5000
-			});
+			paperToast.createHidable('Server error');
 			break;
 		case API_ERRS.TOO_MANY_REQUESTS:
-			paperToast.create({
-				content: 'Too many requests',
-				buttons: [paperToast.BUTTONS.HIDE],
-				duration: 5000
-			});
+			paperToast.createHidable('Too many requests');
 			break;
 	}
 }

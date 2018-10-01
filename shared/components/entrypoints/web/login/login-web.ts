@@ -32,10 +32,7 @@ export class LoginWeb extends Login {
 	}> {
 		const serverData = await this.getData();
 		if (serverData === null) {
-			PaperToast.create({
-				content: 'Could not establish connection to server',
-				buttons: [PaperToast.BUTTONS.HIDE]
-			});
+			PaperToast.createHidable('Could not establish connection to server');
 			return {
 				privateKey: null,
 				response: {
@@ -71,10 +68,7 @@ export class LoginWeb extends Login {
 			}
 			return res;
 		} catch(e) {
-			PaperToast.create({
-				content: 'Could not establish connection to server',
-				buttons: [PaperToast.BUTTONS.HIDE]
-			});
+			PaperToast.createHidable('Could not establish connection to server');
 			return {
 				privateKey: keyPair.privateKey,
 				response: {
@@ -113,10 +107,7 @@ export class LoginWeb extends Login {
 			auth_token === ERRS.INVALID_DECRYPT ||
 			count === ERRS.INVALID_DECRYPT) {
 				PaperToast.hideAll();
-				PaperToast.create({
-					content: 'Failed to decrypt data, please try again',
-					buttons: [PaperToast.BUTTONS.HIDE]
-				});
+				PaperToast.createHidable('Failed to decrypt data, please try again');
 				return;
 			}
 
@@ -153,11 +144,8 @@ export class LoginWeb extends Login {
 				localStorage.setItem('rememberedEmail', email || '');
 			}
 			this.$.button.setState('success');
-			const toast = PaperToast.create({
-				content: 'Loading dashboard...',
-				duration: Infinity,
-				buttons: [PaperToast.BUTTONS.HIDE]
-			});
+			const toast = PaperToast.createHidable('Loading dashboard...',
+				PaperToast.DURATION.FOREVER);
 			await this._proceedToDashboard({ 
 				privateKey, 
 				response,

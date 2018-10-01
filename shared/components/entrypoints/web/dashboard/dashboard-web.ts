@@ -39,11 +39,8 @@ export class DashboardWeb extends Dashboard {
 	}
 
 	private _failNoCredentials(message: string) {
-		PaperToast.create({
-			content: message + ', redirecting to login page...',
-			buttons: [PaperToast.BUTTONS.HIDE],
-			duration: 10000
-		});
+		PaperToast.createHidable(message + ', redirecting to login page...',
+			PaperToast.DURATION.LONG);
 		if (!document.body.classList.contains('dev')) {
 			this.getRoot().changePage(ENTRYPOINT.LOGIN);
 		}

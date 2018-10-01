@@ -134,6 +134,14 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 		FOREVER: 1000 * 60 * 60 * 24
 	}
 
+	static createHidable(content: string, duration: number = this.DURATION.SHORT) {
+		return this.create({
+			content,
+			duration,
+			buttons: [this.BUTTONS.HIDE]
+		});
+	}
+
 	static create(config: {
 		content: string;
 		buttons?: ToastButton[];

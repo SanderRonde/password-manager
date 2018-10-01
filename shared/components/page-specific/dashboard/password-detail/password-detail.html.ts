@@ -303,7 +303,8 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 							<div id="passwordSettingsLayout">
 								<div id="passwordSettings2fa">
 									<material-checkbox checked="${props.selectedDisplayed &&
-											props.selectedDisplayed.twofactor_enabled}">
+											props.selectedDisplayed.twofactor_enabled}"
+											id="passwordSettings2faCheckbox">
 										Enable 2FA
 										<more-info info="${'2FA requires you to enter' +
 											' a code generated on a secondary device' +
@@ -316,7 +317,8 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 								</div>
 								<div id="passwordSettingsu2f">
 									<material-checkbox checked="${props.selectedDisplayed &&
-											props.selectedDisplayed.u2f_enabled}">
+											props.selectedDisplayed.u2f_enabled}"
+											id="passwordSettingsu2fCheckbox">
 										Enable U2F
 										<more-info info="${'U2F requires you to' +
 											' connect a trusted device (usually a USB key)' + 
@@ -334,11 +336,13 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 							<paper-button aria-label="Discard" color="${theme.error}"
 								border border-color="${theme.error}" flat
 								ripple-color="${theme.error}"
+								wc-click="${inlineListener(this.discardChanges, this)}"
 							>
 								Discard
 							</paper-button>
 							<animated-button aria-label="Save Changes" 
 								id="saveChanges"
+								wc-click="${inlineListener(this.saveChanges, this)}"
 								custom-css="${saveChangesButtonCustomCSS}">
 								Save changes
 							</animated-button>
