@@ -369,7 +369,13 @@ function watchArray<T>(arr: T[], path: (string|'*')[], callback: () => void): T[
 	});
 }
 
+const cachedCasing = new Map<string, string>();
 function dashesToCasing(name: string) {
+	const cached = cachedCasing.get(name);
+	if (cached) {
+		return cached;
+	}
+
 	let newStr = '';
 	for (let i = 0; i < name.length; i++) {
 		if (name[i] === '-') {
@@ -379,6 +385,7 @@ function dashesToCasing(name: string) {
 			newStr += name[i];
 		}
 	}
+	cachedCasing.set(name, newStr);
 	return newStr;
 }
 
