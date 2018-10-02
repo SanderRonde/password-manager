@@ -539,11 +539,6 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 		this._freeItem(freePhysical);
 
 		this._containers[freePhysical].virtual = virtual;
-		if (this._containers[freePhysical].element && 
-			this._containers[freePhysical].element.querySelector('password-preview') &&
-			this._containers[freePhysical].element.querySelector('password-preview').props.selected) {
-				// debugger;
-			}
 		render(this._htmlTemplate(this.props.data[virtual],
 			this._itemData![virtual], virtual, false), this._containers[freePhysical].element);
 		const children = Array.prototype.slice.apply(this._containers[freePhysical].element.children);
