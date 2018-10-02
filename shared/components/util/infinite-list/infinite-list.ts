@@ -17,7 +17,11 @@ type TemplateValue<D, ID> = {
 	type: "path";
 	isData: boolean;
 	path: (string | number)[];
-}
+};
+
+export interface ListRendered {
+	listRender(data: any, itemData: any): void;
+};
 
 @config({
 	is: 'infinite-list',
@@ -319,9 +323,7 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 					return value.fn(data, itemData, index, isTemplate);
 				}
 			});
-			console.log('Rendering with args', args);
-			return this.complexHTML(templateString as TemplateStringsArray,
-				...args);
+			return this.complexHTML(templateString as TemplateStringsArray, ...args);
 		}
 	}
 
@@ -366,6 +368,7 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 	}
 
 	private set _scrolled(value: number) {
+		console.log('setting scrolled', value);
 		if (this.props.window) {
 			document.documentElement.scrollTop = value;
 		} else {
@@ -536,11 +539,18 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 		this._freeItem(freePhysical);
 
 		this._containers[freePhysical].virtual = virtual;
-		console.log('Rendering item into', this._containers[freePhysical].element,
-			'with props', this.props.data[virtual], 'and itemdata',
-			this._itemData![virtual]);
+		if (this._containers[freePhysical].element && 
+			this._containers[freePhysical].element.querySelector('password-preview') &&
+			this._containers[freePhysical].element.querySelector('password-preview').props.selected) {
+				// debugger;
+			}
 		render(this._htmlTemplate(this.props.data[virtual],
 			this._itemData![virtual], virtual, false), this._containers[freePhysical].element);
+		const children = Array.prototype.slice.apply(this._containers[freePhysical].element.children);
+		children.forEach((el: ListRendered) => {
+			el.listRender && el.listRender(this.props.data[virtual],
+				this._itemData![virtual]);
+		});
 		this._containers[freePhysical].element.style.transform = 
 			`translateY(${this._getStartOffset(virtual)}px)`;
 	}

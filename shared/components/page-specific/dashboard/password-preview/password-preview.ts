@@ -3,7 +3,7 @@
 import { config, defineProps, PROP_TYPE, ComplexType, isNewElement } from '../../../../lib/webcomponent-util';
 import { MetaPasswords, MetaPasswordsPreviewData } from '../../../entrypoints/base/dashboard/dashboard';
 import { ConfigurableWebComponent, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { InfiniteList } from '../../../util/infinite-list/infinite-list';
+import { InfiniteList, ListRendered } from '../../../util/infinite-list/infinite-list';
 import { rippleEffect, RippleEffect } from '../../../../mixins/ripple';
 import { PasswordPreviewIDMap } from './password-preview-querymap';
 import { PasswordPreviewHTML } from './password-preview.html';
@@ -28,7 +28,7 @@ export interface PasswordPreviewHost {
 	]
 })
 @rippleEffect
-export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDMap> {
+export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDMap> implements ListRendered {
 	props = defineProps(this, {
 		reflect: {
 			id: PROP_TYPE.STRING,
@@ -54,16 +54,6 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 			index: PROP_TYPE.NUMBER
 		}
 	});
-
-	constructor() {
-		super();
-		this.listen('propChange', (name, from, to) => {
-			if (name === 'selected') {
-				console.log('Changed from', from, 'to', to, this);
-				this.$.container.renderToDOM();
-			}
-		});
-	}
 
 	private rippleElement: HTMLElement|null = null;
 	protected get container() {
@@ -115,6 +105,16 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 
 		//Rerender card
 		this.$.container.renderToDOM(CHANGE_TYPE.THEME);
+	}
+
+	listRender(_data: MetaPasswords[0], itemData: MetaPasswordsPreviewData) {
+		this.classList.add('quicktransition');
+		if (itemData.selected) {
+			this.select();
+		} else {
+			this.deselect();
+		}
+		this.classList.remove('quicktransition');
 	}
 
 	postRender() {

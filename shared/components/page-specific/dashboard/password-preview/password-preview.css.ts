@@ -12,7 +12,7 @@ export const invertedCardCSS = new TemplateFn<PasswordPreview>((_props, theme) =
 		}
 	</style>`;
 }, CHANGE_TYPE.THEME);
-export const noCustomCSS = new TemplateFn<PasswordPreview>(null, CHANGE_TYPE.NEVER);
+export const noCustomCSS = new TemplateFn<PasswordPreview>(() => html``, CHANGE_TYPE.THEME);
 
 export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (props, theme) {
 	return html`
@@ -94,6 +94,10 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (prop
 			color: ${props.selected ? 
 				changeOpacity(theme.textOnNonbackground, 85) :
 				changeOpacity(theme.textOnBackground, 85)};
+		}
+
+		:host.quicktransition #websites, :host.quicktransition .username {
+			transition: color 10ms ease-in-out;
 		}
 
 		.urls {
