@@ -368,7 +368,6 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 	}
 
 	private set _scrolled(value: number) {
-		console.log('setting scrolled', value);
 		if (this.props.window) {
 			document.documentElement.scrollTop = value;
 		} else {
