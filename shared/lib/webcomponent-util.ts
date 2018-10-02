@@ -414,19 +414,57 @@ function getCoerced(initial: any, mapType: DefinePropTypes) {
 	return initial;
 }
 
-function watchValue(element: HTMLElement & {
-	renderToDOM(type: CHANGE_TYPE): void;
-}, value: any, watch: boolean, watchProperties: string[]) {
+type QueueRenderFn = (changeType: CHANGE_TYPE) => void;
+
+function watchValue(render: QueueRenderFn, value: any, watch: boolean, watchProperties: string[]) {
 	if (typeof value === 'object' && !Array.isArray(value) && watchProperties.length > 0) {
 		value = watchObject(value, watchProperties, () => {
-			element.renderToDOM(CHANGE_TYPE.PROP)
+			render(CHANGE_TYPE.PROP)
 		});
 	} else if (watch && Array.isArray(value)) {
 		value = watchArray(value, [], () => {
-			element.renderToDOM(CHANGE_TYPE.PROP)
+			render(CHANGE_TYPE.PROP)
 		});
 	}
 	return value;
+}
+
+const renderMap: WeakMap<HTMLElement, CHANGE_TYPE> = new WeakMap();
+
+function queueRender(element: HTMLElement & {
+	renderToDOM(changeType: CHANGE_TYPE): void;
+	getParentRef(ref: string): any;
+	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+}, changeType: CHANGE_TYPE) {
+	if (renderMap.has(element)) {
+		const mapped = renderMap.get(element);
+		//Check if this change type has higher priority
+		if (mapped === CHANGE_TYPE.ALWAYS) return;
+		if (mapped !== changeType) {
+			//It's either theme & prop or prop & theme,
+			// change it to always render
+			renderMap.set(element, CHANGE_TYPE.ALWAYS);
+		}
+		return;
+	}
+
+	renderMap.set(element, changeType);
+	setTimeout(() => {
+		element.renderToDOM(renderMap.get(element)!);
+		renderMap.delete(element);
+	}, 0);
+}
+
+function createQueueRenderFn(element: HTMLElement & {
+	renderToDOM(changeType: CHANGE_TYPE): void;
+	getParentRef(ref: string): any;
+	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+}) {
+	return (changeType: CHANGE_TYPE) => {
+		queueRender(element, changeType);
+	}
 }
 
 type DEFAULT_EVENTS = {
@@ -497,7 +535,7 @@ export function defineProps<P extends {
 					(propValues as any)[casingKey] = newVal;
 					element.fire('propChange', casingKey, prevVal, newVal);
 					if (watch) {
-						element.renderToDOM(CHANGE_TYPE.PROP);
+						queueRender(element, CHANGE_TYPE.PROP);
 					}
 					if (isPrivate) {
 						originalSetAttr(casingKey, '_');
@@ -523,7 +561,7 @@ export function defineProps<P extends {
 					(propValues as any)[casingKey] = newVal;
 					element.fire('propChange', casingKey, prevVal, newVal);
 					if (watch) {
-						element.renderToDOM(CHANGE_TYPE.PROP);
+						queueRender(element, CHANGE_TYPE.PROP);
 					}
 				}
 				originalRemoveAttr(key);
@@ -579,7 +617,8 @@ export function defineProps<P extends {
 			},
 			set(value) {
 				const original = value;
-				value = watchValue(element, value, watch, watchProperties);
+				value = watchValue(createQueueRenderFn(element), 
+					value, watch, watchProperties);
 
 				const prevVal = propValues[mapKey];
 				element.fire('beforePropChange', key, prevVal, value);
@@ -591,19 +630,19 @@ export function defineProps<P extends {
 				}
 
 				if (watch) {
-					element.renderToDOM(CHANGE_TYPE.PROP);
+					queueRender(element, CHANGE_TYPE.PROP);
 				}
 			}
 		});
 		(async () => {
 			if (mapType !== complex) {
-				propValues[mapKey] = watchValue(element, 
+				propValues[mapKey] = watchValue(createQueueRenderFn(element), 
 					getter(element, propName, strict, mapType) as any, 
 					watch, watchProperties);
 			} else {
 				await hookIntoMount(element as any, () => {
 					if (!isPrivate || element.getAttribute(propName) !== '_') {
-						propValues[mapKey] = watchValue(element, 
+						propValues[mapKey] = watchValue(createQueueRenderFn(element), 
 							getter(element, propName, strict, mapType) as any, 
 							watch, watchProperties);
 					}
@@ -613,7 +652,8 @@ export function defineProps<P extends {
 				defaultValue : defaultValue2;
 			if (defaultVal !== undefined && propValues[mapKey] === undefined) {
 				propValues[mapKey] =
-					watchValue(element, defaultVal as any, watch, watchProperties);
+					watchValue(createQueueRenderFn(element), 
+						defaultVal as any, watch, watchProperties);
 				await hookIntoMount(element as any, () => {
 					setter(originalSetAttr, originalRemoveAttr, propName, 
 						isPrivate ? '_' : defaultVal, mapType);
@@ -625,7 +665,7 @@ export function defineProps<P extends {
 				});
 			}
 			await awaitMounted(element as any);
-			element.renderToDOM(CHANGE_TYPE.PROP);
+			queueRender(element, CHANGE_TYPE.PROP);
 		})();
 	}
 	return props as R;
