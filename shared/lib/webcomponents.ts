@@ -162,7 +162,7 @@ export type TemplateFnConfig = {
 	template: TemplateRenderFunction<any>
 };
 export class TemplateFn<T extends WebComponent<any, any> = any> {
-	private _changeOn!: CHANGE_TYPE;
+	public changeOn!: CHANGE_TYPE;
 	private _template!: (TemplateRenderFunction<T>)|TemplateResult|null;
 	private _initialized: boolean = false;
 
@@ -180,7 +180,7 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 	private _doInitialRender(component: T) {
 		if (this._changeType === CHANGE_TYPE.NEVER) {
 			//Args don't matter here as they aren't used
-			this._changeOn = CHANGE_TYPE.NEVER;
+			this.changeOn = CHANGE_TYPE.NEVER;
 			if (this._fn) {
 				this._template = typeSafeCall(this._fn as any,
 					component) as any;
@@ -188,7 +188,7 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 				this._template = null;
 			}
 		} else {
-			this._changeOn = this._changeType,
+			this.changeOn = this._changeType,
 			this._template = this._fn as any
 		}
 	}
@@ -203,7 +203,7 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 			componentTemplateMap.set(component, new WeakMap());
 		}
 		const templateMap = componentTemplateMap.get(component)!;
-		if (this._changeOn === CHANGE_TYPE.NEVER) {
+		if (this.changeOn === CHANGE_TYPE.NEVER) {
 			//Never change, return the only render
 			const cached = templateMap.get(this);
 			if (cached) {
@@ -214,9 +214,9 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 				templateMap.set(this, rendered as TemplateResult);
 			return rendered;
 		}
-		if (this._changeOn === CHANGE_TYPE.ALWAYS || 
+		if (this.changeOn === CHANGE_TYPE.ALWAYS || 
 			changeType === CHANGE_TYPE.ALWAYS ||
-			this._changeOn === changeType ||
+			this.changeOn === changeType ||
 			!templateMap.has(this)) {
 				//Change, rerender
 				const rendered = typeSafeCall(this._template as TemplateRenderFunction<T>, 
