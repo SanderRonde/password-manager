@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, defineProps, PROP_TYPE, ComplexType, isNewElement, wait } from '../../../../lib/webcomponent-util';
+import { config, defineProps, PROP_TYPE, ComplexType, isNewElement } from '../../../../lib/webcomponent-util';
 import { MetaPasswords, MetaPasswordsPreviewData } from '../../../entrypoints/base/dashboard/dashboard';
 import { ConfigurableWebComponent, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { InfiniteList, ListRendered } from '../../../util/infinite-list/infinite-list';
@@ -64,20 +64,12 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		if (this.props.selected) return;
 
 		this.props.selected = true;
-		this._renderContainer();
 	}
 
 	public deselect() {
 		if (!this.props.selected) return;
 
 		this.props.selected = false;
-		this._renderContainer();
-	}
-
-	private _renderContainer() {
-		wait(10).then(() => {
-			this.$.container.renderToDOM();
-		});
 	}
 
 	@bindToClass
@@ -121,10 +113,8 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		this.classList.add('quicktransition');
 		if (itemData && itemData.selected) {
 			this.select();
-			this._renderContainer();
 		} else {
 			this.deselect();
-			this._renderContainer();
 		}
 		this.classList.remove('quicktransition');
 	}

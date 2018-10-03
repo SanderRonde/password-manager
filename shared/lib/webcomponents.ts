@@ -671,6 +671,18 @@ abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends 
 	private _noCustomCSS: TemplateFn = new TemplateFn(null, CHANGE_TYPE.NEVER);
 	public abstract isMounted: boolean;
 
+	constructor() {
+		super();
+
+		const originalSetAttr = this.setAttribute;
+		this.setAttribute = (key: string, val: string) => {
+			originalSetAttr.bind(this)(key, val);
+			if (key === 'custom-css') {
+				this.renderToDOM(CHANGE_TYPE.ALWAYS);
+			}
+		}
+	}
+
 	protected _hasCustomCSS() {
 		if (this.__hasCustomCSS !== null) {
 			return this.__hasCustomCSS;
