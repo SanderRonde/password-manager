@@ -48,6 +48,15 @@ const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => 
 			border: 2px solid ${theme.success};
 			color: ${theme.success};
 		}
+
+		#successContent {
+			fill: ${theme.success};
+		}
+
+		#button.failure {
+			background-color: ${theme.error};
+			border: 2px solid ${theme.error};
+		}
 	</style>`;
 }, CHANGE_TYPE.THEME);
 
