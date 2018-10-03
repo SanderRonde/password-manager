@@ -522,52 +522,44 @@ export function defineProps<P extends {
 		isPrivate: boolean;
 		strict: boolean;
 	}> = new Map();
-	Object.defineProperty(element, 'setAttribute', {
-		get() {
-			return (key: string, val: string) => {
-				const casingKey = dashesToCasing(key)
-				if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
-					const { watch, isPrivate, mapType, strict } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
+	element.setAttribute = (key: string, val: string) => {
+		const casingKey = dashesToCasing(key)
+		if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
+			const { watch, isPrivate, mapType, strict } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
 
-					const prevVal = (propValues as any)[casingKey];
-					const newVal = getterWithVal(element, val, strict, mapType);
-					element.fire('beforePropChange', casingKey, prevVal, newVal);
-					(propValues as any)[casingKey] = newVal;
-					element.fire('propChange', casingKey, prevVal, newVal);
-					if (watch) {
-						queueRender(element, CHANGE_TYPE.PROP);
-					}
-					if (isPrivate) {
-						originalSetAttr(casingKey, '_');
-						return;
-					}
-				} else {
-					(propValues as any)[casingKey] = val;
-				}
-				originalSetAttr(key, val);
-			};
+			const prevVal = (propValues as any)[casingKey];
+			const newVal = getterWithVal(element, val, strict, mapType);
+			element.fire('beforePropChange', casingKey, prevVal, newVal);
+			(propValues as any)[casingKey] = newVal;
+			element.fire('propChange', casingKey, prevVal, newVal);
+			if (watch) {
+				queueRender(element, CHANGE_TYPE.PROP);
+			}
+			if (isPrivate) {
+				originalSetAttr(casingKey, '_');
+				return;
+			}
+		} else {
+			(propValues as any)[casingKey] = val;
 		}
-	});
-	Object.defineProperty(element, 'removeAttribute', {
-		get() {
-			return (key: string) => {
-				const casingKey = dashesToCasing(key);
-				if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
-					const { watch, coerce, mapType } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
+		originalSetAttr(key, val);
+	};
+	element.removeAttribute = (key: string) => {
+		const casingKey = dashesToCasing(key);
+		if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
+			const { watch, coerce, mapType } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
 
-					const prevVal = (propValues as any)[casingKey];
-					const newVal = coerce ? getCoerced(undefined, mapType) : undefined;
-					element.fire('beforePropChange', casingKey, prevVal, newVal);
-					(propValues as any)[casingKey] = newVal;
-					element.fire('propChange', casingKey, prevVal, newVal);
-					if (watch) {
-						queueRender(element, CHANGE_TYPE.PROP);
-					}
-				}
-				originalRemoveAttr(key);
+			const prevVal = (propValues as any)[casingKey];
+			const newVal = coerce ? getCoerced(undefined, mapType) : undefined;
+			element.fire('beforePropChange', casingKey, prevVal, newVal);
+			(propValues as any)[casingKey] = newVal;
+			element.fire('propChange', casingKey, prevVal, newVal);
+			if (watch) {
+				queueRender(element, CHANGE_TYPE.PROP);
 			}
 		}
-	})
+		originalRemoveAttr(key);
+	};
 
 	for (let i in keys) {
 		const { key, reflectToAttr, value } = keys[i];
