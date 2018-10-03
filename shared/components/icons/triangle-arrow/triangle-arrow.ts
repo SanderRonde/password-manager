@@ -15,7 +15,7 @@ export function TriangleArrowSize(width: number = 24, height: number = width) {
 
 export const HollowTriangleArrow = HollowTriangleArrowSize();
 
-function pythagoras(crossSection: number) {
+export function pythagoras(crossSection: number) {
 	return Math.round(Math.sqrt(Math.pow(crossSection, 2) / 2));
 }
 
