@@ -107,9 +107,9 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		this.$.container.renderToDOM(CHANGE_TYPE.THEME);
 	}
 
-	listRender(_data: MetaPasswords[0], itemData: MetaPasswordsPreviewData) {
+	listRender(_data: MetaPasswords[0], itemData: MetaPasswordsPreviewData|null) {
 		this.classList.add('quicktransition');
-		if (itemData.selected) {
+		if (itemData && itemData.selected) {
 			this.select();
 			wait(10).then(() => {
 				this.$.container.renderToDOM();
