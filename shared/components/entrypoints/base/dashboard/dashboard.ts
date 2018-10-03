@@ -32,7 +32,7 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		priv: {
 			metaPasswords: {
 				type: ComplexType<MetaPasswords>(),
-				defaultValue: [],
+				defaultValue: null,
 				isPrivate: true
 			},
 			selected: {
@@ -111,15 +111,30 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		this.props.metaPasswords = pwMeta || [];
 	}
 
+	public getItemSize(data: any, options: {
+		isMin: true;
+	}): number;
+	public getItemSize(data: MetaPasswords[0], options: {
+		isMin: false;
+	}): number;
+	public getItemSize(data: MetaPasswords[0]): number;
 	public getItemSize(data: MetaPasswords[0], {
 		isMin
 	}: {
 		isMin: boolean;
+	} = {
+		isMin: false
 	}) {
 		if (isMin) {
 			return 10 + 90 + 20;
 		}
 		return 30 + (data.websites.length * 90);
+	}
+
+	public getPlaceholderList() {
+		return new Array(Math.ceil(window.innerHeight / this.getItemSize(null, {
+			isMin: true
+		}))).fill('').map((_) => {});
 	}
 
 	mounted() {
