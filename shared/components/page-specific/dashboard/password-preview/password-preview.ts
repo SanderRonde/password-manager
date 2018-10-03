@@ -64,14 +64,20 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		if (this.props.selected) return;
 
 		this.props.selected = true;
-		this.$.container.renderToDOM();
+		this._renderContainer();
 	}
 
 	public deselect() {
 		if (!this.props.selected) return;
 
 		this.props.selected = false;
-		this.$.container.renderToDOM();
+		this._renderContainer();
+	}
+
+	private _renderContainer() {
+		wait(10).then(() => {
+			this.$.container.renderToDOM();
+		});
 	}
 
 	@bindToClass
@@ -97,7 +103,11 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 			selected: isSelected
 		});
 
-		this.props.selected = isSelected;
+		if (isSelected) {
+			this.select();
+		} else {
+			this.deselect();
+		}
 
 		//Signal to dashboard that the selected item changed
 		this.props.ref.props.ref.props.selected = isSelected ?
@@ -111,14 +121,10 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		this.classList.add('quicktransition');
 		if (itemData && itemData.selected) {
 			this.select();
-			wait(10).then(() => {
-				this.$.container.renderToDOM();
-			});
+			this._renderContainer();
 		} else {
 			this.deselect();
-			wait(10).then(() => {
-				this.$.container.renderToDOM();
-			});
+			this._renderContainer();
 		}
 		this.classList.remove('quicktransition');
 	}
