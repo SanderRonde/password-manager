@@ -1,6 +1,6 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword } from "../../../../../../../../../../shared/types/db-types";
 import { Hashed, Padded, MasterPasswordVerificationPadding, encryptWithPublicKey } from "../../../../../../../../lib/crypto";
-import { U2FToken } from "../../../../../../../../../../shared/types/crypto";
+import { U2FToken, APIToken } from "../../../../../../../../../../shared/types/crypto";
 import { API_ERRS } from "../../../../../../../../../../shared/types/api";
 import { COLLECTIONS } from "../../../../../../../../database/database";
 import { ServerResponse } from '../../../../modules/ratelimit';
@@ -361,6 +361,93 @@ export class RoutesAPIInstanceU2f {
 					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 			}
+		})(req, res, next);
+	}
+
+	public isSetup(req: express.Request, res: ServerResponse, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, {}, {
+			count: number;
+			token: APIToken;
+		}, {}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['token', 'count']
+		}, {}, async (toCheck, { instance_id, token, count }) => {
+			if (!this.server.Router.typeCheck(toCheck, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
+			}])) return;
+
+			const { instance, accountPromise, decryptedInstance } = 
+				await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (instance === null || accountPromise === null || decryptedInstance === null) return;
+
+			const registration = decryptedInstance.u2f;
+
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res, true)) return;
+
+			res.status(200);
+			res.json({
+				success: true,
+				data: {
+					enabled: registration !== null
+				}
+			});
+		})(req, res, next);
+	}
+
+	public genRequest(req: express.Request, res: ServerResponse, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, {}, {
+			count: number;
+			token: APIToken;
+		}, {}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['token', 'count']
+		}, {}, async (toCheck, { instance_id, token, count }) => {
+			if (!this.server.Router.typeCheck(toCheck, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
+			}])) return;
+
+			const { instance, accountPromise, decryptedInstance } = 
+				await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (instance === null || accountPromise === null || decryptedInstance === null) return;
+
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res, true)) return;
+
+			if (decryptedInstance.u2f === null) {
+				res.status(200);
+				res.json({
+					success: false,
+					ERR: API_ERRS.INVALID_CREDENTIALS,
+					error: 'U2F not enabled'
+				});
+				return;
+			};
+
+			res.status(200);
+			res.json({
+				success: true,
+				data: {
+					requests: this.server.Router.genRequests(decryptedInstance.u2f,
+						instance._id.toHexString(), decryptedInstance.user_id.toHexString())
+				}
+			});
 		})(req, res, next);
 	}
 }
