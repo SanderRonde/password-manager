@@ -43,6 +43,20 @@ interface PasswordDetailChanges {
 	}[];
 }
 
+export function getHost(fullUrl: string) {
+	const originalUrl = fullUrl;
+	if (fullUrl.indexOf('http') !== 0) {
+		fullUrl = `http://${fullUrl}`;
+	}
+	try {
+		const constructedURL = new URL(fullUrl);
+		return constructedURL.hostname ||
+			constructedURL.host || originalUrl;
+	} catch(e) {
+		return originalUrl;
+	}
+}
+
 @config({
 	is: 'password-detail',
 	css: PasswordDetailCSS,

@@ -6,7 +6,7 @@ import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Visible, VisibleHidden } from '../../../icons/visible/visible';
 import { Cross, CrossSize } from '../../../icons/cross/cross';
 import { Checkmark } from '../../../icons/checkmark/checkmark';
-import { PasswordDetail } from './password-detail';
+import { PasswordDetail, getHost } from './password-detail';
 import { KeySize } from '../../../icons/key/key';
 import { Link } from '../../../icons/link/link';
 import { Copy } from '../../../icons/copy/copy';
@@ -59,20 +59,6 @@ const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => 
 		}
 	</style>`;
 }, CHANGE_TYPE.THEME);
-
-function getHost(fullUrl: string) {
-	const originalUrl = fullUrl;
-	if (fullUrl.indexOf('http') !== 0) {
-		fullUrl = `http://${fullUrl}`;
-	}
-	try {
-		const constructedURL = new URL(fullUrl);
-		return constructedURL.hostname ||
-			constructedURL.host || originalUrl;
-	} catch(e) {
-		return originalUrl;
-	}
-}
 
 const hostUpdateFns: (() => void)[] = [];
 function genHostUpdateFn(container: PasswordDetail, index: number) {
