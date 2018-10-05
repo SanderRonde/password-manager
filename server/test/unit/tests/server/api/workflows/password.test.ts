@@ -189,10 +189,15 @@ export function workflowPasswordTest() {
 					token: token!,
 					count: count++,
 					password_id: passwordId!,
-					websites: expectedWebsites.map((website) => {
+					addedWebsites: expectedWebsites.map((website) => {
 						return {
 							url: website,
 							favicon: null
+						}
+					}),
+					removedWebsites: initialPassword.websites.map((website) => {
+						return {
+							url: website
 						}
 					}),
 					twofactor_enabled: expected2FAEnabled,
@@ -461,10 +466,15 @@ export function workflowPasswordTest() {
 					token: token!,
 					count: count++,
 					password_id: passwordId!,
-					websites: expectedWebsites.map((website) => {
+					addedWebsites: expectedWebsites.map((website) => {
 						return {
 							url: website,
 							favicon: null
+						}
+					}),
+					removedWebsites: initialPassword.websites.map((website) => {
+						return {
+							url: website
 						}
 					}),
 					twofactor_enabled: expected2FAEnabled,
@@ -791,10 +801,15 @@ export function workflowPasswordTest() {
 					token: token!,
 					count: count++,
 					password_id: passwordId!,
-					websites: expectedWebsites.map((website) => {
+					addedWebsites: expectedWebsites.map((website) => {
 						return {
 							url: website,
 							favicon: null
+						}
+					}),
+					removedWebsites: initialPassword.websites.map((website) => {
+						return {
+							url: website
 						}
 					}),
 					twofactor_enabled: expected2FAEnabled,
@@ -1084,10 +1099,15 @@ export function workflowPasswordTest() {
 						token: token!,
 						count: count++,
 						password_id: passwordId!,
-						websites: expectedWebsites.map((website) => {
+						addedWebsites: expectedWebsites.map((website) => {
 							return {
 								url: website,
 								favicon: null
+							}
+						}),
+						removedWebsites: initialPassword.websites.map((website) => {
+							return {
+								url: website
 							}
 						}),
 						twofactor_enabled: expected2FAEnabled,

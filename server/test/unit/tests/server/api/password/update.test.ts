@@ -22,7 +22,8 @@ export function passwordUpdateTest() {
 			count: 'number',
 			password_id: 'string',
 		}, {
-			websites: 'array',
+			addedWebsites: 'array',
+			removedWebsites: 'array',
 			twofactor_enabled: 'boolean',
 			u2f_enabled: 'boolean',
 			encrypted: 'string',
@@ -67,7 +68,7 @@ export function passwordUpdateTest() {
 				token: token!,
 				count: count++,
 				password_id: passwordId!,
-				websites: expectedWebsites.map((website) => {
+				addedWebsites: expectedWebsites.map((website) => {
 					return {
 						url: website,
 						favicon: null
@@ -182,7 +183,7 @@ export function passwordUpdateTest() {
 				token: loginToken!,
 				count: count++,
 				password_id: passwordId!,
-				websites: expectedWebsites.map((website) => {
+				addedWebsites: expectedWebsites.map((website) => {
 					return {
 						url: website,
 						favicon: null
@@ -244,7 +245,7 @@ export function passwordUpdateTest() {
 				token: token!,
 				count: count++,
 				password_id: passwordId!,
-				websites: expectedWebsites.map((website) => {
+				addedWebsites: expectedWebsites.map((website) => {
 					return {
 						url: website,
 						favicon: null
@@ -338,7 +339,7 @@ export function passwordUpdateTest() {
 					password_id: 'someid' as StringifiedObjectId<EncryptedPassword>,
 					token: 'someinvalidtoken',
 					count: 0,
-					websites: [],
+					addedWebsites: [],
 					twofactor_enabled: false,
 					u2f_enabled: false,
 					encrypted: 'somestr' as EncodedString<{
@@ -373,7 +374,7 @@ export function passwordUpdateTest() {
 					password_id: 'someid' as StringifiedObjectId<EncryptedPassword>,
 					token: token!,
 					count: count,
-					websites: [],
+					addedWebsites: [],
 					username: 'someusername',
 					twofactor_enabled: false,
 					u2f_enabled: false,
@@ -409,7 +410,7 @@ export function passwordUpdateTest() {
 					password_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 					token: token!,
 					count: count++,
-					websites: [],
+					addedWebsites: [],
 					twofactor_enabled: false,
 					u2f_enabled: false,
 					encrypted: 'somestr' as EncodedString<{
