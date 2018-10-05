@@ -111,6 +111,10 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		this.props.metaPasswords = pwMeta || [];
 	}
 
+	public fetchMeta() {
+		this._getPwMeta();
+	}
+
 	public getItemSize(data: any, options: {
 		isMin: true;
 	}): number;
