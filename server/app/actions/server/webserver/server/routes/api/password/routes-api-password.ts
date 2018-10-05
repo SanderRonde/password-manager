@@ -349,12 +349,15 @@ export class RoutesApiPassword {
 			count: number;
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
-			websites: {
+			addedWebsites: {
 				url: string;
 				favicon: {
 					mime: string;
 					content: string;
 				}|null;
+			}[];
+			removedWebsites: {
+				url: string;
 			}[];
 			username: string;
 			twofactor_enabled: boolean;
@@ -374,9 +377,9 @@ export class RoutesApiPassword {
 			encrypted: ['token', 'count', 'password_id']
 		}, {
 			encrypted: [
-				'encrypted', 'twofactor_enabled', 'websites',
+				'encrypted', 'twofactor_enabled', 'addedWebsites',
 				'twofactor_token', 'username', 'u2f_enabled',
-				'response', 'u2f_token'
+				'response', 'u2f_token', 'removedWebsites'
 			]
 		}, async (toCheck, { 
 			token, 
@@ -385,7 +388,8 @@ export class RoutesApiPassword {
 			twofactor_token, 
 			encrypted, 
 			twofactor_enabled, 
-			websites,
+			addedWebsites,
+			removedWebsites,
 			count,
 			username,
 			u2f_enabled,
@@ -402,7 +406,11 @@ export class RoutesApiPassword {
 				val: 'password_id',
 				type: 'string'
 			}, {
-				val: 'websites',
+				val: 'addedWebsites',
+				type: 'array',
+				inner: 'object'
+			}, {
+				val: 'removedWebsites',
 				type: 'array',
 				inner: 'object'
 			}, {
@@ -452,10 +460,8 @@ export class RoutesApiPassword {
 			if (!this._verify2FAIfEnabled(twofactor_secret, twofactor_token,
 				password, res)) return;
 
-			const {
-				u2f_enabled: u2f_was_enabled
-			} = this.server.database.Crypto.dbDecryptPasswordRecord(password);
-			if (u2f_was_enabled) {
+			const decryptedPasword = this.server.database.Crypto.dbDecryptPasswordRecord(password);
+			if (decryptedPasword.u2f_enabled) {
 				if (decryptedInstance.u2f === null) {
 					res.status(200);
 					res.json({
@@ -489,7 +495,18 @@ export class RoutesApiPassword {
 						}
 			}
 
-			const mappedWebsites = Array.isArray(websites) ? await Promise.all(websites.map(async ({ url: websiteURL, favicon }) => {
+			const prevWebsites = decryptedPasword.websites.filter((website) => {
+				for (const removedWebsite of removedWebsites || []) {
+					const websiteURL = removedWebsite.url;
+					const host = url.parse(websiteURL).hostname || url.parse(websiteURL).host || websiteURL;
+					if (website.host === host) {
+						return false;
+					}
+				}
+				return true;
+			});
+
+			const mappedWebsites = Array.isArray(addedWebsites) ? await Promise.all(addedWebsites.map(async ({ url: websiteURL, favicon }) => {
 				const host = url.parse(websiteURL).hostname || url.parse(websiteURL).host || websiteURL;
 				if (favicon !== null) {
 					await this.uploadImage(host, decryptedInstance.user_id.toHexString(), favicon);
@@ -526,6 +543,7 @@ export class RoutesApiPassword {
 					id: StringifiedObjectId<EncryptedAsset>
 				}
 			}[];
+			const newWebsites = [...prevWebsites, ...filteredWebsites || []];
 
 			//Check if U2F is enabled for the instance
 			const u2fEnabledOnInstance = decryptedInstance.u2f !== null;
@@ -537,13 +555,20 @@ export class RoutesApiPassword {
 					this.server.database.Crypto.dbEncryptWithSalt(u2fEnabledOnInstance && u2f_enabled) : undefined,
 				twofactor_enabled: typeof twofactor_enabled === 'boolean' ?
 					this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled) : undefined,
-				websites: Array.isArray(filteredWebsites) ?
-					filteredWebsites.map(({ host, exact, favicon }) => {
+				websites: Array.isArray(newWebsites) ?
+					newWebsites.map(({ host, exact, favicon }) => {
 						return {
 							host: this.server.database.Crypto.dbEncrypt(host),
 							exact: this.server.database.Crypto.dbEncrypt(exact),
-							favicon: this.server.database.Crypto.dbEncrypt(favicon ?
-								favicon.id : null)
+							favicon: this.server.database.Crypto.dbEncrypt((() => {
+								if (!favicon) {
+									return null;
+								}
+								if ('success' in favicon) {
+									return favicon.id;
+								}
+								return favicon;
+							})())
 						}
 					}) : undefined,
 				encrypted: encrypted ?

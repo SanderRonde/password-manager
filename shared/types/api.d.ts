@@ -765,9 +765,9 @@ export declare namespace APIRoutes {
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, optional: {}, optionalEncrypted: {
 			/**
-			 * The websites for which this password works
+			 * The newly added websites
 			 */
-			websites: {
+			addedWebsites: {
 				/**
 				 * The URL of the website
 				 */
@@ -785,6 +785,15 @@ export declare namespace APIRoutes {
 					 */
 					mime: string;
 				}
+			}[];
+			/**
+			 * The removed added websites
+			 */
+			removedWebsites: {
+				/**
+				 * The URL of the website
+				 */
+				url: string;
 			}[];
 			/**
 			 * The username for this website
