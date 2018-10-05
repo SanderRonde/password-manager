@@ -83,7 +83,8 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				value: []
 			},
 			authData: ComplexType<PasswordDetailData>(),
-			passwordVisible: PROP_TYPE.BOOL
+			passwordVisible: PROP_TYPE.BOOL,
+			ref: ComplexType<Dashboard>()
 		}
 	});
 
