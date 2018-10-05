@@ -1,20 +1,21 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors, findElementInPath, PROP_TYPE } from '../../../../lib/webcomponent-util';
+import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors, findElementInPath, PROP_TYPE, createCancellableTimeout } from '../../../../lib/webcomponent-util';
+import { APIToken, ERRS, U2FToken, Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, EncryptionAlgorithm } from '../../../../types/crypto';
+import { StringifiedObjectId, EncryptedInstance, ServerPublicKey, PublicKeyDecrypted, MasterPassword } from '../../../../types/db-types';
 import { PasswordDetailHTML, passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
-import { StringifiedObjectId, EncryptedInstance, ServerPublicKey } from '../../../../types/db-types';
 import { PasswordDetailCSS, VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
+import { decryptWithPrivateKey, decrypt, encrypt } from '../../../../lib/browser-crypto';
+import { MetaPasswords, Dashboard } from '../../../entrypoints/base/dashboard/dashboard';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { MaterialCheckbox } from '../../../util/material-checkbox/material-checkbox';
 import { doClientAPIRequest, filterUndefined } from '../../../../lib/apirequests';
-import { decryptWithPrivateKey, decrypt } from '../../../../lib/browser-crypto';
 import { LoadingSpinner } from '../../../util/loading-spinner/loading-spinner';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
-import { MetaPasswords } from '../../../entrypoints/base/dashboard/dashboard';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
+import { API_ERRS, APISuccessfulReturns } from '../../../../types/api';
 import { SizingBlock } from '../../../util/sizing-block/sizing-block';
-import { APIToken, ERRS, U2FToken } from '../../../../types/crypto';
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { PasswordDetailIDMap } from './password-detail-querymap';
@@ -42,6 +43,15 @@ interface PasswordDetailChanges {
 		url: string
 	}[];
 }
+type ToBools<T> = {
+	[P in keyof T]: boolean;
+};
+
+const enum TWOFACTOR_CHECK_STATE {
+	IN_PROGRESS,
+	FAILED,
+	SUCCEEDED
+};
 
 export function getHost(fullUrl: string) {
 	const originalUrl = fullUrl;
@@ -98,6 +108,8 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		twofactorAuthentication: null
 	};
 
+	private _postViewCallback: (() => void)|null = null;
+
 	constructor() {
 		super();
 
@@ -106,6 +118,11 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				this._selectedChange(oldValue, newValue);
 			}
 		});
+	}
+
+	private _nextView() {
+		this._postViewCallback && this._postViewCallback();
+		this._postViewCallback = null;
 	}
 
 	private async _sizeChange(websites: MetaPasswords[0]['websites']) {	
@@ -256,37 +273,254 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		return str1.trim() === str2.trim();
 	}
 
-	private _hasChanged(changes: PasswordDetailChanges) {
-		if (!PasswordDetail._areSameString(this.props.selected.username,
-			changes.username)) {
-				return true;
-			}
-		if (!PasswordDetail._areSameString(changes.password,
-			passwordDetailDataStore[passwordDetailDataSymbol]!.password)) {
-				return true;
-			}
-		if (!PasswordDetail._areSameString(changes.notes.join('\n'),
-			passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n'))) {
-				return true;
-			}
-		if (this.props.selected.twofactor_enabled !== changes.twofactor_enabled) {
-			return true;
-		}
-		if (this.props.selected.u2f_enabled !== changes.u2f_enabled) {
-			return true;
-		}
-		if (this.props.selected.websites.length !== changes.websites.length) {
-			return true;
+	private _getChanged(newPassword: PasswordDetailChanges): ToBools<PasswordDetailChanges> {
+		let websitesChanged: boolean = false;
+		if (this.props.selected.websites.length !== newPassword.websites.length) {
+			websitesChanged = true;
 		}
 		for (let i = 0; i < this.props.selected.websites.length; i++) {
 			if (!PasswordDetail._areSameString(
 				this.props.selected.websites[i].exact,
-				changes.websites[i].url)) {
-					return true;
+				newPassword.websites[i].url)) {
+					websitesChanged = true;
 				}
 		}
-		return false;
+		return {
+			username: !PasswordDetail._areSameString(this.props.selected.username,
+				newPassword.username),
+			password: !PasswordDetail._areSameString(newPassword.password,
+				passwordDetailDataStore[passwordDetailDataSymbol]!.password),
+			notes: !PasswordDetail._areSameString(newPassword.notes.join('\n'),
+				passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n')),
+			twofactor_enabled: this.props.selected.twofactor_enabled !== newPassword.twofactor_enabled,
+			u2f_enabled: this.props.selected.u2f_enabled !== newPassword.u2f_enabled,
+			websites: websitesChanged
+		};
 	}
+
+	private _hasChanged(changed: ToBools<PasswordDetailChanges>) {
+		return changed.username ||
+			changed.password ||
+			changed.notes ||
+			changed.twofactor_enabled ||
+			changed.u2f_enabled ||
+			changed.websites;
+	}
+
+	private async _check2faChanges(newData: PasswordDetailChanges,
+		changed: ToBools<PasswordDetailChanges>, callback: (success: boolean) => void) {
+			//Check if it's set up
+			const request = doClientAPIRequest({
+				publicKey: this.props.authData.server_public_key
+			}, '/api/instance/2fa/is_setup', {
+				instance_id: this.props.authData.instance_id
+			}, {
+				token: this.getRoot().getAPIToken(),
+				count: this.getRoot().getRequestCount()
+			});
+			await this._quickAnimateSelected(request);
+			const response = await request;
+			if (response.success) {
+				if (!response.data.enabled) {
+					PaperToast.createHidable('2FA is not set up for this account,' + 
+						' applying all non-2fa changes', PaperToast.DURATION.LONG);
+				} else {
+					//Get a valid 2FA token
+					await this._animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
+						this.$$('.twofactorDigit').forEach((el: HTMLInputElement) => {
+							el.value = '';
+						});
+					});
+					this._postViewCallback = () => {
+						this._saveChanges(newData, changed, callback);
+					};
+					const firstDigit = this.$('#digit0') as HTMLInputElement;
+					firstDigit && firstDigit.focus();
+					return TWOFACTOR_CHECK_STATE.IN_PROGRESS;
+				}
+			} else {
+				reportDefaultResponseErrors(response, PaperToast);
+				return TWOFACTOR_CHECK_STATE.FAILED;
+			}
+			return TWOFACTOR_CHECK_STATE.SUCCEEDED;
+		}
+
+	private async _checkU2fChanges(newData: PasswordDetailChanges,
+		changed: ToBools<PasswordDetailChanges>, callback: (success: boolean) => void) {
+			if (!changed.u2f_enabled) {
+				return;
+			}
+
+			//Combine these two requests
+			const request = doClientAPIRequest({
+				publicKey: this.props.authData.server_public_key
+			}, '/api/instance/u2f/gen_request', {
+				instance_id: this.props.authData.instance_id
+			}, {
+				token: this.getRoot().getAPIToken(),
+				count: this.getRoot().getRequestCount()
+			});
+			await this._quickAnimateSelected(request);
+			const response = await request;
+			if (response.success) {
+				this._signU2FRequest(response.data.request).then(() => {
+					this._saveChanges(newData, changed, callback);
+				});
+				return TWOFACTOR_CHECK_STATE.IN_PROGRESS;
+			} else if (response.ERR === API_ERRS.INVALID_CREDENTIALS && 
+				response.error === 'U2F not enabled') {
+					PaperToast.createHidable('U2F is not set up for this account,' + 
+						' applying all non-u2f changes', PaperToast.DURATION.LONG);
+				} else {
+					reportDefaultResponseErrors(response, PaperToast);
+					return TWOFACTOR_CHECK_STATE.FAILED;
+				}
+				return TWOFACTOR_CHECK_STATE.SUCCEEDED;
+		}
+
+	private _ifEnabled<T>(enabled: boolean, value: T): T|undefined;
+	private _ifEnabled<T>(enabled: true, value: T): T;
+	private _ifEnabled<T>(enabled: false, value: T): undefined;
+	private _ifEnabled<T>(enabled: boolean, value: T): T|undefined {
+		if (enabled) {
+			return value;
+		}
+		return undefined;
+	}
+
+	private async _fetchFavicon(url: string): Promise<{
+		mime: string;
+		content: string;
+	}|null> {
+		return new Promise<{
+			mime: string;
+			content: string;
+		}|null>((resolve) => {
+			fetch(`http://s2.googleusercontent.com/s2/favicons?domain_url=${url}`).then(async (res) => {
+				res.blob().then((blob) => {
+					const reader = new FileReader();
+					reader.readAsDataURL(blob); 
+					reader.onloadend = () => {
+						resolve({
+							mime: res.headers.get('Content-Type') || 'image/png',
+							content: reader.result!.toString().split(',')[1]
+						});
+					}
+				});
+			}).catch(() => {
+				resolve(null);
+			});
+		});
+	}
+
+	private _getWebsiteDiff(newData: PasswordDetailChanges) {
+		return {
+			added: newData.websites.filter((website) => {
+				for (const oldWebsite of this.props.selectedDisplayed.websites) {
+					if (getHost(website.url) === oldWebsite.host) {
+						//Not new
+						return false;
+					}
+				}
+				//New
+				return true;
+			}),
+			removed: this.props.selectedDisplayed.websites.filter((website) => {
+				for (const newWebsite of newData.websites) {
+					if (getHost(newWebsite.url) === website.host) {
+						//Not removed
+						return false;
+					}
+				}
+				//Removed
+				return true;
+			})
+		}
+	}
+
+	private async _saveChanges(newData: PasswordDetailChanges, 
+		changed: ToBools<PasswordDetailChanges>, callback: (success: boolean) => void) {
+			if (!changed.twofactor_enabled && this._authState.u2fAuthenticated === null) {
+				if (await this._checkU2fChanges(newData, changed, callback) !== TWOFACTOR_CHECK_STATE.SUCCEEDED) {
+					//Either it's waiting for the next view or it failed
+					return;
+				}
+			}
+			if (!changed.twofactor_enabled && this._authState.twofactorAuthentication === null) {
+				if (await this._check2faChanges(newData, changed, callback) !== TWOFACTOR_CHECK_STATE.SUCCEEDED) {
+					//Either it's waiting for the next view or it failed
+					return;
+				}
+			}
+
+			const { added, removed } = this._getWebsiteDiff(newData);
+			const addedWithFavicons = await Promise.all(added.map(async (addedWebsite) => {
+				return {
+					url: addedWebsite.url,
+					favicon: await this._fetchFavicon(addedWebsite.url)
+				}
+			}));
+
+			const decryptHash = this.getRoot().getData('decryptHash');
+			if (!decryptHash) {
+				PaperToast.createHidable('Failed to decrypt server response');
+				return;
+			}
+			const encryptedData: EncodedString<{
+				data: Encrypted<EncodedString<{
+					password: string;
+					notes: string[];
+				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
+				algorithm: EncryptionAlgorithm;
+			}>|undefined = (!changed.password && !changed.notes) ? undefined : 
+				encrypt({
+					password: newData.password,
+					notes: newData.notes
+				}, decryptHash.hash, 'aes-256-ctr');
+
+			//Apply changes
+			const request = doClientAPIRequest({
+				publicKey: this.props.authData.server_public_key
+			}, '/api/password/update', {
+				instance_id: this.props.authData.instance_id
+			}, filterUndefined({
+				//Auth stuff
+				token: this.getRoot().getAPIToken(),
+				password_id: this.props.selected.id,
+				count: this.getRoot().getRequestCount(),
+				twofactor_token: this.props.selected.twofactor_enabled ?
+					this._authState.twofactorAuthentication! : undefined,
+				response: this.props.selected.u2f_enabled ?
+					this._authState.u2fAuthenticated! : undefined,
+				u2f_token: (this.props.selected.u2f_enabled ?
+					this._authState.u2fToken! : undefined),
+
+				//Changes
+				removedWebsites: this._ifEnabled(changed.websites, removed.map((website) => {
+					return {
+						url: website.exact
+					}
+				})),
+				addedWebsites: this._ifEnabled(changed.websites, addedWithFavicons),
+				username: this._ifEnabled(changed.username, newData.username),
+				twofactor_enabled: this._ifEnabled(changed.twofactor_enabled, 
+					newData.twofactor_enabled),
+				u2f_enabled: this._ifEnabled(changed.u2f_enabled,
+					newData.u2f_enabled),
+				encrypted: this._ifEnabled(changed.password || changed.notes,
+					encryptedData)
+			}));
+			await this._quickAnimateSelected(request);
+			const response = await request;
+
+			if (changed.twofactor_enabled || changed.u2f_enabled ||
+				changed.websites || changed.username) {
+					//Update preview
+					this.props.ref && this.props.ref.fetchMeta();
+				}
+
+			return response;
+		}
 
 	@bindToClass
 	public async saveChanges() {
@@ -298,9 +532,39 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			u2f_enabled: this.$.passwordSettingsu2fCheckbox.checked,
 			websites: this._getWebsites()
 		};
+		const changed = this._getChanged(newData);
 
-		if (!this._hasChanged(newData)) {
+		if (!this._hasChanged(changed)) {
 			PaperToast.createHidable('No changes', PaperToast.DURATION.SHORT);
+			return;
+		}
+
+		this.$.saveChanges.setState('loading');
+		await wait(300);
+		const [, response] = await Promise.all([
+			wait(300), 
+			new Promise<{
+				success: boolean;
+			}>((resolve) => {
+				this._saveChanges(newData, changed, (success) => {
+					resolve({
+						success
+					});
+				});
+			})
+		]);
+		if (response.success) {
+			this.$.saveChanges.setState('success');
+			createCancellableTimeout(this, 'save-button', () => {
+				this.$.saveChanges.setState('regular');
+			}, 3000);
+			PaperToast.createHidable('Successfully updated password', 
+				PaperToast.DURATION.SHORT);
+		} else {
+			this.$.saveChanges.setState('failure');
+			createCancellableTimeout(this, 'save-button', () => {
+				this.$.saveChanges.setState('regular');
+			}, 3000);
 		}
 	}
 
@@ -391,7 +655,8 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		}
 	}
 
-	private async _showFailedView() {
+	private async _showFailedView(retryFn: () => void) {
+		this._postViewCallback = retryFn;
 		await this._animateView('failedView', STATIC_VIEW_HEIGHT, () => {
 			//Reset auth state
 			this._authState.twofactorAuthentication = null;
@@ -403,15 +668,53 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	private _failDecryptServerResponse() {
 		PaperToast.createHidable('Failed to decrypt server response',
 			PaperToast.DURATION.LONG);
-		this._showFailedView();
+		this._showFailedView(this._signU2F);
 	}
+
+	private _activeRequests: PublicKeyDecrypted<
+		APISuccessfulReturns['/api/password/getmeta']['encrypted']>['requests'] = null;
+	private async _signU2FRequest(requests: Exclude<PublicKeyDecrypted<
+		APISuccessfulReturns['/api/password/getmeta']['encrypted']>['requests'], null>) {
+			this._activeRequests = requests;
+			const { signed, request } = await Promise.race([
+				new Promise<{
+					signed: U2FSignResponse;
+					request: U2FToken;
+				}>((resolve) => {
+					sign(requests.main.request).then((signed) => {
+						resolve({
+							signed: signed as any,
+							request: requests.main.u2f_token
+						});
+					});
+				}),
+				new Promise<{
+					signed: U2FSignResponse;
+					request: U2FToken;
+				}>((resolve) => {
+					sign(requests.backup.request).then((signed) => {
+						resolve({
+							signed: signed as any,
+							request: requests.backup.u2f_token
+						});
+					});
+				})
+			]);
+			if (this._activeRequests !== requests) {
+				return;
+			}
+			
+			this._authState.u2fAuthenticated = signed;
+			this._authState.u2fToken = request;
+		}
 	
+	@bindToClass
 	private async _signU2F() {
 		const supported = await isSupported();
 		if (!supported) {
 			PaperToast.createHidable('U2F is not supported in your browser',
 				PaperToast.DURATION.LONG);
-			this._showFailedView();
+			this._showFailedView(this._signU2F);
 			return;
 		}
 
@@ -420,7 +723,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				PaperToast.createHidable(
 					'Failed to set up public and/or private key with server',
 					PaperToast.DURATION.LONG);
-				this._showFailedView();
+				this._showFailedView(this._signU2F);
 				return;
 			}
 
@@ -437,7 +740,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			if (this._globalProperties.isWeb === 'true') {
 				this.getRoot().changePage(ENTRYPOINT.LOGIN);
 			}
-			this._showFailedView();
+			this._showFailedView(this._signU2F);
 			return;
 		}
 
@@ -472,43 +775,48 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				return;
 			}
 			const publicKeyDecryptedParsed = parseResult.data;
-			const { signed, request } = await Promise.race([
-				new Promise<{
-					signed: U2FSignResponse;
-					request: U2FToken;
-				}>((resolve) => {
-					sign(publicKeyDecryptedParsed.requests!.main.request).then((signed) => {
-						resolve({
-							signed: signed as any,
-							request: publicKeyDecryptedParsed.requests!.main.u2f_token
-						});
-					});
-				}),
-				new Promise<{
-					signed: U2FSignResponse;
-					request: U2FToken;
-				}>((resolve) => {
-					sign(publicKeyDecryptedParsed.requests!.backup.request).then((signed) => {
-						resolve({
-							signed: signed as any,
-							request: publicKeyDecryptedParsed.requests!.backup.u2f_token
-						});
-					});
-				})
-			]);
-			
+			await this._signU2FRequest(publicKeyDecryptedParsed.requests!);
 			if (usedId !== this.props.selected.id) {
 				return;
 			}
-			this._authState.u2fAuthenticated = signed;
-			this._authState.u2fToken = request;
-			this._getPasswordDetails();
+			this._nextView();
 		} else {
 			reportDefaultResponseErrors(response, PaperToast);
-			this._showFailedView();
+			this._showFailedView(this._signU2F);
 		}
 	}
 
+	private async _quickAnimateSelected(promise: Promise<any>) {
+		if (this.$.selectedView.classList.contains('visible')) {
+			this.$.selectedView.classList.add('quickAnimate');
+
+			//Hide it for now
+			this.$.selectedView.classList.remove('visible');
+
+			const resolved = await Promise.race([
+				promise, wait(MIN_LOADING_TIME)
+			]);
+
+			//Show it again
+			this.$.selectedView.classList.add('visible');
+			this.$.selectedView.classList.remove('quickAnimate');
+
+			if (!resolved) {
+				//Wait resolved, not the request, show loading view
+				await Promise.all([
+					this._animateView('loadingView', STATIC_VIEW_HEIGHT),
+					promise
+				]);
+			}
+		} else {
+			await Promise.all([
+				this._animateView('loadingView', STATIC_VIEW_HEIGHT),
+				promise
+			]);
+		}
+	}
+
+	@bindToClass
 	private async _getPasswordDetails(passwordMeta: MetaPasswords[0] = this.props.selected) {
 		if (passwordMeta.twofactor_enabled && this._authState.twofactorAuthentication === null) {
 			await this._animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
@@ -516,6 +824,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 					el.value = '';
 				});
 			});
+			this._postViewCallback = this._getPasswordDetails;
 			const firstDigit = this.$('#digit0') as HTMLInputElement;
 			firstDigit && firstDigit.focus();
 			return;
@@ -523,6 +832,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			await this._animateView('u2fRequiredView', STATIC_VIEW_HEIGHT, () => {
 				this._signU2F();
 			});
+			this._postViewCallback = this._getPasswordDetails;
 			return;
 		}
 
@@ -539,7 +849,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			if (this._globalProperties.isWeb === 'true') {
 				this.getRoot().changePage(ENTRYPOINT.LOGIN);
 			}
-			this._showFailedView();
+			this._showFailedView(this._getPasswordDetails);
 			return;
 		}
 
@@ -558,33 +868,14 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			u2f_token: (this.props.selected.u2f_enabled ?
 				this._authState.u2fToken! : undefined)
 		}));
-		if (this.$.selectedView.classList.contains('visible')) {
-			this.$.selectedView.classList.add('quickAnimate');
 
-			//Hide it for now
-			this.$.selectedView.classList.remove('visible');
-
-			const resolved = await Promise.race([
-				request, wait(MIN_LOADING_TIME)
-			]);
-
-			//Show it again
-			this.$.selectedView.classList.add('visible');
-			this.$.selectedView.classList.remove('quickAnimate');
-
-			if (!resolved) {
-				//Wait resolved, not the request, show loading view
-				await Promise.all([
-					this._animateView('loadingView', STATIC_VIEW_HEIGHT),
-					request
-				]);
-			}
-		} else {
-			await Promise.all([
-				this._animateView('loadingView', STATIC_VIEW_HEIGHT),
-				request
-			]);
-		}
+		//Reset authstate
+		this._authState = {
+			twofactorAuthentication: null,
+			u2fAuthenticated: null,
+			u2fToken: null
+		};
+		await this._quickAnimateSelected(request);
 		const response = await request;
 		if (response.success) {
 			//Decrypt with public key
@@ -623,7 +914,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			});
 		} else {
 			reportDefaultResponseErrors(response, PaperToast);
-			this._showFailedView();
+			this._showFailedView(this._getPasswordDetails);
 		}
 	}
 	
@@ -634,7 +925,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				return el.value;
 			}).join('');
 		this._authState.twofactorAuthentication = twofactorToken;
-		this._getPasswordDetails();
+		this._nextView();
 	}
 
 	@bindToClass
@@ -644,7 +935,7 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		}
 
 		this.$.retryButton.setState('loading');
-		this._getPasswordDetails();
+		this._nextView();
 	}
 
 	postRender() {
