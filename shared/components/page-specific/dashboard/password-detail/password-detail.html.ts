@@ -324,7 +324,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 								<div id="passwordSettingsu2f">
 									<material-checkbox checked="${props.selectedDisplayed &&
 											props.selectedDisplayed.u2f_enabled}"
-											disabled="${this.u2fSupported() ? null : true}"
+											disabled="${!this.u2fSupported()}"
 											id="passwordSettingsu2fCheckbox">
 										Enable U2F
 										<more-info info="${'U2F requires you to' +
