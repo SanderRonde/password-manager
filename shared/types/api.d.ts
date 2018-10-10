@@ -921,9 +921,13 @@ export declare namespace APIRoutes {
 					 */
 					data: Encrypted<EncodedString<{
 						/**
+						 * The 2FA secret used to generate 2FA codes
+						 */
+						twofactor_secret: string|null;
+						/**
 						 * The password of the website (or group)
 						 */
-						password: string;
+						password: string|null;
 						/**
 						 * Any notes about this website (or group)
 						 */
