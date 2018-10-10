@@ -5,7 +5,6 @@ import { MaterialInput } from '../../../util/material-input/material-input';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Visible, VisibleHidden } from '../../../icons/visible/visible';
 import { Checkmark } from '../../../icons/checkmark/checkmark';
-import { getHost } from '../password-detail/password-detail';
 import { Delete } from '../../../icons/delete/delete';
 import { Cross } from '../../../icons/cross/cross';
 import { Link } from '../../../icons/link/link';
@@ -31,6 +30,20 @@ function genHostUpdateFn(container: PasswordForm, index: number) {
 		}
 		hostInput.set(getHost(urlInput.value));
 	});
+}
+
+export function getHost(fullUrl: string) {
+	const originalUrl = fullUrl;
+	if (fullUrl.indexOf('http') !== 0) {
+		fullUrl = `http://${fullUrl}`;
+	}
+	try {
+		const constructedURL = new URL(fullUrl);
+		return constructedURL.hostname ||
+			constructedURL.host || originalUrl;
+	} catch(e) {
+		return originalUrl;
+	}
 }
 
 const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => {

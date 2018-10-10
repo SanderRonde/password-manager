@@ -17,6 +17,7 @@ import { API_ERRS, APISuccessfulReturns } from '../../../../types/api';
 import { SizingBlock } from '../../../util/sizing-block/sizing-block';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { PasswordDetailIDMap } from './password-detail-querymap';
+import { getHost } from '../password-form/password-form.html';
 import { PasswordForm } from '../password-form/password-form';
 import { ENTRYPOINT } from '../../../../types/shared-types';
 import { bindToClass } from '../../../../lib/decorators';
