@@ -1,4 +1,4 @@
-import { GlobalController } from '../components/entrypoints/global/global-controller';
+import { GlobalController } from '../components/entrypoints/base/global/global-controller';
 import { GlobalProperties, Theme, DEFAULT_THEME } from '../types/shared-types';
 import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
 import { TemplateResult, render, html } from 'lit-html';

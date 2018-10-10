@@ -1,10 +1,9 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors, findElementInPath, PROP_TYPE, createCancellableTimeout } from '../../../../lib/webcomponent-util';
+import { defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors, findElementInPath, PROP_TYPE, createCancellableTimeout } from '../../../../lib/webcomponent-util';
 import { APIToken, ERRS, U2FToken, Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, EncryptionAlgorithm } from '../../../../types/crypto';
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey, PublicKeyDecrypted, MasterPassword } from '../../../../types/db-types';
-import { PasswordDetailHTML, passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
-import { PasswordDetailCSS, VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
+import { passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
 import { decryptWithPrivateKey, decrypt, encrypt } from '../../../../lib/browser-crypto';
 import { MetaPasswords, Dashboard } from '../../../entrypoints/base/dashboard/dashboard';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
@@ -13,6 +12,7 @@ import { doClientAPIRequest, filterUndefined } from '../../../../lib/apirequests
 import { LoadingSpinner } from '../../../util/loading-spinner/loading-spinner';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
+import { VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
 import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { API_ERRS, APISuccessfulReturns } from '../../../../types/api';
 import { SizingBlock } from '../../../util/sizing-block/sizing-block';
@@ -67,23 +67,18 @@ export function getHost(fullUrl: string) {
 	}
 }
 
-@config({
-	is: 'password-detail',
-	css: PasswordDetailCSS,
-	html: PasswordDetailHTML,
-	dependencies: [
-		SizingBlock,
-		VerticalCenterer,
-		MaterialInput,
-		IconButton,
-		PaperToast,
-		AnimatedButton,
-		LoadingSpinner,
-		MaterialCheckbox,
-		MoreInfo
-	]
-})
-export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap> {
+export const PasswordDetailDependencies = [
+	SizingBlock,
+	VerticalCenterer,
+	MaterialInput,
+	IconButton,
+	PaperToast,
+	AnimatedButton,
+	LoadingSpinner,
+	MaterialCheckbox,
+	MoreInfo
+]
+export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap> {
 	props = defineProps(this, {
 		priv: {
 			selectedDisplayed: ComplexType<MetaPasswords[0]>(),
@@ -109,6 +104,8 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	};
 
 	private _postViewCallback: (() => void)|null = null;
+
+	public abstract u2fSupported(): boolean;
 
 	constructor() {
 		super();
@@ -355,6 +352,13 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	private async _checkU2fChanges(newData: PasswordDetailChanges,
 		changed: ToBools<PasswordDetailChanges>, callback: (success: boolean) => void) {
 			if (!changed.u2f_enabled) {
+				return;
+			}
+
+			if (!this._assertU2f()) {
+				this._showFailedView(() => {
+					this._saveChanges(newData, changed, callback);
+				});
 				return;
 			}
 
@@ -676,10 +680,10 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		});
 	}
 	
-	private _failDecryptServerResponse() {
+	private _failDecryptServerResponse(retryFn: () => void) {
 		PaperToast.createHidable('Failed to decrypt server response',
 			PaperToast.DURATION.LONG);
-		this._showFailedView(this._signU2F);
+		this._showFailedView(retryFn);
 	}
 
 	private _activeRequests: PublicKeyDecrypted<
@@ -781,13 +785,13 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				clientPrivateKey || (document.body.classList.contains('dev') ?
 					(response.data as any).privateKey : clientPrivateKey));
 			if (publicKeyDecrypted === ERRS.INVALID_DECRYPT) {
-				this._failDecryptServerResponse();
+				this._failDecryptServerResponse(this._signU2F);
 				return;
 			}
 
 			const parseResult = PasswordDetail._tryParse(publicKeyDecrypted);
 			if (parseResult.success === false) {
-				this._failDecryptServerResponse();
+				this._failDecryptServerResponse(this._signU2F);
 				return;
 			}
 			const publicKeyDecryptedParsed = parseResult.data;
@@ -832,9 +836,30 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		}
 	}
 
+	private _assertU2f() {
+		if (this.u2fSupported()) {
+			return true;
+		}
+		PaperToast.createHidable('U2F is not supported on the dashboard since a ' + 
+			'registration is unique to a computer, please register an instance intead');
+		return false;
+	}
+
 	@bindToClass
 	private async _getPasswordDetails(passwordMeta: MetaPasswords[0] = this.props.selected) {
-		if (passwordMeta.twofactor_enabled && this._authState.twofactorAuthentication === null) {
+		if (passwordMeta.u2f_enabled && this._authState.u2fAuthenticated === null) {
+			if (!this._assertU2f()) {
+				this._showFailedView(() => {
+					this._getPasswordDetails(passwordMeta);
+				});
+				return;
+			}
+			await this._animateView('u2fRequiredView', STATIC_VIEW_HEIGHT, () => {
+				this._signU2F();
+			});
+			this._postViewCallback = this._getPasswordDetails;
+			return;
+		} else if (passwordMeta.twofactor_enabled && this._authState.twofactorAuthentication === null) {
 			await this._animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
 				this.$$('.twofactorDigit').forEach((el: HTMLInputElement) => {
 					el.value = '';
@@ -843,12 +868,6 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			this._postViewCallback = this._getPasswordDetails;
 			const firstDigit = this.$('#digit0') as HTMLInputElement;
 			firstDigit && firstDigit.focus();
-			return;
-		} else if (passwordMeta.u2f_enabled && this._authState.u2fAuthenticated === null) {
-			await this._animateView('u2fRequiredView', STATIC_VIEW_HEIGHT, () => {
-				this._signU2F();
-			});
-			this._postViewCallback = this._getPasswordDetails;
 			return;
 		}
 
@@ -899,25 +918,33 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 				clientPrivateKey || (document.body.classList.contains('dev') ?
 					(response.data as any).privateKey : clientPrivateKey));
 			if (publicKeyDecrypted === ERRS.INVALID_DECRYPT) {
-				this._failDecryptServerResponse();
+				this._failDecryptServerResponse(() => {
+					this._getPasswordDetails(passwordMeta);
+				});
 				return;
 			}
 
 			const parseResult = PasswordDetail._tryParse(publicKeyDecrypted);
 			if (parseResult.success === false) {
-				this._failDecryptServerResponse();
+				this._failDecryptServerResponse(() => {
+					this._getPasswordDetails(passwordMeta);
+				});
 				return;
 			}
 			const publicKeyDecryptedParsed = parseResult.data;
 			const decryptHash = this.getRoot().getData('decryptHash');
 			if (!decryptHash) {
-				this._failDecryptServerResponse();
+				this._failDecryptServerResponse(() => {
+					this._getPasswordDetails(passwordMeta);
+				});
 				return;
 			}
 			const decryptedPasswordData = decrypt(publicKeyDecryptedParsed.encrypted, 
 				decryptHash.hash);
 			if (decryptedPasswordData === ERRS.INVALID_DECRYPT) {
-				this._failDecryptServerResponse();
+				this._failDecryptServerResponse(() => {
+					this._getPasswordDetails(passwordMeta);
+				});
 				return;
 			}
 			passwordDetailDataStore[passwordDetailDataSymbol] = decryptedPasswordData;

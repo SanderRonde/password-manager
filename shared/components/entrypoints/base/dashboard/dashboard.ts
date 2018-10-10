@@ -1,5 +1,6 @@
 import { PasswordPreview, PasswordPreviewHost } from '../../../page-specific/dashboard/password-preview/password-preview';
-import { PasswordDetail, PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
+import { PasswordDetailWeb } from '../../../page-specific/dashboard/web/password-detail-web/password-detail-web';
+import { PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { defineProps, ComplexType, PROP_TYPE } from '../../../../lib/webcomponent-util';
 import { MaterialInput } from '../../../util/material-input/material-input';
@@ -20,7 +21,7 @@ export const DashboarDependencies: (typeof WebComponentBase)[] = [
 	HorizontalCenterer,
 	MDCard,
 	PasswordPreview,
-	PasswordDetail
+	PasswordDetailWeb
 ]
 
 export interface MetaPasswordsPreviewData {

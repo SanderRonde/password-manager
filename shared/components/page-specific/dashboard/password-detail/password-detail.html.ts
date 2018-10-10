@@ -317,12 +317,14 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 											' This improves security by proving you have' + 
 											' access to this secondary device.' + 
 											' To use 2FA, it needs to be set up for your' +
-											' account on the settings page.'}"></more-info>
+											' account on the settings page.'
+											}"></more-info>
 									</material-checkbox>
 								</div>
 								<div id="passwordSettingsu2f">
 									<material-checkbox checked="${props.selectedDisplayed &&
 											props.selectedDisplayed.u2f_enabled}"
+											disabled="${this.u2fSupported() ? null : true}"
 											id="passwordSettingsu2fCheckbox">
 										Enable U2F
 										<more-info info="${'U2F requires you to' +
@@ -331,8 +333,10 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 											' key out there that works for you and it\'s' + 
 											' in your possession, no-one else can read your' +
 											' passwords.' +
-											' To use 2FA, it needs to be set up for your' +
-											' account on the settings page.'}"></more-info>
+											' To use U2F, it needs to be set up for your' +
+											' account on the settings page and you need to' +
+											' register an instance, not the web dashboard.'
+										}"></more-info>
 									</material-checkbox>
 								</div>
 							</div>

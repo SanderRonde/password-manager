@@ -1,5 +1,5 @@
-import { ANIMATE_TIME } from '../../util/loadable-block/loadable-block.css';
-import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
+import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
+import { CHANGE_TYPE, TemplateFn } from '../../../../lib/webcomponents';
 import { GlobalController } from './global-controller';
 import { html } from 'lit-html';
 

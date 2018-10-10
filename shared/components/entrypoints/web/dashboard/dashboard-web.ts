@@ -1,7 +1,7 @@
 import { ERRS, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../../types/crypto';
 import { decryptWithPrivateKey, hash, pad } from '../../../../lib/browser-crypto';
 import { Dashboard, DashboarDependencies } from '../../base/dashboard/dashboard';
-import { GlobalControllerData } from '../../global/global-controller';
+import { GlobalControllerData } from '../../base/global/global-controller';
 import { DashboardHTML } from '../../base/dashboard/dashboard.html';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { DashboardCSS } from '../../base/dashboard/dashboard.css';

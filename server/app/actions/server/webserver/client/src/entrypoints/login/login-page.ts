@@ -1,7 +1,7 @@
-import { GlobalController } from "../../../../../../../../../shared/components/entrypoints/base/global/global-controller";
+import { GlobalControllerWeb } from "../../../../../../../../../shared/components/entrypoints/web/global/global-controller-web";
 import { LoginWeb } from "../../../../../../../../../shared/components/entrypoints/web/login/login-web";
 import { registerServiceWorker } from "../../../static/js/sw";
 
-GlobalController.define();
+GlobalControllerWeb.define();
 LoginWeb.define();
 registerServiceWorker();
