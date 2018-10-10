@@ -34,7 +34,8 @@ export interface PasswordDetailData {
 
 export interface PasswordDetailChanges {
 	username: string;
-	password: string;
+	password: string|null;
+	twofactor_secret: string|null;
 	notes: string[];
 	twofactor_enabled: boolean;
 	u2f_enabled: boolean;
@@ -272,12 +273,14 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			}
 			const encryptedData: EncodedString<{
 				data: Encrypted<EncodedString<{
-					password: string;
+					twofactor_secret: string|null;
+					password: string|null;
 					notes: string[];
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 				algorithm: EncryptionAlgorithm;
 			}>|undefined = (!changed.password && !changed.notes) ? undefined : 
 				encrypt({
+					twofactor_secret: newData.twofactor_secret,
 					password: newData.password,
 					notes: newData.notes
 				}, decryptHash.hash, 'aes-256-ctr');

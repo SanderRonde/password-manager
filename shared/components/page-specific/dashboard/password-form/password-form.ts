@@ -212,7 +212,8 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 			notes: this.$.noteInput.value.split('\n'),
 			twofactor_enabled: this.$.passwordSettings2faCheckbox.checked,
 			u2f_enabled: this.$.passwordSettingsu2fCheckbox.checked,
-			websites: this._getWebsites()
+			websites: this._getWebsites(),
+			twofactor_secret: this.$.twofactorToken.value
 		};
 	}
 
@@ -226,7 +227,7 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 		});
 	}
 
-	private static _areSameString(str1: string, str2: string): boolean {
+	private static _areSame(str1: string|null, str2: string|null): boolean {
 		if (!str1 || !str2) {
 			return !str1 === !str2;
 		}
@@ -239,18 +240,20 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 			websitesChanged = true;
 		}
 		for (let i = 0; i < this.props.selectedDisplayed.websites.length; i++) {
-			if (!PasswordForm._areSameString(
+			if (!PasswordForm._areSame(
 				this.props.selectedDisplayed.websites[i].exact,
 				newPassword.websites[i].url)) {
 					websitesChanged = true;
 				}
 		}
 		return {
-			username: !PasswordForm._areSameString(this.props.selectedDisplayed.username,
+			username: !PasswordForm._areSame(this.props.selectedDisplayed.username,
 				newPassword.username),
-			password: !PasswordForm._areSameString(newPassword.password,
+			twofactor_secret: !PasswordForm._areSame(newPassword.twofactor_secret,
+				passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret),
+			password: !PasswordForm._areSame(newPassword.password,
 				passwordDetailDataStore[passwordDetailDataSymbol]!.password),
-			notes: !PasswordForm._areSameString(newPassword.notes.join('\n'),
+			notes: !PasswordForm._areSame(newPassword.notes.join('\n'),
 				passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n')),
 			twofactor_enabled: this.props.selectedDisplayed.twofactor_enabled !== newPassword.twofactor_enabled,
 			u2f_enabled: this.props.selectedDisplayed.u2f_enabled !== newPassword.u2f_enabled,

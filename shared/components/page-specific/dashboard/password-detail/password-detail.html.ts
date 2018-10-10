@@ -10,8 +10,9 @@ import { html } from 'lit-html';
 export const passwordDetailDataSymbol = Symbol('passwordDetailData');
 export const passwordDetailDataStore: {
 	[passwordDetailDataSymbol]: {
-		password: string;
+		password: string|null;
 		notes: string[];
+		twofactor_secret: string|null;
 	}|null;
 } = {
 	[passwordDetailDataSymbol]: null
