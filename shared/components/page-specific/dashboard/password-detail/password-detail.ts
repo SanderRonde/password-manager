@@ -120,16 +120,6 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		});
 	}
 
-	private _nextView() {
-		this._postViewCallback && this._postViewCallback();
-		this._postViewCallback = null;
-	}
-
-	private async _sizeChange(websites: MetaPasswords[0]['websites']) {	
-		await this.$.sizer.setSize(PasswordDetail._getSelectedViewSize(
-			this.props.selectedDisplayed, websites));
-	}
-
 	private static _isValidURL(url: string) {
 		try {
 			new URL(url);
@@ -212,6 +202,11 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 	@bindToClass
 	public onToggleShowPasswordClick() {
 		this.props.passwordVisible = !this.props.passwordVisible;
+	}
+
+	private async _sizeChange(websites: MetaPasswords[0]['websites']) {	
+		await this.$.sizer.setSize(PasswordDetail._getSelectedViewSize(
+			this.props.selectedDisplayed, websites));
 	}
 
 	@bindToClass
@@ -707,6 +702,11 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			this._authState.u2fAuthenticated = signed;
 			this._authState.u2fToken = request;
 		}
+
+	private _nextView() {
+		this._postViewCallback && this._postViewCallback();
+		this._postViewCallback = null;
+	}
 	
 	@bindToClass
 	private async _signU2F() {
