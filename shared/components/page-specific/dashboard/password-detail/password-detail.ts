@@ -252,6 +252,13 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 
 	@bindToClass
 	public async discardChanges() {
+		if (!this._hasChanged(this._getChanged(this._getFormData()))) {
+			PaperToast.create({
+				content: 'No changes to discard',
+				duration: PaperToast.DURATION.SHORT
+			});
+		}
+
 		//Reset to default values
 		this._setSelected(this.props.selected);
 	}
@@ -522,9 +529,8 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			return response;
 		}
 
-	@bindToClass
-	public async saveChanges() {
-		const newData: PasswordDetailChanges = {
+	private _getFormData(): PasswordDetailChanges {
+		return {
 			username: this.$.passwordUsername.value,
 			password: this.$.passwordPassword.value,
 			notes: this.$.noteInput.value.split('\n'),
@@ -532,6 +538,11 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 			u2f_enabled: this.$.passwordSettingsu2fCheckbox.checked,
 			websites: this._getWebsites()
 		};
+	}
+
+	@bindToClass
+	public async saveChanges() {
+		const newData = this._getFormData();
 		const changed = this._getChanged(newData);
 
 		if (!this._hasChanged(changed)) {
