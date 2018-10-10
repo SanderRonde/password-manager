@@ -188,6 +188,7 @@ export function passwordSetTest() {
 					username: 'someusername',
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
+							twofactor_secret: string;
 							password: string;
 							notes: string[];
 						}>, Hashed<Padded<string, "masterpwdecrypt">, "sha512">, "aes-256-ctr">;

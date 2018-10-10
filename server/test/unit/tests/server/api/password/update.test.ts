@@ -347,6 +347,7 @@ export function passwordUpdateTest() {
 					u2f_enabled: false,
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
+							twofactor_secret: string;
 							password: string;
 							notes: string[];
 						}>, Hashed<Padded<string, "masterpwdecrypt">, "sha512">, "aes-256-ctr">;
@@ -383,6 +384,7 @@ export function passwordUpdateTest() {
 					u2f_enabled: false,
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
+							twofactor_secret: string;
 							password: string;
 							notes: string[];
 						}>, Hashed<Padded<string, "masterpwdecrypt">, "sha512">, "aes-256-ctr">;
@@ -418,6 +420,7 @@ export function passwordUpdateTest() {
 					u2f_enabled: false,
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
+							twofactor_secret: string;
 							username: string;
 							password: string;
 							notes: string[];
