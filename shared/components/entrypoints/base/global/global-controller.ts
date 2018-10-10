@@ -1,19 +1,19 @@
-import { defineProps, PROP_TYPE, config, wait, awaitMounted } from '../../../lib/webcomponent-util';
-import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding, ERRS } from '../../../types/crypto';
-import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../types/db-types';
-import { ANIMATE_TIME } from '../../util/loadable-block/loadable-block.css';
-import { LoadableBlock } from '../../util/loadable-block/loadable-block';
-import { ConfigurableWebComponent } from '../../../lib/webcomponents';
+import { defineProps, PROP_TYPE, config, wait, awaitMounted } from '../../../../lib/webcomponent-util';
+import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding, ERRS } from '../../../../types/crypto';
+import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../types/db-types';
+import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
+import { LoadableBlock } from '../../../util/loadable-block/loadable-block';
+import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { GlobalControllerIDMap } from './global-controller-querymap';
+import { decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { GlobalControllerHTML } from './global-controller.html';
-import { PaperToast } from '../../util/paper-toast/paper-toast';
+import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { GlobalControllerCSS } from './global-controller.css';
-import { doClientAPIRequest } from '../../../lib/apirequests';
-import { ENTRYPOINT } from '../../../types/shared-types';
-import { Dashboard } from '../base/dashboard/dashboard';
-import { API_ERRS } from '../../../types/api';
-import { Login } from '../base/login/login';
-import { decryptWithPrivateKey } from '../../../lib/browser-crypto';
+import { doClientAPIRequest } from '../../../../lib/apirequests';
+import { ENTRYPOINT } from '../../../../types/shared-types';
+import { Dashboard } from '../../base/dashboard/dashboard';
+import { API_ERRS } from '../../../../types/api';
+import { Login } from '../../base/login/login';
 
 export interface GlobalControllerData {
 	loginData: {
