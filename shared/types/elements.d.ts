@@ -1,6 +1,8 @@
 import { PasswordPreview } from "../components/page-specific/dashboard/password-preview/password-preview";
 import { PasswordDetail } from "../components/page-specific/dashboard/password-detail/password-detail";
+import { PasswordForm } from "../components/page-specific/dashboard/password-form/password-form";
 import { HorizontalCenterer } from "../components/util/horizontal-centerer/horizontal-centerer";
+import { MaterialCheckbox } from "../components/util/material-checkbox/material-checkbox";
 import { VerticalCenterer } from "../components/util/vertical-centerer/vertical-centerer";
 import { DashboardWeb } from "../components/entrypoints/web/dashboard/dashboard-web";
 import { AnimatedButton } from "../components/util/animated-button/animated-button";
@@ -14,9 +16,8 @@ import { PaperButton } from "../components/util/paper-button/paper-button";
 import { LoginWeb } from "../components/entrypoints/web/login/login-web";
 import { PaperToast } from "../components/util/paper-toast/paper-toast";
 import { IconButton } from "../components/util/icon-button/icon-button";
-import { MDCard } from "../components/util/md-card/md-card";
-import { MaterialCheckbox } from "../components/util/material-checkbox/material-checkbox";
 import { MoreInfo } from "../components/util/more-info/more-info";
+import { MDCard } from "../components/util/md-card/md-card";
 
 declare global {
 	type HTMLMdCardElement = MDCard;
@@ -28,6 +29,7 @@ declare global {
 	type HTMLDashboardElement = DashboardWeb;
 	type HTMLPaperButtonElement = PaperButton;
 	type HTMLSizingBlockElement = SizingBlock;
+	type HTMLPasswordFormElement = PasswordForm;
 	type HTMLLoadableBlockElement = LoadableBlock;
 	type HTMLMaterialInputElement = MaterialInput;
 	type HTMLThemeSelectorElement = ThemeSelector;
@@ -80,5 +82,7 @@ declare global {
 		name: 'material-checkbox'
 	}|MoreInfo & {
 		name: 'more-info'
-	};
+	}|PasswordForm & {
+		name: 'password-form'
+	}
 }

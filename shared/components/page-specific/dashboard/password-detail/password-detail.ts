@@ -1,13 +1,12 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors, findElementInPath, PROP_TYPE, createCancellableTimeout } from '../../../../lib/webcomponent-util';
+import { defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors } from '../../../../lib/webcomponent-util';
 import { APIToken, ERRS, U2FToken, Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, EncryptionAlgorithm } from '../../../../types/crypto';
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey, PublicKeyDecrypted, MasterPassword } from '../../../../types/db-types';
 import { passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
 import { decryptWithPrivateKey, decrypt, encrypt } from '../../../../lib/browser-crypto';
 import { MetaPasswords, Dashboard } from '../../../entrypoints/base/dashboard/dashboard';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
-import { MaterialCheckbox } from '../../../util/material-checkbox/material-checkbox';
 import { doClientAPIRequest, filterUndefined } from '../../../../lib/apirequests';
 import { LoadingSpinner } from '../../../util/loading-spinner/loading-spinner';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
@@ -16,10 +15,9 @@ import { VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
 import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { API_ERRS, APISuccessfulReturns } from '../../../../types/api';
 import { SizingBlock } from '../../../util/sizing-block/sizing-block';
-import { IconButton } from '../../../util/icon-button/icon-button';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { PasswordDetailIDMap } from './password-detail-querymap';
-import { MoreInfo } from '../../../util/more-info/more-info';
+import { PasswordForm } from '../password-form/password-form';
 import { ENTRYPOINT } from '../../../../types/shared-types';
 import { bindToClass } from '../../../../lib/decorators';
 import { isSupported, sign } from 'u2f-api';
@@ -33,7 +31,7 @@ export interface PasswordDetailData {
 	auth_token: APIToken;
 };
 
-interface PasswordDetailChanges {
+export interface PasswordDetailChanges {
 	username: string;
 	password: string;
 	notes: string[];
@@ -43,7 +41,7 @@ interface PasswordDetailChanges {
 		url: string
 	}[];
 }
-type ToBools<T> = {
+export type ToBools<T> = {
 	[P in keyof T]: boolean;
 };
 
@@ -71,26 +69,23 @@ export const PasswordDetailDependencies = [
 	SizingBlock,
 	VerticalCenterer,
 	MaterialInput,
-	IconButton,
 	PaperToast,
 	AnimatedButton,
 	LoadingSpinner,
-	MaterialCheckbox,
-	MoreInfo
+	PasswordForm
 ]
 export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap> {
 	props = defineProps(this, {
 		priv: {
-			selectedDisplayed: ComplexType<MetaPasswords[0]>(),
 			selected: ComplexType<MetaPasswords[0]>(),
 			visibleWebsites: {
 				type: ComplexType<MetaPasswords[0]['websites']>(),
 				value: []
 			},
 			authData: ComplexType<PasswordDetailData>(),
-			passwordVisible: PROP_TYPE.BOOL,
 			ref: ComplexType<Dashboard>()
-		}
+		},
+		reflect: {}
 	});
 
 	private _authState: {
@@ -115,200 +110,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				this._selectedChange(oldValue, newValue);
 			}
 		});
-	}
-
-	public onDelete() {
-		//TODO: confirm deletion
-		//TODO: actually delete
-	}
-
-	private static _isValidURL(url: string) {
-		try {
-			new URL(url);
-			return true;
-		} catch(e) {
-			return false;
-		}
-	}
-
-	public onLinkClick(e: MouseEvent & {
-		path: HTMLElement[];
-	}) {
-		const input = findElementInPath<MaterialInput>(e.path, 'material-input');
-		if (!input) {
-			PaperToast.create({
-				content: 'Failed to open link',
-				duration: PaperToast.DURATION.SHORT
-			});
-			return;
-		}
-
-		if (PasswordDetail._isValidURL(input.value)) {
-			window.open(input.value, '_blank');
-		} else {
-			window.open(`//${input.value}`, '_blank');
-		}
-	}
-
-	private _copyText(text: string) {
-		const el = document.createElement('textarea');  
-		el.value = text;                                
-		el.style.position = 'absolute';                
-		el.style.left = '-9999px';                      
-		document.body.appendChild(el);                  
-	
-		const selected =           
-			document.getSelection().rangeCount > 0        
-				? document.getSelection().getRangeAt(0)     
-				: false;                                    
-		el.select();                                    
-		document.execCommand('copy');                   
-		document.body.removeChild(el);                  
-		if (selected) {                                 
-			document.getSelection().removeAllRanges();    
-			document.getSelection().addRange(selected);   
-		}
-	}
-
-	private _copyMap: WeakMap<HTMLElement, number> = new WeakMap();
-
-	@bindToClass
-	public copyCredential(e: MouseEvent & {
-		path: HTMLElement[]
-	}) {
-		const input = findElementInPath<MaterialInput>(e.path, 'material-input');
-		if (!input) {
-			PaperToast.create({
-				content: 'Failed to copy text',
-				duration: PaperToast.DURATION.SHORT
-			});
-			return;
-		}
-		
-		this._copyText(input.value);
-
-		input.classList.add('done');
-		if (this._copyMap.has(input)) {
-			window.clearTimeout(this._copyMap.get(input));
-		}
-		
-		PaperToast.create({
-			content: 'Copied',
-			duration: PaperToast.DURATION.SHORT
-		});
-		this._copyMap.set(input, window.setTimeout(() => {
-			input.classList.remove('done');
-		}, 2500));
-	}
-
-	@bindToClass
-	public onToggleShowPasswordClick() {
-		this.props.passwordVisible = !this.props.passwordVisible;
-	}
-
-	private async _sizeChange(websites: MetaPasswords[0]['websites']) {	
-		await this.$.sizer.setSize(PasswordDetail._getSelectedViewSize(
-			this.props.selectedDisplayed, websites));
-	}
-
-	@bindToClass
-	public async addWebsite() {
-		const newWebsites = [...this.props.visibleWebsites, {
-			host: '',
-			exact: '',
-			favicon: null
-		}];
-		await this._sizeChange(newWebsites);
-		this.props.visibleWebsites.push({
-			host: '',
-			exact: '',
-			favicon: null
-		});
-	}
-
-	@bindToClass
-	public async removeLastWebsite() {
-		PaperToast.createHidable('Last website can\'t be removed', 3500);
-	}
-
-	@bindToClass
-	public async removeWebsite(e: MouseEvent & {
-		path: HTMLElement[];
-	}) {
-		const container = findElementInPath(e.path, '.passwordWebsite');
-		const index = container && container.getAttribute('data-index');
-		if (!container || !index) {
-			PaperToast.createHidable('Failed to remove website', 3500);
-			return;
-		}
-
-		const newWebsites = [...this.props.visibleWebsites.slice(0, -1)];
-		this.props.visibleWebsites.splice(~~index, 1);
-		await this._sizeChange(newWebsites);
-	}
-
-	@bindToClass
-	public async discardChanges() {
-		if (!this._hasChanged(this._getChanged(this._getFormData()))) {
-			PaperToast.create({
-				content: 'No changes to discard',
-				duration: PaperToast.DURATION.SHORT
-			});
-		}
-
-		//Reset to default values
-		this._setSelected(this.props.selected);
-	}
-
-	private _getWebsites() {
-		const websiteElements = Array.prototype.slice.apply(
-			this.$.passwordWebsites.querySelectorAll('.passwordWebsite')) as HTMLElement[];
-		return websiteElements.map((element) => {
-			return {
-				url: (element.querySelector('.passwordWebsiteExact') as MaterialInput).value
-			}
-		});
-	}
-
-	private static _areSameString(str1: string, str2: string): boolean {
-		if (!str1 || !str2) {
-			return !str1 === !str2;
-		}
-		return str1.trim() === str2.trim();
-	}
-
-	private _getChanged(newPassword: PasswordDetailChanges): ToBools<PasswordDetailChanges> {
-		let websitesChanged: boolean = false;
-		if (this.props.selected.websites.length !== newPassword.websites.length) {
-			websitesChanged = true;
-		}
-		for (let i = 0; i < this.props.selected.websites.length; i++) {
-			if (!PasswordDetail._areSameString(
-				this.props.selected.websites[i].exact,
-				newPassword.websites[i].url)) {
-					websitesChanged = true;
-				}
-		}
-		return {
-			username: !PasswordDetail._areSameString(this.props.selected.username,
-				newPassword.username),
-			password: !PasswordDetail._areSameString(newPassword.password,
-				passwordDetailDataStore[passwordDetailDataSymbol]!.password),
-			notes: !PasswordDetail._areSameString(newPassword.notes.join('\n'),
-				passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n')),
-			twofactor_enabled: this.props.selected.twofactor_enabled !== newPassword.twofactor_enabled,
-			u2f_enabled: this.props.selected.u2f_enabled !== newPassword.u2f_enabled,
-			websites: websitesChanged
-		};
-	}
-
-	private _hasChanged(changed: ToBools<PasswordDetailChanges>) {
-		return changed.username ||
-			changed.password ||
-			changed.notes ||
-			changed.twofactor_enabled ||
-			changed.u2f_enabled ||
-			changed.websites;
 	}
 
 	private async _check2faChanges(newData: PasswordDetailChanges,
@@ -336,7 +137,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 						});
 					});
 					this._postViewCallback = () => {
-						this._saveChanges(newData, changed, callback);
+						this.saveChanges(newData, changed, callback);
 					};
 					const firstDigit = this.$('#digit0') as HTMLInputElement;
 					firstDigit && firstDigit.focus();
@@ -357,7 +158,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 
 			if (!this._assertU2f()) {
 				this._showFailedView(() => {
-					this._saveChanges(newData, changed, callback);
+					this.saveChanges(newData, changed, callback);
 				});
 				return;
 			}
@@ -375,7 +176,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			const response = await request;
 			if (response.success) {
 				this._signU2FRequest(response.data.request).then(() => {
-					this._saveChanges(newData, changed, callback);
+					this.saveChanges(newData, changed, callback);
 				});
 				return TWOFACTOR_CHECK_STATE.IN_PROGRESS;
 			} else if (response.ERR === API_ERRS.INVALID_CREDENTIALS && 
@@ -427,7 +228,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 	private _getWebsiteDiff(newData: PasswordDetailChanges) {
 		return {
 			added: newData.websites.filter((website) => {
-				for (const oldWebsite of this.props.selectedDisplayed.websites) {
+				for (const oldWebsite of this.props.selected.websites) {
 					if (getHost(website.url) === oldWebsite.host) {
 						//Not new
 						return false;
@@ -436,7 +237,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				//New
 				return true;
 			}),
-			removed: this.props.selectedDisplayed.websites.filter((website) => {
+			removed: this.props.selected.websites.filter((website) => {
 				for (const newWebsite of newData.websites) {
 					if (getHost(newWebsite.url) === website.host) {
 						//Not removed
@@ -449,7 +250,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}
 	}
 
-	private async _saveChanges(newData: PasswordDetailChanges, 
+	public async saveChanges(newData: PasswordDetailChanges, 
 		changed: ToBools<PasswordDetailChanges>, callback: (success: boolean) => void) {
 			if (!changed.twofactor_enabled && this._authState.u2fAuthenticated === null) {
 				if (await this._checkU2fChanges(newData, changed, callback) !== TWOFACTOR_CHECK_STATE.SUCCEEDED) {
@@ -533,57 +334,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			return response;
 		}
 
-	private _getFormData(): PasswordDetailChanges {
-		return {
-			username: this.$.passwordUsername.value,
-			password: this.$.passwordPassword.value,
-			notes: this.$.noteInput.value.split('\n'),
-			twofactor_enabled: this.$.passwordSettings2faCheckbox.checked,
-			u2f_enabled: this.$.passwordSettingsu2fCheckbox.checked,
-			websites: this._getWebsites()
-		};
-	}
-
-	@bindToClass
-	public async saveChanges() {
-		const newData = this._getFormData();
-		const changed = this._getChanged(newData);
-
-		if (!this._hasChanged(changed)) {
-			PaperToast.createHidable('No changes', PaperToast.DURATION.SHORT);
-			return;
-		}
-
-		this.$.saveChanges.setState('loading');
-		await wait(300);
-		const [, response] = await Promise.all([
-			wait(300), 
-			new Promise<{
-				success: boolean;
-			}>((resolve) => {
-				this._saveChanges(newData, changed, (success) => {
-					resolve({
-						success
-					});
-				});
-			})
-		]);
-		if (response.success) {
-			this.$.saveChanges.setState('success');
-			createCancellableTimeout(this, 'save-button', () => {
-				this.$.saveChanges.setState('regular');
-			}, 3000);
-			PaperToast.createHidable('Successfully updated password', 
-				PaperToast.DURATION.SHORT);
-		} else {
-			this.$.saveChanges.setState('failure');
-			createCancellableTimeout(this, 'save-button', () => {
-				this.$.saveChanges.setState('regular');
-			}, 3000);
-		}
-	}
-
-	private static _getSelectedViewSize(password: MetaPasswords[0],
+	public static getSelectedViewSize(password: MetaPasswords[0],
 		websites: MetaPasswords[0]['websites'] = (password && password.websites) || []) {
 			//Height without websites: 513
 			//Single website height: 156
@@ -619,17 +370,10 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		this._cancelCurrentAnimation = null;
 	}
 
-	private _setSelected(item: MetaPasswords[0] = this.props.selected) {
-		this.props.selectedDisplayed = item;
-		if (item && item.websites) {
-			this.props.visibleWebsites = item.websites;
-		}
-	}
-
 	private async _selectedChange(oldValue: MetaPasswords[0]|null, newValue: MetaPasswords[0]|null) {
 		if (oldValue && newValue && oldValue.id === newValue.id) {
 			//Just a list update, nothing to change
-			this._setSelected();
+			
 			return;
 		}
 
@@ -648,7 +392,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		} else if (oldValue !== null) {
 			await this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
 		} else {
-			this._setSelected();
+			this.$.passwordForm.setSelected(this.props.selected);
 		}
 	}
 
@@ -949,11 +693,11 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			}
 			passwordDetailDataStore[passwordDetailDataSymbol] = decryptedPasswordData;
 
-			await this._animateView('selectedView', PasswordDetail._getSelectedViewSize(passwordMeta), () => {
+			await this._animateView('selectedView', PasswordDetail.getSelectedViewSize(passwordMeta), () => {
 				//This will re-render the DOM so no need to do it because of 
 				// selected password change
-				this._setSelected();
-				this.props.passwordVisible = false;
+				this.$.passwordForm.setSelected(this.props.selected);
+				this.$.passwordForm.props.passwordVisible = false;
 			});
 		} else {
 			reportDefaultResponseErrors(response, PaperToast);
