@@ -107,12 +107,8 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) 
 		#passwordButtons {
 			display: flex;
 			flex-direction: row;
-			justify-content: flex-end;
+			justify-content: space-between;
 			margin-top: 40px;
-		}
-
-		#saveChanges {
-			margin-left: 10px;
 		}
 
 		material-input .copy {
@@ -129,6 +125,11 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) 
 
 		material-input.done .copyDone {
 			display: inline-block;
+		}
+
+		#deleteButtonIcon {
+			margin-bottom: -5px;
+			margin-top: 5px;
 		}
 	</style>`
 }, CHANGE_TYPE.ALWAYS);

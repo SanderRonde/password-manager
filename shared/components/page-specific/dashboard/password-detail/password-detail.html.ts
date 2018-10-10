@@ -1,5 +1,5 @@
-import { LockClosedUnfilledSize, LockClosedSize } from '../../../icons/lockClosed/lockClosed';
 import { repeat, inlineListener, changeOpacity, mapArr } from '../../../../lib/webcomponent-util';
+import { LockClosedUnfilledSize, LockClosedSize } from '../../../icons/lockClosed/lockClosed';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
@@ -7,10 +7,12 @@ import { Visible, VisibleHidden } from '../../../icons/visible/visible';
 import { Cross, CrossSize } from '../../../icons/cross/cross';
 import { Checkmark } from '../../../icons/checkmark/checkmark';
 import { PasswordDetail, getHost } from './password-detail';
+import { Delete } from '../../../icons/delete/delete';
 import { KeySize } from '../../../icons/key/key';
 import { Link } from '../../../icons/link/link';
 import { Copy } from '../../../icons/copy/copy';
 import { html } from 'lit-html';
+import { PaperButton } from '../../../util/paper-button/paper-button';
 
 export const passwordDetailDataSymbol = Symbol('passwordDetailData');
 export const passwordDetailDataStore: {
@@ -59,6 +61,14 @@ const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => 
 		}
 	</style>`;
 }, CHANGE_TYPE.THEME);
+
+const deleteButtonCustomCSS = new TemplateFn<PaperButton>(() => {
+	return html`<style>
+		#button {
+			padding: 6px 10px;
+		}
+	</style>`;
+}, CHANGE_TYPE.NEVER);
 
 const hostUpdateFns: (() => void)[] = [];
 function genHostUpdateFn(container: PasswordDetail, index: number) {
@@ -328,14 +338,24 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 							</div>
 						</div>
 						<div id="passwordButtons">
-							<paper-button aria-label="Discard" color="${theme.error}"
+							<paper-button aria-label="Delete password" 
+								color="white"
+								background="${theme.error}"
+								ripple-color="white"
+								custom-css="${deleteButtonCustomCSS}"
+							>
+								<div id="deleteButtonIcon">
+									${Delete}
+								</div>
+							</paper-button>
+							<paper-button aria-label="Discard changes" color="${theme.error}"
 								border border-color="${theme.error}" flat
 								ripple-color="${theme.error}"
 								wc-click="${inlineListener(this.discardChanges, this)}"
 							>
 								Discard
 							</paper-button>
-							<animated-button aria-label="Save Changes" 
+							<animated-button aria-label="Save changes" 
 								id="saveChanges"
 								wc-click="${inlineListener(this.saveChanges, this)}"
 								custom-css="${saveChangesButtonCustomCSS}">
