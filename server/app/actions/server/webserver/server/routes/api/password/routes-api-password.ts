@@ -206,7 +206,8 @@ export class RoutesApiPassword {
 			u2f_enabled: boolean;
 			encrypted: EncodedString<{
 				data: Encrypted<EncodedString<{
-					password: string;
+					twofactor_secret: string|null,
+					password: string|null;
 					notes: string[];
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 				algorithm: EncryptionAlgorithm;
@@ -365,7 +366,8 @@ export class RoutesApiPassword {
 			twofactor_token: string;
 			encrypted: EncodedString<{
 				data: Encrypted<EncodedString<{
-					password: string;
+					twofactor_secret: string|null;
+					password: string|null;
 					notes: string[];
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 				algorithm: EncryptionAlgorithm;

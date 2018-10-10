@@ -54,6 +54,7 @@ export function passwordUpdateTest() {
 			const expected2FAEnabled = Math.random() > 0.5;
 			const expectedU2FEnabled = Math.random() > 0.5;
 			const expectedEncrypted = encrypt({
+				twofactor_secret: null,
 				password: genRandomString(25),
 				notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 			}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
@@ -168,6 +169,7 @@ export function passwordUpdateTest() {
 			const expected2FAEnabled = Math.random() > 0.5;
 			const expectedU2FEnabled = Math.random() > 0.5;
 			const expectedEncrypted = encrypt({
+				twofactor_secret: null,
 				username: genRandomString(25),
 				password: genRandomString(25),
 				notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
@@ -230,6 +232,7 @@ export function passwordUpdateTest() {
 			const expected2FAEnabled = Math.random() > 0.5;
 			const expectedU2FEnabled = Math.random() > 0.5;
 			const expectedEncrypted = encrypt({
+				twofactor_secret: null,
 				username: genRandomString(25),
 				password: genRandomString(25),
 				notes: [genRandomString(10), genRandomString(20), genRandomString(30)]

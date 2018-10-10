@@ -256,6 +256,7 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 							}
 						}),
 						encrypted: encrypt(encrypt({
+							twofactor_secret: null,
 							password: 'somepw' + genRandomString(10),
 							notes: []
 						}, hash(pad(pw, 'masterpwdecrypt')),

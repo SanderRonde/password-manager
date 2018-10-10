@@ -399,6 +399,7 @@ export async function setPasword(toSet: {
 	const expected2FAEnabled = toSet.twofactor_enabled;
 	const expectedU2FEnabled = toSet.u2f_enabled;
 	const expectedEncrypted = encrypt({
+		twofactor_secret: null,
 		password: toSet.password,
 		notes: toSet.notes
 	}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
