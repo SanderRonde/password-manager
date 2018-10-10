@@ -365,11 +365,11 @@ export interface EncryptedPassword {
 	 */
 	username: EncodedString<DatabaseEncrypted<EncodedString<string>>>;
 	/**
-	 * (encrypted) Whether 2FA is enabled for this password
+	 * (encrypted) Whether 2FA is required for this password
 	 */
 	twofactor_enabled: EncodedString<DatabaseEncryptedWithSalt<boolean>>;
 	/**
-	 * (encrypted) Whether U2F is enabled for this password
+	 * (encrypted) Whether U2F is required for this password
 	 */
 	u2f_enabled: EncodedString<DatabaseEncryptedWithSalt<boolean>>;
 	/**
@@ -427,11 +427,11 @@ export interface DecryptedPassword {
 	 */
 	username: string;
 	/**
-	 * Whether 2FA is enabled for this password
+	 * Whether 2FA is required for this password
 	 */
 	twofactor_enabled: boolean;
 	/**
-	 * Whether U2F is enabled for this password
+	 * Whether U2F is required for this password
 	 */
 	u2f_enabled: boolean;
 	/**
