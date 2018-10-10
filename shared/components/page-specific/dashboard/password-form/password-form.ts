@@ -163,8 +163,14 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 	}
 
 	public onDelete() {
-		//TODO: confirm deletion
-		//TODO: actually delete
+		if (!this.props.parent) {
+			PaperToast.create({
+				content: 'Couldn\'t find containing component',
+				duration: PaperToast.DURATION.SHORT
+			});
+		} else {
+			this.props.parent.deletePassword(this.props.selectedDisplayed);
+		}
 	}
 
 	private _getFormData(): PasswordDetailChanges {

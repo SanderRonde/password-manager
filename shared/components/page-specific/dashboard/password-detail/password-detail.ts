@@ -250,6 +250,11 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}
 	}
 
+	public async deletePassword(_password: MetaPasswords[0]) {
+		//TODO: confirm deletion
+		//TODO: actually delete
+	}
+
 	public async saveChanges(newData: PasswordDetailChanges, 
 		changed: ToBools<PasswordDetailChanges>, callback: (success: boolean) => void) {
 			if (!changed.twofactor_enabled && this._authState.u2fAuthenticated === null) {
