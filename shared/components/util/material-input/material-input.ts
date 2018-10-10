@@ -60,6 +60,10 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 			rows: {
 				type: PROP_TYPE.NUMBER,
 				value: 2
+			},
+			readonly: {
+				type: PROP_TYPE.BOOL,
+				value: false
 			}
 		}
 	});
