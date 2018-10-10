@@ -63,5 +63,9 @@ export const PasswordFormCSS = new TemplateFn<PasswordForm>((_props, theme) => {
 			margin-bottom: -5px;
 			margin-top: 5px;
 		}
+
+		.hidden {
+			display: none!important;
+		}
 	</style>`;
 }, CHANGE_TYPE.THEME);

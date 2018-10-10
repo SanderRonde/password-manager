@@ -1,5 +1,5 @@
 import { passwordDetailDataStore, passwordDetailDataSymbol } from '../password-detail/password-detail.html';
-import { inlineListener, mapArr, changeOpacity } from '../../../../lib/webcomponent-util';
+import { inlineListener, mapArr, changeOpacity, classNames } from '../../../../lib/webcomponent-util';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
@@ -89,6 +89,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 		<material-input id="passwordUsername" name="username"
 			type="text" title="Account username"
 			autoComplete="off" fill label="username"
+			readonly="${!props.editing}"
 			value="${(props.selectedDisplayed && props.selectedDisplayed.username) || '?'}"
 		>
 			<div slot="postIcon">
@@ -109,6 +110,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 		<material-input id="passwordPassword" name="password"
 			type="${props.passwordVisible ? 'text' : 'password'}" title="Account password"
 			autoComplete="off" fill label="password"
+			readonly="${!props.editing}"
 			value="${passwordDetailDataStore[passwordDetailDataSymbol] ?
 				passwordDetailDataStore[passwordDetailDataSymbol]!.password : 
 					'password'}"
@@ -146,6 +148,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 							autoComplete="off" fill label="url"
 							wc-keydown="${inlineListener(genHostUpdateFn(this, index))}"
 							value="${website.exact || ''}"
+							readonly="${!props.editing}"
 						>
 							<icon-button tabIndex="-1" slot="postIcon"
 								aria-label="Open URL" title="Open URL"
@@ -169,7 +172,9 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 							</icon-button>
 						</material-input>
 					</div>
-					<div class="passwordWebsiteRemoveCenterer">
+					<div class="${classNames('passwordWebsiteRemoveCenterer', {
+						'hidden': !props.editing
+					})}">
 						${arr.length === 1 ? 
 							html`
 								<icon-button class="passwordWebsiteRemoveField"
@@ -188,7 +193,9 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 				</div>
 			`;
 		}))}
-		<div id="addWebsiteCenterer">
+		<div id="addWebsiteCenterer" class="${classNames({
+			'hidden': !props.editing
+		})}">
 			<paper-button aria-label="Add website"
 				id="addWebsiteButton"
 				border-color="${theme.accent.main}"
@@ -202,13 +209,16 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 		<div id="passwordNotesInput">
 			<material-input multiline id="noteInput" 
 				type="text" title="Notes" rows="4"
+				readonly="${!props.editing}"
 				autoComplete="off" fill label="Notes" value="${
 					passwordDetailDataStore[passwordDetailDataSymbol] ? 
 						passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n') : 
 						''}"></material-input>
 		</div>
 	</div>
-	<div id="passwordSettings">
+	<div id="passwordSettings" class="${classNames({
+			'hidden': !props.editing
+	})}">
 		<div id="passwordSettingsLayout">
 			<div id="passwordSettings2fa">
 				<material-checkbox checked="${props.selectedDisplayed &&
@@ -228,8 +238,8 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 			<div id="passwordSettingsu2f">
 				<material-checkbox checked="${props.selectedDisplayed &&
 						props.selectedDisplayed.u2f_enabled}"
-						disabled="${!(this.props.parent &&
-							this.props.parent.u2fSupported())}"
+						disabled="${!(props.parent &&
+							props.parent.u2fSupported())}"
 						id="passwordSettingsu2fCheckbox">
 					Enable U2F
 					<more-info info="${'U2F requires you to' +
@@ -258,18 +268,32 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 				${Delete}
 			</div>
 		</paper-button>
-		<paper-button aria-label="Discard changes" color="${theme.error}"
-			border border-color="${theme.error}" flat
-			ripple-color="${theme.error}"
-			wc-click="${inlineListener(this.discardChanges, this)}"
-		>
-			Discard
-		</paper-button>
-		<animated-button aria-label="Save changes" 
-			id="saveChanges"
-			wc-click="${inlineListener(this.saveChanges, this)}"
-			custom-css="${saveChangesButtonCustomCSS}">
-			Save changes
-		</animated-button>
+		${props.editing ? html`
+			<paper-button aria-label="Discard changes" color="${theme.error}"
+				border border-color="${theme.error}" flat
+				ripple-color="${theme.error}"
+				wc-click="${inlineListener(this.discardChanges, this)}"
+			>
+				Discard
+			</paper-button>
+			<animated-button aria-label="Save changes" 
+				id="saveChanges"
+				wc-click="${inlineListener(this.saveChanges, this)}"
+				custom-css="${saveChangesButtonCustomCSS}">
+				Save changes
+			</animated-button>
+		` : html`
+			<paper-button aria-label="Edit" 
+				color="white"
+				background="${theme.error}"
+				ripple-color="white"
+				custom-css="${deleteButtonCustomCSS}"
+				wc-click="${inlineListener(this.onDelete, this)}"
+			>
+				<div id="deleteButtonIcon">
+					${Delete}
+				</div>
+			</paper-button>
+		`}
 	</div>`;
 }, CHANGE_TYPE.ALWAYS);

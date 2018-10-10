@@ -52,20 +52,6 @@ const enum TWOFACTOR_CHECK_STATE {
 	SUCCEEDED
 };
 
-export function getHost(fullUrl: string) {
-	const originalUrl = fullUrl;
-	if (fullUrl.indexOf('http') !== 0) {
-		fullUrl = `http://${fullUrl}`;
-	}
-	try {
-		const constructedURL = new URL(fullUrl);
-		return constructedURL.hostname ||
-			constructedURL.host || originalUrl;
-	} catch(e) {
-		return originalUrl;
-	}
-}
-
 export const PasswordDetailDependencies = [
 	SizingBlock,
 	VerticalCenterer,
@@ -338,14 +324,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				}
 
 			return response;
-		}
-
-	public static getSelectedViewSize(password: MetaPasswords[0],
-		websites: MetaPasswords[0]['websites'] = (password && password.websites) || []) {
-			//Height without websites: 513
-			//Single website height: 156
-			//Size per website: 156 + 10px margin
-			return 513 + 156 + ((websites.length - 1) * (156 + 10));
 		}
 
 	private async _hideAll() {
@@ -699,12 +677,12 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			}
 			passwordDetailDataStore[passwordDetailDataSymbol] = decryptedPasswordData;
 
-			await this._animateView('selectedView', PasswordDetail.getSelectedViewSize(passwordMeta), () => {
-				//This will re-render the DOM so no need to do it because of 
-				// selected password change
-				this.$.passwordForm.setSelected(this.props.selected);
-				this.$.passwordForm.props.passwordVisible = false;
-			});
+			await this._animateView('selectedView', 
+				this.$.passwordForm.getSelectedViewSize(passwordMeta), () => {
+					//This will re-render the DOM so no need to do it because of 
+					// selected password change
+					this.$.passwordForm.setSelected(this.props.selected);
+				});
 		} else {
 			reportDefaultResponseErrors(response, PaperToast);
 			this._showFailedView(this._getPasswordDetails);

@@ -34,8 +34,27 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 			passwordVisible: PROP_TYPE.BOOL,
 			selectedDisplayed: ComplexType<MetaPasswords[0]>()
 		},
-		reflect: {}
+		reflect: {
+			editing: {
+				type: PROP_TYPE.BOOL,
+				value: false
+			}
+		}
 	});
+
+	constructor() {
+		super();
+		this.listen('propChange', (name) => {
+			if (name === 'editing') {
+				this._sizeChange();
+			}
+		});
+	}
+
+	public refresh() {
+		this.props.editing = false;
+		this.props.passwordVisible = true;
+	}
 
 	private _copyMap: WeakMap<HTMLElement, number> = new WeakMap();
 
@@ -121,8 +140,21 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 		}
 	}
 
-	private async _sizeChange(websites: MetaPasswords[0]['websites']) {	
-		await this.props.parent.$.sizer.setSize(PasswordDetail.getSelectedViewSize(
+	public getSelectedViewSize(password: MetaPasswords[0],
+		websites: MetaPasswords[0]['websites'] = (password && password.websites) || []) {
+			if (this.props.editing) {
+				//Height without websites: 513
+				//Single website height: 156
+				//Size per website: 156 + 10px margin
+				return 513 + 156 + ((websites.length - 1) * (156 + 10));
+			} else {
+				//TODO: change
+				return 580;
+			}
+		}
+
+	private async _sizeChange(websites: MetaPasswords[0]['websites'] = this.props.visibleWebsites) {	
+		await this.props.parent.$.sizer.setSize(this.getSelectedViewSize(
 			this.props.selectedDisplayed, websites));
 	}
 
@@ -236,6 +268,7 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 	}
 
 	public setSelected(item: MetaPasswords[0]) {
+		this.refresh();
 		this.props.selectedDisplayed = item;
 		if (item && item.websites) {
 			this.props.visibleWebsites = item.websites;
