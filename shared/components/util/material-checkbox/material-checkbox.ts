@@ -24,6 +24,11 @@ export class MaterialCheckbox extends ConfigurableWebComponent<MaterialCheckboxI
 				strict: true,
 				value: false,
 				reflectToSelf: false
+			},
+			disabled: {
+				type: PROP_TYPE.BOOL,
+				strict: true,
+				value: false
 			}
 		}
 	});

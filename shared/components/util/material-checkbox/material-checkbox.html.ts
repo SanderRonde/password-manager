@@ -2,11 +2,12 @@ import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { MaterialCheckbox } from './material-checkbox';
 import { html } from 'lit-html';
 
-export const MaterialCheckboxHTML = new TemplateFn<MaterialCheckbox>(function () {
+export const MaterialCheckboxHTML = new TemplateFn<MaterialCheckbox>(function (props) {
 	return html`
 		<div class="mdc-form-field">
 			<div class="mdc-checkbox">
 				<input type="checkbox"
+					disabled="${props.disabled ? true : null}"
 					class="mdc-checkbox__native-control"
 					id="checkbox"/>
 				<div class="mdc-checkbox__background">
@@ -26,4 +27,4 @@ export const MaterialCheckboxHTML = new TemplateFn<MaterialCheckbox>(function ()
 			</div>
 		</div>
 	`
-}, CHANGE_TYPE.NEVER);
+}, CHANGE_TYPE.PROP);

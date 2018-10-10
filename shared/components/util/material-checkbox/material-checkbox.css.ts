@@ -3,7 +3,7 @@ import { MaterialCheckbox } from './material-checkbox';
 import { html } from 'lit-html';
 import { changeOpacity } from '../../../lib/webcomponent-util';
 
-export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((_props, theme) => {
+export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((props, theme) => {
 	return html`<style>
 		/*!
 		Material Components for the Web
@@ -617,6 +617,7 @@ export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((_props, the
 			margin-top: 11px;
 			cursor: pointer;
 			user-select: none;
+			${props.disabled ? html`opacity: 0.5;` : html``}
 		}
 
 		.mdc-form-field {
