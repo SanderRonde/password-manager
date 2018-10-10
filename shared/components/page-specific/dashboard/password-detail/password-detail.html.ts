@@ -343,6 +343,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 								background="${theme.error}"
 								ripple-color="white"
 								custom-css="${deleteButtonCustomCSS}"
+								wc-click="${inlineListener(this.onDelete, this)}"
 							>
 								<div id="deleteButtonIcon">
 									${Delete}

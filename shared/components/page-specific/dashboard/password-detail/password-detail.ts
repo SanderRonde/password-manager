@@ -120,6 +120,11 @@ export class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap
 		});
 	}
 
+	public onDelete() {
+		//TODO: confirm deletion
+		//TODO: actually delete
+	}
+
 	private static _isValidURL(url: string) {
 		try {
 			new URL(url);
