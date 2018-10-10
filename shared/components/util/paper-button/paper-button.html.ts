@@ -11,6 +11,8 @@ export const PaperButtonHTML = new TemplateFn<PaperButton>(function(props) {
 				'mdl-button--raised': !props.flat,
 				'mdl-js-ripple-effect': !props.noRipple
 			})}" label="${props.ariaLabel}"
+			aria-label="${props.ariaLabel}"
+			title="${props.ariaLabel}"
 			on-mouseup="${inlineListener(this.blurHandler, this, true)}"
 			on-mouseleave="${inlineListener(this.blurHandler, this, true)}"
 			on-click="${inlineListener(this.buttonClick, this, true)}"
