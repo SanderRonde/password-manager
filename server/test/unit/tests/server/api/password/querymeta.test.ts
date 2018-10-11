@@ -139,7 +139,8 @@ export function passwordQueryMetaTest() {
 		});
 		it('fails if auth token is wrong', async () => {
 			const secret = speakeasy.generateSecret({
-				name: 'Password manager server'
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
@@ -166,7 +167,8 @@ export function passwordQueryMetaTest() {
 		});
 		it('fails if instance id is wrong', async () => {
 			const secret = speakeasy.generateSecret({
-				name: 'Password manager server'
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,

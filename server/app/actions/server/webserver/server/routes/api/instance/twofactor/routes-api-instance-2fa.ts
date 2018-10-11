@@ -67,7 +67,8 @@ export class RoutesAPIInstanceTwofactor {
 			if (!twofactor_secret) {
 				//Create a new one
 				const secret = speakeasy.generateSecret({
-					name: 'Password Manager'
+					name: 'Password Manager',
+					length: 64
 				});
 	
 				if (await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {

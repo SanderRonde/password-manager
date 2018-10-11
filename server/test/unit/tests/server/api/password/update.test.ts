@@ -144,7 +144,8 @@ export function passwordUpdateTest() {
 		});
 		it('fails if it requires 2FA and no 2FA token is passed', async () => {
 			const { ascii } = speakeasy.generateSecret({
-				name: 'Password manager server'
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
@@ -207,7 +208,8 @@ export function passwordUpdateTest() {
 		});
 		it('password can be updated if 2FA is enabled', async () => {
 			const { ascii } = speakeasy.generateSecret({
-				name: 'Password manager server'
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,

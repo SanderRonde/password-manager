@@ -88,7 +88,8 @@ export function passwordGetTest() {
 		});
 		it('fails if 2FA is enabled but no 2FA token is passed', async () => {
 			const secret = speakeasy.generateSecret({
-				name: 'Password manager server'
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
@@ -131,7 +132,8 @@ export function passwordGetTest() {
 		});
 		it('can get the password if 2FA is enabled', async () => {
 			const secret = speakeasy.generateSecret({
-				name: 'Password manager server'
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
@@ -203,7 +205,8 @@ export function passwordGetTest() {
 		});
 		it('fails if auth token is wrong', async () => {
 			const secret = speakeasy.generateSecret({
-				name: 'Password manager server'
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
@@ -240,7 +243,8 @@ export function passwordGetTest() {
 		});
 		it('fails if instance id is wrong', async () => {
 			const secret = speakeasy.generateSecret({
-				name: 'Password manager server'
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
@@ -278,7 +282,8 @@ export function passwordGetTest() {
 		});
 		it('fails if password id is wrong', async () => {
 			const secret = speakeasy.generateSecret({
-				name: 'Password manager server'
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,

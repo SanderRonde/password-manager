@@ -42,7 +42,9 @@ export function twofactorVerifyTest() {
 			assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 		});
 		it('fails if an invalid 2FA token is passed', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
@@ -72,7 +74,9 @@ export function twofactorVerifyTest() {
 			assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 		});
 		it('fails if an invalid password verification token is passed', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
@@ -101,7 +105,9 @@ export function twofactorVerifyTest() {
 			assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 		});
 		it('fails if instance id wrong', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,

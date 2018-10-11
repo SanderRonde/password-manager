@@ -14,7 +14,9 @@ export function instanceTwofactorTest() {
 	parallel('Instance Twofactor', () => {
 		const uris = captureURIs();
 		it('can enable 2FA after registering instance when 2FA is enabled for the user', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				twofactor_secret: twofactor.ascii
@@ -112,7 +114,9 @@ export function instanceTwofactorTest() {
 			})();
 		});
 		it('can enable 2FA and then disable it', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: false,
@@ -216,7 +220,9 @@ export function instanceTwofactorTest() {
 			})();
 		});
 		it('can enable 2FA, disable 2FA and then enable it', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: false,
@@ -362,7 +368,9 @@ export function instanceTwofactorTest() {
 			})();
 		});
 		it('can verify a login requiring 2FA', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
@@ -450,7 +458,9 @@ export function instanceTwofactorTest() {
 			})();
 		});
 		it('can register an instance, enable 2FA, log in with it and disable 2FA', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				twofactor_secret: twofactor.ascii

@@ -20,7 +20,9 @@ export function twofactorDisableTest() {
 			password: 'string'
 		}, {});
 		it('can disable 2FA when given a valid 2FA token', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
@@ -115,7 +117,9 @@ export function twofactorDisableTest() {
 			}).message, 'state unchanged (was already set)', 'state is unchanged');
 		});
 		it('fails if an invalid token is passed', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
@@ -151,7 +155,9 @@ export function twofactorDisableTest() {
 			assert.strictEqual(response.ERR, API_ERRS.INVALID_CREDENTIALS, 'got invalid credentials error');
 		});
 		it('fails if password is wrong', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
@@ -180,7 +186,9 @@ export function twofactorDisableTest() {
 			});
 		});
 		it('fails if instance id wrong', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,

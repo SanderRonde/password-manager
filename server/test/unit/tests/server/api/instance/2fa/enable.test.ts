@@ -76,7 +76,9 @@ export function twofactorEnableTest() {
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: false,
-				twofactor_secret: speakeasy.generateSecret().ascii
+				twofactor_secret: speakeasy.generateSecret({
+					length: 64
+				}).ascii
 			});
 			const server = await createServer(config);
 			const { 
@@ -136,7 +138,9 @@ export function twofactorEnableTest() {
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
-				twofactor_secret: speakeasy.generateSecret().ascii
+				twofactor_secret: speakeasy.generateSecret({
+					length: 64
+				}).ascii
 			});
 			const server = await createServer(config);
 			const { 
