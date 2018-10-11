@@ -316,18 +316,18 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 		</div>
 	</div>
 	<div id="passwordButtons">
-		<paper-button aria-label="Delete password" 
-			color="white"
-			background="${theme.error}"
-			ripple-color="white"
-			custom-css="${deleteButtonCustomCSS}"
-			wc-click="${inlineListener(this.onDelete, this)}"
-		>
-			<div id="deleteButtonIcon">
-				${Delete}
-			</div>
-		</paper-button>
 		${props.editing ? html`
+			<paper-button aria-label="Delete password" 
+				color="white"
+				background="${theme.error}"
+				ripple-color="white"
+				custom-css="${deleteButtonCustomCSS}"
+				wc-click="${inlineListener(this.onDelete, this)}"
+			>
+				<div id="deleteButtonIcon">
+					${Delete}
+				</div>
+			</paper-button>
 			<paper-button aria-label="Discard changes" color="${theme.error}"
 				border border-color="${theme.error}" flat
 				ripple-color="${theme.error}"
