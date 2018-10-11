@@ -59,7 +59,6 @@ function rewriteEsModuleImports(file: string): string {
 		.replace(/import (.*) from ['"]js-sha512['"]/g, 'import $1 from \'/modules/js-sha512\'')
 		.replace(/import (.*) from ['"]aes-js['"]/g, 'import $1 from \'/modules/aes-js\'')
 		.replace(/import (.*) from ['"]tslib['"]/g, 'import $1 from \'/modules/tslib\'')
-		.replace(/import (.*) from ['"]speakeasy['"]/g, 'import $1 from \'/modules/speakeasy\'')
 		.replace(/import (.*) from ['"]u2f-api['"]/g, 'import $1 from \'/modules/u2f-api\'')
 		.replace(/import (.*) from ['"]lit-html['"]/g, 'import $1 from \'/modules/lit-html\'')
 		.replace(/import (.*) from ['"]lit-html\/lib\/lit-extended['"]/g, 'import $1 from \'/modules/lit-html/lib/lit-extended\'');
@@ -170,20 +169,6 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 		res.write(`${result};
 		const { ErrorCodes, ErrorNames, isSupported, ensureSupport, register, sign } = _u2fApi;
 		export { ErrorCodes, ErrorNames, isSupported, ensureSupport, register, sign }`);
-		res.end();
-	});
-	webserver.app.all([
-		'/modules/speakeasy',
-		'/modules/speakeasy.js',
-		'/modules/speakeasy/speakeasy.js'
-	], async (_req, res) => {
-		const result = await getWebpackPacked('speakEasy',
-			path.join(PROJECT_ROOT, 'node_modules/speakeasy/index.js'));
-		res.contentType('.js');
-		res.write(`${result};
-		const { digest, hotp, counter, totp, time, generateSecret, generateSecretASCII, otpauthURL } = _speakEasy;
-		export { digest, hotp, counter, totp, time, generateSecret, generateSecretASCII, otpauthURL }`
-			.replace('this.hotp', 'exports.hotp'));
 		res.end();
 	});
 	webserver.app.all([
