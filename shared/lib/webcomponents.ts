@@ -1,6 +1,6 @@
 import { GlobalController } from '../components/entrypoints/base/global/global-controller';
+import { ComponentIs, WebComponentConfiguration, refPrefix } from './webcomponent-util';
 import { GlobalProperties, Theme, DEFAULT_THEME } from '../types/shared-types';
-import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
 import { TemplateResult, render, html } from 'lit-html';
 import { theme } from '../components/theming/theme/theme';
 import { removeAllElementListeners } from './listeners';
@@ -606,18 +606,17 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 
 type ComplexValue = TemplateFn|Function|Object;
 export abstract class WebComponentComplexValueManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
-	public static readonly refPrefix = '___complex_ref';
 	private __reffed: ComplexValue[] = [];
 
 	private __genRef(value: ComplexValue) {
 		if (this.__reffed.indexOf(value) !== -1) {
-			return `${WebComponentComplexValueManager.refPrefix}${
+			return `${refPrefix}${
 				this.__reffed.indexOf(value)}`;
 		}
 
 		this.__reffed.push(value);
 		const refIndex = this.__reffed.length - 1;
-		return `${WebComponentComplexValueManager.refPrefix}${refIndex}`;
+		return `${refPrefix}${refIndex}`;
 	}
 
 	private static _isDirective(value: any) {
@@ -650,7 +649,7 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 		if (typeof ref !== 'string') {
 			return undefined;
 		}
-		const refNumber = ~~ref.split(WebComponentComplexValueManager.refPrefix)[1];
+		const refNumber = ~~ref.split(refPrefix)[1];
 		return this.__reffed[refNumber];
 	}
 

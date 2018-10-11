@@ -1,5 +1,5 @@
-import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TYPE, WebComponentComplexValueManager } from './webcomponents';
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './listeners';
+import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TYPE } from './webcomponents';
 import { directive, AttributePart, DirectiveFn, TemplateResult, html } from 'lit-html';
 import { supportsPassive, isNewElement, listenWithIdentifier } from "./listeners";
 import { PaperToast } from '../components/util/paper-toast/paper-toast';
@@ -42,6 +42,7 @@ export function classNames(...args: ClassNamesArg[]) {
 	return classes.join(' ');
 }
 
+export const refPrefix = '___complex_ref';
 export function multiFunctions(...fns: Function[]) {
 	return (...args: any[]) => {
 		fns.forEach((fn) => {
@@ -92,7 +93,7 @@ function getterWithVal<R>(component: {
 			if (type === 'number') {
 				return ~~value;
 			} else if (type === complex) {
-				if (value.startsWith(WebComponentComplexValueManager.refPrefix)) {
+				if (value.startsWith(refPrefix)) {
 					return component.getParentRef(value);
 				} else {
 					return JSON.parse(decodeURIComponent(value));
