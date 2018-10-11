@@ -34,7 +34,7 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	layoutMounted() {
 		if (!this.getRoot().getAttribute('prop_theme')) {
 			//This is a non-server-served page
-			const currentTheme = this.__globalProperties.theme;
+			const currentTheme = this.getGlobalProperty('theme');
 			const cookieTheme = getCookie('theme');
 			if (cookieTheme && cookieTheme !== currentTheme) {
 				this.setGlobalProperty('theme', cookieTheme as VALID_THEMES_T);
@@ -72,20 +72,20 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	}
 
 	async getData(): Promise<LoginData|null> {
-		if (this.__globalProperties.page !== 'login') {
+		if (this.getGlobalProperty('page') !== 'login') {
 			throw new Error('Failed to get login data');
 		}
 
-		if (!this.__globalProperties.comm_token ||
-			!this.__globalProperties.server_public_key) {
+		if (!this.getGlobalProperty('comm_token') ||
+			!this.getGlobalProperty('server_public_key')) {
 			await this._fetchData().catch(() => {});
-			if (!this.__globalProperties.comm_token ||
-				!this.__globalProperties.server_public_key) {
+			if (!this.getGlobalProperty('comm_token') ||
+				!this.getGlobalProperty('server_public_key')) {
 					return null;
 				}
 		}
 
-		return this.__globalProperties as LoginData;
+		return this.globalProperties as LoginData;
 	}
 
 	abstract onLogin(): void;

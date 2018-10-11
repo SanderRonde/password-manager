@@ -418,6 +418,10 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		return props;
 	}
 
+	public get globalProperties() {
+		return this.__globalProperties;
+	}
+
 	connectedCallback() {
 		this.__isRoot = this.hasAttribute('_root');
 		this.__globalProperties = {...{

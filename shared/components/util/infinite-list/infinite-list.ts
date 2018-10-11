@@ -741,10 +741,10 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 	async mounted() {
 		this._genTemplateGetter();
 		this._render(true);
-		this.__disposables.push(
+		this.disposables.push(
 			createDisposableWindowListener('resize', this._onWindowResize));
 		if (this.props.window) {
-			this.__disposables.push(
+			this.disposables.push(
 				createDisposableWindowListener('scroll', () => {
 					requestAnimationFrame(() => {
 						this._render(false);
