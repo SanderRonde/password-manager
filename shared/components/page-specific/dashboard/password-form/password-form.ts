@@ -1,6 +1,7 @@
 import { defineProps, ComplexType, findElementInPath, PROP_TYPE, wait, createCancellableTimeout, config } from '../../../../lib/webcomponent-util';
 import { passwordDetailDataStore, passwordDetailDataSymbol } from '../password-detail/password-detail.html';
 import { PasswordDetail, PasswordDetailChanges, ToBools } from '../password-detail/password-detail';
+import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
 import { MaterialCheckbox } from '../../../util/material-checkbox/material-checkbox';
 import { MetaPasswords } from '../../../entrypoints/base/dashboard/dashboard';
 import { MaterialInput } from '../../../util/material-input/material-input';
@@ -21,7 +22,8 @@ import { totp } from 'speakeasy';
 	dependencies: [
 		MaterialCheckbox,
 		MoreInfo,
-		IconButton
+		IconButton,
+		FloatingActionButton
 	]
 })
 export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {

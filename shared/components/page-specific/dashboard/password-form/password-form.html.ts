@@ -9,6 +9,7 @@ import { Delete } from '../../../icons/delete/delete';
 import { Cross } from '../../../icons/cross/cross';
 import { Link } from '../../../icons/link/link';
 import { Copy } from '../../../icons/copy/copy';
+import { Edit } from '../../../icons/edit/edit';
 import { PasswordForm } from './password-form';
 import { html } from 'lit-html';
 
@@ -342,17 +343,11 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 				Save changes
 			</animated-button>
 		` : html`
-			<paper-button aria-label="Edit" 
-				color="white"
-				background="${theme.error}"
-				ripple-color="white"
-				custom-css="${deleteButtonCustomCSS}"
+			<floating-action-button aria-label="Edit" 
 				wc-click="${inlineListener(this.onDelete, this)}"
 			>
-				<div id="deleteButtonIcon">
-					${Delete}
-				</div>
-			</paper-button>
+				${Edit}
+			</floating-action-button>
 		`}
 	</div>`;
 }, CHANGE_TYPE.ALWAYS);
