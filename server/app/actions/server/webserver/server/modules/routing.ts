@@ -114,7 +114,6 @@ export class WebserverRouter {
 		}
 		return speakeasy.totp.verify({
 			secret: secret,
-			encoding: 'base32',
 			token: key,
 			window: 6
 		});
