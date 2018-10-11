@@ -13,7 +13,7 @@ import { PasswordFormIDMap } from './password-form-querymap';
 import { bindToClass } from '../../../../lib/decorators';
 import { PasswordFormHTML } from './password-form.html';
 import { PasswordFormCSS } from './password-form.css';
-import { totp } from 'speakeasy';
+import { totp } from '../../../../lib/browser-crypto';
 
 @config({
 	is: 'password-form',
@@ -74,16 +74,15 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 	private _shouldRefresh2FA: boolean = true;
 
 	@bindToClass
-	private _refresh2FA() {		
+	private async _refresh2FA() {		
 		const secretContainer = passwordDetailDataStore[passwordDetailDataSymbol];
 		if (!secretContainer) return;
 		const secret = secretContainer.twofactor_secret;
 		if (!this._shouldRefresh2FA || !secret) {
 			return;
 		}
-		this.$.twofactorToken.set(totp({
+		this.$.twofactorToken.set(await totp({
 			secret: secret!,
-			encoding: 'base32',
 			step: PasswordForm.TWOFACTOR_TIME_STEP
 		}));
 	}
