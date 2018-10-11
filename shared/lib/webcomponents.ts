@@ -32,9 +32,26 @@ abstract class WebComponentDefiner extends elementBase {
 	 */
 	protected static is: ComponentIs;
 	/**
-	 * Any hooks that should be called after the constructor
+	 * Any internal properties that are only used by the framework
 	 */
-	protected __connectedHooks = [] as (() => void)[];
+	protected __internals: {
+		/**
+		 * Any hooks that should be called after the constructor
+		 */
+		connectedHooks: (() => void)[];
+		/**
+		 * Any hooks that should be called after rendering
+		 */
+		postRenderHooks: (() => void)[];
+		/**
+		 * Global properties
+		 */
+		globalProperties: GlobalProperties;
+	} = {
+		connectedHooks: [],
+		postRenderHooks: [],
+		globalProperties: undefined as any
+	};
 	/**
 	 * All defined webcomponents
 	 */
@@ -44,7 +61,7 @@ abstract class WebComponentDefiner extends elementBase {
 		super();
 
 		const isConnected = new Promise<void>((resolve) => {
-			this.__connectedHooks.push(() => {
+			this.__internals.connectedHooks.push(() => {
 				resolve();
 			});
 		});
@@ -269,10 +286,6 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	protected root = this.attachShadow({
 		mode: 'open'
 	});
-	/**
-	 * Any hooks that should be called after rendering
-	 */
-	protected __postRenderHooks = [] as (() => void)[];
 	
 	/**
 	 * The properties of this component
@@ -287,7 +300,7 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	}
 
 	private __doPostRenderLifecycle() {
-		this.__postRenderHooks.forEach(fn => fn());
+		this.__internals.postRenderHooks.forEach(fn => fn());
 		if (this.__firstRender) {
 			this.__firstRender = false;
 			this.firstRender();
@@ -394,7 +407,6 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 	private __children: Set<WebComponentHierarchyManager<any>> = new Set();
 	private __parent: WebComponentHierarchyManager<any>|null = null;
 	private __isRoot!: boolean;
-	protected __globalProperties!: GlobalProperties;
 
 	protected __getParent<T extends WebComponentHierarchyManager<any>>(): T|null {
 		return this.__parent as T;
@@ -419,12 +431,12 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 	}
 
 	public get globalProperties() {
-		return this.__globalProperties;
+		return this.__internals.globalProperties;
 	}
 
 	connectedCallback() {
 		this.__isRoot = this.hasAttribute('_root');
-		this.__globalProperties = {...{
+		this.__internals.globalProperties = {...{
 			theme: 'light',
 			isWeb: (location.protocol === 'http:' || location.protocol === 'https:') ?
 				'true' : 'false'
@@ -519,13 +531,13 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 	public registerChild(element: WebComponentHierarchyManager<any>): GlobalProperties {
 		this.__clearNonExistentChildren();
 		this.__children.add(element);
-		return this.__globalProperties;
+		return this.__internals.globalProperties;
 	}
 
 	private __setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
 		value: V) {
-			if (this.__globalProperties[key] !== value) {
-				this.__globalProperties[key] = value;
+			if (this.__internals.globalProperties[key] !== value) {
+				this.__internals.globalProperties[key] = value;
 				this.fire('globalPropChange', key, value);
 			}
 		}
@@ -551,10 +563,10 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		}
 
 	public getGlobalProperty<P extends keyof GlobalProperties>(key: P): GlobalProperties[P]|undefined {
-		if (!this.__globalProperties) {
+		if (!this.__internals.globalProperties) {
 			return undefined;
 		}
-		return this.__globalProperties[key] as any;
+		return this.__internals.globalProperties[key] as any;
 	}
 
 	public setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
@@ -599,7 +611,7 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 	}
 
 	public getThemeName() {
-		return (this.__globalProperties && this.__globalProperties.theme) 
+		return (this.__internals.globalProperties && this.__internals.globalProperties.theme) 
 			|| defaultTheme;
 	}
 
@@ -729,12 +741,12 @@ export abstract class WebComponent<IDS extends {
 	 * 	cleared upon render
 	 */
 	private __idMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
-	protected __disposables: (() => void)[] = [];
+	protected disposables: (() => void)[] = [];
 	public isMounted: boolean = false;
 
 	constructor() {
 		super();
-		this.__postRenderHooks.push(this.__clearMap);
+		this.__internals.postRenderHooks.push(this.__clearMap);
 	}
 
 	@bindToClass
@@ -788,7 +800,7 @@ export abstract class WebComponent<IDS extends {
 		this.renderToDOM(CHANGE_TYPE.ALWAYS);
 		this.layoutMounted();
 
-		this.__connectedHooks.filter(fn => fn());
+		this.__internals.connectedHooks.filter(fn => fn());
 	}
 
 	/**
@@ -796,8 +808,8 @@ export abstract class WebComponent<IDS extends {
 	 */
 	disconnectedCallback() {
 		removeAllElementListeners(this);
-		this.__disposables.forEach(disposable => disposable());
-		this.__disposables = [];
+		this.disposables.forEach(disposable => disposable());
+		this.disposables = [];
 		this.isMounted = false;
 	}
 
