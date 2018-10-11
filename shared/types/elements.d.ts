@@ -1,4 +1,5 @@
 import { PasswordPreview } from "../components/page-specific/dashboard/password-preview/password-preview";
+import { FloatingActionButton } from "../components/util/floating-action-button/floating-action-button";
 import { PasswordDetail } from "../components/page-specific/dashboard/password-detail/password-detail";
 import { PasswordForm } from "../components/page-specific/dashboard/password-form/password-form";
 import { HorizontalCenterer } from "../components/util/horizontal-centerer/horizontal-centerer";
@@ -41,6 +42,7 @@ declare global {
 	type HTMLMaterialCheckboxElement = MaterialCheckbox;
 	type HTMLInfiniteListElement = InfiniteList<any, any, any>;
 	type HTMLHorizontalCentererElement = HorizontalCenterer;
+	type HTMLFloatingActionButtonElement = FloatingActionButton;
 
 	type HTMLPathElement = any;
 
@@ -84,5 +86,7 @@ declare global {
 		name: 'more-info'
 	}|PasswordForm & {
 		name: 'password-form'
+	}|FloatingActionButton & {
+		name: 'floating-action-button'
 	}
 }
