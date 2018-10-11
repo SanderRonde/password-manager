@@ -484,11 +484,11 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		if (!clientPrivateKey && !document.body.classList.contains('dev')) {
 			PaperToast.createHidable(
 				'Failed to set up public and/or private key with server' + 
-					(this._globalProperties.isWeb === 'true' ? 
+					(this.__globalProperties.isWeb === 'true' ? 
 						', redirecting to login page...' :
 						', please delete this instance and create a new instance to fix it'),
 				PaperToast.DURATION.LONG);
-			if (this._globalProperties.isWeb === 'true') {
+			if (this.__globalProperties.isWeb === 'true') {
 				this.getRoot().changePage(ENTRYPOINT.LOGIN);
 			}
 			this._showFailedView(this._signU2F);
@@ -608,11 +608,11 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		if (!clientPrivateKey && !document.body.classList.contains('dev')) {
 			PaperToast.createHidable(
 				'Failed to set up public and/or private key with server' + 
-					(this._globalProperties.isWeb === 'true' ? 
+					(this.__globalProperties.isWeb === 'true' ? 
 						', redirecting to login page...' :
 						', please delete this instance and create a new instance to fix it'),
 				PaperToast.DURATION.LONG);
-			if (this._globalProperties.isWeb === 'true') {
+			if (this.__globalProperties.isWeb === 'true') {
 				this.getRoot().changePage(ENTRYPOINT.LOGIN);
 			}
 			this._showFailedView(this._getPasswordDetails);

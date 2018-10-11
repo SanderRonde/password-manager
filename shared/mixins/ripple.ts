@@ -79,7 +79,7 @@ export interface RippleEffect {
 export function rippleEffect(target: ExtendableComponent): any {
 	return class Rippled extends target implements RippleEffect {
 		protected css!: TemplateFn;
-		protected _hasCustomCSS!: () => boolean;
+		protected __hasCustomCSS!: () => boolean;
 		protected customCSS!: () => TemplateFn;
 		protected renderer!: TemplateFn;
 		private _rippleElement!: HTMLElement|null;

@@ -78,9 +78,9 @@ export class DashboardWeb extends Dashboard {
 
 		this.renderToDOM(CHANGE_TYPE.PROP);
 
-		if (this._globalProperties.password_meta) {
+		if (this.__globalProperties.password_meta) {
 			const decrypted = decryptWithPrivateKey(
-				this._globalProperties.password_meta,
+				this.__globalProperties.password_meta,
 				this._data.private_key);
 			if (decrypted === ERRS.INVALID_DECRYPT) {
 				this._failNoCredentials('Failed to decrypt data');
