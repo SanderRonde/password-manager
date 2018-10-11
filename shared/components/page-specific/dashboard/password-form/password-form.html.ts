@@ -75,6 +75,39 @@ const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => 
 	</style>`;
 }, CHANGE_TYPE.THEME);
 
+const twofactorTokenCustomCSS = new TemplateFn<MaterialInput>((_, theme) => {
+	return html`<style>
+		@keyframes animate-line {
+			0%  {
+				width: 0;
+			}
+			100%: {
+				width: 100%;
+			}
+		}
+
+		.mdl-textfield__label:after {
+			bottom: 20px;
+			content: "";
+			height: 2px;
+			left: 45%;
+			position: absolute;
+			transition-duration: 0.2s;
+			transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+			visibility: visible;
+			left: 0;
+			width: 0;
+			-webkit-animation: animate-line 30s linear 0s infinite;
+			-moz-animation: animate-line 30s linear 0s infinite;
+			-o-animation: animate-line 30s linear 0s infinite;
+			animation: animate-line 30s linear 0s infinite;
+			animation: animate-line 30s linear 0s infinite;
+			width: 100%;
+			background-color: ${theme.accent.main};
+		}
+	</style>`;
+}, CHANGE_TYPE.THEME);
+
 const deleteButtonCustomCSS = new TemplateFn<PasswordForm>(() => {
 	return html`<style>
 		#button {
@@ -83,6 +116,13 @@ const deleteButtonCustomCSS = new TemplateFn<PasswordForm>(() => {
 	</style>`;
 }, CHANGE_TYPE.NEVER);
 
+function getString(base: unknown, fallback: string): string {
+	if (typeof base === 'string') {
+		return base;
+	}
+	return fallback;
+}
+
 export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, theme, html) {
 	return html`
 	<div id="passwordCredentials">
@@ -90,7 +130,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 			type="text" title="Account username"
 			autoComplete="off" fill label="username"
 			readonly="${!props.editing}"
-			value="${(props.selectedDisplayed && props.selectedDisplayed.username) || '?'}"
+			value="${getString(props.selectedDisplayed && props.selectedDisplayed.username, '')}"
 		>
 			<div slot="postIcon">
 				<icon-button tabIndex="-1" class="copy"
@@ -108,12 +148,15 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 			</div>
 		</material-input>
 		<material-input id="passwordPassword" name="password"
+			class="${classNames({
+				'hidden': !passwordDetailDataStore[passwordDetailDataSymbol] ||
+					!passwordDetailDataStore[passwordDetailDataSymbol]!.password
+			})}"
 			type="${props.passwordVisible ? 'text' : 'password'}" title="Account password"
 			autoComplete="off" fill label="password"
 			readonly="${!props.editing}"
-			value="${passwordDetailDataStore[passwordDetailDataSymbol] ?
-				passwordDetailDataStore[passwordDetailDataSymbol]!.password : 
-					'password'}"
+			value="${getString(passwordDetailDataStore[passwordDetailDataSymbol] &&
+				passwordDetailDataStore[passwordDetailDataSymbol]!.password, '')}"
 		>
 			<div slot="postIcon">
 				<icon-button tabIndex="-1"
@@ -137,6 +180,22 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 				</icon-button>
 			</div>
 		</material-input>
+		<material-input id="twofactorToken"
+			type="text" title="${props.editing ? '2FA Secret (base32)' : '2FA Token'}"
+			autoComplete="off" fill label="${props.editing ? '2FA Secret (base32)' : '2FA Token'}"
+			class="${classNames({
+				'hidden': !passwordDetailDataStore[passwordDetailDataSymbol] ||
+					!passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret
+			})}"
+			custom-css="${twofactorTokenCustomCSS}"
+			readonly="${!props.editing}"
+		></material-input>
+		<div id="removeTwofactorToken" class="${classNames({
+				'hidden': !props.editing || !(!passwordDetailDataStore[passwordDetailDataSymbol] ||
+					!passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret)
+		})}">
+			<!-- TODO: remove 2FA token button -->
+		</div>
 	</div>
 	<div id="passwordWebsites">
 		${mapArr((props.visibleWebsites || []).map((website, index, arr) => {

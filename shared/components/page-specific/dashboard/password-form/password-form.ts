@@ -12,6 +12,7 @@ import { PasswordFormIDMap } from './password-form-querymap';
 import { bindToClass } from '../../../../lib/decorators';
 import { PasswordFormHTML } from './password-form.html';
 import { PasswordFormCSS } from './password-form.css';
+import { totp } from 'speakeasy';
 
 @config({
 	is: 'password-form',
@@ -44,11 +45,47 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 
 	constructor() {
 		super();
-		this.listen('propChange', (name) => {
+		this.listen('propChange', (name, _from, to) => {
 			if (name === 'editing') {
 				this._sizeChange();
+
+				if (to) {
+					//Now editing
+					if (passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret) {
+						this.$.twofactorToken.set(passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret!);
+					}
+					this._shouldRefresh2FA = true;
+				} else {
+					//Exiting edit mode
+					this._shouldRefresh2FA = false;
+				}
 			}
 		});
+
+		const timeStepMS = PasswordForm.TWOFACTOR_TIME_STEP * 1000;
+		window.setTimeout(() => {
+			window.setInterval(this._refresh2FA, timeStepMS);
+		}, timeStepMS - (Date.now() % timeStepMS));
+	}
+
+	private static readonly TWOFACTOR_TIME_STEP = 30; //Seconds
+	private _shouldRefresh2FA: boolean = true;
+
+	@bindToClass
+	private _refresh2FA() {		
+		const secret = passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret;
+		if (!this._shouldRefresh2FA || !secret) {
+			return;
+		}
+		this.$.twofactorToken.set(totp({
+			secret: secret!,
+			encoding: 'base32',
+			step: PasswordForm.TWOFACTOR_TIME_STEP
+		}));
+	}
+
+	private _force2FATokenGeneration() {
+		this._refresh2FA();
 	}
 
 	public refresh() {
@@ -276,6 +313,7 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 		if (item && item.websites) {
 			this.props.visibleWebsites = item.websites;
 		}
+		this._force2FATokenGeneration();
 	}
 
 	@bindToClass
