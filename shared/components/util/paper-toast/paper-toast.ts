@@ -46,7 +46,14 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 		}	
 	});
 
+	private static _showListeners: ((type: 'show'|'hide') => void)[] = [];
+	static listen(listener: (type: 'show'|'hide') => void) {
+		this._showListeners.push(listener);
+	}
+
 	show() {
+		PaperToast._showListeners.forEach(listener => listener('show'));
+
 		this.classList.add('show');
 		if (this.props.duration === Infinity) {
 			return;
@@ -57,6 +64,8 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 	}
 
 	async hide() {
+		PaperToast._showListeners.forEach(listener => listener('hide'));
+
 		this.classList.remove('show');
 		this.fire('hide');
 		await wait(300);
