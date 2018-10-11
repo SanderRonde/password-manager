@@ -238,7 +238,8 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}
 	}
 
-	public async deletePassword(_password: MetaPasswords[0]) {
+	public async deletePassword(password: MetaPasswords[0]|null) {
+		if (!password) return;
 		//TODO: confirm deletion
 		//TODO: actually delete
 	}
@@ -357,6 +358,11 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		this._cancelCurrentAnimation = null;
 	}
 
+	private _deselect() {
+		this.$.passwordForm.setSelected(null);
+		passwordDetailDataStore[passwordDetailDataSymbol] = null;
+	}
+
 	private async _selectedChange(oldValue: MetaPasswords[0]|null, newValue: MetaPasswords[0]|null) {
 		if (oldValue && newValue && oldValue.id === newValue.id) {
 			//Just a list update, nothing to change
@@ -377,9 +383,10 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 
 			this._getPasswordDetails(newValue);
 		} else if (oldValue !== null) {
+			this._deselect();
 			await this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
 		} else {
-			this.$.passwordForm.setSelected(this.props.selected);
+			this._deselect();
 		}
 	}
 

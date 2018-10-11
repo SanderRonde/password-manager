@@ -35,7 +35,7 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 			},
 			parent: ComplexType<PasswordDetail>(),
 			passwordVisible: PROP_TYPE.BOOL,
-			selectedDisplayed: ComplexType<MetaPasswords[0]>()
+			selectedDisplayed: ComplexType<MetaPasswords[0]|null>()
 		},
 		reflect: {
 			editing: {
@@ -181,7 +181,7 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 		}
 	}
 
-	public getSelectedViewSize(password: MetaPasswords[0],
+	public getSelectedViewSize(password: MetaPasswords[0]|null,
 		websites: MetaPasswords[0]['websites'] = (password && password.websites) || []) {
 			if (this.props.editing) {
 				//Height without websites: 513
@@ -277,18 +277,18 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 
 	private _getChanged(newPassword: PasswordDetailChanges): ToBools<PasswordDetailChanges> {
 		let websitesChanged: boolean = false;
-		if (this.props.selectedDisplayed.websites.length !== newPassword.websites.length) {
+		if (this.props.selectedDisplayed!.websites.length !== newPassword.websites.length) {
 			websitesChanged = true;
 		}
-		for (let i = 0; i < this.props.selectedDisplayed.websites.length; i++) {
+		for (let i = 0; i < this.props.selectedDisplayed!.websites.length; i++) {
 			if (!PasswordForm._areSame(
-				this.props.selectedDisplayed.websites[i].exact,
+				this.props.selectedDisplayed!.websites[i].exact,
 				newPassword.websites[i].url)) {
 					websitesChanged = true;
 				}
 		}
 		return {
-			username: !PasswordForm._areSame(this.props.selectedDisplayed.username,
+			username: !PasswordForm._areSame(this.props.selectedDisplayed!.username,
 				newPassword.username),
 			twofactor_secret: !PasswordForm._areSame(newPassword.twofactor_secret,
 				passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret),
@@ -296,8 +296,8 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 				passwordDetailDataStore[passwordDetailDataSymbol]!.password),
 			notes: !PasswordForm._areSame(newPassword.notes.join('\n'),
 				passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n')),
-			twofactor_enabled: this.props.selectedDisplayed.twofactor_enabled !== newPassword.twofactor_enabled,
-			u2f_enabled: this.props.selectedDisplayed.u2f_enabled !== newPassword.u2f_enabled,
+			twofactor_enabled: this.props.selectedDisplayed!.twofactor_enabled !== newPassword.twofactor_enabled,
+			u2f_enabled: this.props.selectedDisplayed!.u2f_enabled !== newPassword.u2f_enabled,
 			websites: websitesChanged
 		};
 	}
@@ -311,7 +311,7 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 			changed.websites;
 	}
 
-	public setSelected(item: MetaPasswords[0]) {
+	public setSelected(item: MetaPasswords[0]|null) {
 		this.refresh();
 		this.props.selectedDisplayed = item;
 		if (item && item.websites) {
