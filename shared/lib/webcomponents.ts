@@ -1,8 +1,8 @@
 import { GlobalController } from '../components/entrypoints/base/global/global-controller';
-import { ComponentIs, WebComponentConfiguration, refPrefix } from './webcomponent-util';
+import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
 import { GlobalProperties, Theme, DEFAULT_THEME } from '../types/shared-types';
-import { TemplateResult, render, html } from 'lit-html';
 import { theme } from '../components/theming/theme/theme';
+import { TemplateResult, render, html } from 'lit-html';
 import { removeAllElementListeners } from './listeners';
 import { bindToClass } from './decorators';
 
@@ -620,6 +620,7 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 	}
 }
 
+export const refPrefix = '___complex_ref';
 type ComplexValue = TemplateFn|Function|Object;
 export abstract class WebComponentComplexValueManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
 	private __reffed: ComplexValue[] = [];
