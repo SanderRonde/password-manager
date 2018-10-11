@@ -73,7 +73,9 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 
 	@bindToClass
 	private _refresh2FA() {		
-		const secret = passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret;
+		const secretContainer = passwordDetailDataStore[passwordDetailDataSymbol];
+		if (!secretContainer) return;
+		const secret = secretContainer.twofactor_secret;
 		if (!this._shouldRefresh2FA || !secret) {
 			return;
 		}
