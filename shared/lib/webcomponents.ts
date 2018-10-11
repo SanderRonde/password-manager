@@ -57,7 +57,6 @@ abstract class WebComponentDefiner extends elementBase {
 		component: WebComponent<any, any>;
 		constructed: Promise<void>;
 	}[] = [];
-	protected __definer = WebComponentDefiner;
 	protected static async __listenForFinished(component: WebComponent<any, any>, isConstructed: Promise<void>) {
 		if (this.__finished) {
 			await isConstructed;
