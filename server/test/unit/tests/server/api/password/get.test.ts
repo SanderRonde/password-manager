@@ -92,7 +92,7 @@ export function passwordGetTest() {
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: secret.base32
+				twofactor_secret: secret.ascii
 			});
 			const server = await createServer(config);
 			const { http, uri, server_public_key } = config;
@@ -135,7 +135,7 @@ export function passwordGetTest() {
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: secret.base32
+				twofactor_secret: secret.ascii
 			});
 			const server = await createServer(config);
 			const { http, uri, server_public_key, instance_private_key, userpw } = config;
@@ -166,8 +166,7 @@ export function passwordGetTest() {
 				count: count++,
 				password_id: passwordId!,
 				twofactor_token: speakeasy.totp({
-					secret: secret.base32,
-					encoding: 'base32'
+					secret: secret.ascii
 				})
 			}));
 
@@ -208,7 +207,7 @@ export function passwordGetTest() {
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: secret.base32
+				twofactor_secret: secret.ascii
 			});
 			const server = await createServer(config);
 			const { http, uri, server_public_key } = config;
@@ -245,7 +244,7 @@ export function passwordGetTest() {
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: secret.base32
+				twofactor_secret: secret.ascii
 			});
 			const server = await createServer(config);
 			const { http, uri, server_public_key } = config;
@@ -283,7 +282,7 @@ export function passwordGetTest() {
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: secret.base32
+				twofactor_secret: secret.ascii
 			});
 			const server = await createServer(config);
 			const { http, uri, server_public_key } = config;

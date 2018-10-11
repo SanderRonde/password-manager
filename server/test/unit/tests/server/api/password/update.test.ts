@@ -143,12 +143,12 @@ export function passwordUpdateTest() {
 						'decrypted username is the same');
 		});
 		it('fails if it requires 2FA and no 2FA token is passed', async () => {
-			const { base32 } = speakeasy.generateSecret({
+			const { ascii } = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: base32
+				twofactor_secret: ascii
 			});
 			const server = await createServer(config);
 			const { http, uri, server_public_key, userpw } = config;
@@ -206,12 +206,12 @@ export function passwordUpdateTest() {
 			assert.strictEqual(response.ERR, API_ERRS.MISSING_PARAMS, 'failed with missing parameters');
 		});
 		it('password can be updated if 2FA is enabled', async () => {
-			const { base32 } = speakeasy.generateSecret({
+			const { ascii } = speakeasy.generateSecret({
 				name: 'Password manager server'
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: base32
+				twofactor_secret: ascii
 			});
 			const server = await createServer(config);
 			const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
@@ -258,8 +258,7 @@ export function passwordUpdateTest() {
 				twofactor_enabled: expected2FAEnabled,
 				u2f_enabled: expectedU2FEnabled,
 				twofactor_token: speakeasy.totp({
-					secret: base32,
-					encoding: 'base32'
+					secret: ascii
 				}),
 				encrypted: expectedEncrypted
 			}));

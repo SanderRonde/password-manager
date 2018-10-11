@@ -57,7 +57,7 @@ export function u2fDisableTest() {
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
-				twofactor_secret: twofactor.base32
+				twofactor_secret: twofactor.ascii
 			});
 			const server = await createServer(config);
 			const { http, userpw, uri, instance_id, server_public_key } = config;
@@ -73,8 +73,7 @@ export function u2fDisableTest() {
 					instance_id: instance_id.toHexString(),
 					email: DEFAULT_EMAIL,
 					twofactor_token: speakeasy.totp({
-						secret: twofactor.base32,
-						encoding: 'base32',
+						secret: twofactor.ascii,
 						time: Date.now() - (60 * 60)
 					})
 				},
@@ -87,7 +86,7 @@ export function u2fDisableTest() {
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
-				twofactor_secret: twofactor.base32
+				twofactor_secret: twofactor.ascii
 			});
 			const server = await createServer(config);
 			const { http, userpw, uri, server_public_key } = config;
@@ -103,8 +102,7 @@ export function u2fDisableTest() {
 					instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
 					email: DEFAULT_EMAIL,
 					twofactor_token: speakeasy.totp({
-						secret: twofactor.base32,
-						encoding: 'base32',
+						secret: twofactor.ascii,
 						time: Date.now() - (60 * 60)
 					})
 				},

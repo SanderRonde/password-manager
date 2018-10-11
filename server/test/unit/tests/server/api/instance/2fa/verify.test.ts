@@ -46,7 +46,7 @@ export function twofactorVerifyTest() {
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
-				twofactor_secret: twofactor.base32
+				twofactor_secret: twofactor.ascii
 			});
 			const server = await createServer(config);
 			const { 
@@ -59,8 +59,7 @@ export function twofactorVerifyTest() {
 			const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/2fa/verify', {
 				instance_id: instance_id.toHexString(),
 				twofactor_token: speakeasy.totp({
-					secret: twofactor.base32,
-					encoding: 'base32',
+					secret: twofactor.ascii,
 					time: Date.now() - (60 * 60)
 				}),
 				pw_verification_token: 'sometoken'
@@ -77,7 +76,7 @@ export function twofactorVerifyTest() {
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
-				twofactor_secret: twofactor.base32
+				twofactor_secret: twofactor.ascii
 			});
 			const server = await createServer(config);
 			const { 
@@ -90,8 +89,7 @@ export function twofactorVerifyTest() {
 			const response = JSON.parse(await doServerAPIRequest({ port: http }, '/api/instance/2fa/verify', {
 				instance_id: instance_id.toHexString(),
 				twofactor_token: speakeasy.totp({
-					secret: twofactor.base32,
-					encoding: 'base32'
+					secret: twofactor.ascii,
 				}),
 				pw_verification_token: 'sometoken'
 			}));
@@ -107,7 +105,7 @@ export function twofactorVerifyTest() {
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
-				twofactor_secret: twofactor.base32
+				twofactor_secret: twofactor.ascii
 			});
 			const server = await createServer(config);
 			const { http, uri, server_public_key } = config;
@@ -120,8 +118,7 @@ export function twofactorVerifyTest() {
 				unencrypted: {
 					instance_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedInstance>,
 					twofactor_token: speakeasy.totp({
-						secret: twofactor.base32,
-						encoding: 'base32'
+						secret: twofactor.ascii,
 					}),
 					pw_verification_token: 'sometoken'
 				},

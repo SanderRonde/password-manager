@@ -182,8 +182,8 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, th
 			</div>
 		</material-input>
 		<material-input id="twofactorToken"
-			type="text" title="${props.editing ? '2FA Secret (base32)' : '2FA Token'}"
-			autoComplete="off" fill label="${props.editing ? '2FA Secret (base32)' : '2FA Token'}"
+			type="text" title="${props.editing ? '2FA Secret' : '2FA Token'}"
+			autoComplete="off" fill label="${props.editing ? '2FA Secret' : '2FA Token'}"
 			class="${classNames({
 				'hidden': !passwordDetailDataStore[passwordDetailDataSymbol] ||
 					!passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret

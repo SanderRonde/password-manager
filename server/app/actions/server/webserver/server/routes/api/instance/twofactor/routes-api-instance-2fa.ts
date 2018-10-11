@@ -73,7 +73,7 @@ export class RoutesAPIInstanceTwofactor {
 				if (await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
 					_id: instance.user_id
 				}, {
-					twofactor_secret: this.server.database.Crypto.dbEncryptWithSalt(secret.base32),
+					twofactor_secret: this.server.database.Crypto.dbEncryptWithSalt(secret.ascii),
 					twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
 				}) === null) {
 					res.status(500);
