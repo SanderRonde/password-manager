@@ -445,6 +445,63 @@ export function defineProps<P extends {
 	getParentRef(ref: string): any;
 	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
 		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+}, props: {
+	reflect: P;
+	priv: T;
+}): {
+	[K in keyof P]: GetTSType<P[K]>;
+} & {
+	[K in keyof T]: GetTSType<T[K]>;
+};
+export function defineProps<P extends {
+	[key: string]: DefinePropTypes|DefinePropTypeConfig;
+}, T extends {
+	[key: string]: DefinePropTypes|DefinePropTypeConfig;
+}, R extends {
+	[K in keyof P]: GetTSType<P[K]>;
+} & {
+	[K in keyof T]: GetTSType<T[K]>;
+}>(element: HTMLElement & {
+	renderToDOM(changeType: CHANGE_TYPE): void;
+	getParentRef(ref: string): any;
+	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+}, props: {
+	priv?: T;
+}): {
+	[K in keyof T]: GetTSType<T[K]>;
+};
+export function defineProps<P extends {
+	[key: string]: DefinePropTypes|DefinePropTypeConfig;
+}, T extends {
+	[key: string]: DefinePropTypes|DefinePropTypeConfig;
+}, R extends {
+	[K in keyof P]: GetTSType<P[K]>;
+} & {
+	[K in keyof T]: GetTSType<T[K]>;
+}>(element: HTMLElement & {
+	renderToDOM(changeType: CHANGE_TYPE): void;
+	getParentRef(ref: string): any;
+	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+}, props: {
+	reflect: P;
+}): {
+	[K in keyof P]: GetTSType<P[K]>;
+};
+export function defineProps<P extends {
+	[key: string]: DefinePropTypes|DefinePropTypeConfig;
+}, T extends {
+	[key: string]: DefinePropTypes|DefinePropTypeConfig;
+}, R extends {
+	[K in keyof P]: GetTSType<P[K]>;
+} & {
+	[K in keyof T]: GetTSType<T[K]>;
+}>(element: HTMLElement & {
+	renderToDOM(changeType: CHANGE_TYPE): void;
+	getParentRef(ref: string): any;
+	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
 }, {
 	reflect = {} as P, priv = {} as T
 }: {
