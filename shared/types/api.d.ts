@@ -109,6 +109,10 @@ export interface APIFns {
 	 * Login through the dashboard
 	 */
 	'/api/dashboard/login': typeof APIRoutes.Dashboard.login;
+	/**
+	 * Get login page comm values (public keys etc)
+	 */
+	'/api/dashboard/get_comm': typeof APIRoutes.Dashboard.getComm;
 }
 
 export type APIArgs = {
@@ -1268,6 +1272,17 @@ export declare namespace APIRoutes {
 			 * The index of the used command. Used to prevent replay attacks and token interception
 			 */
 			count: PublicKeyEncrypted<number, InstancePublicKey>;
+		}>;
+
+		export function getComm(params: {}, encrypted: {}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+			/**
+			 * A comm token used to identify the (server) private key that is used to decrypt
+			 */
+			comm_token: string;
+			/**
+			 * A public key to encrypt any data with
+			 */
+			server_public_key: string;
 		}>;
 	}
 }
