@@ -1,7 +1,7 @@
 import { ERRS, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../../types/crypto';
 import { decryptWithPrivateKey, hash, pad } from '../../../../lib/browser-crypto';
 import { Dashboard, DashboarDependencies } from '../../base/dashboard/dashboard';
-import { GlobalControllerData } from '../../global/global-controller';
+import { GlobalControllerData } from '../../base/global/global-controller';
 import { DashboardHTML } from '../../base/dashboard/dashboard.html';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { DashboardCSS } from '../../base/dashboard/dashboard.css';
@@ -78,9 +78,9 @@ export class DashboardWeb extends Dashboard {
 
 		this.renderToDOM(CHANGE_TYPE.PROP);
 
-		if (this._globalProperties.password_meta) {
+		if (this.getGlobalProperty('password_meta')) {
 			const decrypted = decryptWithPrivateKey(
-				this._globalProperties.password_meta,
+				this.getGlobalProperty('password_meta')!,
 				this._data.private_key);
 			if (decrypted === ERRS.INVALID_DECRYPT) {
 				this._failNoCredentials('Failed to decrypt data');

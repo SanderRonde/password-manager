@@ -1,3 +1,5 @@
+import { pythagoras } from '../../../icons/triangle-arrow/triangle-arrow';
+import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { changeOpacity } from '../../../../lib/webcomponent-util';
 import { Dashboard } from './dashboard';
@@ -53,7 +55,7 @@ export const CustomDashboardCSS = {
 			margin-top: 2px;
 		}
 	</style>`, CHANGE_TYPE.THEME),
-	infiniteList: new TemplateFn<Dashboard>(() => html`<style>
+	infiniteList: new TemplateFn<InfiniteList<any, any, any>>(() => html`<style>
 		#contentContainer {
 			overflow-y: hidden;
 		}
@@ -62,7 +64,70 @@ export const CustomDashboardCSS = {
 			margin-bottom: 20px;
 			margin-left: 5px;
 		}
-	</style>`, CHANGE_TYPE.NEVER)
+	</style>`, CHANGE_TYPE.NEVER),
+	templateList: new TemplateFn<InfiniteList<any, any, any>>((_props, theme) => {
+		const color = changeOpacity(theme.textOnBackground, 25);
+		const actualWidth = pythagoras(35);
+		const actualHeight = pythagoras(35);
+		const widthPart = actualWidth / 4;
+		const heightPart = actualHeight / 4;
+		return html`<style>
+			.templateContainer {
+				width: 435px;
+				height: 70px;
+				padding: 10px 15px;
+				display: -webkit-flex;
+				display: flex;
+				flex-direction: row;
+				-webkit-justify-content: space-between;
+				justify-content: space-between;
+				color: ${color};
+			}
+
+			.templateIcon {
+				width: 70px;
+				height: 70px;
+				border-radius: 50%;
+				background-color: ${color};
+			}
+
+			.templateWebsite {
+				display: -webkit-flex;
+				display: flex;
+				flex-direction: column;
+				-webkit-justify-content: space-around;
+				justify-content: space-around;
+				flex-grow: 100;
+			}
+
+			.templateLine {
+				height: 1em;
+				margin: 0 20px;
+				display: -webkit-flex;
+				display: flex;
+				flex-direction: column;
+				-webkit-justify-content: space-around;
+				justify-content: space-around;
+				background-color: ${color};
+			}
+
+			.templateArrow {
+				display: -webkit-flex;
+				display: flex;
+				flex-direction: column;
+				-webkit-justify-content: space-around;
+				justify-content: space-around;
+			}
+
+			.__hollow_arrow {
+				border-right: ${widthPart}px solid ${color};
+				border-bottom: ${heightPart}px solid ${color};
+				width: ${widthPart * 3}px;
+				height: ${heightPart * 3}px;
+				transform: rotate(-45deg);
+			}
+		</style>`
+	}, CHANGE_TYPE.THEME)
 }
 
 export const DashboardCSS = new TemplateFn<Dashboard>((_props, theme) => {

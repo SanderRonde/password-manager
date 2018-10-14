@@ -12,6 +12,8 @@ export const AnimatedButtonHTML = new TemplateFn<AnimatedButton>(function (props
 	return html`
 		<button id="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
 			label="${props.ariaLabel}"
+			aria-label="${props.ariaLabel}"
+			title="${props.ariaLabel}"
 			on-mouseup="${inlineListener(this.blurHandler, this, true)}"
 			on-mouseleave="${inlineListener(this.blurHandler, this, true)}"
 			on-click="${inlineListener(this.onButtonClick, this, true)}"

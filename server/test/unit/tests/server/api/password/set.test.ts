@@ -39,6 +39,7 @@ export function passwordSetTest() {
 			const expected2FAEnabled = Math.random() > 0.5;
 			const expectedU2FEnabled = Math.random() > 0.5;
 			const expectedEncrypted = encrypt({
+				twofactor_secret: null,
 				password: genRandomString(25),
 				notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 			}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
@@ -152,6 +153,7 @@ export function passwordSetTest() {
 					username: 'someusername',
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
+							twofactor_secret: null,
 							password: string;
 							notes: string[];
 						}>, Hashed<Padded<string, "masterpwdecrypt">, "sha512">, "aes-256-ctr">;
@@ -186,6 +188,7 @@ export function passwordSetTest() {
 					username: 'someusername',
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
+							twofactor_secret: string;
 							password: string;
 							notes: string[];
 						}>, Hashed<Padded<string, "masterpwdecrypt">, "sha512">, "aes-256-ctr">;

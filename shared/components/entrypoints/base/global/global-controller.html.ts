@@ -1,4 +1,4 @@
-import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
+import { CHANGE_TYPE, TemplateFn } from '../../../../lib/webcomponents';
 import { GlobalController } from './global-controller';
 import { html } from 'lit-html';
 

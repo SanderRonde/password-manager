@@ -1,5 +1,5 @@
 /// <reference types="Cypress" />
-import { GlobalController } from "../../../../../shared/components/entrypoints/global/global-controller";
+import { GlobalController } from "../../../../../shared/components/entrypoints/base/global/global-controller";
 import { ThemeSelector } from "../../../../../shared/components/util/theme-selector/theme-selector";
 import { PaperToast } from "../../../../../shared/components/util/paper-toast/paper-toast";
 import { MAIN_SERVER_PORT, DEFAULT_EMAIL, DEFAULT_PW } from "../../../lib/ui-test-const";

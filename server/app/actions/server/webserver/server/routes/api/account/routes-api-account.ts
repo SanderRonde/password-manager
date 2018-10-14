@@ -142,7 +142,8 @@ export class RoutesAPIAccount {
 							_id: encryptedPassword._id
 						}, {
 							encrypted: this.server.database.Crypto.dbEncrypt(reEncrypted),
-							twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
+							twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
+							u2f_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
 						})) {
 							updatedPasswordIndexes.push(index);
 							resolve(true)
@@ -167,8 +168,9 @@ export class RoutesAPIAccount {
 				return;
 			}
 
-			const instances = unfilteredInstances.filter(({ twofactor_enabled }) => {
-					return this.server.database.Crypto.dbDecryptWithSalt(twofactor_enabled);
+			const instances = unfilteredInstances.filter(({ twofactor_enabled, u2f }) => {
+					return this.server.database.Crypto.dbDecryptWithSalt(twofactor_enabled) ||
+						this.server.database.Crypto.dbDecryptWithSalt(u2f) !== null;
 				});
 
 			if ((await Promise.all(instances.map((instance) => {
@@ -177,8 +179,8 @@ export class RoutesAPIAccount {
 						COLLECTIONS.INSTANCES, {
 							_id: instance._id
 						}, {
-							twofactor_enabled: 
-								this.server.database.Crypto.dbEncryptWithSalt(false)
+							twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
+							u2f: this.server.database.Crypto.dbEncryptWithSalt(null)
 						})) {
 							resolve(false);
 						} else {

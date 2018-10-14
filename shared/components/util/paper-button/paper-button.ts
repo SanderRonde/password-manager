@@ -85,6 +85,7 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 	private getColorCustomCSS(): any {
 		return html`<style>
 			#button {
+				fill: ${this.props.color};
 				color: ${this.props.color};
 			}
 		</style>`;

@@ -1,11 +1,11 @@
 import { HollowTriangleArrowSize } from '../../../icons/triangle-arrow/triangle-arrow';
 import { QuestionmarkSize } from '../../../icons/questionmark/questionmark';
+import { inlineListener, mapArr } from '../../../../lib/webcomponent-util';
 import { LockClosedUnfilled } from '../../../icons/lockClosed/lockClosed';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { invertedCardCSS, noCustomCSS } from './password-preview.css';
 import { PasswordPreview } from './password-preview';
 import { Key } from '../../../icons/key/key';
-import { inlineListener, mapArr } from '../../../../lib/webcomponent-util';
 
 function prefixWithWWW(url: string) {
 	if (url.startsWith('www.')) {

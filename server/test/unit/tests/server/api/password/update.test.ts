@@ -22,7 +22,8 @@ export function passwordUpdateTest() {
 			count: 'number',
 			password_id: 'string',
 		}, {
-			websites: 'array',
+			addedWebsites: 'array',
+			removedWebsites: 'array',
 			twofactor_enabled: 'boolean',
 			u2f_enabled: 'boolean',
 			encrypted: 'string',
@@ -53,6 +54,7 @@ export function passwordUpdateTest() {
 			const expected2FAEnabled = Math.random() > 0.5;
 			const expectedU2FEnabled = Math.random() > 0.5;
 			const expectedEncrypted = encrypt({
+				twofactor_secret: null,
 				password: genRandomString(25),
 				notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 			}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
@@ -67,7 +69,7 @@ export function passwordUpdateTest() {
 				token: token!,
 				count: count++,
 				password_id: passwordId!,
-				websites: expectedWebsites.map((website) => {
+				addedWebsites: expectedWebsites.map((website) => {
 					return {
 						url: website,
 						favicon: null
@@ -141,12 +143,13 @@ export function passwordUpdateTest() {
 						'decrypted username is the same');
 		});
 		it('fails if it requires 2FA and no 2FA token is passed', async () => {
-			const { base32 } = speakeasy.generateSecret({
-				name: 'Password manager server'
+			const { ascii } = speakeasy.generateSecret({
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: base32
+				twofactor_secret: ascii
 			});
 			const server = await createServer(config);
 			const { http, uri, server_public_key, userpw } = config;
@@ -167,6 +170,7 @@ export function passwordUpdateTest() {
 			const expected2FAEnabled = Math.random() > 0.5;
 			const expectedU2FEnabled = Math.random() > 0.5;
 			const expectedEncrypted = encrypt({
+				twofactor_secret: null,
 				username: genRandomString(25),
 				password: genRandomString(25),
 				notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
@@ -182,7 +186,7 @@ export function passwordUpdateTest() {
 				token: loginToken!,
 				count: count++,
 				password_id: passwordId!,
-				websites: expectedWebsites.map((website) => {
+				addedWebsites: expectedWebsites.map((website) => {
 					return {
 						url: website,
 						favicon: null
@@ -203,12 +207,13 @@ export function passwordUpdateTest() {
 			assert.strictEqual(response.ERR, API_ERRS.MISSING_PARAMS, 'failed with missing parameters');
 		});
 		it('password can be updated if 2FA is enabled', async () => {
-			const { base32 } = speakeasy.generateSecret({
-				name: 'Password manager server'
+			const { ascii } = speakeasy.generateSecret({
+				name: 'Password manager server',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: base32
+				twofactor_secret: ascii
 			});
 			const server = await createServer(config);
 			const { http, uri, server_public_key, userpw, instance_id, dbpw } = config;
@@ -229,6 +234,7 @@ export function passwordUpdateTest() {
 			const expected2FAEnabled = Math.random() > 0.5;
 			const expectedU2FEnabled = Math.random() > 0.5;
 			const expectedEncrypted = encrypt({
+				twofactor_secret: null,
 				username: genRandomString(25),
 				password: genRandomString(25),
 				notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
@@ -244,7 +250,7 @@ export function passwordUpdateTest() {
 				token: token!,
 				count: count++,
 				password_id: passwordId!,
-				websites: expectedWebsites.map((website) => {
+				addedWebsites: expectedWebsites.map((website) => {
 					return {
 						url: website,
 						favicon: null
@@ -254,8 +260,7 @@ export function passwordUpdateTest() {
 				twofactor_enabled: expected2FAEnabled,
 				u2f_enabled: expectedU2FEnabled,
 				twofactor_token: speakeasy.totp({
-					secret: base32,
-					encoding: 'base32'
+					secret: ascii
 				}),
 				encrypted: expectedEncrypted
 			}));
@@ -338,11 +343,12 @@ export function passwordUpdateTest() {
 					password_id: 'someid' as StringifiedObjectId<EncryptedPassword>,
 					token: 'someinvalidtoken',
 					count: 0,
-					websites: [],
+					addedWebsites: [],
 					twofactor_enabled: false,
 					u2f_enabled: false,
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
+							twofactor_secret: string;
 							password: string;
 							notes: string[];
 						}>, Hashed<Padded<string, "masterpwdecrypt">, "sha512">, "aes-256-ctr">;
@@ -373,12 +379,13 @@ export function passwordUpdateTest() {
 					password_id: 'someid' as StringifiedObjectId<EncryptedPassword>,
 					token: token!,
 					count: count,
-					websites: [],
+					addedWebsites: [],
 					username: 'someusername',
 					twofactor_enabled: false,
 					u2f_enabled: false,
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
+							twofactor_secret: string;
 							password: string;
 							notes: string[];
 						}>, Hashed<Padded<string, "masterpwdecrypt">, "sha512">, "aes-256-ctr">;
@@ -409,11 +416,12 @@ export function passwordUpdateTest() {
 					password_id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 					token: token!,
 					count: count++,
-					websites: [],
+					addedWebsites: [],
 					twofactor_enabled: false,
 					u2f_enabled: false,
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
+							twofactor_secret: string;
 							username: string;
 							password: string;
 							notes: string[];

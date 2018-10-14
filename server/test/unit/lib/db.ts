@@ -244,6 +244,7 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 		websites: [],
 		username: encrypt('someusername', dbpw, ENCRYPTION_ALGORITHM),
 		encrypted: encrypt(encrypt({
+			twofactor_secret: null,
 			password: 'somepw',
 			notes: []
 		}, hash(pad(userpw, 'masterpwdecrypt')), 
@@ -259,6 +260,7 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 			favicon: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
 		}],
 		encrypted: encrypt(encrypt({
+			twofactor_secret: null,
 			password: 'somepw',
 			notes: []
 		}, hash(pad(userpw, 'masterpwdecrypt')), 
@@ -270,6 +272,7 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 		websites: [],
 		username: encrypt('someusername', dbpw, ENCRYPTION_ALGORITHM),
 		encrypted: encrypt(encrypt({
+			twofactor_secret: null,
 			password: 'somepw',
 			notes: []
 		}, hash(pad(userpw, 'masterpwdecrypt')), 
@@ -281,6 +284,7 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 		websites: [],
 		username: encrypt('someusername', dbpw, ENCRYPTION_ALGORITHM),
 		encrypted: encrypt(encrypt({
+			twofactor_secret: null,
 			password: 'somepw',
 			notes: []
 		}, hash(pad(userpw, 'masterpwdecrypt')), 
@@ -296,6 +300,7 @@ export async function genPasswordsOnly(suppliedDb: SuppliedDatabase, id: TypedOb
 			favicon: encrypt(null, dbpw, ENCRYPTION_ALGORITHM)
 		}],
 		encrypted: encrypt(encrypt({
+			twofactor_secret: null,
 			password: 'somepw',
 			notes: []
 		}, hash(pad(userpw, 'masterpwdecrypt')), 

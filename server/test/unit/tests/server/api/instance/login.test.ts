@@ -71,8 +71,9 @@ export function loginTest() {
 					account_twofactor_enabled: true,
 					instance_twofactor_enabled: true,
 					twofactor_secret: speakeasy.generateSecret({
-						name: 'Password Manager'
-					}).base32
+						name: 'Password Manager',
+						length: 64
+					}).ascii
 				});
 				const server = await createServer(config);
 				const { 
@@ -111,8 +112,9 @@ export function loginTest() {
 					account_twofactor_enabled: true,
 					instance_twofactor_enabled: true,
 					twofactor_secret: speakeasy.generateSecret({
-						name: 'Password Manager'
-					}).base32
+						name: 'Password Manager',
+						length: 64
+					}).ascii
 				});
 				const server = await createServer(config);
 				const { 
@@ -147,12 +149,13 @@ export function loginTest() {
 		})
 		it('login token can be generated when 2FA is enabled', async () => {
 			const twofactorSecret = speakeasy.generateSecret({
-				name: 'Password Manager'
+				name: 'Password Manager',
+				length: 64
 			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
-				twofactor_secret: twofactorSecret.base32
+				twofactor_secret: twofactorSecret.ascii
 			});
 			const server = await createServer(config);
 			const { 
@@ -173,8 +176,7 @@ export function loginTest() {
 				instance_id: instance_id.toHexString(),
 				challenge: encryptWithPublicKey(challenge, server_public_key),
 				twofactor_token: speakeasy.totp({
-					secret: twofactorSecret.base32,
-					encoding: 'base32'
+					secret: twofactorSecret.ascii
 				})
 			}, {
 				password_hash: hash(pad(userpw, 'masterpwverify'))

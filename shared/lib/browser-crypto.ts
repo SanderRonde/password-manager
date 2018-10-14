@@ -198,3 +198,49 @@ export function decrypt<T, K extends string, A extends EncryptionAlgorithm>(encr
 		return ERRS.INVALID_DECRYPT;
 	}
 }
+
+export async function createDigest({ secret, counter }: {
+	secret: string;
+	counter: number;
+}) {
+	// create an buffer from the counter
+	const buf = new Buffer(8);
+	let tmp = counter;
+	for (let i = 0; i < 8; i++) {
+	  // mask 0xff over number to get last 8
+	  buf[7 - i] = tmp & 0xff;
+  
+	  // shift 8 and get ready to loop over the next batch of 8
+	  tmp = tmp >> 8;
+	}
+
+	const key = await window.crypto.subtle.importKey('raw', 
+		new TextEncoder().encode(secret), {
+			name: 'HMAC',
+			hash: {
+				name: 'SHA-1'
+			}
+		}, false, ['sign']);
+  
+	return new Uint8Array(await window.crypto.subtle.sign('HMAC', key, buf));
+}
+
+export async function totp({ secret, step = 30 }: {
+	secret: string;
+	step?: number;
+}) {
+	const counter = Math.floor((Date.now() / step) / 1000);
+	const digits = 6;
+
+	// digest the options
+	const digest = await createDigest({ secret, counter });
+
+	const offset = digest[digest.length - 1] & 0xf;
+
+	const code = (digest[offset] & 0x7f) << 24 |
+		(digest[offset + 1] & 0xff) << 16 |
+		(digest[offset + 2] & 0xff) << 8 |
+		(digest[offset + 3] & 0xff);
+
+	return new Array(digits + 1).join('0') + code.toString(10).substr(-digits);
+}

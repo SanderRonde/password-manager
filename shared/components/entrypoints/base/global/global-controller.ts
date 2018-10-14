@@ -1,19 +1,17 @@
-import { defineProps, PROP_TYPE, config, wait, awaitMounted } from '../../../lib/webcomponent-util';
-import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding, ERRS } from '../../../types/crypto';
-import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../types/db-types';
-import { ANIMATE_TIME } from '../../util/loadable-block/loadable-block.css';
-import { LoadableBlock } from '../../util/loadable-block/loadable-block';
-import { ConfigurableWebComponent } from '../../../lib/webcomponents';
+import { defineProps, PROP_TYPE, wait, awaitMounted } from '../../../../lib/webcomponent-util';
+import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding, ERRS } from '../../../../types/crypto';
+import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../types/db-types';
+import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
+import { LoadableBlock } from '../../../util/loadable-block/loadable-block';
+import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
+import { decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { GlobalControllerIDMap } from './global-controller-querymap';
-import { GlobalControllerHTML } from './global-controller.html';
-import { PaperToast } from '../../util/paper-toast/paper-toast';
-import { GlobalControllerCSS } from './global-controller.css';
-import { doClientAPIRequest } from '../../../lib/apirequests';
-import { ENTRYPOINT } from '../../../types/shared-types';
-import { Dashboard } from '../base/dashboard/dashboard';
-import { API_ERRS } from '../../../types/api';
-import { Login } from '../base/login/login';
-import { decryptWithPrivateKey } from '../../../lib/browser-crypto';
+import { PaperToast } from '../../../util/paper-toast/paper-toast';
+import { doClientAPIRequest } from '../../../../lib/apirequests';
+import { ENTRYPOINT } from '../../../../types/shared-types';
+import { Dashboard } from '../../base/dashboard/dashboard';
+import { API_ERRS } from '../../../../types/api';
+import { Login } from '../../base/login/login';
 
 export interface GlobalControllerData {
 	loginData: {
@@ -30,27 +28,13 @@ export interface GlobalControllerData {
 
 type EntrypointPage = Login|Dashboard;
 
-function getEntrypointValue(entrypoint: ENTRYPOINT) {
-	switch (entrypoint) {
-		case ENTRYPOINT.LOGIN:
-			return 'login';
-		case ENTRYPOINT.DASHBOARD:
-			return 'dashboard';
-	}
-}
-
 //Should be kept in sync with server/app/lib/constants.ts
 const AUTH_TOKEN_EXPIRE_TIME = 1000 * 60 * 15;
 
-@config({
-	is: 'global-controller',
-	css: GlobalControllerCSS,
-	html: GlobalControllerHTML,
-	dependencies: [
-		LoadableBlock,
-		PaperToast
-	]
-})
+export const GlobalControllerDependencies = [
+	LoadableBlock,
+	PaperToast
+];
 export abstract class GlobalController extends ConfigurableWebComponent<GlobalControllerIDMap> {
 	private _data: Map<keyof GlobalControllerData, 
 		GlobalControllerData[keyof GlobalControllerData]> = new Map();
@@ -214,22 +198,19 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		return this._token!;
 	}
 
-	private _definePage(page: ENTRYPOINT) {
-		const entrypoint = getEntrypointValue(page);
-		if (customElements.get(`${entrypoint}-page`)) {
-			return;
+	protected abstract _loadEntrypoint(page: ENTRYPOINT): void;
+
+	protected _getEntrypointValue(entrypoint: ENTRYPOINT) {
+		switch (entrypoint) {
+			case ENTRYPOINT.LOGIN:
+				return 'login';
+			case ENTRYPOINT.DASHBOARD:
+				return 'dashboard';
 		}
-		const src = `/entrypoints/${entrypoint}/${entrypoint}-page.js`;
-		const script = document.createElement('script');
-		if (document.body.classList.contains('dev')) {
-			script.type = 'module';
-		}
-		script.src = src;
-		document.body.appendChild(script);
 	}
 
 	private _addNewPage(page: ENTRYPOINT): EntrypointPage {
-		const newEl = document.createElement(`${getEntrypointValue(page)}-page`);
+		const newEl = document.createElement(`${this._getEntrypointValue(page)}-page`);
 		newEl.classList.add('hidden', 'newpage', 'invisible');
 
 		this.$.content.appendChild(newEl);
@@ -264,7 +245,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		}
 
 		this._hideNonCurrent();
-		this._definePage(page);
+		this._loadEntrypoint(page);
 		const el = this._addNewPage(page);
 		this.$.loadable.load();
 		await wait(500);
@@ -294,7 +275,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 	}
 	
 	mounted() {
-		this.props.page = this._globalProperties.page!;
+		this.props.page = this.getGlobalProperty('page')!;
 		this.listen('globalPropChange', (key, val) => {
 			if (key === 'page') {
 				this.props.page = val as ENTRYPOINT;

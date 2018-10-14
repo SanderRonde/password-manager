@@ -114,7 +114,6 @@ export class WebserverRouter {
 		}
 		return speakeasy.totp.verify({
 			secret: secret,
-			encoding: 'base32',
 			token: key,
 			window: 6
 		});
@@ -487,6 +486,9 @@ export class WebserverRouter {
 		this.parent.app.post('/api/instance/2fa/verify', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.Twofactor, 'verify')));
+		this.parent.app.post('/api/instance/2fa/is_setup', bruteforceLimiter,
+			this._wrapInErrorHandler(
+				this._doBind(this.parent.Routes.API.Instance.Twofactor, 'isSetup')));
 
 		this.parent.app.post('/api/instance/u2f/enable', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
@@ -500,6 +502,12 @@ export class WebserverRouter {
 		this.parent.app.post('/api/instance/u2f/verify', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(
 				this._doBind(this.parent.Routes.API.Instance.U2F, 'verify')));
+		this.parent.app.post('/api/instance/u2f/is_setup', bruteforceLimiter,
+			this._wrapInErrorHandler(
+				this._doBind(this.parent.Routes.API.Instance.U2F, 'isSetup')));
+		this.parent.app.post('/api/instance/u2f/gen_request', bruteforceLimiter,
+			this._wrapInErrorHandler(
+				this._doBind(this.parent.Routes.API.Instance.U2F, 'genRequest')));
 
 		this.parent.app.post('/api/password/set', bruteforceLimiter,
 			apiUseLimiter, this._wrapInErrorHandler(

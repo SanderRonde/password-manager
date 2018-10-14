@@ -365,11 +365,11 @@ export interface EncryptedPassword {
 	 */
 	username: EncodedString<DatabaseEncrypted<EncodedString<string>>>;
 	/**
-	 * (encrypted) Whether 2FA is enabled for this password
+	 * (encrypted) Whether 2FA is required for this password
 	 */
 	twofactor_enabled: EncodedString<DatabaseEncryptedWithSalt<boolean>>;
 	/**
-	 * (encrypted) Whether U2F is enabled for this password
+	 * (encrypted) Whether U2F is required for this password
 	 */
 	u2f_enabled: EncodedString<DatabaseEncryptedWithSalt<boolean>>;
 	/**
@@ -382,9 +382,13 @@ export interface EncryptedPassword {
 		 */
 		data: Encrypted<EncodedString<{
 			/**
+			 * The 2FA secret used to generate 2FA codes
+			 */
+			twofactor_secret: string|null;
+			/**
 			 * The password of the website (or group)
 			 */
-			password: string;
+			password: string|null;
 			/**
 			 * Any notes about this website (or group)
 			 */
@@ -427,11 +431,11 @@ export interface DecryptedPassword {
 	 */
 	username: string;
 	/**
-	 * Whether 2FA is enabled for this password
+	 * Whether 2FA is required for this password
 	 */
 	twofactor_enabled: boolean;
 	/**
-	 * Whether U2F is enabled for this password
+	 * Whether U2F is required for this password
 	 */
 	u2f_enabled: boolean;
 	/**
@@ -444,9 +448,13 @@ export interface DecryptedPassword {
 		 */
 		data: Encrypted<EncodedString<{
 			/**
+			 * The 2FA secret used to generate 2FA codes
+			 */
+			twofactor_secret: string|null;
+			/**
 			 * The password of the website (or group)
 			 */
-			password: string;
+			password: string|null;
 			/**
 			 * Any notes about this website (or group)
 			 */

@@ -37,6 +37,10 @@ export interface APIFns {
 	 * Verify 2FA when logging in
 	 */
 	'/api/instance/2fa/verify': typeof APIRoutes.Instance.Twofactor.verify;
+	/**
+	 * Whether 2FA is set up for this account
+	 */
+	'/api/instance/2fa/is_setup': typeof APIRoutes.Instance.Twofactor.isSetup;
 
 	/**
 	 * Enable U2F for an instance
@@ -54,6 +58,14 @@ export interface APIFns {
 	 * Verify U2F when logging in
 	 */
 	'/api/instance/u2f/verify': typeof APIRoutes.Instance.U2F.verify;
+	/**
+	 * Whether U2F is set up for this account
+	 */
+	'/api/instance/u2f/is_setup': typeof APIRoutes.Instance.U2F.isSetup;
+	/**
+	 * Generate a U2F verification request
+	 */
+	'/api/instance/u2f/gen_request': typeof APIRoutes.Instance.U2F.genRequest;
 
 	/**
 	 * Create a new password
@@ -394,6 +406,27 @@ export declare namespace APIRoutes {
 				 */
 				auth_token: PublicKeyEncrypted<APIToken, InstancePublicKey>;
 			}>;
+
+			export function isSetup(params: {
+				/**
+				 * The id of the instance assigned at registration
+				 */
+				instance_id: StringifiedObjectId<EncryptedInstance>;
+			}, encrypted: {
+				/**
+				 * An auth token
+				 */
+				token: APIToken;
+				/**
+				 * The index of the used command. Used to prevent replay attacks and token interception
+				 */
+				count: number;
+			}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+				/**
+				 * Whether it's set up
+				 */
+				enabled: boolean;
+			}>;
 		}
 
 		export namespace U2F {
@@ -559,6 +592,75 @@ export declare namespace APIRoutes {
 				 */
 				auth_token: PublicKeyEncrypted<APIToken, InstancePublicKey>;
 			}>;
+
+			export function isSetup(params: {
+				/**
+				 * The id of the instance assigned at registration
+				 */
+				instance_id: StringifiedObjectId<EncryptedInstance>;
+			}, encrypted: {
+				/**
+				 * An auth token
+				 */
+				token: APIToken;
+				/**
+				 * The index of the used command. Used to prevent replay attacks and token interception
+				 */
+				count: number;
+			}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+				/**
+				 * Whether it's set up
+				 */
+				enabled: boolean;
+			}>;
+
+			export function genRequest(params: {
+				/**
+				 * The id of the instance assigned at registration
+				 */
+				instance_id: StringifiedObjectId<EncryptedInstance>;
+			}, encrypted: {
+				/**
+				 * An auth token
+				 */
+				token: APIToken;
+				/**
+				 * The index of the used command. Used to prevent replay attacks and token interception
+				 */
+				count: number;
+			}, optional: {}, optionalEncrypted: {}): JSONResponse<{
+				/**
+				 * The requests, one of which has to be solved
+				 */
+				request: {
+					/**
+					 * The main request
+					 */
+					main: {
+						/**
+						 * The request that has to be solved
+						 */
+						request: U2FRequest;
+						/**
+						 * A token to identify the request
+						 */
+						u2f_token: U2FToken;
+					}
+					/**
+					 * A backup request
+					 */
+					backup: {
+						/**
+						 * The request that has to be solved
+						 */
+						request: U2FRequest;
+						/**
+						 * A token to identify the request
+						 */
+						u2f_token: U2FToken;
+					}
+				}
+			}>;
 		}
 	}
 
@@ -623,9 +725,13 @@ export declare namespace APIRoutes {
 				 */
 				data: Encrypted<EncodedString<{
 					/**
+					 * The 2FA secret used to generate 2FA codes
+					 */
+					twofactor_secret: string|null;
+					/**
 					 * The password for this website
 					 */
-					password: string;
+					password: string|null;
 					/**
 					 * Any secure notes
 					 */
@@ -663,9 +769,9 @@ export declare namespace APIRoutes {
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, optional: {}, optionalEncrypted: {
 			/**
-			 * The websites for which this password works
+			 * The newly added websites
 			 */
-			websites: {
+			addedWebsites: {
 				/**
 				 * The URL of the website
 				 */
@@ -683,6 +789,15 @@ export declare namespace APIRoutes {
 					 */
 					mime: string;
 				}
+			}[];
+			/**
+			 * The removed added websites
+			 */
+			removedWebsites: {
+				/**
+				 * The URL of the website
+				 */
+				url: string;
 			}[];
 			/**
 			 * The username for this website
@@ -709,9 +824,13 @@ export declare namespace APIRoutes {
 				 */
 				data: Encrypted<EncodedString<{
 					/**
+					 * The 2FA secret used to generate 2FA codes
+					 */
+					twofactor_secret: string|null;
+					/**
 					 * The password for this website
 					 */
-					password: string;
+					password: string|null;
 					/**
 					 * Any secure notes
 					 */
@@ -810,9 +929,13 @@ export declare namespace APIRoutes {
 					 */
 					data: Encrypted<EncodedString<{
 						/**
+						 * The 2FA secret used to generate 2FA codes
+						 */
+						twofactor_secret: string|null;
+						/**
 						 * The password of the website (or group)
 						 */
-						password: string;
+						password: string|null;
 						/**
 						 * Any notes about this website (or group)
 						 */

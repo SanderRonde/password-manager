@@ -68,6 +68,7 @@ export function workflowPasswordTest() {
 				twofactorEnabled: Math.random() > 0.5,
 				u2fEnabled: Math.random() > 0.5,
 				encrypted: encrypt({
+					twofactor_secret: null,
 					username: genRandomString(25),
 					password: genRandomString(25),
 					notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
@@ -170,6 +171,7 @@ export function workflowPasswordTest() {
 				twofactorEnabled: Math.random() > 0.5,
 				username: genRandomString(25),
 				encrypted: encrypt({
+					twofactor_secret: null,
 					password: genRandomString(25),
 					notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 				}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM)
@@ -189,10 +191,15 @@ export function workflowPasswordTest() {
 					token: token!,
 					count: count++,
 					password_id: passwordId!,
-					websites: expectedWebsites.map((website) => {
+					addedWebsites: expectedWebsites.map((website) => {
 						return {
 							url: website,
 							favicon: null
+						}
+					}),
+					removedWebsites: initialPassword.websites.map((website) => {
+						return {
+							url: website
 						}
 					}),
 					twofactor_enabled: expected2FAEnabled,
@@ -339,6 +346,7 @@ export function workflowPasswordTest() {
 				twofactorEnabled: Math.random() > 0.5,
 				u2fEnabled: false,
 				encrypted: encrypt({
+					twofactor_secret: null,
 					username: genRandomString(25),
 					password: genRandomString(25),
 					notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
@@ -447,6 +455,7 @@ export function workflowPasswordTest() {
 				const expectedWebsites = updatedPassword.websites;
 				const expected2FAEnabled = updatedPassword.twofactorEnabled;
 				const expectedEncrypted = encrypt({
+					twofactor_secret: null,
 					password: updatedPassword.password,
 					notes: updatedPassword.notes
 				}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
@@ -461,10 +470,15 @@ export function workflowPasswordTest() {
 					token: token!,
 					count: count++,
 					password_id: passwordId!,
-					websites: expectedWebsites.map((website) => {
+					addedWebsites: expectedWebsites.map((website) => {
 						return {
 							url: website,
 							favicon: null
+						}
+					}),
+					removedWebsites: initialPassword.websites.map((website) => {
+						return {
+							url: website
 						}
 					}),
 					twofactor_enabled: expected2FAEnabled,
@@ -670,6 +684,7 @@ export function workflowPasswordTest() {
 				twofactorEnabled: Math.random() > 0.5,
 				u2fEnabled: Math.random() > 0.5,
 				encrypted: encrypt({
+					twofactor_secret: null,
 					username: genRandomString(25),
 					password: genRandomString(25),
 					notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
@@ -771,6 +786,7 @@ export function workflowPasswordTest() {
 				websites: [genURL(), genURL(), genURL()],
 				twofactorEnabled: Math.random() > 0.5,
 				encrypted: encrypt({
+					twofactor_secret: null,
 					password: genRandomString(25),
 					notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
 				}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM),
@@ -791,10 +807,15 @@ export function workflowPasswordTest() {
 					token: token!,
 					count: count++,
 					password_id: passwordId!,
-					websites: expectedWebsites.map((website) => {
+					addedWebsites: expectedWebsites.map((website) => {
 						return {
 							url: website,
 							favicon: null
+						}
+					}),
+					removedWebsites: initialPassword.websites.map((website) => {
+						return {
+							url: website
 						}
 					}),
 					twofactor_enabled: expected2FAEnabled,
@@ -962,6 +983,7 @@ export function workflowPasswordTest() {
 					twofactorEnabled: Math.random() > 0.5,
 					u2fEnabled: Math.random() > 0.5,
 					encrypted: encrypt({
+						twofactor_secret: null,
 						username: genRandomString(25),
 						password: genRandomString(25),
 						notes: [genRandomString(10), genRandomString(20), genRandomString(30)]
@@ -1070,6 +1092,7 @@ export function workflowPasswordTest() {
 					const expectedWebsites = updatedPassword.websites;
 					const expected2FAEnabled = updatedPassword.twofactorEnabled;
 					const expectedEncrypted = encrypt({
+						twofactor_secret: null,
 						password: updatedPassword.password,
 						notes: updatedPassword.notes
 					}, hash(pad(userpw, 'masterpwdecrypt')), ENCRYPTION_ALGORITHM);
@@ -1084,10 +1107,15 @@ export function workflowPasswordTest() {
 						token: token!,
 						count: count++,
 						password_id: passwordId!,
-						websites: expectedWebsites.map((website) => {
+						addedWebsites: expectedWebsites.map((website) => {
 							return {
 								url: website,
 								favicon: null
+							}
+						}),
+						removedWebsites: initialPassword.websites.map((website) => {
+							return {
+								url: website
 							}
 						}),
 						twofactor_enabled: expected2FAEnabled,

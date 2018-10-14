@@ -1,8 +1,8 @@
-import { GlobalController } from '../components/entrypoints/global/global-controller';
-import { GlobalProperties, Theme, DEFAULT_THEME } from '../types/shared-types';
+import { GlobalController } from '../components/entrypoints/base/global/global-controller';
 import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
-import { TemplateResult, render, html } from 'lit-html';
+import { GlobalProperties, Theme, DEFAULT_THEME } from '../types/shared-types';
 import { theme } from '../components/theming/theme/theme';
+import { TemplateResult, render, html } from 'lit-html';
 import { removeAllElementListeners } from './listeners';
 import { bindToClass } from './decorators';
 
@@ -32,9 +32,26 @@ abstract class WebComponentDefiner extends elementBase {
 	 */
 	protected static is: ComponentIs;
 	/**
-	 * Any hooks that should be called after the constructor
+	 * Any internal properties that are only used by the framework
 	 */
-	protected _connectedHooks = [] as (() => void)[];
+	protected __internals: {
+		/**
+		 * Any hooks that should be called after the constructor
+		 */
+		connectedHooks: (() => void)[];
+		/**
+		 * Any hooks that should be called after rendering
+		 */
+		postRenderHooks: (() => void)[];
+		/**
+		 * Global properties
+		 */
+		globalProperties: GlobalProperties;
+	} = {
+		connectedHooks: [],
+		postRenderHooks: [],
+		globalProperties: undefined as any
+	};
 	/**
 	 * All defined webcomponents
 	 */
@@ -44,27 +61,26 @@ abstract class WebComponentDefiner extends elementBase {
 		super();
 
 		const isConnected = new Promise<void>((resolve) => {
-			this._connectedHooks.push(() => {
+			this.__internals.connectedHooks.push(() => {
 				resolve();
 			});
 		});
 		const definer = customElements.get(this.tagName.toLowerCase()) as typeof WebComponentDefiner;
-		definer.listenForFinished(this as any, isConnected);
+		definer.__listenForFinished(this as any, isConnected);
 	}
 
-	private static _finished: boolean = false;
-	private static _listeners: {
+	private static __finished: boolean = false;
+	private static __listeners: {
 		component: WebComponent<any, any>;
 		constructed: Promise<void>;
 	}[] = [];
-	protected _definer = WebComponentDefiner;
-	protected static async listenForFinished(component: WebComponent<any, any>, isConstructed: Promise<void>) {
-		if (this._finished) {
+	protected static async __listenForFinished(component: WebComponent<any, any>, isConstructed: Promise<void>) {
+		if (this.__finished) {
 			await isConstructed;
 			component.isMounted = true;
 			component.mounted();
 		} else {
-			this._listeners.push({
+			this.__listeners.push({
 				component,
 				constructed: isConstructed
 			});
@@ -75,10 +91,10 @@ abstract class WebComponentDefiner extends elementBase {
 	 * Define this component and its dependencies as a webcomponent
 	 */
 	static define(isRoot: boolean = true) {
-		if (isRoot && this._finished) {
+		if (isRoot && this.__finished) {
 			//Another root is being defined, clear last one
-			this._finished = false;
-			this._listeners = [];
+			this.__finished = false;
+			this.__listeners = [];
 		}
 
 		for (const dependency of this.dependencies) {
@@ -96,10 +112,10 @@ abstract class WebComponentDefiner extends elementBase {
 		define(this.is.name, this.is.component);
 		this.defined.push(this.is.name);
 
-		this._finishLoad();
+		this.__finishLoad();
 	}
 
-	private static _doSingleMount(component: WebComponent<any, any>) {
+	private static __doSingleMount(component: WebComponent<any, any>) {
 		return new Promise((resolve) => {
 			(window.requestAnimationFrame || window.webkitRequestAnimationFrame)(() => {
 				if (component.isMounted) {
@@ -113,15 +129,15 @@ abstract class WebComponentDefiner extends elementBase {
 		});
 	}
 
-	private static async _finishLoad() {
-		this._finished = true;
+	private static async __finishLoad() {
+		this.__finished = true;
 		if (window.requestAnimationFrame || window.webkitRequestAnimationFrame) {
-			for (const { component, constructed } of [...this._listeners]) {
+			for (const { component, constructed } of [...this.__listeners]) {
 				await constructed;
-				await this._doSingleMount(component);
+				await this.__doSingleMount(component);
 			}
 		} else {
-			this._listeners.forEach(async ({ constructed, component }) => {
+			this.__listeners.forEach(async ({ constructed, component }) => {
 				await constructed;
 				if (component.isMounted) {
 					return;
@@ -162,7 +178,7 @@ export type TemplateFnConfig = {
 	template: TemplateRenderFunction<any>
 };
 export class TemplateFn<T extends WebComponent<any, any> = any> {
-	private _changeOn!: CHANGE_TYPE;
+	public changeOn!: CHANGE_TYPE;
 	private _template!: (TemplateRenderFunction<T>)|TemplateResult|null;
 	private _initialized: boolean = false;
 
@@ -180,7 +196,7 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 	private _doInitialRender(component: T) {
 		if (this._changeType === CHANGE_TYPE.NEVER) {
 			//Args don't matter here as they aren't used
-			this._changeOn = CHANGE_TYPE.NEVER;
+			this.changeOn = CHANGE_TYPE.NEVER;
 			if (this._fn) {
 				this._template = typeSafeCall(this._fn as any,
 					component) as any;
@@ -188,7 +204,7 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 				this._template = null;
 			}
 		} else {
-			this._changeOn = this._changeType,
+			this.changeOn = this._changeType,
 			this._template = this._fn as any
 		}
 	}
@@ -203,7 +219,7 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 			componentTemplateMap.set(component, new WeakMap());
 		}
 		const templateMap = componentTemplateMap.get(component)!;
-		if (this._changeOn === CHANGE_TYPE.NEVER) {
+		if (this.changeOn === CHANGE_TYPE.NEVER) {
 			//Never change, return the only render
 			const cached = templateMap.get(this);
 			if (cached) {
@@ -214,9 +230,9 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 				templateMap.set(this, rendered as TemplateResult);
 			return rendered;
 		}
-		if (this._changeOn === CHANGE_TYPE.ALWAYS || 
+		if (this.changeOn === CHANGE_TYPE.ALWAYS || 
 			changeType === CHANGE_TYPE.ALWAYS ||
-			this._changeOn === changeType ||
+			this.changeOn === changeType ||
 			!templateMap.has(this)) {
 				//Change, rerender
 				const rendered = typeSafeCall(this._template as TemplateRenderFunction<T>, 
@@ -235,12 +251,12 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	/**
 	 * Whether the render method should be temporarily disabled (to prevent infinite loops)
 	 */
-	private _disableRender: boolean = false;
+	private __disableRender: boolean = false;
 
 	/**
 	 * Whether this is the first render
 	 */
-	private _firstRender: boolean = true;
+	private __firstRender: boolean = true;
 
 	/**
 	 * The render method that will render this component
@@ -257,7 +273,7 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	/**
 	 * A function signalign whether this component has custom CSS applied to it
 	 */
-	protected abstract _hasCustomCSS(): boolean;
+	protected abstract __hasCustomCSS(): boolean;
 
 	/**
 	 * The render method that will render this component's css
@@ -270,50 +286,46 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	protected root = this.attachShadow({
 		mode: 'open'
 	});
-	/**
-	 * Any hooks that should be called after rendering
-	 */
-	protected _postRenderHooks = [] as (() => void)[];
 	
 	/**
 	 * The properties of this component
 	 */
 	props: any = {};
 
-	private _doPreRenderLifecycle() {
-		this._disableRender = true;
+	private __doPreRenderLifecycle() {
+		this.__disableRender = true;
 		const retVal = this.preRender();
-		this._disableRender = false;
+		this.__disableRender = false;
 		return retVal;
 	}
 
-	private _doPostRenderLifecycle() {
-		this._postRenderHooks.forEach(fn => fn());
-		if (this._firstRender) {
-			this._firstRender = false;
+	private __doPostRenderLifecycle() {
+		this.__internals.postRenderHooks.forEach(fn => fn());
+		if (this.__firstRender) {
+			this.__firstRender = false;
 			this.firstRender();
 		}
 		this.postRender();
 	}
 
-	private _noHTML = html``;
+	private __noHTML = html``;
 
 	@bindToClass
 	/**
 	 * The method that starts the rendering cycle
 	 */
 	public renderToDOM(change: CHANGE_TYPE = CHANGE_TYPE.ALWAYS) {
-		if (this._disableRender) return;
-		if (this._doPreRenderLifecycle() === false) {
+		if (this.__disableRender) return;
+		if (this.__doPreRenderLifecycle() === false) {
 			return;
 		}
 		render(html`${this.css.render(change, this as any)}
-		${this._hasCustomCSS() ? 
+		${this.__hasCustomCSS() ? 
 			this.customCSS().render(change, this as any) : 
-			this._noHTML}
+			this.__noHTML}
 		${this.renderer.render(change, this as any)}`, 
 			this.root);
-		this._doPostRenderLifecycle();
+		this.__doPostRenderLifecycle();
 	}
 
 	/**
@@ -338,11 +350,11 @@ export interface EventListenerObj {
 	};
 }
 abstract class WebComponentListenable<E extends EventListenerObj> extends WebComponentBase {
-	private _listenerMap: {
+	private __listenerMap: {
 		[P in keyof E]: Set<(...params: E[P]['args']) => E[P]['returnType']>;
 	} = {} as any;
 
-	private _insertOnce<T extends E[keyof E], L extends (...args: T['args']) => T['returnType']>(fns: Set<L>, listener: L) {
+	private __insertOnce<T extends E[keyof E], L extends (...args: T['args']) => T['returnType']>(fns: Set<L>, listener: L) {
 		const self = ((...args: T['args']) => {
 			fns.delete(self);
 			listener(...args);
@@ -350,7 +362,7 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 		fns.add(self);
 	}
 
-	private _assertKeyExists<EV extends keyof T, T extends {
+	private __assertKeyExists<EV extends keyof T, T extends {
 		[P in keyof E]: Set<(...params: E[P]['args']) => E[P]['returnType']>;
 	}>(key: EV, value: T) {
 		if (!(key in value)) {
@@ -359,26 +371,26 @@ abstract class WebComponentListenable<E extends EventListenerObj> extends WebCom
 	}
 
 	public listen<EV extends keyof E>(event: EV, listener: (...args: E[EV]['args']) => E[EV]['returnType'], once: boolean = false) {
-		this._assertKeyExists(event, this._listenerMap);
+		this.__assertKeyExists(event, this.__listenerMap);
 		if (once) {
-			this._insertOnce(this._listenerMap[event], listener);
+			this.__insertOnce(this.__listenerMap[event], listener);
 		} else {
-			this._listenerMap[event].add(listener);
+			this.__listenerMap[event].add(listener);
 		}
 	}
 
-	protected _clearListeners<EV extends keyof E>(event: EV) {
-		if (event in this._listenerMap) {
-			this._listenerMap[event].clear();
+	protected __clearListeners<EV extends keyof E>(event: EV) {
+		if (event in this.__listenerMap) {
+			this.__listenerMap[event].clear();
 		}
 	}
 
 	public fire<EV extends keyof E, R extends E[EV]['returnType']>(event: EV, ...params: E[EV]['args']): R[] {
-		if (!(event in this._listenerMap)) {
+		if (!(event in this.__listenerMap)) {
 			return [];
 		}
 
-		const set = this._listenerMap[event];
+		const set = this.__listenerMap[event];
 		const returnValues: R[] = [];
 		for (const listener of set.values()) {
 			returnValues.push(listener(...params));
@@ -392,17 +404,16 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		args: [keyof GlobalProperties, GlobalProperties[keyof GlobalProperties]]
 	}
 }> {
-	private _children: Set<WebComponentHierarchyManager<any>> = new Set();
-	private _parent: WebComponentHierarchyManager<any>|null = null;
-	private _isRoot!: boolean;
-	protected _globalProperties!: GlobalProperties;
+	private __children: Set<WebComponentHierarchyManager<any>> = new Set();
+	private __parent: WebComponentHierarchyManager<any>|null = null;
+	private __isRoot!: boolean;
 
-	protected _getParent<T extends WebComponentHierarchyManager<any>>(): T|null {
-		return this._parent as T;
+	protected __getParent<T extends WebComponentHierarchyManager<any>>(): T|null {
+		return this.__parent as T;
 	}
 
-	private _getGlobalProperties() {
-		if (!this._isRoot) {
+	private __getGlobalProperties() {
+		if (!this.__isRoot) {
 			return {};
 		}
 
@@ -419,17 +430,21 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		return props;
 	}
 
+	public get globalProperties() {
+		return this.__internals.globalProperties;
+	}
+
 	connectedCallback() {
-		this._isRoot = this.hasAttribute('_root');
-		this._globalProperties = {...{
+		this.__isRoot = this.hasAttribute('_root');
+		this.__internals.globalProperties = {...{
 			theme: 'light',
 			isWeb: (location.protocol === 'http:' || location.protocol === 'https:') ?
 				'true' : 'false'
-		}, ...this._getGlobalProperties()};
-		this._registerToParent();
+		}, ...this.__getGlobalProperties()};
+		this.__registerToParent();
 	}
 
-	private _findLocalRoot() {
+	private __findLocalRoot() {
 		let element: Node|null = this.parentNode;
 		while (element && !(element instanceof (window as any).ShadowRoot) && 
 			(element as any) !== document && !(element instanceof DocumentFragment)) {
@@ -451,7 +466,7 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		return host;
 	}
 
-	private _findDirectParents() {
+	private __findDirectParents() {
 		let element: Node|null = this.parentNode;
 		while (element && !(element instanceof (window as any).ShadowRoot) && 
 			(element as any) !== document && !(element instanceof DocumentFragment) &&
@@ -476,101 +491,101 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		return host;
 	}
 
-	private _getRoot() {
-		const localRoot = this._findLocalRoot();
+	private __getRoot() {
+		const localRoot = this.__findLocalRoot();
 		if (localRoot !== null && localRoot !== this) {
 			//Found an actual root, use that
 			return localRoot;
 		}
-		return this._findDirectParents();
+		return this.__findDirectParents();
 	}
 
 	@bindToClass
-	private _registerToParent() {
-		const root = this._getRoot();
+	private __registerToParent() {
+		const root = this.__getRoot();
 		if (root === this) {
-			this._isRoot = true;
+			this.__isRoot = true;
 			return;
 		} else if (root === null) {
 			return;
 		}
 		
-		this._parent = root;
+		this.__parent = root;
 		const newProps = {...root.registerChild(this)};
 		for (const key in newProps) {
-			this._setGlobalProperty(key as keyof typeof newProps, 
+			this.__setGlobalProperty(key as keyof typeof newProps, 
 				newProps[key as keyof typeof newProps]);
 		}
 	}
 
-	private _clearNonExistentChildren() {
+	private __clearNonExistentChildren() {
 		const nodeChildren = Array.prototype.slice.apply(this.children) as HTMLElement[];
-		for (const child of this._children.values()) {
+		for (const child of this.__children.values()) {
 			if (!this.shadowRoot!.contains(child) && 
 				!nodeChildren.filter(nodeChild => nodeChild.contains(child)).length) {
-					this._children.delete(child);
+					this.__children.delete(child);
 				}
 		}
 	}
 
 	public registerChild(element: WebComponentHierarchyManager<any>): GlobalProperties {
-		this._clearNonExistentChildren();
-		this._children.add(element);
-		return this._globalProperties;
+		this.__clearNonExistentChildren();
+		this.__children.add(element);
+		return this.__internals.globalProperties;
 	}
 
-	private _setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
+	private __setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
 		value: V) {
-			if (this._globalProperties[key] !== value) {
-				this._globalProperties[key] = value;
+			if (this.__internals.globalProperties[key] !== value) {
+				this.__internals.globalProperties[key] = value;
 				this.fire('globalPropChange', key, value);
 			}
 		}
 
-	protected _setGlobalPropertyFromChild<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
+	protected __setGlobalPropertyFromChild<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
 		value: V) {
-			this._setGlobalProperty(key, value);
-			if (this._isRoot) {
-				for (const child of this._children) {
-					child._setGlobalPropertyFromParent(key, value);
+			this.__setGlobalProperty(key, value);
+			if (this.__isRoot) {
+				for (const child of this.__children) {
+					child.__setGlobalPropertyFromParent(key, value);
 				}
-			} else if (this._parent) {
-				this._parent._setGlobalPropertyFromChild(key, value);
+			} else if (this.__parent) {
+				this.__parent.__setGlobalPropertyFromChild(key, value);
 			}
 		}
 
-	protected _setGlobalPropertyFromParent<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
+	protected __setGlobalPropertyFromParent<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
 		value: V) {
-			this._setGlobalProperty(key, value);
-			for (const child of this._children) {
-				child._setGlobalPropertyFromParent(key, value);
+			this.__setGlobalProperty(key, value);
+			for (const child of this.__children) {
+				child.__setGlobalPropertyFromParent(key, value);
 			}
 		}
 
 	public getGlobalProperty<P extends keyof GlobalProperties>(key: P): GlobalProperties[P]|undefined {
-		if (!this._globalProperties) {
+		if (!this.__internals.globalProperties) {
 			return undefined;
 		}
-		return this._globalProperties[key] as any;
+		return this.__internals.globalProperties[key] as any;
 	}
 
 	public setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
 		value: V) {
-			this._setGlobalProperty(key, value);
-			if (this._parent) {
-				this._parent._setGlobalPropertyFromChild(key, value);
-			} else if (this._isRoot) {
-				this._setGlobalPropertyFromParent(key, value);
+			this.__setGlobalProperty(key, value);
+			if (this.__parent) {
+				this.__parent.__setGlobalPropertyFromChild(key, value);
+			} else if (this.__isRoot) {
+				this.__setGlobalPropertyFromParent(key, value);
 			} else {
 				console.warn(`Failed to propagate global property "${key}" since this element has no registered parent`);
 			}
 		}
 
 	public getRoot(): GlobalController {
-		if (this._isRoot) {
+		if (this.__isRoot) {
 			return <GlobalController><any>this;
 		}
-		return this._parent!.getRoot();
+		return this.__parent!.getRoot();
 	}
 }
 
@@ -581,22 +596,22 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 
 		this.listen('globalPropChange', (prop): any => {
 			if (prop === 'theme') {
-				this._setTheme();
+				this.__setTheme();
 			}
 		});
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._setTheme();
+		this.__setTheme();
 	}
 
-	private _setTheme() {
+	private __setTheme() {
 		this.renderToDOM(CHANGE_TYPE.THEME);
 	}
 
 	public getThemeName() {
-		return (this._globalProperties && this._globalProperties.theme) 
+		return (this.__internals.globalProperties && this.__internals.globalProperties.theme) 
 			|| defaultTheme;
 	}
 
@@ -605,20 +620,20 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 	}
 }
 
+export const refPrefix = '___complex_ref';
 type ComplexValue = TemplateFn|Function|Object;
 export abstract class WebComponentComplexValueManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
-	public static readonly refPrefix = '___complex_ref';
-	private _reffed: ComplexValue[] = [];
+	private __reffed: ComplexValue[] = [];
 
-	private _genRef(value: ComplexValue) {
-		if (this._reffed.indexOf(value) !== -1) {
-			return `${WebComponentComplexValueManager.refPrefix}${
-				this._reffed.indexOf(value)}`;
+	private __genRef(value: ComplexValue) {
+		if (this.__reffed.indexOf(value) !== -1) {
+			return `${refPrefix}${
+				this.__reffed.indexOf(value)}`;
 		}
 
-		this._reffed.push(value);
-		const refIndex = this._reffed.length - 1;
-		return `${WebComponentComplexValueManager.refPrefix}${refIndex}`;
+		this.__reffed.push(value);
+		const refIndex = this.__reffed.length - 1;
+		return `${refPrefix}${refIndex}`;
 	}
 
 	private static _isDirective(value: any) {
@@ -629,18 +644,18 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 	public complexHTML(strings: TemplateStringsArray, ...values: any[]) {
 		values = values.map((value) => {
 			if (value instanceof TemplateFn) {
-				return this._genRef(value);
+				return this.__genRef(value);
 			}
 			if (Array.isArray(value) && !(value[0] instanceof TemplateResult)) {
-				return this._genRef(value);
+				return this.__genRef(value);
 			}
 			if (!Array.isArray(value) && typeof value === 'object' && 
 				!(value instanceof TemplateResult)) {
-					return this._genRef(value);
+					return this.__genRef(value);
 				}
 			if (typeof value === 'function' && 
 				!WebComponentComplexValueManager._isDirective(value)) {
-					return this._genRef(value);
+					return this.__genRef(value);
 				}
 			return value;
 		});
@@ -651,12 +666,12 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 		if (typeof ref !== 'string') {
 			return undefined;
 		}
-		const refNumber = ~~ref.split(WebComponentComplexValueManager.refPrefix)[1];
-		return this._reffed[refNumber];
+		const refNumber = ~~ref.split(refPrefix)[1];
+		return this.__reffed[refNumber];
 	}
 
 	public getParentRef(ref: string) {
-		const parent = this._getParent<WebComponentComplexValueManager<any>>();
+		const parent = this.__getParent<WebComponentComplexValueManager<any>>();
 		if (!parent) {
 			console.warn('Could not find parent of', this, 
 				'and because of that could not find ref with id', ref);
@@ -667,36 +682,48 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 }
 
 abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends WebComponentComplexValueManager<E> {
-	private __hasCustomCSS: boolean|null = null;
-	private _noCustomCSS: TemplateFn = new TemplateFn(null, CHANGE_TYPE.NEVER);
+	private ___hasCustomCSS: boolean|null = null;
+	private __noCustomCSS: TemplateFn = new TemplateFn(null, CHANGE_TYPE.NEVER);
 	public abstract isMounted: boolean;
 
-	protected _hasCustomCSS() {
-		if (this.__hasCustomCSS !== null) {
-			return this.__hasCustomCSS;
+	constructor() {
+		super();
+
+		const originalSetAttr = this.setAttribute;
+		this.setAttribute = (key: string, val: string) => {
+			originalSetAttr.bind(this)(key, val);
+			if (key === 'custom-css') {
+				this.renderToDOM(CHANGE_TYPE.ALWAYS);
+			}
+		}
+	}
+
+	protected __hasCustomCSS() {
+		if (this.___hasCustomCSS !== null) {
+			return this.___hasCustomCSS;
 		}
 		if (!this.hasAttribute('custom-css') ||
 			!this.getParentRef(this.getAttribute('custom-css')!)) {
 				//No custom CSS applies
 				if (this.isMounted) {
-					this.__hasCustomCSS = false;
+					this.___hasCustomCSS = false;
 				}
 				return false;
 			}
 
-		return (this.__hasCustomCSS = true);
+		return (this.___hasCustomCSS = true);
 	}
 
-	private _getCustomCSS() {
-		if (!this._hasCustomCSS()) {
-			return this._noCustomCSS;
+	private __getCustomCSS() {
+		if (!this.__hasCustomCSS()) {
+			return this.__noCustomCSS;
 		}
 
 		return this.getParentRef(this.getAttribute('custom-css')!) as TemplateFn<any>
 	}
 
 	protected customCSS() {
-		return this._getCustomCSS();
+		return this.__getCustomCSS();
 	}
 }
 
@@ -714,21 +741,21 @@ export abstract class WebComponent<IDS extends {
 	 * An ID map containing maps between queried IDs and elements,
 	 * 	cleared upon render
 	 */
-	private _idMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
-	protected _disposables: (() => void)[] = [];
+	private __idMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
+	protected disposables: (() => void)[] = [];
 	public isMounted: boolean = false;
 
 	constructor() {
 		super();
-		this._postRenderHooks.push(this._clearMap);
+		this.__internals.postRenderHooks.push(this.__clearMap);
 	}
 
 	@bindToClass
 	/**
 	 * Clears the ID map
 	 */
-	private _clearMap() {
-		this._idMap.clear();
+	private __clearMap() {
+		this.__idMap.clear();
 	}
 
 	/**
@@ -743,13 +770,13 @@ export abstract class WebComponent<IDS extends {
 				if (typeof id !== 'string') {
 					return null;
 				}
-				const cached = __this._idMap.get(id);
+				const cached = __this.__idMap.get(id);
 				if (cached && __this.shadowRoot!.contains(cached)) {
 					return cached;
 				}
 				const el = __this.root.getElementById(id);
 				if (el) {
-					__this._idMap.set(id, el);
+					__this.__idMap.set(id, el);
 				}
 				return el;
 			}
@@ -774,7 +801,7 @@ export abstract class WebComponent<IDS extends {
 		this.renderToDOM(CHANGE_TYPE.ALWAYS);
 		this.layoutMounted();
 
-		this._connectedHooks.filter(fn => fn());
+		this.__internals.connectedHooks.filter(fn => fn());
 	}
 
 	/**
@@ -782,8 +809,8 @@ export abstract class WebComponent<IDS extends {
 	 */
 	disconnectedCallback() {
 		removeAllElementListeners(this);
-		this._disposables.forEach(disposable => disposable());
-		this._disposables = [];
+		this.disposables.forEach(disposable => disposable());
+		this.disposables = [];
 		this.isMounted = false;
 	}
 

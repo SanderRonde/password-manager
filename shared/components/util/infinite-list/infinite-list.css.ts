@@ -28,7 +28,7 @@ export const InfiniteListCSS = new TemplateFn<InfiniteList<any, any, any>>(funct
 		#focusCapturer {
 			top: 0;
 			left: 0;
-			position: absolute;
+			position: fixed;
 			height: 0;
 			width: 0;
 		}

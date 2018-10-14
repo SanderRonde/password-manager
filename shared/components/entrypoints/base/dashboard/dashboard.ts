@@ -1,5 +1,7 @@
 import { PasswordPreview, PasswordPreviewHost } from '../../../page-specific/dashboard/password-preview/password-preview';
-import { PasswordDetail, PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
+import { PasswordDetailWeb } from '../../../page-specific/dashboard/web/password-detail-web/password-detail-web';
+import { PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
+import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { defineProps, ComplexType, PROP_TYPE } from '../../../../lib/webcomponent-util';
 import { MaterialInput } from '../../../util/material-input/material-input';
@@ -20,7 +22,8 @@ export const DashboarDependencies: (typeof WebComponentBase)[] = [
 	HorizontalCenterer,
 	MDCard,
 	PasswordPreview,
-	PasswordDetail
+	PasswordDetailWeb,
+	FloatingActionButton
 ]
 
 export interface MetaPasswordsPreviewData {
@@ -32,7 +35,7 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		priv: {
 			metaPasswords: {
 				type: ComplexType<MetaPasswords>(),
-				defaultValue: [],
+				defaultValue: null,
 				isPrivate: true
 			},
 			selected: {
@@ -111,15 +114,34 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		this.props.metaPasswords = pwMeta || [];
 	}
 
+	public fetchMeta() {
+		this._getPwMeta();
+	}
+
+	public getItemSize(data: any, options: {
+		isMin: true;
+	}): number;
+	public getItemSize(data: MetaPasswords[0], options: {
+		isMin: false;
+	}): number;
+	public getItemSize(data: MetaPasswords[0]): number;
 	public getItemSize(data: MetaPasswords[0], {
 		isMin
 	}: {
 		isMin: boolean;
+	} = {
+		isMin: false
 	}) {
 		if (isMin) {
 			return 10 + 90 + 20;
 		}
 		return 30 + (data.websites.length * 90);
+	}
+
+	public getPlaceholderList() {
+		return new Array(Math.ceil(window.innerHeight / this.getItemSize(null, {
+			isMin: true
+		}))).fill('').map((_) => {});
 	}
 
 	mounted() {

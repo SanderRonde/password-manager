@@ -1,8 +1,8 @@
-import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TYPE, WebComponentComplexValueManager } from './webcomponents';
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './listeners';
+import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TYPE, refPrefix } from './webcomponents';
+import { directive, AttributePart, DirectiveFn, TemplateResult, html } from 'lit-html';
 import { supportsPassive, isNewElement, listenWithIdentifier } from "./listeners";
 import { PaperToast } from '../components/util/paper-toast/paper-toast';
-import { directive, AttributePart, DirectiveFn, TemplateResult } from 'lit-html';
 import { API_ERRS } from '../types/api';
 
 // From https://github.com/JedWatson/classnames
@@ -92,7 +92,7 @@ function getterWithVal<R>(component: {
 			if (type === 'number') {
 				return ~~value;
 			} else if (type === complex) {
-				if (value.startsWith(WebComponentComplexValueManager.refPrefix)) {
+				if (value.startsWith(refPrefix)) {
 					return component.getParentRef(value);
 				} else {
 					return JSON.parse(decodeURIComponent(value));
@@ -369,7 +369,13 @@ function watchArray<T>(arr: T[], path: (string|'*')[], callback: () => void): T[
 	});
 }
 
+const cachedCasing = new Map<string, string>();
 function dashesToCasing(name: string) {
+	const cached = cachedCasing.get(name);
+	if (cached) {
+		return cached;
+	}
+
 	let newStr = '';
 	for (let i = 0; i < name.length; i++) {
 		if (name[i] === '-') {
@@ -379,6 +385,7 @@ function dashesToCasing(name: string) {
 			newStr += name[i];
 		}
 	}
+	cachedCasing.set(name, newStr);
 	return newStr;
 }
 
@@ -407,19 +414,57 @@ function getCoerced(initial: any, mapType: DefinePropTypes) {
 	return initial;
 }
 
-function watchValue(element: HTMLElement & {
-	renderToDOM(type: CHANGE_TYPE): void;
-}, value: any, watch: boolean, watchProperties: string[]) {
+type QueueRenderFn = (changeType: CHANGE_TYPE) => void;
+
+function watchValue(render: QueueRenderFn, value: any, watch: boolean, watchProperties: string[]) {
 	if (typeof value === 'object' && !Array.isArray(value) && watchProperties.length > 0) {
 		value = watchObject(value, watchProperties, () => {
-			element.renderToDOM(CHANGE_TYPE.PROP)
+			render(CHANGE_TYPE.PROP)
 		});
 	} else if (watch && Array.isArray(value)) {
 		value = watchArray(value, [], () => {
-			element.renderToDOM(CHANGE_TYPE.PROP)
+			render(CHANGE_TYPE.PROP)
 		});
 	}
 	return value;
+}
+
+const renderMap: WeakMap<HTMLElement, CHANGE_TYPE> = new WeakMap();
+
+function queueRender(element: HTMLElement & {
+	renderToDOM(changeType: CHANGE_TYPE): void;
+	getParentRef(ref: string): any;
+	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+}, changeType: CHANGE_TYPE) {
+	if (renderMap.has(element)) {
+		const mapped = renderMap.get(element);
+		//Check if this change type has higher priority
+		if (mapped === CHANGE_TYPE.ALWAYS) return;
+		if (mapped !== changeType) {
+			//It's either theme & prop or prop & theme,
+			// change it to always render
+			renderMap.set(element, CHANGE_TYPE.ALWAYS);
+		}
+		return;
+	}
+
+	renderMap.set(element, changeType);
+	setTimeout(() => {
+		element.renderToDOM(renderMap.get(element)!);
+		renderMap.delete(element);
+	}, 0);
+}
+
+function createQueueRenderFn(element: HTMLElement & {
+	renderToDOM(changeType: CHANGE_TYPE): void;
+	getParentRef(ref: string): any;
+	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+}) {
+	return (changeType: CHANGE_TYPE) => {
+		queueRender(element, changeType);
+	}
 }
 
 type DEFAULT_EVENTS = {
@@ -534,52 +579,44 @@ export function defineProps<P extends {
 		isPrivate: boolean;
 		strict: boolean;
 	}> = new Map();
-	Object.defineProperty(element, 'setAttribute', {
-		get() {
-			return (key: string, val: string) => {
-				const casingKey = dashesToCasing(key)
-				if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
-					const { watch, isPrivate, mapType, strict } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
+	element.setAttribute = (key: string, val: string) => {
+		const casingKey = dashesToCasing(key)
+		if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
+			const { watch, isPrivate, mapType, strict } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
 
-					const prevVal = (propValues as any)[casingKey];
-					const newVal = getterWithVal(element, val, strict, mapType);
-					element.fire('beforePropChange', casingKey, prevVal, newVal);
-					(propValues as any)[casingKey] = newVal;
-					element.fire('propChange', casingKey, prevVal, newVal);
-					if (watch) {
-						element.renderToDOM(CHANGE_TYPE.PROP);
-					}
-					if (isPrivate) {
-						originalSetAttr(casingKey, '_');
-						return;
-					}
-				} else {
-					(propValues as any)[casingKey] = val;
-				}
-				originalSetAttr(key, val);
-			};
+			const prevVal = (propValues as any)[casingKey];
+			const newVal = getterWithVal(element, val, strict, mapType);
+			element.fire('beforePropChange', casingKey, prevVal, newVal);
+			(propValues as any)[casingKey] = newVal;
+			element.fire('propChange', casingKey, prevVal, newVal);
+			if (watch) {
+				queueRender(element, CHANGE_TYPE.PROP);
+			}
+			if (isPrivate) {
+				originalSetAttr(casingKey, '_');
+				return;
+			}
+		} else {
+			(propValues as any)[casingKey] = val;
 		}
-	});
-	Object.defineProperty(element, 'removeAttribute', {
-		get() {
-			return (key: string) => {
-				const casingKey = dashesToCasing(key);
-				if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
-					const { watch, coerce, mapType } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
+		originalSetAttr(key, val);
+	};
+	element.removeAttribute = (key: string) => {
+		const casingKey = dashesToCasing(key);
+		if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
+			const { watch, coerce, mapType } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
 
-					const prevVal = (propValues as any)[casingKey];
-					const newVal = coerce ? getCoerced(undefined, mapType) : undefined;
-					element.fire('beforePropChange', casingKey, prevVal, newVal);
-					(propValues as any)[casingKey] = newVal;
-					element.fire('propChange', casingKey, prevVal, newVal);
-					if (watch) {
-						element.renderToDOM(CHANGE_TYPE.PROP);
-					}
-				}
-				originalRemoveAttr(key);
+			const prevVal = (propValues as any)[casingKey];
+			const newVal = coerce ? getCoerced(undefined, mapType) : undefined;
+			element.fire('beforePropChange', casingKey, prevVal, newVal);
+			(propValues as any)[casingKey] = newVal;
+			element.fire('propChange', casingKey, prevVal, newVal);
+			if (watch) {
+				queueRender(element, CHANGE_TYPE.PROP);
 			}
 		}
-	})
+		originalRemoveAttr(key);
+	};
 
 	for (let i in keys) {
 		const { key, reflectToAttr, value } = keys[i];
@@ -629,7 +666,8 @@ export function defineProps<P extends {
 			},
 			set(value) {
 				const original = value;
-				value = watchValue(element, value, watch, watchProperties);
+				value = watchValue(createQueueRenderFn(element), 
+					value, watch, watchProperties);
 
 				const prevVal = propValues[mapKey];
 				element.fire('beforePropChange', key, prevVal, value);
@@ -641,19 +679,19 @@ export function defineProps<P extends {
 				}
 
 				if (watch) {
-					element.renderToDOM(CHANGE_TYPE.PROP);
+					queueRender(element, CHANGE_TYPE.PROP);
 				}
 			}
 		});
 		(async () => {
 			if (mapType !== complex) {
-				propValues[mapKey] = watchValue(element, 
+				propValues[mapKey] = watchValue(createQueueRenderFn(element), 
 					getter(element, propName, strict, mapType) as any, 
 					watch, watchProperties);
 			} else {
 				await hookIntoMount(element as any, () => {
 					if (!isPrivate || element.getAttribute(propName) !== '_') {
-						propValues[mapKey] = watchValue(element, 
+						propValues[mapKey] = watchValue(createQueueRenderFn(element), 
 							getter(element, propName, strict, mapType) as any, 
 							watch, watchProperties);
 					}
@@ -663,7 +701,8 @@ export function defineProps<P extends {
 				defaultValue : defaultValue2;
 			if (defaultVal !== undefined && propValues[mapKey] === undefined) {
 				propValues[mapKey] =
-					watchValue(element, defaultVal as any, watch, watchProperties);
+					watchValue(createQueueRenderFn(element), 
+						defaultVal as any, watch, watchProperties);
 				await hookIntoMount(element as any, () => {
 					setter(originalSetAttr, originalRemoveAttr, propName, 
 						isPrivate ? '_' : defaultVal, mapType);
@@ -675,7 +714,7 @@ export function defineProps<P extends {
 				});
 			}
 			await awaitMounted(element as any);
-			element.renderToDOM(CHANGE_TYPE.PROP);
+			queueRender(element, CHANGE_TYPE.PROP);
 		})();
 	}
 	return props as R;
@@ -1244,4 +1283,35 @@ export function mapArr(result: any[], fallback: string|TemplateResult = '') {
 		return fallback;
 	}
 	return result;
+}
+
+export function joinTemplates<T extends WebComponent<any>>(...templates: TemplateFn<T>[]): TemplateFn<T> {
+	const changeType = templates.reduce((prev, template) => {
+		if (template.changeOn === CHANGE_TYPE.ALWAYS ||
+			prev === CHANGE_TYPE.ALWAYS) {
+				return CHANGE_TYPE.ALWAYS
+			}
+		if (template.changeOn === CHANGE_TYPE.PROP || 
+			template.changeOn === CHANGE_TYPE.THEME) {
+				if (prev === CHANGE_TYPE.NEVER) {
+					return template.changeOn;
+				}
+				if (template.changeOn !== prev) {
+					return CHANGE_TYPE.ALWAYS;
+				}
+				return prev;
+			}
+		if (prev === CHANGE_TYPE.PROP ||
+			prev === CHANGE_TYPE.THEME) {
+				return prev;
+			}
+		return CHANGE_TYPE.NEVER;
+	}, CHANGE_TYPE.NEVER);
+	return new TemplateFn<T>(function () {
+		return html`
+			${mapArr(templates.map((template) => {
+				return template.render(changeType, this);
+			}))}
+		`;
+	}, changeType as any);
 }

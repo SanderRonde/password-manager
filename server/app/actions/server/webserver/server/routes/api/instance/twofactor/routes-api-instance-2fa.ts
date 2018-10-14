@@ -1,6 +1,6 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../../../../../../../shared/types/db-types';
 import { Hashed, Padded, MasterPasswordVerificationPadding, encryptWithPublicKey } from '../../../../../../../../lib/crypto';
-import { TwofactorVerifyToken } from "../../../../../../../../../../shared/types/crypto";
+import { TwofactorVerifyToken, APIToken } from "../../../../../../../../../../shared/types/crypto";
 import { API_ERRS } from '../../../../../../../../../../shared/types/api';
 import { COLLECTIONS } from '../../../../../../../../database/database';
 import { ServerResponse } from '../../../../modules/ratelimit';
@@ -67,13 +67,14 @@ export class RoutesAPIInstanceTwofactor {
 			if (!twofactor_secret) {
 				//Create a new one
 				const secret = speakeasy.generateSecret({
-					name: 'Password Manager'
+					name: 'Password Manager',
+					length: 64
 				});
 	
 				if (await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.USERS, {
 					_id: instance.user_id
 				}, {
-					twofactor_secret: this.server.database.Crypto.dbEncryptWithSalt(secret.base32),
+					twofactor_secret: this.server.database.Crypto.dbEncryptWithSalt(secret.ascii),
 					twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
 				}) === null) {
 					res.status(500);
@@ -334,6 +335,44 @@ export class RoutesAPIInstanceTwofactor {
 					ERR: API_ERRS.INVALID_CREDENTIALS
 				});
 			}
+		})(req, res, next);
+	}
+
+	public isSetup(req: express.Request, res: ServerResponse, next: express.NextFunction) {
+		this.server.Router.requireParams<{
+			instance_id: StringifiedObjectId<EncryptedInstance>;
+		}, {}, {
+			count: number;
+			token: APIToken;
+		}, {}>({
+			unencrypted: ['instance_id'],
+			encrypted: ['token', 'count']
+		}, {}, async (toCheck, { instance_id, token, count }) => {
+			if (!this.server.Router.typeCheck(toCheck, res, [{
+				val: 'instance_id',
+				type: 'string'
+			}, {
+				val: 'token',
+				type: 'string'
+			}, {
+				val: 'count',
+				type: 'number'
+			}])) return;
+
+			const { instance, accountPromise } = 
+				await this.server.Router.verifyAndGetInstance(instance_id, res);
+			if (instance === null || accountPromise === null) return;
+			const { twofactor_secret } = await accountPromise;
+
+			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res, true)) return;
+
+			res.status(200);
+			res.json({
+				success: true,
+				data: {
+					enabled: twofactor_secret !== null
+				}
+			});
 		})(req, res, next);
 	}
 }

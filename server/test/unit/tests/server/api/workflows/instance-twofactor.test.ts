@@ -14,10 +14,12 @@ export function instanceTwofactorTest() {
 	parallel('Instance Twofactor', () => {
 		const uris = captureURIs();
 		it('can enable 2FA after registering instance when 2FA is enabled for the user', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: twofactor.base32
+				twofactor_secret: twofactor.ascii
 			});
 			const server = await createServer(config);
 			const { 
@@ -112,11 +114,13 @@ export function instanceTwofactorTest() {
 			})();
 		});
 		it('can enable 2FA and then disable it', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: false,
-				twofactor_secret: twofactor.base32
+				twofactor_secret: twofactor.ascii
 			});
 			const server = await createServer(config);
 			const { 
@@ -178,8 +182,7 @@ export function instanceTwofactorTest() {
 				}, '/api/instance/2fa/disable', {
 					instance_id: instance_id.toHexString(),
 					twofactor_token: speakeasy.totp({
-						secret: twofactor.base32,
-						encoding: 'base32'
+						secret: twofactor.ascii
 					})
 				}, {
 					password: hash(pad(userpw, 'masterpwverify'))
@@ -217,11 +220,13 @@ export function instanceTwofactorTest() {
 			})();
 		});
 		it('can enable 2FA, disable 2FA and then enable it', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: false,
-				twofactor_secret: twofactor.base32
+				twofactor_secret: twofactor.ascii
 			});
 			const server = await createServer(config);
 			const { 
@@ -283,8 +288,7 @@ export function instanceTwofactorTest() {
 				}, '/api/instance/2fa/disable', {
 					instance_id: instance_id.toHexString(),
 					twofactor_token: speakeasy.totp({
-						secret: twofactor.base32,
-						encoding: 'base32'
+						secret: twofactor.ascii
 					})
 				}, {
 					password: hash(pad(userpw, 'masterpwverify'))
@@ -364,11 +368,13 @@ export function instanceTwofactorTest() {
 			})();
 		});
 		it('can verify a login requiring 2FA', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
 				instance_twofactor_enabled: true,
-				twofactor_secret: twofactor.base32
+				twofactor_secret: twofactor.ascii
 			});
 			const server = await createServer(config);
 			const { 
@@ -390,8 +396,7 @@ export function instanceTwofactorTest() {
 					instance_id: instance_id.toHexString(),
 					challenge: encryptWithPublicKey(challenge, server_public_key),
 					twofactor_token: speakeasy.totp({
-						secret: twofactor.base32,
-						encoding: 'base32'
+						secret: twofactor.ascii
 					})
 				}, {
 					password_hash: hash(pad(userpw, 'masterpwverify'))
@@ -453,10 +458,12 @@ export function instanceTwofactorTest() {
 			})();
 		});
 		it('can register an instance, enable 2FA, log in with it and disable 2FA', async () => {
-			const twofactor = speakeasy.generateSecret();
+			const twofactor = speakeasy.generateSecret({
+				length: 64
+			});
 			const config = await genUserAndDb({
 				account_twofactor_enabled: true,
-				twofactor_secret: twofactor.base32
+				twofactor_secret: twofactor.ascii
 			});
 			const server = await createServer(config);
 			const { 
@@ -558,8 +565,7 @@ export function instanceTwofactorTest() {
 					instance_id: instance_id!,
 					challenge: encryptWithPublicKey(challenge, server_public_key!),
 					twofactor_token: speakeasy.totp({
-						secret: twofactor.base32,
-						encoding: 'base32'
+						secret: twofactor.ascii
 					})
 				}, {
 					password_hash: hash(pad(userpw, 'masterpwverify'))
@@ -624,8 +630,7 @@ export function instanceTwofactorTest() {
 				}, '/api/instance/2fa/disable', {
 					instance_id: instance_id!,
 					twofactor_token: speakeasy.totp({
-						secret: twofactor.base32,
-						encoding: 'base32'
+						secret: twofactor.ascii
 					})
 				}, {
 					password: hash(pad(userpw, 'masterpwverify'))
@@ -767,8 +772,7 @@ export function instanceTwofactorTest() {
 				const response = JSON.parse(await doServerAPIRequest({ port: http}, '/api/instance/2fa/confirm', {
 					instance_id: instance_id!,
 					twofactor_token: speakeasy.totp({
-						secret: secret!,
-						encoding: 'base32'
+						secret: secret!
 					})
 				}));
 
@@ -795,8 +799,7 @@ export function instanceTwofactorTest() {
 					instance_id: instance_id!,
 					challenge: encryptWithPublicKey(challenge, server_public_key!),
 					twofactor_token: speakeasy.totp({
-						secret: secret,
-						encoding: 'base32'
+						secret: secret
 					})
 				}, {
 					password_hash: hash(pad(userpw, 'masterpwverify'))
@@ -861,8 +864,7 @@ export function instanceTwofactorTest() {
 				}, '/api/instance/2fa/disable', {
 					instance_id: instance_id!,
 					twofactor_token: speakeasy.totp({
-						secret: secret,
-						encoding: 'base32'
+						secret: secret
 					})
 				}, {
 					password: hash(pad(userpw, 'masterpwverify'))
