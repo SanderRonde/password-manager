@@ -19,6 +19,7 @@ import { PaperToast } from "../components/util/paper-toast/paper-toast";
 import { IconButton } from "../components/util/icon-button/icon-button";
 import { MoreInfo } from "../components/util/more-info/more-info";
 import { MDCard } from "../components/util/md-card/md-card";
+import { RequestDelay } from "../components/util/request-delay/request-delay";
 
 declare global {
 	type HTMLMdCardElement = MDCard;
@@ -46,47 +47,36 @@ declare global {
 
 	type HTMLPathElement = any;
 
-	type WebComponentElements = MDCard & {
-		name: 'md-card'
-	}|LoginWeb & {
-		name: 'login-web'
-	}|DashboardWeb & {
-		name: 'dashboard-web'
-	}|IconButton & {
-		name: 'icon-button'
-	}|PaperToast & {
-		name: 'paper-toast'
-	}|PaperButton & {
-		name: 'paper-button'
-	}|SizingBlock & {
-		name: 'sizing-block'
-	}|LoadableBlock & {
-		name: 'loadable-block'
-	}|MaterialInput & {
-		name: 'material-input'
-	}|ThemeSelector & {
-		name: 'theme-selector'
-	}|AnimatedButton & {
-		name: 'animated-button'
-	}|PasswordDetail & {
-		name: 'password-detail'
-	}|LoadingSpinner & {
-		name: 'loading-spinner'
-	}|PasswordPreview & {
-		name: 'password-preview'
-	}|VerticalCenterer & {
-		name: 'vertical-centerer'
-	}|InfiniteList<any,any,any> & {
-		name: 'infinite-list'
-	}|HorizontalCenterer & {
-		name: 'horizontal-centerer'
-	}|MaterialCheckbox & {
-		name: 'material-checkbox'
-	}|MoreInfo & {
-		name: 'more-info'
-	}|PasswordForm & {
-		name: 'password-form'
-	}|FloatingActionButton & {
-		name: 'floating-action-button'
+	type WebComponentElementsByTag = {
+		'md-card': MDCard;
+		'login-web': LoginWeb;
+		'more-info': MoreInfo;
+		'paper-toast': PaperToast;
+		'icon-button': IconButton;
+		'sizing-block': SizingBlock;
+		'paper-button': PaperButton;
+		'password-form': PasswordForm;
+		'request-delay': RequestDelay;
+		'dashboard-web': DashboardWeb;
+		'loadable-block': LoadableBlock;
+		'material-input': MaterialInput;
+		'theme-selector': ThemeSelector;
+		'animated-button': AnimatedButton;
+		'password-detail': PasswordDetail;
+		'loading-spinner': LoadingSpinner;
+		'password-preview': PasswordPreview;
+		'vertical-centerer': VerticalCenterer;
+		'material-checkbox': MaterialCheckbox;
+		'horizontal-centerer': HorizontalCenterer;
+		'infinte-list': InfiniteList<any, any, any>;
+		'floating-action-button': FloatingActionButton;
 	}
+
+	type WebComponentElementsWithName = {
+		[T in keyof WebComponentElementsByTag]: WebComponentElementsByTag[T] & {
+			name: T;
+		}
+	}
+
+	type WebComponentElements = WebComponentElementsWithName[keyof WebComponentElementsWithName];
 }
