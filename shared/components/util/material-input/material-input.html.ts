@@ -1,4 +1,4 @@
-import { classNames, inlineListener } from "../../../lib/webcomponent-util";
+import { classNames, inlineListener, attribute } from "../../../lib/webcomponent-util";
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { MaterialInput } from "./material-input";
 import { html } from "lit-html";
@@ -18,8 +18,9 @@ export const MaterialInputHTML = new TemplateFn<MaterialInput>(function (props) 
 					html`
 						<textarea class="mdl-textfield__input" type="${props.type}" 
 							id="input" rows="${props.rows}"
-							pattern="${props.pattern}"
-							readonly="${props.readonly ? true : null}"
+							_pattern="${attribute(!!props.pattern, props.pattern)}"
+							_readonly="${attribute(props.readonly || false)}"
+							autocomplete="${props.autocomplete ? 'on' : 'off'}"
 							on-keydown="${inlineListener(this.inputKeyDown, this)}"
 							on-input="${inlineListener(this.updateClasses, this)}"
 							on-focus="${inlineListener(this.onFocus, this)}"
@@ -29,8 +30,9 @@ export const MaterialInputHTML = new TemplateFn<MaterialInput>(function (props) 
 					` : html`
 						<input class="mdl-textfield__input" type="${props.type}" 
 							id="input" value="${props.value}" 
-							pattern="${props.pattern}"
-							readonly="${props.readonly ? true : null}"
+							_pattern="${attribute(!!props.pattern, props.pattern)}"
+							_readonly="${attribute(props.readonly || false)}"
+							autocomplete="${props.autocomplete ? 'on' : 'off'}"
 							on-keydown="${inlineListener(this.inputKeyDown, this)}"
 							on-input="${inlineListener(this.updateClasses, this)}"
 							on-focus="${inlineListener(this.onFocus, this)}"

@@ -64,6 +64,12 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 			readonly: {
 				type: PROP_TYPE.BOOL,
 				value: false
+			},
+			autocomplete: {
+				type: PROP_TYPE.BOOL,
+				value: true,
+				coerce: true,
+				strict: true
 			}
 		}
 	});
