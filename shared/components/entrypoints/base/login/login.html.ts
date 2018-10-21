@@ -46,6 +46,7 @@ export const LoginHTML = new TemplateFn<Login>(function (props, _) {
 								title="Twofactor authentication token (if enabled for the account)"
 								wc-valid="${inlineListener(this.updateValidity, this)}"
 								wc-keydown="${inlineListener(this.onSubmit, this)}"
+								autoComplete="false"
 								autoFocus label="2FA Token (if enabled)"></material-input>
 							<div id="buttonPositioner">
 								<animated-button aria-label="Submit form" id="button" 
