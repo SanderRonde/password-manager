@@ -18,6 +18,6 @@ export const PaperButtonHTML = new TemplateFn<PaperButton>(function(props) {
 			on-click="${inlineListener(this.buttonClick, this, true)}"
 		>
 			<slot></slot>
-			<span>${props.content}</span>
+			${props.content ? html`<span>${props.content}</span>` : ''}
 		</button>`;
 }, CHANGE_TYPE.PROP);

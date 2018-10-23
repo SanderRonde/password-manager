@@ -32,7 +32,8 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 				coerce: true
 			},
 			border: PROP_TYPE.BOOL,
-			borderColor: PROP_TYPE.STRING
+			borderColor: PROP_TYPE.STRING,
+			content: PROP_TYPE.STRING
 		}
 	});
 
