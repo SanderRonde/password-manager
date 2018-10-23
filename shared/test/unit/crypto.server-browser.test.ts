@@ -2,7 +2,6 @@ const parallel = require('mocha.parallel') as (name: string, fn: (this: Mocha.Co
 import { genRandomString } from '../../../server/app/lib/util';
 import * as serverCrypto from '../../../server/app/lib/crypto';
 import * as requireHacker from 'require-hacker';
-import * as speakeasy from 'speakeasy';
 import path = require('path');
 import { assert } from 'chai';
 
