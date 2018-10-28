@@ -366,7 +366,7 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 			callbackOrOptions(null!, this._records.length);
 		}
 		else if (typeof callbackOrQuery === 'function') {
-			callbackOrQuery(null!, this._records.length);
+			(callbackOrQuery as any)(null!, this._records.length);
 		}
 		else {
 			return Promise.resolve(this._records.length);

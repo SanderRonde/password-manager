@@ -31,7 +31,7 @@ export abstract class DashboardScrollManager extends ConfigurableWebComponent<Da
 	private _currentAnimationFrame: number|null = null;
 	private _passwordFocusIsFixed: boolean = false;
 	private _scroll() {
-		if (this._passwordFocusIsFixed || document.documentElement.scrollTop <= MAX_DOC_SCROLL) {
+		if (this._passwordFocusIsFixed || document.documentElement!.scrollTop <= MAX_DOC_SCROLL) {
 			this._passwordFocusIsFixed = false;
 			this.$.passwordDetail.classList.remove('fixed');
 		} else if (!this._passwordFocusIsFixed && 
