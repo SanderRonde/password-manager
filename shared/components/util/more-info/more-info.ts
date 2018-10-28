@@ -12,12 +12,22 @@ import { MoreInfoCSS } from './more-info.css';
 	html: MoreInfoHTML
 })
 export class MoreInfo extends ConfigurableWebComponent<MoreInfoIDMap> {
+	public infoHeight: number = 0;
+
 	props = defineProps(this, {
 		reflect: {
 			info: {
 				type: PROP_TYPE.STRING,
 				value: ''
-			}
+			},
+			openUp: PROP_TYPE.BOOL
 		}
 	});
+
+	mounted() {
+		this.infoHeight = this.$.info.scrollHeight;
+		if (this.props.openUp) {
+			this.renderToDOM();
+		}
+	}
 }

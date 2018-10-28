@@ -3,7 +3,7 @@ import { changeOpacity } from '../../../lib/webcomponent-util';
 import { MoreInfo } from './more-info';
 import { html } from 'lit-html';
 
-export const MoreInfoCSS = new TemplateFn<MoreInfo>((_props, theme) => {
+export const MoreInfoCSS = new TemplateFn<MoreInfo>(function (props, theme) {
 	return html`<style>
 		#letter {
 			display: inline;
@@ -41,6 +41,13 @@ export const MoreInfoCSS = new TemplateFn<MoreInfo>((_props, theme) => {
 			background-color: ${changeOpacity(theme.textOnBackground, 70)};
 			color: ${theme.textOnNonbackground};
 		}
+
+		${!props.openUp ? '' : `
+			#info {
+				margin-top: -${this.infoHeight + 20}px;
+				transform-origin: bottom;
+			}
+		`}
 
 		#hoverable:hover #info {
 			transform: scale(1);
