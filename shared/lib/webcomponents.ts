@@ -2,7 +2,7 @@ import { GlobalController } from '../components/entrypoints/base/global/global-c
 import { ComponentIs, WebComponentConfiguration } from './webcomponent-util';
 import { GlobalProperties, Theme, DEFAULT_THEME } from '../types/shared-types';
 import { theme } from '../components/theming/theme/theme';
-import { TemplateResult, render, html } from 'lit-html';
+import { TemplateResult, render, html, isDirective } from 'lit-html';
 import { removeAllElementListeners } from './listeners';
 import { bindToClass } from './decorators';
 
@@ -542,25 +542,24 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 			}
 		}
 
-	protected __setGlobalPropertyFromChild<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
-		value: V) {
-			this.__setGlobalProperty(key, value);
-			if (this.__isRoot) {
-				for (const child of this.__children) {
-					child.__setGlobalPropertyFromParent(key, value);
-				}
-			} else if (this.__parent) {
-				this.__parent.__setGlobalPropertyFromChild(key, value);
-			}
+	private __propagateThroughTree<R>(fn: (element: WebComponentHierarchyManager<any>) => R): R[] {
+		if (this.__isRoot) {
+			const results: R[] = [];
+			this.__propagateDown(fn, results);
+			return results;
+		} else if (this.__parent) {
+			return this.__parent.__propagateThroughTree(fn);
 		}
+		return [];
+	}
 
-	protected __setGlobalPropertyFromParent<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
-		value: V) {
-			this.__setGlobalProperty(key, value);
-			for (const child of this.__children) {
-				child.__setGlobalPropertyFromParent(key, value);
-			}
+	private __propagateDown<R>(fn: (element: WebComponentHierarchyManager<any>) => R, results: R[]) {
+		results.push(fn(this));
+
+		for (const child of this.__children) {
+			child.__propagateDown(fn, results);
 		}
+	}
 
 	public getGlobalProperty<P extends keyof GlobalProperties>(key: P): GlobalProperties[P]|undefined {
 		if (!this.__internals.globalProperties) {
@@ -571,14 +570,13 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 
 	public setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
 		value: V) {
-			this.__setGlobalProperty(key, value);
-			if (this.__parent) {
-				this.__parent.__setGlobalPropertyFromChild(key, value);
-			} else if (this.__isRoot) {
-				this.__setGlobalPropertyFromParent(key, value);
-			} else {
+			if (!this.__parent && !this.__isRoot) {
 				console.warn(`Failed to propagate global property "${key}" since this element has no registered parent`);
+				return;
 			}
+			this.__propagateThroughTree((element) => {
+				element.__setGlobalProperty(key, value);
+			});
 		}
 
 	public getRoot(): GlobalController {
@@ -587,6 +585,10 @@ abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends 
 		}
 		return this.__parent!.getRoot();
 	}
+
+	public runGlobalFunction<R>(fn: (element: ConfigurableWebComponent<any>) => R): R[] {
+		return this.__propagateThroughTree(fn);
+	}
 }
 
 const defaultTheme: DEFAULT_THEME = 'light';
@@ -594,7 +596,7 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 	constructor() {
 		super();
 
-		this.listen('globalPropChange', (prop): any => {
+		this.listen('globalPropChange', (prop, _): any => {
 			if (prop === 'theme') {
 				this.__setTheme();
 			}

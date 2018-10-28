@@ -5,7 +5,7 @@ import { GlobalControllerData } from '../../base/global/global-controller';
 import { DashboardHTML } from '../../base/dashboard/dashboard.html';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { DashboardCSS } from '../../base/dashboard/dashboard.css';
-import { doClientAPIRequest } from '../../../../lib/apirequests';
+import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { MasterPassword } from '../../../../types/db-types';
 import { CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { ENTRYPOINT } from '../../../../types/shared-types';
@@ -94,7 +94,8 @@ export class DashboardWeb extends Dashboard {
 			}
 		}
 
-		const res = await doClientAPIRequest({
+		const requestDelay = this.getRoot().find('request-delay');
+		const request = createClientAPIRequest({
 			publicKey: this._data.server_public_key
 		}, '/api/password/allmeta', {
 			instance_id: this._data.instance_id
@@ -103,6 +104,8 @@ export class DashboardWeb extends Dashboard {
 			token: this.getRoot().getAPIToken(),
 			password_hash: verifyHashed
 		});
+		const res = await (requestDelay ? requestDelay.pushRequest(request) :
+			request.fn());
 		if (res.success === false) {
 			this._failNoCredentials(`Failed to get passwords "${res.ERR}"`);
 			return null;

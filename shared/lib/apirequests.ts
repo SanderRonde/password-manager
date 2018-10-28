@@ -50,27 +50,46 @@ export function filterUndefined<T>(obj: T): UndefinedRemoved<T> {
 	return copied as UndefinedRemoved<T>;
 }
 
-export async function doClientAPIRequest<K extends keyof APIFns>({ publicKey }: {
+export function createClientAPIRequest<K extends keyof APIFns>({ publicKey }: {
 	publicKey: string;
-}, path: K,args: APIArgs[K][0], encrypted: APIArgs[K][1]): Promise<APIReturns[K]>;
-export async function doClientAPIRequest<K extends keyof APIFns>({  }: {
+}, path: K,args: APIArgs[K][0], encrypted: APIArgs[K][1]): {
+	api: K;
+	fn: () => Promise<APIReturns[K]>
+};
+export function createClientAPIRequest<K extends keyof APIFns>({  }: {
 	publicKey?: string;
-}, path: K,args: APIArgs[K][0]): Promise<APIReturns[K]>;
-export async function doClientAPIRequest<K extends keyof APIFns>({ publicKey }: {
+}, path: K,args: APIArgs[K][0]): {
+	api: K;
+	fn: () => Promise<APIReturns[K]>
+};
+export function createClientAPIRequest<K extends keyof APIFns>({ publicKey }: {
 	publicKey?: string;
-}, path: K,args: APIArgs[K][0], encrypted?: APIArgs[K][1]): Promise<APIReturns[K]> {
+}, path: K,args: APIArgs[K][0], encrypted?: APIArgs[K][1]): {
+	api: K;
+	fn: () => Promise<APIReturns[K]>
+ } {
 	const keys = Object.getOwnPropertyNames(encrypted || {});
 	if (keys.length && !publicKey) {
-		return Promise.resolve({
-			success: false as false,
-			ERR: API_ERRS.CLIENT_ERR,
-			error: 'missing public key'
-		});
+		return {
+			api: path,
+			fn: () => {
+				return Promise.resolve({
+					success: false as false,
+					ERR: API_ERRS.CLIENT_ERR,
+					error: 'missing public key'
+				});
+			}
+		}
 	}
 	const data = {...filterUndefined(args) as Object, ...(keys.length && publicKey ? {
 		encrypted: encryptWithPublicKey(filterUndefined(encrypted), publicKey)
 	} : {})};
 
 	const baseURL = `${location.protocol}//${location.host}`;
-	return doHTTPRequest(`${baseURL}${path}`, 'POST', data) as Promise<APIReturns[K]>;
+	return {
+		api: path,
+		fn: () => {
+			return doHTTPRequest(`${baseURL}${path}`, 'POST', data) as Promise<APIReturns[K]>;
+		}
+	}
 }

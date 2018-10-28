@@ -3,11 +3,12 @@ import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding, ERRS } from 
 import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../types/db-types';
 import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
 import { LoadableBlock } from '../../../util/loadable-block/loadable-block';
+import { RequestDelay } from '../../../util/request-delay/request-delay';
 import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { decryptWithPrivateKey } from '../../../../lib/browser-crypto';
+import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { GlobalControllerIDMap } from './global-controller-querymap';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
-import { doClientAPIRequest } from '../../../../lib/apirequests';
 import { ENTRYPOINT } from '../../../../types/shared-types';
 import { Dashboard } from '../../base/dashboard/dashboard';
 import { API_ERRS } from '../../../../types/api';
@@ -33,7 +34,8 @@ const AUTH_TOKEN_EXPIRE_TIME = 1000 * 60 * 15;
 
 export const GlobalControllerDependencies = [
 	LoadableBlock,
-	PaperToast
+	PaperToast,
+	RequestDelay
 ];
 export abstract class GlobalController extends ConfigurableWebComponent<GlobalControllerIDMap> {
 	private _data: Map<keyof GlobalControllerData, 
@@ -135,7 +137,8 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 				' extended and will time out in 3 minutes', PaperToast.DURATION.LONG);
 			return;
 		}
-		const response = await doClientAPIRequest({
+		const requestDelay = this.getRoot().find('request-delay');
+		const request = createClientAPIRequest({
 			publicKey: data.server_public_key
 		}, '/api/instance/extend_key', {
 			instance_id: data.instance_id
@@ -143,6 +146,8 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 			old_token: this._token!,
 			count: this.getRequestCount()
 		});
+		const response = await (requestDelay ? requestDelay.pushRequest(request) :
+			request.fn());
 		if (response.success) {
 			const decryptedToken = decryptWithPrivateKey(response.data.auth_token,
 				data.private_key);
@@ -272,6 +277,21 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 				GlobalController._entrypointURLs[page]);
 			this._setTitle(GlobalController._entrypointTitles[page]);
 		}
+	}
+
+	find<T extends keyof WebComponentElementsByTag>(tagName: T): WebComponentElementsByTag[T]|null {
+		const maps = this.runGlobalFunction((element) => {
+			return {
+				tagName: element.config.is,
+				element
+			}
+		});
+		for (const { element, tagName: elementTagName } of maps) {
+			if (tagName === elementTagName) {
+				return element as any;
+			}
+		}
+		return null;
 	}
 	
 	mounted() {

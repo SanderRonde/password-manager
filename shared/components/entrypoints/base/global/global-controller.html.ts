@@ -9,5 +9,6 @@ export const GlobalControllerHTML = new TemplateFn<GlobalController>(() => {
 				<slot id="slotContent"></slot>
 				<div id="content"></div>
 			</div>
-		</loadable-block>`;
+		</loadable-block>
+		<request-delay></request-delay>`;
 }, CHANGE_TYPE.NEVER);

@@ -2,7 +2,7 @@ import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey }
 import { config, cancelTimeout, wait, createCancellableTimeout, reportDefaultResponseErrors } from '../../../../lib/webcomponent-util';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { Login, LoginDependencies } from '../../base/login/login';
-import { doClientAPIRequest } from '../../../../lib/apirequests';
+import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { API_ERRS, APIReturns } from '../../../../types/api';
 import { ENTRYPOINT } from '../../../../types/shared-types';
 import { bindToClass } from '../../../../lib/decorators';
@@ -49,18 +49,21 @@ export class LoginWeb extends Login {
 
 		const { comm_token, server_public_key } = serverData;
 		try {
+			const requestDelay = this.getRoot().find('request-delay');
+			const request = createClientAPIRequest({},
+				'/api/dashboard/login', {
+					comm_token,
+					public_key: keyPair.publicKey,
+					encrypted_data: encryptWithPublicKey({
+						email: email,
+						twofactor_token: twofactor_token || undefined,
+						password: hash(pad(password, 'masterpwverify')),
+					}, server_public_key)
+				});
 			const res = {
 				privateKey: keyPair.privateKey,
-				response: await doClientAPIRequest({},
-					'/api/dashboard/login', {
-						comm_token,
-						public_key: keyPair.publicKey,
-						encrypted_data: encryptWithPublicKey({
-							email: email,
-							twofactor_token: twofactor_token || undefined,
-							password: hash(pad(password, 'masterpwverify')),
-						}, server_public_key)
-					})
+				response: await (requestDelay ? requestDelay.pushRequest(request) :
+					request.fn())
 			};
 			if (res.response.success === false) {
 				reportDefaultResponseErrors(res.response,

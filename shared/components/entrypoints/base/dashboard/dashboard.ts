@@ -3,7 +3,7 @@ import { PasswordDetailWeb } from '../../../page-specific/dashboard/web/password
 import { PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
 import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
-import { defineProps, ComplexType, PROP_TYPE } from '../../../../lib/webcomponent-util';
+import { defineProps, ComplexType, PROP_TYPE, wait } from '../../../../lib/webcomponent-util';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
@@ -62,9 +62,17 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 			MetaPasswordsPreviewData, Dashboard>;
 	}
 
+	private _mountedCalled: boolean = false;
+
 	constructor() {
 		super();
 
+		console.log('constructed');
+		wait(2500).then(() => {
+			if (this._mountedCalled) return;
+			debugger;
+			this.mounted();
+		});
 		this.listen('beforePropChange', (key, prevVal: MetaPasswords, newVal: MetaPasswords) => {
 			if (key === 'metaPasswords' && this.props.selected !== -1 &&
 				typeof this.props.selected === 'number') {
@@ -103,14 +111,19 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 	protected abstract _getPasswordMeta(): Promise<MetaPasswords|null>|MetaPasswords|null;
 
 	private async _getPwMeta() {
+		console.log('Getting pwmeta');
 		const pwMeta = await this._getPasswordMeta();
+		console.log('Got pwmeta', pwMeta);
 		if (!pwMeta || (pwMeta.length === 0 && document.body.classList.contains('dev'))) {
+			console.log('is dev mode');
 			if (document.body.classList.contains('dev')) {
+				console.log('Using dummy passwords');
 				this.props.metaPasswords = devPasswords.getDevPasswords();
 			}
 			//Redirecting to /login, just let this go
 			return;
 		}
+		console.log('Using ', pwMeta, '||', [], '=', pwMeta || []);
 		this.props.metaPasswords = pwMeta || [];
 	}
 
@@ -144,8 +157,16 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		}))).fill('').map((_) => {});
 	}
 
-	mounted() {
+	private _onMount() {
+		if (this._mountedCalled) return;
+		this._mountedCalled = true;
+		console.log('supermounted');
 		super.mounted();
+		console.log('was mounted');
 		this._getPwMeta();
+	}
+
+	mounted() {
+		this._onMount();
 	}
 }

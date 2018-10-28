@@ -1,6 +1,6 @@
 export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './listeners';
 import { WebComponentBase, EventListenerObj, WebComponent, TemplateFn, CHANGE_TYPE, refPrefix } from './webcomponents';
-import { directive, AttributePart, DirectiveFn, TemplateResult, html } from 'lit-html';
+import { directive, AttributePart, Directive, TemplateResult, html } from 'lit-html';
 import { supportsPassive, isNewElement, listenWithIdentifier } from "./listeners";
 import { PaperToast } from '../components/util/paper-toast/paper-toast';
 import { API_ERRS } from '../types/api';
@@ -545,6 +545,7 @@ export function defineProps<P extends {
 }>(element: HTMLElement & {
 	renderToDOM(changeType: CHANGE_TYPE): void;
 	getParentRef(ref: string): any;
+	isMounted: boolean;
 	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
 		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
 }, {
@@ -579,7 +580,22 @@ export function defineProps<P extends {
 		isPrivate: boolean;
 		strict: boolean;
 	}> = new Map();
+
+	const preMountedQueue: {
+		set: [string, string][],
+		remove: string[]
+	} = {
+		set: [],
+		remove: []
+	}
+
 	element.setAttribute = (key: string, val: string) => {
+		if (!element.isMounted) {
+			preMountedQueue.set.push([key, val]);
+			originalSetAttr(key, val);
+			return;
+		}
+
 		const casingKey = dashesToCasing(key)
 		if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
 			const { watch, isPrivate, mapType, strict } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
@@ -602,6 +618,12 @@ export function defineProps<P extends {
 		originalSetAttr(key, val);
 	};
 	element.removeAttribute = (key: string) => {
+		if (!element.isMounted) {
+			preMountedQueue.remove.push(key);
+			originalSetAttr(key);
+			return;
+		}
+
 		const casingKey = dashesToCasing(key);
 		if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
 			const { watch, coerce, mapType } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
@@ -714,6 +736,48 @@ export function defineProps<P extends {
 				});
 			}
 			await awaitMounted(element as any);
+
+			for (const [key, val] of preMountedQueue.set) {
+				//TODO: DRY
+				const casingKey = dashesToCasing(key)
+				if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
+					const { watch, isPrivate, mapType, strict } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
+
+					const prevVal = (propValues as any)[casingKey];
+					const newVal = getterWithVal(element, val, strict, mapType);
+					element.fire('beforePropChange', casingKey, prevVal, newVal);
+					(propValues as any)[casingKey] = newVal;
+					element.fire('propChange', casingKey, prevVal, newVal);
+					if (watch) {
+						queueRender(element, CHANGE_TYPE.PROP);
+					}
+					if (isPrivate) {
+						originalSetAttr(casingKey, '_');
+						return;
+					}
+				} else {
+					(propValues as any)[casingKey] = val;
+				}
+				originalSetAttr(key, val);
+			}
+			for (const key of preMountedQueue.remove) {
+				//TODO: DRY
+				const casingKey = dashesToCasing(key);
+				if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
+					const { watch, coerce, mapType } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
+		
+					const prevVal = (propValues as any)[casingKey];
+					const newVal = coerce ? getCoerced(undefined, mapType) : undefined;
+					element.fire('beforePropChange', casingKey, prevVal, newVal);
+					(propValues as any)[casingKey] = newVal;
+					element.fire('propChange', casingKey, prevVal, newVal);
+					if (watch) {
+						queueRender(element, CHANGE_TYPE.PROP);
+					}
+				}
+				originalRemoveAttr(key);
+			}
+
 			queueRender(element, CHANGE_TYPE.PROP);
 		})();
 	}
@@ -1074,13 +1138,27 @@ export function isDark(color: string) {
 	return r * a < 100 && g * a < 100 && b * a < 100;
 }
 
+function waitForMountedCallback(el: WebComponentBase): Promise<() => void> {
+	const realEl = el as WebComponent;
+	return new Promise<() => void>(async (resolve) => {
+		if (realEl.mounted) {
+			resolve(realEl.mounted);
+		} else {
+			await wait(50);
+			await waitForMountedCallback(el);
+			resolve(realEl.mounted);
+		}
+	});
+}
+
 export async function awaitMounted(el: WebComponentBase) {
 	const realEl = el as WebComponent;
 	if (realEl.isMounted) {
 		return;
 	}
-	await new Promise((resolve) => {
-		const originalMounted = realEl.mounted && realEl.mounted.bind(realEl);
+	await new Promise(async (resolve) => {
+		const originalMounted = realEl.mounted ?
+			realEl.mounted.bind(realEl) : await waitForMountedCallback(realEl);
 		realEl.mounted = () => {
 			originalMounted && originalMounted();
 			resolve();
@@ -1094,8 +1172,9 @@ export async function hookIntoMount(el: WebComponentBase, fn: () => void) {
 		fn();
 		return;
 	}
-	await new Promise((resolve) => {
-		const originalMounted = realEl.mounted && realEl.mounted.bind(realEl);
+	await new Promise(async (resolve) => {
+		const originalMounted = realEl.mounted ?
+			realEl.mounted.bind(realEl) : await waitForMountedCallback(realEl);
 		realEl.mounted = () => {
 			fn();
 			originalMounted && originalMounted();
@@ -1178,8 +1257,8 @@ export function reportDefaultResponseErrors(response: {
 }
 
 const directives: {
-	baseMap: WeakMap<WebComponent<any>, WeakMap<Function, DirectiveFn<AttributePart>>>;
-	fnMap: WeakMap<Function, DirectiveFn<AttributePart>>;
+	baseMap: WeakMap<WebComponent<any>, WeakMap<Function, Directive<AttributePart>>>;
+	fnMap: WeakMap<Function, Directive<AttributePart>>;
 } = {
 	baseMap: new WeakMap(),
 	fnMap: new WeakMap()
@@ -1203,7 +1282,7 @@ export function inlineListener<B extends WebComponent<any>>(listener: Function, 
 		}
 
 		const generatedDirective = directive<AttributePart>(async (part) => {
-			const [ prefix, event, ...rest ] = part.name.split('-');
+			const [ prefix, event, ...rest ] = part.committer.name.split('-');
 			if (rest.length > 0) {
 				console.warn('Attempting to use inline listener without specifying event');
 				return;
@@ -1212,7 +1291,7 @@ export function inlineListener<B extends WebComponent<any>>(listener: Function, 
 				eventContexts.set(event, {});
 			}
 			const eventScope = eventContexts.get(event);
-			if (isNewElement(part.element as HTMLElement, eventScope)) {
+			if (isNewElement(part.committer.element as HTMLElement, eventScope)) {
 				if (prefix === 'on') {
 					if (!base) {
 						console.warn('Attempting to listen to event without a component base');
@@ -1223,10 +1302,10 @@ export function inlineListener<B extends WebComponent<any>>(listener: Function, 
 						inlineListenerBases.set(base, new WeakMap());
 					}
 					const baseMap = inlineListenerBases.get(base)!;
-					if (!baseMap.has(part.element as HTMLElement)) {
-						baseMap.set(part.element as HTMLElement, new Map());
+					if (!baseMap.has(part.committer.element as HTMLElement)) {
+						baseMap.set(part.committer.element as HTMLElement, new Map());
 					}
-					const elementMap = baseMap.get(part.element as HTMLElement)!;
+					const elementMap = baseMap.get(part.committer.element as HTMLElement)!;
 					if (!elementMap.get(event)) {
 						elementMap.set(event, new WeakMap());
 					}
@@ -1235,12 +1314,12 @@ export function inlineListener<B extends WebComponent<any>>(listener: Function, 
 						eventMap.set(listener, `__inline_listener${listenerIdIndex++}`);
 					}
 					
-					listenWithIdentifier(base, part.element as HTMLElement, eventMap.get(listener)!,
+					listenWithIdentifier(base, part.committer.element as HTMLElement, eventMap.get(listener)!,
 						event as any, listener as any, options);
 				} else if (prefix === 'wc') {
-					await awaitMounted(part.element as WebComponent<any>);
-					(part.element as WebComponent<any>).listen &&
-						(part.element as WebComponent<any>).listen(event as any,
+					await awaitMounted(part.committer.element as WebComponent<any>);
+					(part.committer.element as WebComponent<any>).listen &&
+						(part.committer.element as WebComponent<any>).listen(event as any,
 							listener as any);
 				} else {
 					console.warn('Attempting to use inline listener without specifying event');
@@ -1314,4 +1393,15 @@ export function joinTemplates<T extends WebComponent<any>>(...templates: Templat
 			}))}
 		`;
 	}, changeType as any);
+}
+
+export function attribute(condition: boolean, value?: string) {
+	return directive<AttributePart>(async (part) => {
+		const key = part.committer.name.slice(1);
+		if (condition) {
+			part.committer.element.setAttribute(key, value || key);
+		} else {
+			part.committer.element.removeAttribute(key);
+		}
+	});
 }
