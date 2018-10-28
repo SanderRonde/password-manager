@@ -361,7 +361,7 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 
 	private get _scrolled() {
 		if (this.props.window) {
-			return document.documentElement.scrollTop;
+			return document.documentElement!.scrollTop;
 		} else {
 			return this.$.contentContainer.scrollTop;
 		}
@@ -369,7 +369,7 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 
 	private set _scrolled(value: number) {
 		if (this.props.window) {
-			document.documentElement.scrollTop = value;
+			document.documentElement!.scrollTop = value;
 		} else {
 			this.$.contentContainer.scrollTop = value;
 		}
@@ -612,6 +612,10 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 	}
 
 	public updateItemData(index: number, updated: Partial<ID>) {
+		if (typeof index !== 'number') {
+			console.warn('No valid index supplied');
+			return;
+		}
 		const prevData = this._itemData![index];
 		if (typeof prevData !== 'object' || typeof updated !== 'object') {
 			console.warn('Can\'t update non-object data (use set)');
