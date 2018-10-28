@@ -13,7 +13,7 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "target": "es6",
+        "target": "esnext",
         "noUnusedParameters": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": true,
@@ -24,11 +24,11 @@
     "allowJs": true,
     "compileOnSave": true,
     "include": [
-        "./",
-        "../static",
-        "../../../../../../../typings/"
+        "src",
+        "static",
+        "../../../../../../typings/"
     ],
     "references": [{
-        "path": "../../../../../../../shared/tsconfig.commonjs.json"
+        "path": "../../../../../../shared"
     }]
 }

@@ -27,7 +27,7 @@
     "allowJs": true,
     "include": [
         "./",
-        "../typings/"
+        "../typings/", "../server/app/actions/server/webserver/client/tsconfig.json"
     ],
     "exclude": [
         "test/"

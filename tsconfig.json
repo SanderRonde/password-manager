@@ -27,7 +27,7 @@
 	"references": [{
 		"path": "./server/tsconfig.ts3.json"
 	}, {
-		"path": "./server/app/actions/server/webserver/client/src"
+		"path": "./server/app/actions/server/webserver/client"
 	}, {
         "path": "./test/tsconfig.json"
     }, {

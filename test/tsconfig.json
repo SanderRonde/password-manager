@@ -35,6 +35,6 @@
 	}, {
 		"path": "../shared/tsconfig.commonjs.json"
 	}, {
-		"path": "../server/app/actions/server/webserver/client/src/tsconfig.commonjs.json"
+		"path": "../server/app/actions/server/webserver/client/tsconfig.commonjs.json"
 	}]
 }
