@@ -636,10 +636,6 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 		return `${refPrefix}${refIndex}`;
 	}
 
-	private static _isDirective(value: any) {
-		return value && value.__litDirective === true;
-	}
-
 	@bindToClass
 	public complexHTML(strings: TemplateStringsArray, ...values: any[]) {
 		values = values.map((value) => {
@@ -653,10 +649,9 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 				!(value instanceof TemplateResult)) {
 					return this.__genRef(value);
 				}
-			if (typeof value === 'function' && 
-				!WebComponentComplexValueManager._isDirective(value)) {
-					return this.__genRef(value);
-				}
+			if (typeof value === 'function' && !isDirective(value)) {
+				return this.__genRef(value);
+			}
 			return value;
 		});
 		return html(strings, ...values);
@@ -692,7 +687,7 @@ abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends 
 		const originalSetAttr = this.setAttribute;
 		this.setAttribute = (key: string, val: string) => {
 			originalSetAttr.bind(this)(key, val);
-			if (key === 'custom-css') {
+			if (key === 'custom-css' && this.isMounted) {
 				this.renderToDOM(CHANGE_TYPE.ALWAYS);
 			}
 		}

@@ -122,7 +122,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props
 						<password-form id="passwordForm"
 							parent="${this}"
 							password-visible="true"
-							visible-websites="${props.visibleWebsites}"
+							visible-websites="${props.visibleWebsites || []}"
 						></password-form>
 					</div>
 				</sizing-block>
