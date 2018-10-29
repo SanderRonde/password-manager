@@ -49,7 +49,6 @@ export class LoginWeb extends Login {
 
 		const { comm_token, server_public_key } = serverData;
 		try {
-			const requestDelay = this.getRoot().find('request-delay');
 			const request = createClientAPIRequest({},
 				'/api/dashboard/login', {
 					comm_token,
@@ -62,8 +61,7 @@ export class LoginWeb extends Login {
 				});
 			const res = {
 				privateKey: keyPair.privateKey,
-				response: await (requestDelay ? requestDelay.pushRequest(request) :
-					request.fn())
+				response: await request.fn()
 			};
 			if (res.response.success === false) {
 				reportDefaultResponseErrors(res.response,

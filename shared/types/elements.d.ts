@@ -19,7 +19,6 @@ import { PaperToast } from "../components/util/paper-toast/paper-toast";
 import { IconButton } from "../components/util/icon-button/icon-button";
 import { MoreInfo } from "../components/util/more-info/more-info";
 import { MDCard } from "../components/util/md-card/md-card";
-import { RequestDelay } from "../components/util/request-delay/request-delay";
 
 declare global {
 	type HTMLMdCardElement = MDCard;
@@ -56,7 +55,6 @@ declare global {
 		'sizing-block': SizingBlock;
 		'paper-button': PaperButton;
 		'password-form': PasswordForm;
-		'request-delay': RequestDelay;
 		'dashboard-web': DashboardWeb;
 		'loadable-block': LoadableBlock;
 		'material-input': MaterialInput;

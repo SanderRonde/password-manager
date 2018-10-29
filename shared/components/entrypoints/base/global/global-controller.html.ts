@@ -1,4 +1,4 @@
-import { CHANGE_TYPE, TemplateFn } from '../../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { GlobalController } from './global-controller';
 import { html } from 'lit-html';
 
@@ -9,6 +9,5 @@ export const GlobalControllerHTML = new TemplateFn<GlobalController>(() => {
 				<slot id="slotContent"></slot>
 				<div id="content"></div>
 			</div>
-		</loadable-block>
-		<request-delay></request-delay>`;
+		</loadable-block>`;
 }, CHANGE_TYPE.NEVER);

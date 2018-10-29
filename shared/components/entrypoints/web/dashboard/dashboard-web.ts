@@ -94,7 +94,6 @@ export class DashboardWeb extends Dashboard {
 			}
 		}
 
-		const requestDelay = this.getRoot().find('request-delay');
 		const request = createClientAPIRequest({
 			publicKey: this._data.server_public_key
 		}, '/api/password/allmeta', {
@@ -104,8 +103,7 @@ export class DashboardWeb extends Dashboard {
 			token: this.getRoot().getAPIToken(),
 			password_hash: verifyHashed
 		});
-		const res = await (requestDelay ? requestDelay.pushRequest(request) :
-			request.fn());
+		const res = await request.fn();
 		if (res.success === false) {
 			this._failNoCredentials(`Failed to get passwords "${res.ERR}"`);
 			return null;

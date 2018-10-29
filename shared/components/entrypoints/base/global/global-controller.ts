@@ -3,7 +3,6 @@ import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding, ERRS } from 
 import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../types/db-types';
 import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
 import { LoadableBlock } from '../../../util/loadable-block/loadable-block';
-import { RequestDelay } from '../../../util/request-delay/request-delay';
 import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
@@ -34,8 +33,7 @@ const AUTH_TOKEN_EXPIRE_TIME = 1000 * 60 * 15;
 
 export const GlobalControllerDependencies = [
 	LoadableBlock,
-	PaperToast,
-	RequestDelay
+	PaperToast
 ];
 export abstract class GlobalController extends ConfigurableWebComponent<GlobalControllerIDMap> {
 	private _data: Map<keyof GlobalControllerData, 
@@ -137,7 +135,6 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 				' extended and will time out in 3 minutes', PaperToast.DURATION.LONG);
 			return;
 		}
-		const requestDelay = this.getRoot().find('request-delay');
 		const request = createClientAPIRequest({
 			publicKey: data.server_public_key
 		}, '/api/instance/extend_key', {
@@ -146,8 +143,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 			old_token: this._token!,
 			count: this.getRequestCount()
 		});
-		const response = await (requestDelay ? requestDelay.pushRequest(request) :
-			request.fn());
+		const response = await request.fn();
 		if (response.success) {
 			const decryptedToken = decryptWithPrivateKey(response.data.auth_token,
 				data.private_key);

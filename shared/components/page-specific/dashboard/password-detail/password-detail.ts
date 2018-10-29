@@ -103,7 +103,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 	private async _check2faChanges(newData: PasswordDetailChanges,
 		changed: ToBools<PasswordDetailChanges>, callback: (success: boolean) => void) {
 			//Check if it's set up
-			const requestDelay = this.getRoot().find('request-delay');
 			const request = createClientAPIRequest({
 				publicKey: this.props.authData.server_public_key
 			}, '/api/instance/2fa/is_setup', {
@@ -112,8 +111,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				token: this.getRoot().getAPIToken(),
 				count: this.getRoot().getRequestCount()
 			});
-			const requestProm = (requestDelay ? requestDelay.pushRequest(request) :
-				request.fn());
+			const requestProm = request.fn();
 			await this._quickAnimateSelected(requestProm);
 			const response = await requestProm;
 			if (response.success) {
@@ -155,7 +153,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			}
 
 			//Combine these two requests
-			const requestDelay = this.getRoot().find('request-delay');
 			const request = createClientAPIRequest({
 				publicKey: this.props.authData.server_public_key
 			}, '/api/instance/u2f/gen_request', {
@@ -164,8 +161,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				token: this.getRoot().getAPIToken(),
 				count: this.getRoot().getRequestCount()
 			});
-			const requestProm = (requestDelay ? requestDelay.pushRequest(request) :
-				request.fn());
+			const requestProm = request.fn();
 			await this._quickAnimateSelected(requestProm);
 			const response = await requestProm;
 			if (response.success) {
@@ -293,7 +289,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				}, decryptHash.hash, 'aes-256-ctr');
 
 			//Apply changes
-			const requestDelay = this.getRoot().find('request-delay');
 			const request = createClientAPIRequest({
 				publicKey: this.props.authData.server_public_key
 			}, '/api/password/update', {
@@ -325,8 +320,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				encrypted: this._ifEnabled(changed.password || changed.notes,
 					encryptedData)
 			}));
-			const requestProm = (requestDelay ? requestDelay.pushRequest(request) :
-				request.fn());
+			const requestProm = request.fn();
 			await this._quickAnimateSelected(requestProm);
 			const response = await request;
 
@@ -512,7 +506,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}
 
 		const usedId = this.props.selected.id;
-		const requestDelay = this.getRoot().find('request-delay');
 		const request = createClientAPIRequest({
 			publicKey: this.props.authData.server_public_key
 		}, '/api/password/getmeta', {
@@ -522,8 +515,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			count: this.getRoot().getRequestCount(),
 			password_id: usedId
 		});;
-		const response = await (requestDelay ? requestDelay.pushRequest(request) :
-			request.fn());;
+		const response = await request.fn();
 
 		if (usedId !== this.props.selected.id) {
 			return;
@@ -638,7 +630,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			return;
 		}
 
-		const requestDelay = this.getRoot().find('request-delay');
 		const request = createClientAPIRequest({
 			publicKey: this.props.authData.server_public_key
 		}, '/api/password/get', {
@@ -654,8 +645,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			u2f_token: (this.props.selected.u2f_enabled ?
 				this._authState.u2fToken! : undefined)
 		}));
-		const requestProm = (requestDelay ? requestDelay.pushRequest(request) :
-			request.fn());
+		const requestProm = request.fn();
 
 		//Reset authstate
 		this._authState = {
