@@ -1,4 +1,4 @@
-import { defineProps, PROP_TYPE, wait, awaitMounted } from '../../../../lib/webcomponent-util';
+import { Props, PROP_TYPE, wait, awaitMounted } from '../../../../lib/webcomponent-util';
 import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding, ERRS } from '../../../../types/crypto';
 import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../types/db-types';
 import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
@@ -48,7 +48,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		[ENTRYPOINT.LOGIN]: 'Log in to your dashboard',
 		[ENTRYPOINT.DASHBOARD]: 'Your Dashboard'
 	};
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			page: {
 				type: PROP_TYPE.STRING,

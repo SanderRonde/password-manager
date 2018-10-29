@@ -4,7 +4,7 @@ import { FloatingActionButtonIDMap } from './floating-action-button-querymap';
 import { FloatingActionButtonHTML } from './floating-action-button.html';
 import { FloatingActionButtonCSS } from './floating-action-button.css';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
-import { config, defineProps } from '../../../lib/webcomponent-util';
+import { config, Props } from '../../../lib/webcomponent-util';
 
 @config({
 	is: 'floating-action-button',
@@ -12,7 +12,7 @@ import { config, defineProps } from '../../../lib/webcomponent-util';
 	html: FloatingActionButtonHTML
 })
 export class FloatingActionButton extends ConfigurableWebComponent<FloatingActionButtonIDMap> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 
 	});
 }

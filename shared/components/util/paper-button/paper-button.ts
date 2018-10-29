@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, isNewElement, defineProps, PROP_TYPE, changeOpacity } from '../../../lib/webcomponent-util';
+import { config, isNewElement, Props, PROP_TYPE, changeOpacity } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
 import { PaperButtonIDMap } from './paper-button-querymap';
@@ -19,7 +19,7 @@ export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
 		args: [MouseEvent]
 	}	
 }> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			flat: PROP_TYPE.BOOL,
 			color: PROP_TYPE.STRING,

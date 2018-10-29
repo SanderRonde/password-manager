@@ -1,7 +1,7 @@
 /// <reference path="../../../types/elements.d.ts" />
 
 import { ConfigurableWebComponent, TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { config, wait, defineProps, PROP_TYPE } from '../../../lib/webcomponent-util';
+import { config, wait, Props, PROP_TYPE } from '../../../lib/webcomponent-util';
 import { SizingBlockIDMap } from './sizing-block-querymap';
 import { SizingBlockHTML } from './sizing-block.html';
 import { html } from 'lit-html';
@@ -20,7 +20,7 @@ export class SizingBlock extends ConfigurableWebComponent<SizingBlockIDMap> {
 	private _supportsAnimate = !!HTMLElement.prototype.animate;
 	private static readonly ANIMATE_DURATION = 300;
 
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			maxHeight: {
 				type: PROP_TYPE.STRING

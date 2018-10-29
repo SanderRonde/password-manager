@@ -429,41 +429,456 @@ function watchValue(render: QueueRenderFn, value: any, watch: boolean, watchProp
 	return value;
 }
 
-const renderMap: WeakMap<HTMLElement, CHANGE_TYPE> = new WeakMap();
+namespace PropsDefiner {
+	// Reflect and private type configs
+	interface PropTypeConfig {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	};
+	type ReturnType<R extends PropTypeConfig, P extends PropTypeConfig> = {
+		[K in keyof R]: GetTSType<R[K]>;
+	} & {
+		[K in keyof P]: GetTSType<P[K]>;
+	};
+	type KeyPart<C extends PropTypeConfig, B extends boolean> = {
+		key: Extract<keyof C, string>;
+		value: C[keyof C];
+		reflectToAttr: B;
+	};
+	type Keys<R extends PropTypeConfig, P extends PropTypeConfig> = (KeyPart<R, true>|KeyPart<P, false>)[];
+	type Element = HTMLElement & {
+		renderToDOM(changeType: CHANGE_TYPE): void;
+		getParentRef(ref: string): any;
+		isMounted: boolean;
+		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+	};
 
-function queueRender(element: HTMLElement & {
-	renderToDOM(changeType: CHANGE_TYPE): void;
-	getParentRef(ref: string): any;
-	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
-		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
-}, changeType: CHANGE_TYPE) {
-	if (renderMap.has(element)) {
-		const mapped = renderMap.get(element);
-		//Check if this change type has higher priority
-		if (mapped === CHANGE_TYPE.ALWAYS) return;
-		if (mapped !== changeType) {
-			//It's either theme & prop or prop & theme,
-			// change it to always render
-			renderMap.set(element, CHANGE_TYPE.ALWAYS);
+	const renderMap: WeakMap<HTMLElement, CHANGE_TYPE> = new WeakMap();
+
+	function queueRender(element: HTMLElement & {
+		renderToDOM(changeType: CHANGE_TYPE): void;
+		getParentRef(ref: string): any;
+		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+	}, changeType: CHANGE_TYPE) {
+		if (renderMap.has(element)) {
+			const mapped = renderMap.get(element);
+			//Check if this change type has higher priority
+			if (mapped === CHANGE_TYPE.ALWAYS) return;
+			if (mapped !== changeType) {
+				//It's either theme & prop or prop & theme,
+				// change it to always render
+				renderMap.set(element, CHANGE_TYPE.ALWAYS);
+			}
+			return;
 		}
-		return;
+
+		renderMap.set(element, changeType);
+		setTimeout(() => {
+			element.renderToDOM(renderMap.get(element)!);
+			renderMap.delete(element);
+		}, 0);
 	}
 
-	renderMap.set(element, changeType);
-	setTimeout(() => {
-		element.renderToDOM(renderMap.get(element)!);
-		renderMap.delete(element);
-	}, 0);
+	function createQueueRenderFn(element: HTMLElement & {
+		renderToDOM(changeType: CHANGE_TYPE): void;
+		getParentRef(ref: string): any;
+		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+	}) {
+		return (changeType: CHANGE_TYPE) => {
+			queueRender(element, changeType);
+		}
+	}
+
+	class ElementRepresentation<R extends PropTypeConfig, P extends PropTypeConfig> {
+		public setAttr: (name: string, value: string) => void;
+		public removeAttr: (name: string) => void;
+		public keyMap: Map<Extract<keyof R|keyof P, string>, {
+			watch: boolean;
+			coerce: boolean;
+			mapType: DefinePropTypes;
+			isPrivate: boolean;
+			strict: boolean;
+		}> = new Map();
+		public propValues: Partial<ReturnType<R, P>> = {};
+		public preMountedQueue: {
+			set: [string, string][],
+			remove: string[]
+		} = {
+			set: [],
+			remove: []
+		};
+
+		constructor(public component: Element) {
+			this.setAttr = component.setAttribute.bind(component);
+			this.removeAttr = component.removeAttribute.bind(component);
+		}
+
+		public overrideAttributeFunctions() {
+			this.component.setAttribute = (key: string, val: string) => {
+				if (!this.component.isMounted) {
+					this.preMountedQueue.set.push([key, val]);
+					this.setAttr(key, val);
+					return;
+				}
+
+				onSetAttribute(key, val, this);
+			};
+			this.component.removeAttribute = (key: string) => {
+				if (!this.component.isMounted) {
+					this.preMountedQueue.remove.push(key);
+					this.removeAttr(key);
+					return;
+				}
+
+				onRemoveAttribute(key, this);
+			};
+		}
+
+		public runQueued() {
+			this.preMountedQueue.set.forEach(([key, val]) => onSetAttribute(key, val, this));
+			this.preMountedQueue.remove.forEach(key => onRemoveAttribute(key, this));
+			queueRender(this.component, CHANGE_TYPE.PROP);
+		}
+	}
+
+	function getKeys<R extends PropTypeConfig, P extends PropTypeConfig>({
+		reflect = {} as R, priv = {} as P
+	}: {
+		reflect?: R;
+		priv?: P;
+	}): Keys<R, P> {
+		return [...Object.getOwnPropertyNames(reflect).map((key) => {
+			return {
+				key: key as Extract<keyof R, string>,
+				value: reflect[key],
+				reflectToAttr: true
+			}
+		}) as KeyPart<R, true>[], ...Object.getOwnPropertyNames(priv).map((key) => {
+			return {
+				key: key as Extract<keyof P, string>,
+				value: priv[key],
+				reflectToAttr: false
+			}
+		}) as KeyPart<P, false>[]];
+	}
+
+	function onSetAttribute<R extends PropTypeConfig, P extends PropTypeConfig>(
+		key: string, val: string, el: ElementRepresentation<R, P>) {
+			const casingKey = dashesToCasing(key) as Extract<keyof R|keyof P, string>;
+			if (el.keyMap.has(casingKey)) {
+				const { 
+					watch, isPrivate, mapType, strict 
+				} = el.keyMap.get(casingKey)!;
+
+				const prevVal = el.propValues[casingKey];
+				const newVal = getterWithVal(el.component, val, strict, mapType);
+				
+				el.component.fire('beforePropChange', casingKey, prevVal, newVal);
+				el.propValues[casingKey] = newVal;
+				el.component.fire('propChange', casingKey, prevVal, newVal);
+
+				if (watch) {
+					queueRender(el.component, CHANGE_TYPE.PROP);
+				}
+				if (isPrivate) {
+					el.setAttr(casingKey, '_');
+					return;
+				}
+			} else {
+				el.propValues[casingKey] = val;
+			}
+			el.setAttr(key, val);
+		}
+
+	function onRemoveAttribute<R extends PropTypeConfig, P extends PropTypeConfig>(
+		key: string, el: ElementRepresentation<R, P>) {
+			const casingKey = dashesToCasing(key) as Extract<keyof R|keyof P, string>;
+				if (el.keyMap.has(casingKey)) {
+					const { 
+						watch, coerce, mapType
+					} = el.keyMap.get(casingKey)!;
+
+					const prevVal = el.propValues[casingKey];
+					const newVal = coerce ? getCoerced(undefined, mapType) : undefined;
+
+					el.component.fire('beforePropChange', casingKey, prevVal, newVal);
+					el.propValues[casingKey] = newVal;
+					el.component.fire('propChange', casingKey, prevVal, newVal);
+
+					if (watch) {
+						queueRender(el.component, CHANGE_TYPE.PROP);
+					}
+				}
+				el.removeAttr(key);
+		}
+
+	class Property<R extends PropTypeConfig, P extends PropTypeConfig, K extends KeyPart<R, true>|KeyPart<P, false>,
+		Z extends ReturnType<R, P>> {
+			constructor(private _propertyConfig: K, private _rep: ElementRepresentation<R, P>,
+				private _props: Props & Partial<Z>) { }
+
+			private _getConfig() {
+				const { key, value, reflectToAttr } = this._propertyConfig;
+				const mapKey = key as Extract<keyof R|P, string>;
+
+				const propName = casingToDashes(mapKey);
+				const { 
+					watch = true,
+					coerce = false,
+					defaultValue,
+					value: defaultValue2,
+					type: type,
+					strict = false,
+					isPrivate = false,
+					watchProperties = [],
+					reflectToSelf = false
+				} = getDefinePropConfig(value);
+				return {
+					watch, coerce, type, strict, 
+					isPrivate, watchProperties, reflectToSelf,
+					mapKey, key, reflectToAttr, propName,
+					defaultValue: defaultValue !== undefined ? defaultValue : defaultValue2
+				}
+			}
+
+			public setKeyMap(keyMap: Map<Extract<keyof R|keyof P, string>, {
+				watch: boolean;
+				coerce: boolean;
+				mapType: DefinePropTypes;
+				isPrivate: boolean;
+				strict: boolean;
+			}>) {
+				const { key } = this._propertyConfig;
+				const { 
+					watch = true,
+					coerce = false,
+					type: mapType,
+					strict = false,
+					isPrivate = false,
+				} = this._getConfig();
+
+				keyMap.set(key, {
+					watch, coerce, mapType, isPrivate, strict
+				});
+			}
+
+			private _setReflect() {
+				const _this = this;
+				const { mapKey, isPrivate, strict, type, key, propName } = this._getConfig();
+				Object.defineProperty(this._rep.component, mapKey, {
+					get() {
+						if (isPrivate) {
+							return _this._rep.propValues[mapKey];
+						}
+						return getter(_this._rep.component, propName, strict, type);
+					},
+					set(value) {
+						const prevVal = _this._props[mapKey];
+						_this._rep.component.fire('beforePropChange', key, prevVal, value);
+						_this._props[mapKey] = value;
+						_this._rep.component.fire('propChange', key, prevVal, value);
+					}
+				});
+			}
+
+			public setReflect() {
+				const { reflectToAttr, reflectToSelf } = this._getConfig();
+				if (reflectToSelf && reflectToAttr) {
+					this._setReflect();
+				}
+			}
+
+			public setPropAccessors() {
+				const _this = this;
+				const { 
+					mapKey, isPrivate, coerce, type, key,
+					watch, watchProperties, propName
+				} = this._getConfig();
+				Object.defineProperty(this._props, mapKey, {
+					get() {
+						const value = _this._rep.propValues[mapKey];
+						if (coerce) {
+							return getCoerced(value, type);
+						}
+						return value;
+
+					},
+					set(value) {
+						const original = value;
+						value = watchValue(createQueueRenderFn(_this._rep.component), 
+							value, watch, watchProperties);
+
+						const prevVal = _this._rep.propValues[mapKey];
+						_this._rep.component.fire('beforePropChange', key, prevVal, value);
+						_this._rep.propValues[mapKey] = value;
+						_this._rep.component.fire('propChange', key, prevVal, value);
+						if (_this._propertyConfig.reflectToAttr) {
+							setter(_this._rep.setAttr, _this._rep.removeAttr, propName, 
+								isPrivate ? '_' : original, type);
+						}
+
+						if (watch) {
+							queueRender(_this._rep.component, CHANGE_TYPE.PROP);
+						}
+					}
+				});
+			}
+
+			public async doInitialAssign() {
+				const { 
+					type, mapKey, propName, strict, watch,
+					watchProperties, isPrivate
+				} = this._getConfig();
+				if (type !== complex) {
+					this._rep.propValues[mapKey] = watchValue(createQueueRenderFn(this._rep.component), 
+						getter(this._rep.component, propName, strict, type) as any, 
+						watch, watchProperties);
+				} else {
+					await hookIntoMount(this._rep.component as any, () => {
+						if (!isPrivate || this._rep.component.getAttribute(propName) !== '_') {
+							this._rep.propValues[mapKey] = watchValue(createQueueRenderFn(this._rep.component), 
+								getter(this._rep.component, propName, strict, type) as any, 
+								watch, watchProperties);
+						}
+					});
+				}
+			}
+
+			public async doDefaultAssign() {
+				const { 
+					defaultValue, mapKey, watch, watchProperties,
+					propName, isPrivate, type
+				} = this._getConfig();
+				if (defaultValue !== undefined && this._rep.propValues[mapKey] === undefined) {
+					this._rep.propValues[mapKey] = watchValue(
+						createQueueRenderFn(this._rep.component), 
+						defaultValue as any, watch, watchProperties);
+					await hookIntoMount(this._rep.component as any, () => {
+						setter(this._rep.setAttr, this._rep.removeAttr, propName, 
+							isPrivate ? '_' : defaultValue, type);
+					});
+				} else if (isPrivate || type === complex) {
+					await hookIntoMount(this._rep.component as any, () => {
+						setter(this._rep.setAttr, this._rep.removeAttr, propName,
+							isPrivate ? '_' : this._rep.propValues[mapKey] as any, type);
+					});
+				}
+			}
+		}
+
+	export function define<R extends PropTypeConfig, P extends PropTypeConfig, Z extends ReturnType<R, P>>(
+		props: Props & Partial<Z>, component: Element, config: {
+			reflect?: R;
+			priv?: P;
+		} = {}) {
+			const element = new ElementRepresentation(component);
+
+			element.overrideAttributeFunctions();
+			awaitMounted(component as any).then(() => {
+				element.runQueued();
+			});
+
+			const keys = getKeys(config);
+			const properties = keys.map(key => new Property(key, element, props));
+			properties.forEach(property => property.setKeyMap(element.keyMap));
+			properties.forEach(property => property.setReflect());
+			properties.forEach(property => property.setPropAccessors());
+			properties.forEach(async (property) => {
+				await property.doInitialAssign();
+				await property.doDefaultAssign();
+			});
+		}
 }
 
-function createQueueRenderFn(element: HTMLElement & {
-	renderToDOM(changeType: CHANGE_TYPE): void;
-	getParentRef(ref: string): any;
-	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
-		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
-}) {
-	return (changeType: CHANGE_TYPE) => {
-		queueRender(element, changeType);
+export class Props {
+	public __src!: {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	} & {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	}
+
+	constructor() {}
+
+	static define<P extends {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	}, T extends {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	}, R extends {
+		[K in keyof P]: GetTSType<P[K]>;
+	} & {
+		[K in keyof T]: GetTSType<T[K]>;
+	}>(element: HTMLElement & {
+		renderToDOM(changeType: CHANGE_TYPE): void;
+		getParentRef(ref: string): any;
+		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+	}, props: {
+		reflect: P;
+		priv: T;
+	}): Props & {
+		[K in keyof P]: GetTSType<P[K]>;
+	} & {
+		[K in keyof T]: GetTSType<T[K]>;
+	};
+	static define<P extends {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	}, T extends {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	}, R extends {
+		[K in keyof P]: GetTSType<P[K]>;
+	} & {
+		[K in keyof T]: GetTSType<T[K]>;
+	}>(element: HTMLElement & {
+		renderToDOM(changeType: CHANGE_TYPE): void;
+		getParentRef(ref: string): any;
+		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+	}, props: {
+		priv?: T;
+	}): Props & {
+		[K in keyof T]: GetTSType<T[K]>;
+	};
+	static define<P extends {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	}, T extends {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	}, R extends {
+		[K in keyof P]: GetTSType<P[K]>;
+	} & {
+		[K in keyof T]: GetTSType<T[K]>;
+	}>(element: HTMLElement & {
+		renderToDOM(changeType: CHANGE_TYPE): void;
+		getParentRef(ref: string): any;
+		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+	}, props: {
+		reflect: P;
+	}): Props & {
+		[K in keyof P]: GetTSType<P[K]>;
+	};
+	static define<P extends {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	}, T extends {
+		[key: string]: DefinePropTypes|DefinePropTypeConfig;
+	}, R extends {
+		[K in keyof P]: GetTSType<P[K]>;
+	} & {
+		[K in keyof T]: GetTSType<T[K]>;
+	}>(element: HTMLElement & {
+		renderToDOM(changeType: CHANGE_TYPE): void;
+		getParentRef(ref: string): any;
+		isMounted: boolean;
+		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
+			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+	}, config: {
+		reflect?: P;
+		priv?: T;
+	} = {}): Props & R {
+		const props = new Props();
+		PropsDefiner.define(props as Props & Partial<R>, element, config);
+		return props as Props & R;
 	}
 }
 
@@ -477,312 +892,6 @@ type DEFAULT_EVENTS = {
 		returnType: void;
 	}
 };
-export function defineProps<P extends {
-	[key: string]: DefinePropTypes|DefinePropTypeConfig;
-}, T extends {
-	[key: string]: DefinePropTypes|DefinePropTypeConfig;
-}, R extends {
-	[K in keyof P]: GetTSType<P[K]>;
-} & {
-	[K in keyof T]: GetTSType<T[K]>;
-}>(element: HTMLElement & {
-	renderToDOM(changeType: CHANGE_TYPE): void;
-	getParentRef(ref: string): any;
-	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
-		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
-}, props: {
-	reflect: P;
-	priv: T;
-}): {
-	[K in keyof P]: GetTSType<P[K]>;
-} & {
-	[K in keyof T]: GetTSType<T[K]>;
-};
-export function defineProps<P extends {
-	[key: string]: DefinePropTypes|DefinePropTypeConfig;
-}, T extends {
-	[key: string]: DefinePropTypes|DefinePropTypeConfig;
-}, R extends {
-	[K in keyof P]: GetTSType<P[K]>;
-} & {
-	[K in keyof T]: GetTSType<T[K]>;
-}>(element: HTMLElement & {
-	renderToDOM(changeType: CHANGE_TYPE): void;
-	getParentRef(ref: string): any;
-	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
-		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
-}, props: {
-	priv?: T;
-}): {
-	[K in keyof T]: GetTSType<T[K]>;
-};
-export function defineProps<P extends {
-	[key: string]: DefinePropTypes|DefinePropTypeConfig;
-}, T extends {
-	[key: string]: DefinePropTypes|DefinePropTypeConfig;
-}, R extends {
-	[K in keyof P]: GetTSType<P[K]>;
-} & {
-	[K in keyof T]: GetTSType<T[K]>;
-}>(element: HTMLElement & {
-	renderToDOM(changeType: CHANGE_TYPE): void;
-	getParentRef(ref: string): any;
-	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
-		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
-}, props: {
-	reflect: P;
-}): {
-	[K in keyof P]: GetTSType<P[K]>;
-};
-export function defineProps<P extends {
-	[key: string]: DefinePropTypes|DefinePropTypeConfig;
-}, T extends {
-	[key: string]: DefinePropTypes|DefinePropTypeConfig;
-}, R extends {
-	[K in keyof P]: GetTSType<P[K]>;
-} & {
-	[K in keyof T]: GetTSType<T[K]>;
-}>(element: HTMLElement & {
-	renderToDOM(changeType: CHANGE_TYPE): void;
-	getParentRef(ref: string): any;
-	isMounted: boolean;
-	fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
-		event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
-}, {
-	reflect = {} as P, priv = {} as T
-}: {
-	reflect?: P;
-	priv?: T;
-} = {}): R {
-	const propValues: Partial<R> = {};
-	const props: Partial<R> = {};
-
-	const keys = [...Object.getOwnPropertyNames(reflect).map((key) => {
-		return {
-			key: key as Extract<keyof P, string>,
-			value: reflect[key],
-			reflectToAttr: true
-		}
-	}), ...Object.getOwnPropertyNames(priv).map((key) => {
-		return {
-			key: key as Extract<keyof T, string>,
-			value: priv[key],
-			reflectToAttr: false
-		}
-	})];
-	
-	const originalSetAttr = element.setAttribute.bind(element);
-	const originalRemoveAttr = element.removeAttribute.bind(element);
-	const keyMap: Map<(typeof keys)[0]['key'], {
-		watch: boolean;
-		coerce: boolean;
-		mapType: DefinePropTypes;
-		isPrivate: boolean;
-		strict: boolean;
-	}> = new Map();
-
-	const preMountedQueue: {
-		set: [string, string][],
-		remove: string[]
-	} = {
-		set: [],
-		remove: []
-	}
-
-	element.setAttribute = (key: string, val: string) => {
-		if (!element.isMounted) {
-			preMountedQueue.set.push([key, val]);
-			originalSetAttr(key, val);
-			return;
-		}
-
-		const casingKey = dashesToCasing(key)
-		if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
-			const { watch, isPrivate, mapType, strict } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
-
-			const prevVal = (propValues as any)[casingKey];
-			const newVal = getterWithVal(element, val, strict, mapType);
-			element.fire('beforePropChange', casingKey, prevVal, newVal);
-			(propValues as any)[casingKey] = newVal;
-			element.fire('propChange', casingKey, prevVal, newVal);
-			if (watch) {
-				queueRender(element, CHANGE_TYPE.PROP);
-			}
-			if (isPrivate) {
-				originalSetAttr(casingKey, '_');
-				return;
-			}
-		} else {
-			(propValues as any)[casingKey] = val;
-		}
-		originalSetAttr(key, val);
-	};
-	element.removeAttribute = (key: string) => {
-		if (!element.isMounted) {
-			preMountedQueue.remove.push(key);
-			originalSetAttr(key);
-			return;
-		}
-
-		const casingKey = dashesToCasing(key);
-		if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
-			const { watch, coerce, mapType } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
-
-			const prevVal = (propValues as any)[casingKey];
-			const newVal = coerce ? getCoerced(undefined, mapType) : undefined;
-			element.fire('beforePropChange', casingKey, prevVal, newVal);
-			(propValues as any)[casingKey] = newVal;
-			element.fire('propChange', casingKey, prevVal, newVal);
-			if (watch) {
-				queueRender(element, CHANGE_TYPE.PROP);
-			}
-		}
-		originalRemoveAttr(key);
-	};
-
-	for (let i in keys) {
-		const { key, reflectToAttr, value } = keys[i];
-		const mapKey = key as Extract<keyof P|T, string>;
-
-		const { 
-			watch = true,
-			coerce = false,
-			defaultValue,
-			value: defaultValue2,
-			type: mapType,
-			strict = false,
-			isPrivate = false,
-			watchProperties = [],
-			reflectToSelf = false
-		} = getDefinePropConfig(value);
-
-		keyMap.set(key, {
-			watch, coerce, mapType, isPrivate, strict
-		});
-
-		const propName = casingToDashes(mapKey);
-		if (reflectToAttr && reflectToSelf) {
-			Object.defineProperty(element, mapKey, {
-				get() {
-					if (isPrivate) {
-						return propValues[mapKey];
-					}
-					return getter(element, propName, strict, mapType);
-				},
-				set(value) {
-					const prevVal = props[mapKey];
-					element.fire('beforePropChange', key, prevVal, value);
-					props[mapKey] = value;
-					element.fire('propChange', key, prevVal, value);
-				}
-			});
-		}
-		Object.defineProperty(props, mapKey, {
-			get() {
-				const value = propValues[mapKey];
-				if (coerce) {
-					return getCoerced(value, mapType);
-				}
-				return value;
-
-			},
-			set(value) {
-				const original = value;
-				value = watchValue(createQueueRenderFn(element), 
-					value, watch, watchProperties);
-
-				const prevVal = propValues[mapKey];
-				element.fire('beforePropChange', key, prevVal, value);
-				propValues[mapKey] = value;
-				element.fire('propChange', key, prevVal, value);
-				if (reflectToAttr) {
-					setter(originalSetAttr, originalRemoveAttr, propName, 
-						isPrivate ? '_' : original, mapType);
-				}
-
-				if (watch) {
-					queueRender(element, CHANGE_TYPE.PROP);
-				}
-			}
-		});
-		(async () => {
-			if (mapType !== complex) {
-				propValues[mapKey] = watchValue(createQueueRenderFn(element), 
-					getter(element, propName, strict, mapType) as any, 
-					watch, watchProperties);
-			} else {
-				await hookIntoMount(element as any, () => {
-					if (!isPrivate || element.getAttribute(propName) !== '_') {
-						propValues[mapKey] = watchValue(createQueueRenderFn(element), 
-							getter(element, propName, strict, mapType) as any, 
-							watch, watchProperties);
-					}
-				});
-			}
-			const defaultVal = defaultValue !== undefined ? 
-				defaultValue : defaultValue2;
-			if (defaultVal !== undefined && propValues[mapKey] === undefined) {
-				propValues[mapKey] =
-					watchValue(createQueueRenderFn(element), 
-						defaultVal as any, watch, watchProperties);
-				await hookIntoMount(element as any, () => {
-					setter(originalSetAttr, originalRemoveAttr, propName, 
-						isPrivate ? '_' : defaultVal, mapType);
-				});
-			} else if (isPrivate || mapType === complex) {
-				await hookIntoMount(element as any, () => {
-					setter(originalSetAttr, originalRemoveAttr, propName,
-						isPrivate ? '_' : propValues[mapKey] as any, mapType);
-				});
-			}
-			await awaitMounted(element as any);
-
-			for (const [key, val] of preMountedQueue.set) {
-				//TODO: DRY
-				const casingKey = dashesToCasing(key)
-				if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
-					const { watch, isPrivate, mapType, strict } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
-
-					const prevVal = (propValues as any)[casingKey];
-					const newVal = getterWithVal(element, val, strict, mapType);
-					element.fire('beforePropChange', casingKey, prevVal, newVal);
-					(propValues as any)[casingKey] = newVal;
-					element.fire('propChange', casingKey, prevVal, newVal);
-					if (watch) {
-						queueRender(element, CHANGE_TYPE.PROP);
-					}
-					if (isPrivate) {
-						originalSetAttr(casingKey, '_');
-						return;
-					}
-				} else {
-					(propValues as any)[casingKey] = val;
-				}
-				originalSetAttr(key, val);
-			}
-			for (const key of preMountedQueue.remove) {
-				//TODO: DRY
-				const casingKey = dashesToCasing(key);
-				if (keyMap.has(casingKey as (typeof keys)[0]['key'])) {
-					const { watch, coerce, mapType } = keyMap.get(casingKey as (typeof keys)[0]['key'])!;
-		
-					const prevVal = (propValues as any)[casingKey];
-					const newVal = coerce ? getCoerced(undefined, mapType) : undefined;
-					element.fire('beforePropChange', casingKey, prevVal, newVal);
-					(propValues as any)[casingKey] = newVal;
-					element.fire('propChange', casingKey, prevVal, newVal);
-					if (watch) {
-						queueRender(element, CHANGE_TYPE.PROP);
-					}
-				}
-				originalRemoveAttr(key);
-			}
-
-			queueRender(element, CHANGE_TYPE.PROP);
-		})();
-	}
-	return props as R;
-}
 
 export declare abstract class WebComponentInterface extends WebComponent<any, any> {
 	static is: ComponentIs;

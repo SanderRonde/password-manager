@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { config, isNewElement, defineProps, PROP_TYPE } from "../../../lib/webcomponent-util";
+import { config, isNewElement, Props, PROP_TYPE } from "../../../lib/webcomponent-util";
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { LoadingSpinnerIDMap } from "./loading-spinner-querymap";
 import { LoadingSpinnerHTML } from "./loading-spinner.html";
@@ -12,7 +12,7 @@ import { LoadingSpinnerCSS } from "./loading-spinner.css";
 	html: LoadingSpinnerHTML
 })
 export class LoadingSpinner extends ConfigurableWebComponent<LoadingSpinnerIDMap> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			big: PROP_TYPE.BOOL,
 			medium: PROP_TYPE.BOOL,

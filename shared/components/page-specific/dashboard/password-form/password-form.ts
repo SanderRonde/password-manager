@@ -1,4 +1,4 @@
-import { defineProps, ComplexType, findElementInPath, PROP_TYPE, wait, createCancellableTimeout, config } from '../../../../lib/webcomponent-util';
+import { Props, ComplexType, findElementInPath, PROP_TYPE, wait, createCancellableTimeout, config } from '../../../../lib/webcomponent-util';
 import { passwordDetailDataStore, passwordDetailDataSymbol } from '../password-detail/password-detail.html';
 import { PasswordDetail, PasswordDetailChanges, ToBools } from '../password-detail/password-detail';
 import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
@@ -27,7 +27,7 @@ import { totp } from '../../../../lib/browser-crypto';
 	]
 })
 export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		priv: {
 			visibleWebsites: {
 				type: ComplexType<MetaPasswords[0]['websites']>(),

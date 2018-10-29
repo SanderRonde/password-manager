@@ -1,4 +1,4 @@
-import { config, defineProps, PROP_TYPE, ComplexType, createNumberList, any, listenWithIdentifier, isNewElement, listen, wait, createDisposableWindowListener } from '../../../lib/webcomponent-util';
+import { config, Props, PROP_TYPE, ComplexType, createNumberList, any, listenWithIdentifier, isNewElement, listen, wait, createDisposableWindowListener } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { InfiniteListIDMap } from './infinite-list-querymap';
 import { TemplateResult, html, render } from 'lit-html';
@@ -33,7 +33,7 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 	private _usedViewportHeight: number|null = null;
 	private _usedData: D[]|null = null;
 	private _itemData: (ID|null)[]|null = null;
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			dataName: {
 				type: PROP_TYPE.STRING,

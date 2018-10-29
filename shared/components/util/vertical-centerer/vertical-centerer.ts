@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, config } from '../../../lib/webcomponent-util';
+import { Props, PROP_TYPE, config } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { VerticalCentererIDMap } from './vertical-centerer-querymap';
 import { VerticalCentererHTML } from './vertical-centerer.html';
@@ -11,7 +11,7 @@ import { VerticalCentererCSS } from './vertical-centerer.css';
 	html: VerticalCentererHTML
 })
 export class VerticalCenterer extends ConfigurableWebComponent<VerticalCentererIDMap> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			fullscreen: PROP_TYPE.BOOL
 		}

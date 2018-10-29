@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, isNewElement, defineProps, PROP_TYPE, listenWithIdentifier } from "../../../lib/webcomponent-util";
+import { config, isNewElement, Props, PROP_TYPE, listenWithIdentifier } from "../../../lib/webcomponent-util";
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { ThemeSelectorIDMap } from "./theme-selector-querymap";
 import { VALID_THEMES_T } from '../../../types/shared-types';
@@ -17,7 +17,7 @@ import { bindToClass } from '../../../lib/decorators';
 	]
 })
 export class ThemeSelector extends ConfigurableWebComponent<ThemeSelectorIDMap> { 
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			currentTheme: {
 				type: PROP_TYPE.STRING,

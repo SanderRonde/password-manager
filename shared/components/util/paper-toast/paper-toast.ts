@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, config, isNewElement, createCancellableTimeout, awaitMounted, wait } from '../../../lib/webcomponent-util';
+import { Props, PROP_TYPE, config, isNewElement, createCancellableTimeout, awaitMounted, wait } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { PaperButton } from '../paper-button/paper-button';
 import { PaperToastIDMap } from './paper-toast-querymap';
@@ -30,7 +30,7 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 		args: []
 	}
 }> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			content: {
 				type: PROP_TYPE.STRING,

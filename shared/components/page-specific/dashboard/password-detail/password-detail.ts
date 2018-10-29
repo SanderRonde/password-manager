@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { defineProps, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors } from '../../../../lib/webcomponent-util';
+import { Props, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors } from '../../../../lib/webcomponent-util';
 import { APIToken, ERRS, U2FToken, Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, EncryptionAlgorithm } from '../../../../types/crypto';
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey, PublicKeyDecrypted, MasterPassword } from '../../../../types/db-types';
 import { passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
@@ -63,7 +63,7 @@ export const PasswordDetailDependencies = [
 	PasswordForm
 ]
 export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		priv: {
 			selected: ComplexType<MetaPasswords[0]>(),
 			visibleWebsites: {

@@ -1,5 +1,5 @@
 /// <reference path="../../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, isDefined, getCookie } from '../../../../lib/webcomponent-util'
+import { Props, PROP_TYPE, isDefined, getCookie } from '../../../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
@@ -25,7 +25,7 @@ export const LoginDependencies = [
 	MDCard
 ];
 export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		priv: {
 			emailRemembered: PROP_TYPE.BOOL
 		}

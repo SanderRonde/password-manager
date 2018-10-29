@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { defineProps, PROP_TYPE, config, listen, isNewElement } from '../../../lib/webcomponent-util';
+import { Props, PROP_TYPE, config, listen, isNewElement } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { MaterialInputIDMap } from './material-input-querymap';
 import { MaterialInputHTML } from './material-input.html';
@@ -26,7 +26,7 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 	private _validityState: boolean = true;
 	private _maxRows: number = -1;
 
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			label: {
 				type: PROP_TYPE.STRING,

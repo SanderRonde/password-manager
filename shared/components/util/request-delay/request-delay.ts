@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { config, defineProps, PROP_TYPE, ComplexType, wait } from '../../../lib/webcomponent-util';
+import { config, Props, PROP_TYPE, ComplexType, wait } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { RequestDelayIDMap } from './request-delay-querymap';
 import { PaperToast } from '../paper-toast/paper-toast';
@@ -94,7 +94,7 @@ class RateLimitStore {
 	html: RequestDelayHTML
 })
 export class RequestDelay extends ConfigurableWebComponent<RequestDelayIDMap> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			requests: {
 				type: PROP_TYPE.NUMBER,

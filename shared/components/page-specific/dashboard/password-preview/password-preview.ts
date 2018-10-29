@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, defineProps, PROP_TYPE, ComplexType, isNewElement } from '../../../../lib/webcomponent-util';
+import { config, Props, PROP_TYPE, ComplexType, isNewElement } from '../../../../lib/webcomponent-util';
 import { MetaPasswords, MetaPasswordsPreviewData } from '../../../entrypoints/base/dashboard/dashboard';
 import { ConfigurableWebComponent, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { InfiniteList, ListRendered } from '../../../util/infinite-list/infinite-list';
@@ -29,7 +29,7 @@ export interface PasswordPreviewHost {
 })
 @rippleEffect
 export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDMap> implements ListRendered {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			id: PROP_TYPE.STRING,
 			websites: {

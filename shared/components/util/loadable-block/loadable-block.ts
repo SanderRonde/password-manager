@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, defineProps, PROP_TYPE, wait, createCancellableTimeout, awaitMounted } from "../../../lib/webcomponent-util";
+import { config, Props, PROP_TYPE, wait, createCancellableTimeout, awaitMounted } from "../../../lib/webcomponent-util";
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { LoadableBlockCSS, ANIMATE_TIME } from './loadable-block.css';
 import { LoadableBlockIDMap } from './loadable-block-querymap';
@@ -16,7 +16,7 @@ export class LoadableBlock extends ConfigurableWebComponent<LoadableBlockIDMap> 
 		y: number;
 	}|null = null;
 	private __spinnerSize: number|null = null;
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			loading: PROP_TYPE.BOOL,
 			spinnerSize: {

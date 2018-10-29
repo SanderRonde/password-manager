@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { config, defineProps, PROP_TYPE } from '../../../lib/webcomponent-util';
+import { config, Props, PROP_TYPE } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { MoreInfoIDMap } from './more-info-querymap';
 import { MoreInfoHTML } from './more-info.html';
@@ -16,7 +16,7 @@ const MORE_INFO_SPACING = 30;
 export class MoreInfo extends ConfigurableWebComponent<MoreInfoIDMap> {
 	public infoHeight: number = 0;
 
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			info: {
 				type: PROP_TYPE.STRING,

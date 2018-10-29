@@ -1,5 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, isNewElement, defineProps, PROP_TYPE, wait } from '../../../lib/webcomponent-util';
+import { config, isNewElement, Props, PROP_TYPE, wait } from '../../../lib/webcomponent-util';
 import { AnimatedButtonCSS, FADE_IN_OUT_TIME, COLOR_FADE_TIME } from './animated-button.css';
 import { ConfigurableWebComponent } from "../../../lib/webcomponents";
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
@@ -20,7 +20,7 @@ export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap
 		args: [MouseEvent]
 	}
 }> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			content: PROP_TYPE.STRING,
 			ariaLabel: {

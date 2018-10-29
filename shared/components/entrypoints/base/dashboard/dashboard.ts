@@ -3,7 +3,7 @@ import { PasswordDetailWeb } from '../../../page-specific/dashboard/web/password
 import { PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
 import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
-import { defineProps, ComplexType, PROP_TYPE, wait } from '../../../../lib/webcomponent-util';
+import { Props, ComplexType, PROP_TYPE, wait } from '../../../../lib/webcomponent-util';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
@@ -31,7 +31,7 @@ export interface MetaPasswordsPreviewData {
 }
 
 export abstract class Dashboard extends DashboardScrollManager implements PasswordPreviewHost { 
-	props = defineProps(this, {
+	props = Props.define(this, {
 		priv: {
 			metaPasswords: {
 				type: ComplexType<MetaPasswords>(),

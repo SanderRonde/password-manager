@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { defineProps, PROP_TYPE, config } from '../../../lib/webcomponent-util';
+import { Props, PROP_TYPE, config } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { MdCardIDMap } from './md-card-querymap';
 import { MDCardHTML } from './md-card.html';
@@ -12,7 +12,7 @@ import { MDCardCSS } from './md-card.css';
 	html: MDCardHTML
 })
 export class MDCard extends ConfigurableWebComponent<MdCardIDMap> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			level: {
 				type: PROP_TYPE.NUMBER,

@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { config, defineProps, PROP_TYPE, listen, isNewElement } from '../../../lib/webcomponent-util';
+import { config, Props, PROP_TYPE, listen, isNewElement } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent } from '../../../lib/webcomponents';
 import { MaterialCheckboxIDMap } from './material-checkbox-querymap';
 import { MaterialCheckboxHTML } from './material-checkbox.html';
@@ -17,7 +17,7 @@ export class MaterialCheckbox extends ConfigurableWebComponent<MaterialCheckboxI
 		args: [boolean, boolean]
 	}
 }> {
-	props = defineProps(this, {
+	props = Props.define(this, {
 		reflect: {
 			checked: {
 				type: PROP_TYPE.BOOL,
