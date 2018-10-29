@@ -199,9 +199,14 @@ export function decrypt<T, K extends string, A extends EncryptionAlgorithm>(encr
 	}
 }
 
-export async function createDigest({ secret, counter }: {
+export async function createDigest({ 
+	secret, 
+	counter,
+	crypto = window.crypto
+}: {
 	secret: string;
 	counter: number;
+	crypto?:  Crypto
 }) {
 	// create an buffer from the counter
 	const buf = new Buffer(8);
@@ -214,7 +219,7 @@ export async function createDigest({ secret, counter }: {
 	  tmp = tmp >> 8;
 	}
 
-	const key = await window.crypto.subtle.importKey('raw', 
+	const key = await crypto.subtle.importKey('raw', 
 		new TextEncoder().encode(secret), {
 			name: 'HMAC',
 			hash: {
@@ -222,18 +227,27 @@ export async function createDigest({ secret, counter }: {
 			}
 		}, false, ['sign']);
   
-	return new Uint8Array(await window.crypto.subtle.sign('HMAC', key, buf));
+	return new Uint8Array(await crypto.subtle.sign('HMAC', key, buf));
 }
 
-export async function totp({ secret, step = 30 }: {
+export async function totp({ 
+	secret, 
+	step = 30,
+	crypto = window.crypto
+}: {
 	secret: string;
 	step?: number;
+	crypto?: Crypto;
 }) {
 	const counter = Math.floor((Date.now() / step) / 1000);
 	const digits = 6;
 
 	// digest the options
-	const digest = await createDigest({ secret, counter });
+	const digest = await createDigest({ 
+		secret, 
+		counter,
+		crypto
+	});
 
 	const offset = digest[digest.length - 1] & 0xf;
 
