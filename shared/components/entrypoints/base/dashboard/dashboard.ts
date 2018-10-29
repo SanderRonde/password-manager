@@ -67,7 +67,6 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 	constructor() {
 		super();
 
-		console.log('constructed');
 		wait(2500).then(() => {
 			if (this._mountedCalled) return;
 			debugger;
@@ -111,19 +110,14 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 	protected abstract _getPasswordMeta(): Promise<MetaPasswords|null>|MetaPasswords|null;
 
 	private async _getPwMeta() {
-		console.log('Getting pwmeta');
 		const pwMeta = await this._getPasswordMeta();
-		console.log('Got pwmeta', pwMeta);
 		if (!pwMeta || (pwMeta.length === 0 && document.body.classList.contains('dev'))) {
-			console.log('is dev mode');
 			if (document.body.classList.contains('dev')) {
-				console.log('Using dummy passwords');
 				this.props.metaPasswords = devPasswords.getDevPasswords();
 			}
 			//Redirecting to /login, just let this go
 			return;
 		}
-		console.log('Using ', pwMeta, '||', [], '=', pwMeta || []);
 		this.props.metaPasswords = pwMeta || [];
 	}
 
@@ -160,9 +154,7 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 	private _onMount() {
 		if (this._mountedCalled) return;
 		this._mountedCalled = true;
-		console.log('supermounted');
 		super.mounted();
-		console.log('was mounted');
 		this._getPwMeta();
 	}
 
