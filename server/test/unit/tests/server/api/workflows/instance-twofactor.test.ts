@@ -772,7 +772,8 @@ export function instanceTwofactorTest() {
 				const response = JSON.parse(await doServerAPIRequest({ port: http}, '/api/instance/2fa/confirm', {
 					instance_id: instance_id!,
 					twofactor_token: speakeasy.totp({
-						secret: secret!
+						secret: secret!,
+                        encoding: 'base32'
 					})
 				}));
 
@@ -799,7 +800,8 @@ export function instanceTwofactorTest() {
 					instance_id: instance_id!,
 					challenge: encryptWithPublicKey(challenge, server_public_key!),
 					twofactor_token: speakeasy.totp({
-						secret: secret
+						secret: secret,
+                        encoding: 'base32'
 					})
 				}, {
 					password_hash: hash(pad(userpw, 'masterpwverify'))
@@ -864,7 +866,8 @@ export function instanceTwofactorTest() {
 				}, '/api/instance/2fa/disable', {
 					instance_id: instance_id!,
 					twofactor_token: speakeasy.totp({
-						secret: secret
+						secret: secret,
+                        encoding: 'base32'
 					})
 				}, {
 					password: hash(pad(userpw, 'masterpwverify'))
