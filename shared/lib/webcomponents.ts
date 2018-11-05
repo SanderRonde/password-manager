@@ -1,7 +1,6 @@
-export { WebComponentBase } from './webcomponents/base';
-
+export { ConfigurableWebComponent } from './webcomponents/configurable';
 export { CHANGE_TYPE, TemplateFn } from './webcomponents/base';
-export { WebComponent } from './webcomponents/component';
 export { EventListenerObj } from './webcomponents/listener';
 export { refPrefix } from './webcomponents/template-manager'
-export { ConfigurableWebComponent } from './webcomponents/configurable';
+export { WebComponent } from './webcomponents/component';
+export { WebComponentBase } from './webcomponents/base';
