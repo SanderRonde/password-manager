@@ -42,24 +42,6 @@ export function classNames(...args: ClassNamesArg[]) {
 	return classes.join(' ');
 }
 
-export function multiFunctions(...fns: Function[]) {
-	return (...args: any[]) => {
-		fns.forEach((fn) => {
-			fn(...args);
-		});
-	}
-}
-
-export const enum ICON_STATE {
-	ENABLED,
-	DISABLED,
-	HIDDEN
-}
-
-export function important(rule: string|number) {
-	return `${rule}!important`
-}
-
 export function isDefined<U extends string>(value: null|undefined|U): value is U {
 	return value !== undefined && value !== null && value !== 'false';
 }
