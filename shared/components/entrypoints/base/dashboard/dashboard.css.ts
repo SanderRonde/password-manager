@@ -3,14 +3,13 @@ import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { changeOpacity } from '../../../../lib/webcomponent-util';
 import { Dashboard } from './dashboard';
-import { html } from "lit-html";
 
 const PAGE_TOP = 130;
 export const TITLE_BAR_HEIGHT = 60;
 export const PW_VIEW_SCROLL = 85;
 
 export const CustomDashboardCSS = {
-	searchInput: new TemplateFn<Dashboard>((_props, theme) => html`<style>
+	searchInput: new TemplateFn<Dashboard>((html, _props, theme) => html`<style>
 		.mdl-textfield__input {
 			color: ${theme.textOnNonbackground};
 			border-bottom: none;
@@ -55,7 +54,7 @@ export const CustomDashboardCSS = {
 			margin-top: 2px;
 		}
 	</style>`, CHANGE_TYPE.THEME),
-	infiniteList: new TemplateFn<InfiniteList<any, any, any>>(() => html`<style>
+	infiniteList: new TemplateFn<InfiniteList<any, any, any>>((html, _props, _theme) => html`<style>
 		#contentContainer {
 			overflow-y: hidden;
 		}
@@ -65,7 +64,7 @@ export const CustomDashboardCSS = {
 			margin-left: 5px;
 		}
 	</style>`, CHANGE_TYPE.NEVER),
-	templateList: new TemplateFn<InfiniteList<any, any, any>>((_props, theme) => {
+	templateList: new TemplateFn<InfiniteList<any, any, any>>((html, _props, theme) => {
 		const color = changeOpacity(theme.textOnBackground, 25);
 		const actualWidth = pythagoras(35);
 		const actualHeight = pythagoras(35);
@@ -130,7 +129,7 @@ export const CustomDashboardCSS = {
 	}, CHANGE_TYPE.THEME)
 }
 
-export const DashboardCSS = new TemplateFn<Dashboard>((_props, theme) => {
+export const DashboardCSS = new TemplateFn<Dashboard>((html, _props, theme) => {
 	return html`<style>
 		#container {
 			background-color: ${theme.background};

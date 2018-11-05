@@ -2,9 +2,8 @@ import { CHANGE_TYPE, TemplateFn } from '../../../../lib/webcomponents';
 import { changeOpacity } from '../../../../lib/webcomponent-util';
 import { RippleCSS } from '../../../../mixins/ripple';
 import { PasswordPreview } from './password-preview';
-import { html } from 'lit-html';
 
-export const invertedCardCSS = new TemplateFn<PasswordPreview>((_props, theme) => {
+export const invertedCardCSS = new TemplateFn<PasswordPreview>((html, _props, theme) => {
 	return html`<style>
 		#shadow {
 			background-color: ${theme.oppositeBackground};
@@ -12,9 +11,9 @@ export const invertedCardCSS = new TemplateFn<PasswordPreview>((_props, theme) =
 		}
 	</style>`;
 }, CHANGE_TYPE.THEME);
-export const noCustomCSS = new TemplateFn<PasswordPreview>(() => html``, CHANGE_TYPE.THEME);
+export const noCustomCSS = new TemplateFn<PasswordPreview>((html) => html``, CHANGE_TYPE.THEME);
 
-export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (props, theme) {
+export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (html, props, theme) {
 	return html`
 		${RippleCSS.render(CHANGE_TYPE.THEME, this)}
 		<style>

@@ -1,8 +1,7 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { SizingBlock } from './sizing-block';
-import { html } from 'lit-html';
 
-export const SizingBlockHTML = new TemplateFn<SizingBlock>(function () {
+export const SizingBlockHTML = new TemplateFn<SizingBlock>(function (html) {
 	return html`
 		${this.getMaxHeightCSS()}
 		<div id="sizer">

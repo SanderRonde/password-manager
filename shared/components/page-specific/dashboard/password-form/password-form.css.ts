@@ -1,9 +1,8 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { changeOpacity } from '../../../../lib/webcomponent-util';
 import { PasswordForm } from './password-form';
-import { html } from 'lit-html';
 
-export const PasswordFormCSS = new TemplateFn<PasswordForm>((_props, theme) => {
+export const PasswordFormCSS = new TemplateFn<PasswordForm>((html, _props, theme) => {
 	return html`<style>
 		.passwordWebsite {
 			padding: 10px;

@@ -1,8 +1,7 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { GlobalController } from './global-controller';
-import { html } from 'lit-html';
 
-export const GlobalControllerHTML = new TemplateFn<GlobalController>(() => {
+export const GlobalControllerHTML = new TemplateFn<GlobalController>((html, _props, _theme) => {
 	return html`
 		<loadable-block spinner-size="big" id="loadable" click-through>
 			<div>

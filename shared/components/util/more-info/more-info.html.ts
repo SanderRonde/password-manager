@@ -1,8 +1,7 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { MoreInfo } from './more-info';
-import { html } from 'lit-html';
 
-export const MoreInfoHTML = new TemplateFn<MoreInfo>((props) => {
+export const MoreInfoHTML = new TemplateFn<MoreInfo>((html, props) => {
 	return html`
 		<div id="hoverable">
 			<div id="circle">

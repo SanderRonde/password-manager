@@ -3,9 +3,8 @@ import { classNames, inlineListener, mapArr } from '../../../lib/webcomponent-ut
 import { ColorSize } from '../../icons/color/color';
 import { theme } from '../../theming/theme/theme';
 import { ThemeSelector } from "./theme-selector";
-import { html } from "lit-html";
 
-export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function() {
+export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function(html) {
 	const currentThemeName = this.getGlobalProperty('theme');
 	return html`
 		<div id="container">

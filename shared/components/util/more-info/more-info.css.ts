@@ -1,9 +1,8 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { changeOpacity } from '../../../lib/webcomponent-util';
 import { MoreInfo } from './more-info';
-import { html } from 'lit-html';
 
-export const MoreInfoCSS = new TemplateFn<MoreInfo>(function (_props, theme) {
+export const MoreInfoCSS = new TemplateFn<MoreInfo>(function (html, _props, theme) {
 	return html`<style>
 		#letter {
 			display: inline;

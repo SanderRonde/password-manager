@@ -1,8 +1,7 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { HorizontalCenterer } from './horizontal-centerer';
-import { html } from "lit-html";
 
-export const HorizontalCentererCSS = new TemplateFn<HorizontalCenterer>(() => {
+export const HorizontalCentererCSS = new TemplateFn<HorizontalCenterer>((html) => {
 	return html`<style>
 		#container {
 			display: flex;

@@ -1,9 +1,8 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { inlineListener } from '../../../lib/webcomponent-util';
 import { InfiniteList } from './infinite-list';
-import { html } from 'lit-html';
 
-export const InfiniteListHTML = new TemplateFn<InfiniteList<any, any, any>>(function () {
+export const InfiniteListHTML = new TemplateFn<InfiniteList<any, any, any>>(function (html) {
 	return html`
 		<slot name="template" id="template" class="hidden"></slot>
 		<div id="sizeGetter" class="hidden"></div>

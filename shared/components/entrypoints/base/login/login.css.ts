@@ -1,8 +1,7 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Login } from './login';
-import { html } from "lit-html";
 
-export const LoginCSS = new TemplateFn<Login>((_props, theme) => {
+export const LoginCSS = new TemplateFn<Login>((html, _props, theme) => {
 	return html`<style>
 		#formContainer {
 			width: 400px;

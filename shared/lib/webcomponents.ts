@@ -165,8 +165,8 @@ function typeSafeCall<T extends (this: any, ...args: any[]) => any>(fn: T,
 	}
 
 type TemplateRenderFunction<T extends WebComponent<any, any>> = (this: T, 
-	props: T['props'], theme: Theme, 
-	complexHTML: (strings: TemplateStringsArray, ...values: any[]) => TemplateResult) => TemplateResult;
+	complexHTML: (strings: TemplateStringsArray, ...values: any[]) => TemplateResult,
+	props: T['props'], theme: Theme, ) => TemplateResult;
 
 const componentTemplateMap: WeakMap<WebComponent<any, any>, 
 	WeakMap<TemplateFn<any>, TemplateResult|null>> = new WeakMap();
@@ -236,8 +236,7 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 			!templateMap.has(this)) {
 				//Change, rerender
 				const rendered = typeSafeCall(this._template as TemplateRenderFunction<T>, 
-					component, component.props, component.getTheme(), 
-					component.complexHTML);
+					component, component.complexHTML, component.props, component.getTheme());
 				templateMap.set(this, rendered);
 				return rendered;
 			}
@@ -624,7 +623,7 @@ abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebCo
 
 export const refPrefix = '___complex_ref';
 type ComplexValue = TemplateFn|Function|Object;
-export abstract class WebComponentComplexValueManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
+export abstract class WebComponentTemplateManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
 	private __reffed: ComplexValue[] = [];
 
 	private __genRef(value: ComplexValue) {
@@ -668,7 +667,7 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 	}
 
 	public getParentRef(ref: string) {
-		const parent = this.__getParent<WebComponentComplexValueManager<any>>();
+		const parent = this.__getParent<WebComponentTemplateManager<any>>();
 		if (!parent) {
 			console.warn('Could not find parent of', this, 
 				'and because of that could not find ref with id', ref);
@@ -678,7 +677,7 @@ export abstract class WebComponentComplexValueManager<E extends EventListenerObj
 	}
 }
 
-abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends WebComponentComplexValueManager<E> {
+abstract class WebComponentCustomCSSManager<E extends EventListenerObj> extends WebComponentTemplateManager<E> {
 	private ___hasCustomCSS: boolean|null = null;
 	private __noCustomCSS: TemplateFn = new TemplateFn(null, CHANGE_TYPE.NEVER);
 	public abstract isMounted: boolean;

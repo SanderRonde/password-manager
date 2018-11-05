@@ -13,7 +13,7 @@ function prefixWithWWW(url: string) {
 	}
 	return `www.${url}`;
 }
-export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>(function (props, _, html) {
+export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>(function (html, props, _) {
 	return html`
 		<md-card id="container" level="3"
 			padding-vertical="0"

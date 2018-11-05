@@ -3,9 +3,8 @@ import { inlineListener } from '../../../../lib/webcomponent-util';
 import { LockClosed } from "../../../icons/lockClosed/lockClosed";
 import { LockOpen } from "../../../icons/lockOpen/lockOpen";
 import { Login } from "./login";
-import { html } from 'lit-html';
 
-export const LoginHTML = new TemplateFn<Login>(function (props, _) {
+export const LoginHTML = new TemplateFn<Login>(function (html, props, _) {
 	return html`
 		<div id="pageContainer">
 			<horizontal-centerer>

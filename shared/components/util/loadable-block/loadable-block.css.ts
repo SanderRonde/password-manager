@@ -1,9 +1,8 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { LoadableBlock } from './loadable-block';
-import { html } from "lit-html";
 
 export const ANIMATE_TIME = 500;
-export const LoadableBlockCSS = new TemplateFn<LoadableBlock>((props, theme) => {
+export const LoadableBlockCSS = new TemplateFn<LoadableBlock>((html, props, theme) => {
 	return html`<style>
 		:host {
 			display: block;

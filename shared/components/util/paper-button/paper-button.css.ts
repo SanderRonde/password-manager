@@ -3,9 +3,8 @@ import { AnimatedButton } from '../animated-button/animated-button';
 import { changeOpacity } from '../../../lib/webcomponent-util';
 import { RippleCSS } from '../../../mixins/ripple';
 import { PaperButton } from './paper-button';
-import { html } from "lit-html";
 
-export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>(function (_props, theme) {
+export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>(function (html, _props, theme) {
 	return html`
 		${RippleCSS.render(CHANGE_TYPE.THEME, this)}
 		<style>

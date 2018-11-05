@@ -1,8 +1,7 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { FloatingActionButton } from './floating-action-button';
-import { html } from 'lit-html';
 
-export const FloatingActionButtonHTML = new TemplateFn<FloatingActionButton>(function (_props) {
+export const FloatingActionButtonHTML = new TemplateFn<FloatingActionButton>(function (html) {
 	return html`
 		<div id="container">
 			<div id="circle">

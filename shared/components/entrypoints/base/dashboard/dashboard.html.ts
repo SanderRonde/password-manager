@@ -4,7 +4,7 @@ import { Search } from '../../../icons/search/search';
 import { CustomDashboardCSS } from './dashboard.css';
 import { Dashboard } from './dashboard';
 
-export const DashboardHTML = new TemplateFn<Dashboard>(function (props, _theme, html) {
+export const DashboardHTML = new TemplateFn<Dashboard>(function (html, props, _theme) {
 	return html`
 		<div id="container">
 			<div id="titleBar">

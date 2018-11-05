@@ -1,8 +1,7 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { ThemeSelector } from './theme-selector';
-import { html } from "lit-html";
 
-export const ThemeSelectorCSS = new TemplateFn<ThemeSelector>((_props, theme) => {
+export const ThemeSelectorCSS = new TemplateFn<ThemeSelector>((html, _props, theme) => {
 	return html`<style>
 		.themeContainer {
 			height: 40px;

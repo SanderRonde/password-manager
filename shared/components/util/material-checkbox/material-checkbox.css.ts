@@ -1,9 +1,8 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { MaterialCheckbox } from './material-checkbox';
-import { html } from 'lit-html';
 import { changeOpacity } from '../../../lib/webcomponent-util';
+import { MaterialCheckbox } from './material-checkbox';
 
-export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((props, theme) => {
+export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((html, props, theme) => {
 	return html`<style>
 		/*!
 		Material Components for the Web

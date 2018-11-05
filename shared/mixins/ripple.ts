@@ -1,9 +1,8 @@
 import { listenWithIdentifier } from '../lib/webcomponent-util';
 import { TemplateFn, CHANGE_TYPE } from '../lib/webcomponents';
 import { ExtendableComponent } from '../lib/decorators';
-import { html } from 'lit-html';
 
-export const RippleCSS = new TemplateFn<any>((_props, theme) => {
+export const RippleCSS = new TemplateFn<any>((html, _props, theme) => {
 	return html`<style>
 		.mdl-button--raised.mdl-button--colored .mdl-ripple {
 			background: ${theme.textOnNonbackground};

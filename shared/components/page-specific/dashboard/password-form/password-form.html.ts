@@ -11,7 +11,6 @@ import { Link } from '../../../icons/link/link';
 import { Copy } from '../../../icons/copy/copy';
 import { Edit } from '../../../icons/edit/edit';
 import { PasswordForm } from './password-form';
-import { html } from 'lit-html';
 
 const hostUpdateFns: (() => void)[] = [];
 function genHostUpdateFn(container: PasswordForm, index: number) {
@@ -47,7 +46,7 @@ export function getHost(fullUrl: string) {
 	}
 }
 
-const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => {
+const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((html, _, theme) => {
 	return html`<style>
 		#button .mdl-ripple {
 			background: ${theme.success};
@@ -76,14 +75,14 @@ const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => 
 	</style>`;
 }, CHANGE_TYPE.THEME);
 
-const twofactorTokenCustomCSS = new TemplateFn<MaterialInput>((_, theme) => {
+const twofactorTokenCustomCSS = new TemplateFn<MaterialInput>((html, _, theme) => {
 	return html`<style>
 		@keyframes animate-line {
 			0%  {
 				width: 0;
 			}
-			100%: {
-				width: 100%;
+			100% {
+				with: 100%;
 			}
 		}
 
@@ -109,7 +108,7 @@ const twofactorTokenCustomCSS = new TemplateFn<MaterialInput>((_, theme) => {
 	</style>`;
 }, CHANGE_TYPE.THEME);
 
-const deleteButtonCustomCSS = new TemplateFn<PasswordForm>(() => {
+const deleteButtonCustomCSS = new TemplateFn<PasswordForm>((html) => {
 	return html`<style>
 		#button {
 			padding: 6px 10px;
@@ -124,7 +123,7 @@ function getString(base: unknown, fallback: string): string {
 	return fallback;
 }
 
-export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (props, theme, html) {
+export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, props, theme) {
 	return html`
 	<div id="passwordCredentials">
 		<material-input id="passwordUsername" name="username"

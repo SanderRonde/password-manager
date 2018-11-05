@@ -5,7 +5,6 @@ import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { CrossSize } from '../../../icons/cross/cross';
 import { PasswordDetail } from './password-detail';
 import { KeySize } from '../../../icons/key/key';
-import { html } from 'lit-html';
 
 export const passwordDetailDataSymbol = Symbol('passwordDetailData');
 export const passwordDetailDataStore: {
@@ -18,7 +17,7 @@ export const passwordDetailDataStore: {
 	[passwordDetailDataSymbol]: null
 }
 
-const retryButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => {
+const retryButtonCustomCSS = new TemplateFn<AnimatedButton>((html, _props, theme) => {
 	return html`<style>
 		#button {
 			background: ${theme.error};
@@ -28,7 +27,7 @@ const retryButtonCustomCSS = new TemplateFn<AnimatedButton>((_, theme) => {
 }, CHANGE_TYPE.THEME);
 
 
-export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (props, _theme, html) {
+export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (html, props, _theme) {
 	return html`
 		<div>
 			<md-card level="3" 

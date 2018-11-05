@@ -2,10 +2,9 @@ import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { CheckmarkSize } from "../../icons/checkmark/checkmark";
 import { CrossSize } from "../../icons/cross/cross";
 import { AnimatedButton } from "./animated-button";
-import { html } from "lit-html";
 import { inlineListener } from '../../../lib/webcomponent-util';
 
-export const AnimatedButtonHTML = new TemplateFn<AnimatedButton>(function (props) {
+export const AnimatedButtonHTML = new TemplateFn<AnimatedButton>(function (html, props) {
 	const Checkmark = CheckmarkSize(35);
 	const Cross = CrossSize(35);
 

@@ -1,8 +1,7 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { MDCard } from './md-card';
-import { html } from 'lit-html';
 
-export const MDCardHTML = new TemplateFn<MDCard>(() => {
+export const MDCardHTML = new TemplateFn<MDCard>((html) => {
 	return html`
 		<div id="shadow">
 			<slot></slot>

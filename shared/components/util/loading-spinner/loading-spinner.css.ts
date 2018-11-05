@@ -1,6 +1,5 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { LoadingSpinner } from './loading-spinner';
-import { html } from "lit-html";
 
 function getDimensions(props: LoadingSpinner['props']) {
 	if (props.dimensions) {
@@ -15,7 +14,7 @@ function getDimensions(props: LoadingSpinner['props']) {
 	return 28;
 }
 
-export const LoadingSpinnerCSS = new TemplateFn<LoadingSpinner>((props) => {
+export const LoadingSpinnerCSS = new TemplateFn<LoadingSpinner>((html, props) => {
 	return html`<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.

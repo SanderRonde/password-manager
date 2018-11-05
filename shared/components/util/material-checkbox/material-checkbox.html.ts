@@ -1,8 +1,7 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { MaterialCheckbox } from './material-checkbox';
-import { html } from 'lit-html';
 
-export const MaterialCheckboxHTML = new TemplateFn<MaterialCheckbox>(function (props) {
+export const MaterialCheckboxHTML = new TemplateFn<MaterialCheckbox>(function (html, props) {
 	return html`
 		<div class="mdc-form-field">
 			<div class="mdc-checkbox">

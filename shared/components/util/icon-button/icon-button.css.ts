@@ -1,9 +1,8 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { changeOpacity } from '../../../lib/webcomponent-util';
 import { IconButton } from './icon-button';
-import { html } from "lit-html";
 
-export const IconButtonCSS = new TemplateFn<IconButton>((props, theme) => {
+export const IconButtonCSS = new TemplateFn<IconButton>((html, props, theme) => {
 	return html`<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.

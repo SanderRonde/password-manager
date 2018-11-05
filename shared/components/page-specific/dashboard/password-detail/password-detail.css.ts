@@ -1,11 +1,10 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { changeOpacity } from '../../../../lib/webcomponent-util';
 import { PasswordDetail } from './password-detail';
-import { html } from 'lit-html';
 
 export const VIEW_FADE_TIME = 300;
 export const STATIC_VIEW_HEIGHT = Math.min(window.innerHeight, 580);
-export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((_props, theme) => {
+export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((html, _props, theme) => {
 	return html`<style>
 		#noneSelectedView, #twofactorRequiredView, #u2fRequiredView, #failedView, #loadingView {
 			height: ${STATIC_VIEW_HEIGHT}px;

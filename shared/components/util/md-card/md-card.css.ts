@@ -1,6 +1,5 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { MDCard } from './md-card';
-import { html } from 'lit-html';
 
 function getShadow(level: number) {
 	switch (level) {
@@ -27,7 +26,7 @@ function assertNumber(value: any, fallback: number): number {
 	return value;
 }
 
-export const MDCardCSS = new TemplateFn<MDCard>((props, theme) => {
+export const MDCardCSS = new TemplateFn<MDCard>((html, props, theme) => {
 	return html`<style>
 		#shadow {
 			transition: background-color 300ms ease-in-out,
