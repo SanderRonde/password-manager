@@ -1,4 +1,5 @@
 import { WebComponent } from './webcomponents';
+
 type IDMap = Map<string, (this: any, ev: HTMLElementEventMap[keyof HTMLElementEventMap]) => any>;
 const listenedToElements: WeakMap<WebComponent, {
 	self: IDMap;
