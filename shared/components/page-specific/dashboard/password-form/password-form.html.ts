@@ -1,9 +1,10 @@
 import { passwordDetailDataStore, passwordDetailDataSymbol } from '../password-detail/password-detail.html';
-import { inlineListener, mapArr, changeOpacity, classNames } from '../../../../lib/webcomponent-util';
+import { changeOpacity, inlineListener } from '../../../../lib/webcomponents/template-util';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Visible, VisibleHidden } from '../../../icons/visible/visible';
+import { mapArr, classNames } from '../../../../lib/webcomponent-util';
 import { Checkmark } from '../../../icons/checkmark/checkmark';
 import { Delete } from '../../../icons/delete/delete';
 import { Cross } from '../../../icons/cross/cross';

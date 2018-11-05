@@ -1,12 +1,12 @@
 /// <reference path="../../../../types/elements.d.ts" />
-import { Props, PROP_TYPE, isDefined, getCookie } from '../../../../lib/webcomponent-util'
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
+import { ConfigurableWebComponent, Props, PROP_TYPE } from "../../../../lib/webcomponents";
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { LoginData, VALID_THEMES_T } from '../../../../types/shared-types';
-import { ConfigurableWebComponent } from "../../../../lib/webcomponents";
+import { isDefined, getCookie } from '../../../../lib/webcomponent-util'
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { bindToClass } from '../../../../lib/decorators';

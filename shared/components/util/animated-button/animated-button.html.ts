@@ -1,8 +1,8 @@
+import { inlineListener } from '../../../lib/webcomponents/template-util';
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { CheckmarkSize } from "../../icons/checkmark/checkmark";
 import { CrossSize } from "../../icons/cross/cross";
 import { AnimatedButton } from "./animated-button";
-import { inlineListener } from '../../../lib/webcomponent-util';
 
 export const AnimatedButtonHTML = new TemplateFn<AnimatedButton>(function (html, props) {
 	const Checkmark = CheckmarkSize(35);

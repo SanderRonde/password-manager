@@ -1,5 +1,5 @@
+import { changeOpacity } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { changeOpacity } from '../../../lib/webcomponent-util';
 import { IconButton } from './icon-button';
 
 export const IconButtonCSS = new TemplateFn<IconButton>((html, props, theme) => {

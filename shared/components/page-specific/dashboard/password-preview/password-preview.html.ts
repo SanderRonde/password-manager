@@ -1,9 +1,10 @@
 import { HollowTriangleArrowSize } from '../../../icons/triangle-arrow/triangle-arrow';
+import { inlineListener } from '../../../../lib/webcomponents/template-util';
 import { QuestionmarkSize } from '../../../icons/questionmark/questionmark';
-import { inlineListener, mapArr } from '../../../../lib/webcomponent-util';
 import { LockClosedUnfilled } from '../../../icons/lockClosed/lockClosed';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { invertedCardCSS, noCustomCSS } from './password-preview.css';
+import { mapArr } from '../../../../lib/webcomponent-util';
 import { PasswordPreview } from './password-preview';
 import { Key } from '../../../icons/key/key';
 

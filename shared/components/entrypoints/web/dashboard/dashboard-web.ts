@@ -2,14 +2,13 @@ import { ERRS, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../
 import { decryptWithPrivateKey, hash, pad } from '../../../../lib/browser-crypto';
 import { Dashboard, DashboarDependencies } from '../../base/dashboard/dashboard';
 import { GlobalControllerData } from '../../base/global/global-controller';
+import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { DashboardHTML } from '../../base/dashboard/dashboard.html';
+import { CHANGE_TYPE, config } from '../../../../lib/webcomponents';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { DashboardCSS } from '../../base/dashboard/dashboard.css';
-import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { MasterPassword } from '../../../../types/db-types';
-import { CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { ENTRYPOINT } from '../../../../types/shared-types';
-import { config } from '../../../../lib/webcomponent-util';
 import { Remove } from '../../../../types/serviceworker';
 
 @config({

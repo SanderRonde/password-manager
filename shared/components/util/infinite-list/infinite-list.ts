@@ -1,5 +1,6 @@
-import { config, Props, PROP_TYPE, ComplexType, createNumberList, any, listenWithIdentifier, isNewElement, listen, wait, createDisposableWindowListener } from '../../../lib/webcomponent-util';
-import { ConfigurableWebComponent } from '../../../lib/webcomponents';
+import { createNumberList, any, listenWithIdentifier, isNewElement, listen, wait } from '../../../lib/webcomponent-util';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE, ComplexType } from '../../../lib/webcomponents';
+import { createDisposableWindowListener } from '../../../lib/webcomponents/template-util';
 import { InfiniteListIDMap } from './infinite-list-querymap';
 import { TemplateResult, html, render } from 'lit-html';
 import { InfiniteListHTML } from './infinite-list.html';

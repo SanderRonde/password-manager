@@ -1,5 +1,5 @@
+import { inlineListener } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { inlineListener } from '../../../lib/webcomponent-util';
 import { InfiniteList } from './infinite-list';
 
 export const InfiniteListHTML = new TemplateFn<InfiniteList<any, any, any>>(function (html) {

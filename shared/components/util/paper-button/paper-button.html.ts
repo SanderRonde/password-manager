@@ -1,5 +1,6 @@
+import { inlineListener } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { classNames, inlineListener } from '../../../lib/webcomponent-util';
+import { classNames } from '../../../lib/webcomponent-util';
 import { PaperButton } from "./paper-button";
 
 export const PaperButtonHTML = new TemplateFn<PaperButton>(function(html, props) {

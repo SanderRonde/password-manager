@@ -1,4 +1,4 @@
-import { createDisposableWindowListener } from '../../../../lib/webcomponent-util';
+import { createDisposableWindowListener } from '../../../../lib/webcomponents/template-util';
 import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { PW_VIEW_SCROLL, TITLE_BAR_HEIGHT } from './dashboard.css';
 import { bindToClass } from '../../../../lib/decorators';

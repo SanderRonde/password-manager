@@ -1,8 +1,8 @@
 import { GlobalController, GlobalControllerDependencies } from '../../base/global/global-controller';
 import { GlobalControllerHTML } from '../../base/global/global-controller.html';
 import { GlobalControllerCSS } from '../../base/global/global-controller.css';
-import { config } from '../../../../lib/webcomponent-util';
 import { ENTRYPOINT } from '../../../../types/shared-types';
+import { config } from '../../../../lib/webcomponents';
 
 @config({
 	is: 'global-controller',

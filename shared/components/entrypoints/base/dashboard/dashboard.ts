@@ -2,15 +2,15 @@ import { PasswordPreview, PasswordPreviewHost } from '../../../page-specific/das
 import { PasswordDetailWeb } from '../../../page-specific/dashboard/web/password-detail-web/password-detail-web';
 import { PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
 import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
+import { WebComponentBase, Props, ComplexType, PROP_TYPE } from "../../../../lib/webcomponents";
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
-import { Props, ComplexType, PROP_TYPE, wait } from '../../../../lib/webcomponent-util';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { DashboardScrollManager } from './dashboard-scroll-manager';
-import { WebComponentBase } from "../../../../lib/webcomponents";
 import { PublicKeyDecrypted } from '../../../../types/db-types';
 import { APISuccessfulReturns } from '../../../../types/api';
+import { wait } from '../../../../lib/webcomponent-util';
 import { MDCard } from '../../../util/md-card/md-card';
 import * as devPasswords from './dev-passwords';
 

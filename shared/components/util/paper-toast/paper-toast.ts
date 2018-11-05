@@ -1,6 +1,7 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { Props, PROP_TYPE, config, isNewElement, createCancellableTimeout, awaitMounted, wait } from '../../../lib/webcomponent-util';
-import { ConfigurableWebComponent } from '../../../lib/webcomponents';
+import { createCancellableTimeout, awaitMounted } from '../../../lib/webcomponents/template-util';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE } from '../../../lib/webcomponents';
+import { isNewElement, wait } from '../../../lib/webcomponent-util';
 import { PaperButton } from '../paper-button/paper-button';
 import { PaperToastIDMap } from './paper-toast-querymap';
 import { rippleEffect } from '../../../mixins/ripple';

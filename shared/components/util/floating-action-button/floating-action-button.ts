@@ -1,10 +1,9 @@
 /// <reference path="../../../types/elements.d.ts" />
 
+import { ConfigurableWebComponent, config, Props } from '../../../lib/webcomponents';
 import { FloatingActionButtonIDMap } from './floating-action-button-querymap';
 import { FloatingActionButtonHTML } from './floating-action-button.html';
 import { FloatingActionButtonCSS } from './floating-action-button.css';
-import { ConfigurableWebComponent } from '../../../lib/webcomponents';
-import { config, Props } from '../../../lib/webcomponent-util';
 
 @config({
 	is: 'floating-action-button',

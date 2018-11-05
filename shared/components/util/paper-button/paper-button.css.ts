@@ -1,6 +1,6 @@
+import { changeOpacity } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { AnimatedButton } from '../animated-button/animated-button';
-import { changeOpacity } from '../../../lib/webcomponent-util';
 import { RippleCSS } from '../../../mixins/ripple';
 import { PaperButton } from './paper-button';
 

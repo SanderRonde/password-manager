@@ -1,7 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { Props, PROP_TYPE, config } from '../../../lib/webcomponent-util';
-import { ConfigurableWebComponent } from '../../../lib/webcomponents';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE } from '../../../lib/webcomponents';
 import { MdCardIDMap } from './md-card-querymap';
 import { MDCardHTML } from './md-card.html';
 import { MDCardCSS } from './md-card.css';

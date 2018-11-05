@@ -1,7 +1,7 @@
+import { changeOpacity } from '../../../../lib/webcomponents/template-util';
 import { pythagoras } from '../../../icons/triangle-arrow/triangle-arrow';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { changeOpacity } from '../../../../lib/webcomponent-util';
 import { Dashboard } from './dashboard';
 
 const PAGE_TOP = 130;

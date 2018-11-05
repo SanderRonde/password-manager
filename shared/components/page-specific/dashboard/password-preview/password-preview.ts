@@ -1,11 +1,11 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, Props, PROP_TYPE, ComplexType, isNewElement } from '../../../../lib/webcomponent-util';
+import { ConfigurableWebComponent, CHANGE_TYPE, config, Props, PROP_TYPE, ComplexType } from '../../../../lib/webcomponents';
 import { MetaPasswords, MetaPasswordsPreviewData } from '../../../entrypoints/base/dashboard/dashboard';
-import { ConfigurableWebComponent, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { InfiniteList, ListRendered } from '../../../util/infinite-list/infinite-list';
 import { rippleEffect, RippleEffect } from '../../../../mixins/ripple';
 import { PasswordPreviewIDMap } from './password-preview-querymap';
+import { isNewElement } from '../../../../lib/webcomponent-util';
 import { PasswordPreviewHTML } from './password-preview.html';
 import { PasswordPreviewCSS } from './password-preview.css';
 import { bindToClass } from '../../../../lib/decorators';

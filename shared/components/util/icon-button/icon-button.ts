@@ -1,6 +1,5 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, Props, PROP_TYPE } from "../../../lib/webcomponent-util";
-import { ConfigurableWebComponent } from "../../../lib/webcomponents";
+import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
 import { IconButtonIDMap } from "./icon-button-querymap";
 import { IconButtonHTML } from "./icon-button.html";
 import { IconButtonCSS } from "./icon-button.css";

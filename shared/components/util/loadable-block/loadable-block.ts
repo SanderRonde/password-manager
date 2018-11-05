@@ -1,9 +1,10 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, Props, PROP_TYPE, wait, createCancellableTimeout, awaitMounted } from "../../../lib/webcomponent-util";
-import { ConfigurableWebComponent } from "../../../lib/webcomponents";
+import { awaitMounted, createCancellableTimeout } from '../../../lib/webcomponents/template-util';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
 import { LoadableBlockCSS, ANIMATE_TIME } from './loadable-block.css';
 import { LoadableBlockIDMap } from './loadable-block-querymap';
 import { LoadableBlockHTML } from './loadable-block.html';
+import { wait } from "../../../lib/webcomponent-util";
 
 @config({
 	is: 'loadable-block',

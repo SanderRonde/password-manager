@@ -1,5 +1,6 @@
+import { inlineListener } from '../../../lib/webcomponents/template-util';
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
-import { classNames, inlineListener, mapArr } from '../../../lib/webcomponent-util';
+import { classNames, mapArr } from '../../../lib/webcomponent-util';
 import { ColorSize } from '../../icons/color/color';
 import { theme } from '../../theming/theme/theme';
 import { ThemeSelector } from "./theme-selector";
@@ -15,17 +16,17 @@ export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function(html) {
 						<div class="themeContainer">
 							<div class="theme" themename="${themeName}">
 								<div class="themeHighligher"
-									style="background-color: ${currentTheme.textOnBackground}"
+									style="${"background-color: " + currentTheme.textOnBackground}"
 								>
 									<div class="themeBackground" 
-										style="background-color: ${currentTheme.background}"
+										style="${"background-color: " + currentTheme.background}"
 									>
 										<div class="colorButtons">
 											<div class="primaryColor"
-												style="background-color: ${currentTheme.primary.main}"
+												style="${"background-color: " + currentTheme.primary.main}"
 											></div>
 											<div class="accentColor"
-												style="background-color: ${currentTheme.accent.main}"
+												style="${"background-color: " + currentTheme.accent.main}"
 											></div>
 										</div>
 									</div>

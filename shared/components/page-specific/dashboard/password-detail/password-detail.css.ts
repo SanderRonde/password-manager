@@ -1,5 +1,5 @@
+import { changeOpacity } from '../../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { changeOpacity } from '../../../../lib/webcomponent-util';
 import { PasswordDetail } from './password-detail';
 
 export const VIEW_FADE_TIME = 300;

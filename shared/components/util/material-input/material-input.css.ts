@@ -1,5 +1,5 @@
+import { changeOpacity } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { changeOpacity } from '../../../lib/webcomponent-util';
 import { MaterialInput } from './material-input';
 
 export const MaterialInputCSS = new TemplateFn<MaterialInput>((html, props, theme) => {

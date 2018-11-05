@@ -1,5 +1,5 @@
+import { inlineListener } from '../../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { inlineListener } from '../../../../lib/webcomponent-util';
 import { LockClosed } from "../../../icons/lockClosed/lockClosed";
 import { LockOpen } from "../../../icons/lockOpen/lockOpen";
 import { Login } from "./login";

@@ -1,16 +1,44 @@
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey } from '../../../../lib/browser-crypto';
-import { config, cancelTimeout, wait, createCancellableTimeout, reportDefaultResponseErrors } from '../../../../lib/webcomponent-util';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { Login, LoginDependencies } from '../../base/login/login';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { API_ERRS, APIReturns } from '../../../../types/api';
 import { ENTRYPOINT } from '../../../../types/shared-types';
+import { wait } from '../../../../lib/webcomponent-util';
 import { bindToClass } from '../../../../lib/decorators';
 import { LoginHTML } from '../../base/login/login.html';
 import { LoginCSS } from '../../base/login/login.css';
 import { ERRS } from '../../../../types/crypto';
+import { config } from '../../../../lib/webcomponents';
+import { cancelTimeout, createCancellableTimeout } from '../../../../lib/webcomponents/template-util';
 
 type ServerLoginResponse = APIReturns['/api/dashboard/login'];
+
+export function reportDefaultResponseErrors(response: {
+	success:false;
+	ERR: API_ERRS;
+	error: string;
+}, paperToast: typeof PaperToast) {
+	switch (response.ERR) {
+		case API_ERRS.CLIENT_ERR:
+			paperToast.createHidable('Failed to send request');
+			break;
+		case API_ERRS.INVALID_CREDENTIALS:
+			paperToast.createHidable('Invalid credentials');
+			break;
+		case API_ERRS.INVALID_PARAM_TYPES:
+		case API_ERRS.MISSING_PARAMS:
+		case API_ERRS.NO_REQUEST_BODY:
+			paperToast.createHidable('Invalid request');
+			break;
+		case API_ERRS.SERVER_ERROR:
+			paperToast.createHidable('Server error');
+			break;
+		case API_ERRS.TOO_MANY_REQUESTS:
+			paperToast.createHidable('Too many requests');
+			break;
+	}
+}
 
 @config({
 	is: 'login-page',

@@ -1,7 +1,8 @@
-import { repeat, inlineListener } from '../../../../lib/webcomponent-util';
 import { LockClosedUnfilledSize, LockClosedSize } from '../../../icons/lockClosed/lockClosed';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
+import { inlineListener } from '../../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { repeat } from '../../../../lib/webcomponent-util';
 import { CrossSize } from '../../../icons/cross/cross';
 import { PasswordDetail } from './password-detail';
 import { KeySize } from '../../../icons/key/key';

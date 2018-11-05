@@ -1,18 +1,19 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { Props, ComplexType, wait, isNewElement, listenWithIdentifier, reportDefaultResponseErrors } from '../../../../lib/webcomponent-util';
 import { APIToken, ERRS, U2FToken, Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, EncryptionAlgorithm } from '../../../../types/crypto';
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey, PublicKeyDecrypted, MasterPassword } from '../../../../types/db-types';
+import { wait, isNewElement, listenWithIdentifier } from '../../../../lib/webcomponent-util';
+import { ConfigurableWebComponent, Props, ComplexType } from '../../../../lib/webcomponents';
 import { passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
 import { decryptWithPrivateKey, decrypt, encrypt } from '../../../../lib/browser-crypto';
 import { MetaPasswords, Dashboard } from '../../../entrypoints/base/dashboard/dashboard';
-import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
+import { reportDefaultResponseErrors } from '../../../entrypoints/web/login/login-web';
 import { createClientAPIRequest, filterUndefined } from '../../../../lib/apirequests';
+import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { LoadingSpinner } from '../../../util/loading-spinner/loading-spinner';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
-import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { API_ERRS, APISuccessfulReturns } from '../../../../types/api';
 import { SizingBlock } from '../../../util/sizing-block/sizing-block';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';

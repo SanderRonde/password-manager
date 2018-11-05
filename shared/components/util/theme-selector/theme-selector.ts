@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, isNewElement, Props, PROP_TYPE, listenWithIdentifier } from "../../../lib/webcomponent-util";
-import { ConfigurableWebComponent } from "../../../lib/webcomponents";
+import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
+import { isNewElement, listenWithIdentifier } from "../../../lib/webcomponent-util";
 import { ThemeSelectorIDMap } from "./theme-selector-querymap";
 import { VALID_THEMES_T } from '../../../types/shared-types';
 import { ThemeSelectorHTML } from './theme-selector.html';

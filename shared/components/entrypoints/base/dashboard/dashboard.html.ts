@@ -1,5 +1,5 @@
+import { joinTemplates } from '../../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { joinTemplates } from '../../../../lib/webcomponent-util';
 import { Search } from '../../../icons/search/search';
 import { CustomDashboardCSS } from './dashboard.css';
 import { Dashboard } from './dashboard';

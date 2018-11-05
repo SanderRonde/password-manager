@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { Props, PROP_TYPE, config, listen, isNewElement } from '../../../lib/webcomponent-util';
-import { ConfigurableWebComponent } from "../../../lib/webcomponents";
+import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
+import { listen, isNewElement } from '../../../lib/webcomponent-util';
 import { MaterialInputIDMap } from './material-input-querymap';
 import { MaterialInputHTML } from './material-input.html';
 import { MaterialInputCSS } from './material-input.css';

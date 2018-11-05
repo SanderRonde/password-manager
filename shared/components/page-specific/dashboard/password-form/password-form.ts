@@ -1,11 +1,12 @@
-import { Props, ComplexType, findElementInPath, PROP_TYPE, wait, createCancellableTimeout, config } from '../../../../lib/webcomponent-util';
+import { ConfigurableWebComponent, config, Props, ComplexType, PROP_TYPE } from '../../../../lib/webcomponents';
 import { passwordDetailDataStore, passwordDetailDataSymbol } from '../password-detail/password-detail.html';
 import { PasswordDetail, PasswordDetailChanges, ToBools } from '../password-detail/password-detail';
 import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
+import { createCancellableTimeout } from '../../../../lib/webcomponents/template-util';
 import { MaterialCheckbox } from '../../../util/material-checkbox/material-checkbox';
 import { MetaPasswords } from '../../../entrypoints/base/dashboard/dashboard';
+import { findElementInPath, wait } from '../../../../lib/webcomponent-util';
 import { MaterialInput } from '../../../util/material-input/material-input';
-import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { MoreInfo } from '../../../util/more-info/more-info';

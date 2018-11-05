@@ -1,7 +1,7 @@
 import { PasswordDetail, PasswordDetailDependencies } from '../../password-detail/password-detail';
 import { PasswordDetailHTML } from '../../password-detail/password-detail.html';
 import { PasswordDetailCSS } from '../../password-detail/password-detail.css';
-import { config } from '../../../../../lib/webcomponent-util';
+import { config } from '../../../../../lib/webcomponents';
 
 @config({
 	is: 'password-detail',

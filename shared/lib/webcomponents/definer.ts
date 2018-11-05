@@ -1,7 +1,7 @@
 import { GlobalProperties } from '../../types/shared-types';
-import { ComponentIs } from '../webcomponent-util';
 import { WebComponent } from './component';
 import { WebComponentBase } from './base';
+import { ComponentIs } from './configurable';
 
 interface ExtendedProcess extends NodeJS.Process {
 	HTMLElement: typeof HTMLElement;

@@ -1,15 +1,16 @@
-import { Props, PROP_TYPE, wait, awaitMounted } from '../../../../lib/webcomponent-util';
 import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding, ERRS } from '../../../../types/crypto';
 import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../types/db-types';
+import { ConfigurableWebComponent, Props, PROP_TYPE } from '../../../../lib/webcomponents';
 import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
 import { LoadableBlock } from '../../../util/loadable-block/loadable-block';
-import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
+import { awaitMounted } from '../../../../lib/webcomponents/template-util';
 import { decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { GlobalControllerIDMap } from './global-controller-querymap';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { ENTRYPOINT } from '../../../../types/shared-types';
 import { Dashboard } from '../../base/dashboard/dashboard';
+import { wait } from '../../../../lib/webcomponent-util';
 import { API_ERRS } from '../../../../types/api';
 import { Login } from '../../base/login/login';
 

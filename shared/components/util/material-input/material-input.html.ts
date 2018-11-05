@@ -1,5 +1,6 @@
-import { classNames, inlineListener, attribute } from "../../../lib/webcomponent-util";
+import { attribute, inlineListener } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { classNames } from "../../../lib/webcomponent-util";
 import { MaterialInput } from "./material-input";
 
 export const MaterialInputHTML = new TemplateFn<MaterialInput>(function (html, props) {

@@ -1,7 +1,8 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { config, isNewElement, Props, PROP_TYPE, changeOpacity } from '../../../lib/webcomponent-util';
-import { ConfigurableWebComponent } from "../../../lib/webcomponents";
+import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
+import { changeOpacity } from '../../../lib/webcomponents/template-util';
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
+import { isNewElement } from '../../../lib/webcomponent-util';
 import { PaperButtonIDMap } from './paper-button-querymap';
 import { PaperButtonHTML } from './paper-button.html';
 import { bindToClass } from '../../../lib/decorators';

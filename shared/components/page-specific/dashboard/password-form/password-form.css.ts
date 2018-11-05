@@ -1,5 +1,5 @@
+import { changeOpacity } from '../../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { changeOpacity } from '../../../../lib/webcomponent-util';
 import { PasswordForm } from './password-form';
 
 export const PasswordFormCSS = new TemplateFn<PasswordForm>((html, _props, theme) => {

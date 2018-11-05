@@ -1,5 +1,5 @@
+import { changeOpacity } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { changeOpacity } from '../../../lib/webcomponent-util';
 import { MoreInfo } from './more-info';
 
 export const MoreInfoCSS = new TemplateFn<MoreInfo>(function (html, _props, theme) {
