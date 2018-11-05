@@ -324,7 +324,7 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 					return value.fn(data, itemData, index, isTemplate);
 				}
 			});
-			return this.complexHTML(templateString as TemplateStringsArray, ...args);
+			return this.complexHTML(html, templateString as TemplateStringsArray, ...args);
 		}
 	}
 

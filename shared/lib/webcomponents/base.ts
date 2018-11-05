@@ -91,7 +91,9 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 			!templateMap.has(this)) {
 				//Change, rerender
 				const rendered = typeSafeCall(this._template as TemplateRenderFunction<T>, 
-					component, component.complexHTML, component.props, component.getTheme());
+					component, (strings: TemplateStringsArray, values: any[]) => {
+						return component.complexHTML(html, strings, values);
+					}, component.props, component.getTheme());
 				templateMap.set(this, rendered);
 				return rendered;
 			}

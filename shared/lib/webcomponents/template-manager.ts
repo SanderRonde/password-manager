@@ -1,5 +1,5 @@
-import { TemplateResult, isDirective, html } from 'lit-html';
 import { WebComponentThemeManger } from './theme-manager';
+import { TemplateResult, isDirective } from 'lit-html';
 import { EventListenerObj } from './listener';
 import { bindToClass } from '../decorators';
 import { TemplateFn } from './base';
@@ -21,25 +21,26 @@ export abstract class WebComponentTemplateManager<E extends EventListenerObj> ex
 	}
 
 	@bindToClass
-	public complexHTML(strings: TemplateStringsArray, ...values: any[]) {
-		values = values.map((value) => {
-			if (value instanceof TemplateFn) {
-				return this.__genRef(value);
-			}
-			if (Array.isArray(value) && !(value[0] instanceof TemplateResult)) {
-				return this.__genRef(value);
-			}
-			if (!Array.isArray(value) && typeof value === 'object' && 
-				!(value instanceof TemplateResult)) {
+	public complexHTML(fn: (strings: TemplateStringsArray, ...values: any[]) => TemplateResult, 
+		strings: TemplateStringsArray, ...values: any[]) {
+			values = values.map((value) => {
+				if (value instanceof TemplateFn) {
 					return this.__genRef(value);
 				}
-			if (typeof value === 'function' && !isDirective(value)) {
-				return this.__genRef(value);
-			}
-			return value;
-		});
-		return html(strings, ...values);
-	}
+				if (Array.isArray(value) && !(value[0] instanceof TemplateResult)) {
+					return this.__genRef(value);
+				}
+				if (!Array.isArray(value) && typeof value === 'object' && 
+					!(value instanceof TemplateResult)) {
+						return this.__genRef(value);
+					}
+				if (typeof value === 'function' && !isDirective(value)) {
+					return this.__genRef(value);
+				}
+				return value;
+			});
+			return fn(strings, ...values);
+		}
 
 	public getRef(ref: string) {
 		if (typeof ref !== 'string') {
