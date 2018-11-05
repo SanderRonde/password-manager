@@ -11,6 +11,7 @@ export const RippleCSS = new TemplateFn<any>((html, _props, theme) => {
 		.mdl-button--fab .mdl-button__ripple-container {
 			border-radius: 50%;
 			-webkit-mask-image: -webkit-radial-gradient(circle, white, black);
+			mask-image: radial-gradient(circle, white, black);
 		}
 
 		.mdl-button--fab.mdl-button--colored .mdl-ripple {
@@ -20,6 +21,7 @@ export const RippleCSS = new TemplateFn<any>((html, _props, theme) => {
 		.mdl-button--icon .mdl-button__ripple-container {
 			border-radius: 50%;
 			-webkit-mask-image: -webkit-radial-gradient(circle, white, black);
+			mask-image: radial-gradient(circle, white, black);
 		}
 
 		.mdl-button__ripple-container {
