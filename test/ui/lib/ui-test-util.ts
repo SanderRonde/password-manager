@@ -186,3 +186,8 @@ export function onMounted(...selectors: string[]): Promise<any[]> {
 		});
 	})) as any;
 }
+
+export function getInnerText(el: HTMLElement) {
+	const content = el.innerHTML;
+	return content.split(/<!-.*?->/g).filter(t => t.trim() !== '').join('');
+}

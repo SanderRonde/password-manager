@@ -1,5 +1,5 @@
 import { MaterialInput } from "../../../../../shared/components/util/material-input/material-input";
-import { onMounted, iterateThemes, toRGB } from "../../../lib/ui-test-util";
+import { onMounted, iterateThemes, toRGB, getInnerText } from "../../../lib/ui-test-util";
 import { UI_TEST_PORT } from "../../../lib/ui-test-const";
 
 
@@ -68,7 +68,7 @@ context('Material-Input', () => {
 		it('should have a label if label property is set', () => {
 			cy.get('#withProps').then((el: JQuery<MaterialInput>) => {
 				cy.get('#withProps').invoke('attr', 'label').then((label) => {
-					expect(el.get(0).$.label.innerText).to.be.equal(
+					expect(getInnerText(el.get(0).$.label)).to.be.equal(
 						label);
 				});
 			});
@@ -85,8 +85,8 @@ context('Material-Input', () => {
 		it('should have an error set if error attribute is set', () => {
 			cy.get('#withProps').then((el: JQuery<MaterialInput>) => {
 				cy.get('#withProps').invoke('attr', 'error').then((error) => {
-					expect((<HTMLElement>el.get(0).shadowRoot!.querySelector('.mdl-textfield__error')!)
-						.innerText).to.be.equal(error);
+					expect(getInnerText(<HTMLElement>el.get(0).shadowRoot!.querySelector('.mdl-textfield__error')!))
+						.to.be.equal(error);
 				});
 			});
 		});
