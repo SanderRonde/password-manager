@@ -92,6 +92,8 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (html, props, _t
 				</div>
 			</horizontal-centerer>
 			<theme-selector id="themeSelector"></theme-selector>
-			<floating-action-button id="passwordFab">+</floating-action-button>
+			<floating-action-button id="passwordFab">
+				<span id="passwordFabPlus">+</span>
+			</floating-action-button>
 		</div>`;
 }, CHANGE_TYPE.PROP);

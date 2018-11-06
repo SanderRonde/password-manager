@@ -211,5 +211,10 @@ export const DashboardCSS = new TemplateFn<Dashboard>((html, _props, theme) => {
 			font-size: 130%;
 			font-weight: 500;
 		}
+
+		#passwordFabPlus {
+			cursor: pointer;
+			font-size: 200%;
+		}
 	</style>`
 }, CHANGE_TYPE.THEME);
