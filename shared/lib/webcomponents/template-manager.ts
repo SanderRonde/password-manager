@@ -4,12 +4,13 @@ import {
 	isPrimitive, noChange 
 } from 'lit-html';
 import { RenderOptions } from 'lit-html/lib/render-options';
-import { WebComponent, refPrefix } from '../webcomponents';
 import { WebComponentThemeManger } from './theme-manager';
 import { classNames } from '../webcomponent-util';
 import { TemplateFn, CHANGE_TYPE } from './base';
+import { WebComponent } from '../webcomponents';
 import { EventListenerObj } from './listener';
 import { bindToClass } from '../decorators';
+import { refPrefix } from './props';
 
 export const CUSTOM_CSS_PROP_NAME = 'custom-css';
 
