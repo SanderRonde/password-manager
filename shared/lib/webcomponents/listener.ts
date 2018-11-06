@@ -36,6 +36,17 @@ export abstract class WebComponentListenable<E extends EventListenerObj> extends
 		}
 	}
 
+	public clearListener<EV extends keyof E>(event: EV, listener?: (...args: E[EV]['args']) => E[EV]['returnType']) {
+		if (event in this.__listenerMap) {
+			const eventListeners = this.__listenerMap[event];
+			if (!listener) {
+				eventListeners.clear();
+				return;
+			}
+			eventListeners.delete(listener);
+		}
+	}
+
 	protected __clearListeners<EV extends keyof E>(event: EV) {
 		if (event in this.__listenerMap) {
 			this.__listenerMap[event].clear();
