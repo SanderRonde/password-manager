@@ -189,7 +189,6 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 				//Size per website: 156 + 10px margin
 				return 513 + 156 + ((websites.length - 1) * (156 + 10));
 			} else {
-				//TODO: change
 				return 580;
 			}
 		}
