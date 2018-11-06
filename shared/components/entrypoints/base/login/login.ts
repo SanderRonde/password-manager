@@ -146,7 +146,7 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	}
 
 	@bindToClass
-	public onSubmit(e: KeyboardEvent) {
+	public onKeyDown(e: KeyboardEvent) {
 		//Enter
 		if (e.keyCode === 13 && this._getInputData().valid) {
 			this.onLogin();

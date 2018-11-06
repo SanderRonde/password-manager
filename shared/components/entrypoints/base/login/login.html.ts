@@ -18,7 +18,7 @@ export const LoginHTML = new TemplateFn<Login>(function (html, props, _) {
 								error="Please enter a valid email address"
 								autoComplete="username" fill required
 								wc-valid="${inlineListener(this.updateValidity, this)}"
-								wc-keydown="${inlineListener(this.onSubmit, this)}"
+								wc-keydown="${inlineListener(this.onKeyDown, this)}"
 								autoFocus label="Email"
 							>
 								<icon-button tabIndex="-1" slot="postIcon"
@@ -37,14 +37,14 @@ export const LoginHTML = new TemplateFn<Login>(function (html, props, _) {
 								error="Please enter a password"
 								autoComplete="password" fill required
 								wc-valid="${inlineListener(this.updateValidity, this)}"
-								wc-keydown="${inlineListener(this.onSubmit, this)}"
+								wc-keydown="${inlineListener(this.onKeyDown, this)}"
 								autoFocus label="Password"></material-input>
 							<material-input id="twofactorInput" name="twofactor"
 								type="tel" autoComplete="off" fill
 								pattern="\\d{6}" error="Enter a 6-digit code"
 								title="Twofactor authentication token (if enabled for the account)"
 								wc-valid="${inlineListener(this.updateValidity, this)}"
-								wc-keydown="${inlineListener(this.onSubmit, this)}"
+								wc-keydown="${inlineListener(this.onKeyDown, this)}"
 								autoComplete="false"
 								autoFocus label="2FA Token (if enabled)"></material-input>
 							<div id="buttonPositioner">
