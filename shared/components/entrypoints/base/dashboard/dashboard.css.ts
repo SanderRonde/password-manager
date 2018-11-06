@@ -175,7 +175,7 @@ export const DashboardCSS = new TemplateFn<Dashboard>((html, _props, theme) => {
 
 		#themeSelector {
 			position: fixed;
-			bottom: 5px;
+			top: 65px;
 			right: 0;
 		}
 

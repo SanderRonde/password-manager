@@ -20,7 +20,7 @@ export const LoginCSS = new TemplateFn<Login>((html, _props, theme) => {
 
 		#themeSelector {
 			position: absolute;
-			bottom: 5px;
+			top: 5px;
 			right: 0;
 		}
 	</style>`

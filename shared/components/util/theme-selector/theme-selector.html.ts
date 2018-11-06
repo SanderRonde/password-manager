@@ -8,6 +8,9 @@ export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function(html) {
 	const currentThemeName = this.getGlobalProperty('theme');
 	return html`
 		<div id="container">
+			<icon-button aria-label="Change theme" id="button" fill="text"
+				@click="${this.toggleAnimation}"
+				>${ColorSize(30, 30)}</icon-button>
 			<div id="themes">
 				${mapArr(Object.getOwnPropertyNames(theme).map((themeName: keyof typeof theme) => {
 					const currentTheme = theme[themeName];
@@ -38,9 +41,6 @@ export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function(html) {
 					`
 				}))}
 			</div>
-			<icon-button aria-label="Change theme" id="button" fill="text"
-				@click="${this.toggleAnimation}"
-				>${ColorSize(30, 30)}</icon-button>
 		</div>
 	`
 }, CHANGE_TYPE.THEME);
