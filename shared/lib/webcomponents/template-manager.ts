@@ -7,7 +7,6 @@ import { RenderOptions } from 'lit-html/lib/render-options';
 import { WebComponentThemeManger } from './theme-manager';
 import { classNames } from '../webcomponent-util';
 import { TemplateFn, CHANGE_TYPE } from './base';
-import { WebComponent } from '../webcomponents';
 import { EventListenerObj } from './listener';
 import { bindToClass } from '../decorators';
 import { refPrefix } from './props';
@@ -94,9 +93,9 @@ class ComplexValuePart implements Part {
 }
 
 class ComponentEventPart extends EventPart {
-	element: WebComponent<any, any>|Element;
+	element: WebComponentThemeManger<any>|Element;
 
-	constructor(element: WebComponent<any, any>|Element, eventName: string, 
+	constructor(element: WebComponentThemeManger<any>|Element, eventName: string, 
 		eventContext?: EventTarget) {
 			super(element, eventName, eventContext);
 			this.element = element;
@@ -124,16 +123,16 @@ class ComponentEventPart extends EventPart {
 		const shouldAddListener =
 			newListener != null && (oldListener == null || shouldRemoveListener);
 	  
-		if (!(this.element instanceof WebComponent)) {
+		if (!(this.element instanceof WebComponentThemeManger)) {
 			console.warn('Attempting to listen using webcomponent listener on non-webcomponent element',
 				`Name: ${this.eventName}, element:`, this.element);
 		}
 		if (shouldRemoveListener) {
-			(<WebComponent<any, any>>this.element)
+			(<WebComponentThemeManger<any>>this.element)
 				.clearListener(this.eventName);
 		}
 		if (shouldAddListener) {
-			(<WebComponent<any, any>>this.element)
+			(<WebComponentThemeManger<any>>this.element)
 				.listen(this.eventName, this.handleEvent.bind(this));
 		}
 		this.value = newListener;
