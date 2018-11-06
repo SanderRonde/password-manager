@@ -1,7 +1,7 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { MDCard } from './md-card';
 
-function getShadow(level: number) {
+export function getShadow(level: number) {
 	switch (level) {
 		case 1:
 			return `box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);`;
