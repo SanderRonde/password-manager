@@ -3,12 +3,18 @@ import { FloatingActionButton } from './floating-action-button';
 
 export const FloatingActionButtonHTML = new TemplateFn<FloatingActionButton>(function (html) {
 	return html`
-		<div id="container">
-			<div id="circle">
-				<div id="content">
-					<slot></slot>
+		<div id="floater">
+			<button id="container" @click="${this.onClick}">
+				<div id="rippleContainer">
+					<vertical-centerer>
+						<horizontal-centerer>
+							<div id="content">
+								<slot></slot>
+							</div>
+						</horizontal-centerer>
+					</vertical-centerer>
 				</div>
-			</div>
+			</button>
 		</div>
 	`
 }, CHANGE_TYPE.PROP);
