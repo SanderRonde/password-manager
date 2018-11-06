@@ -3,9 +3,7 @@ import { TemplateResult } from 'lit-html';
 
 // From https://github.com/JedWatson/classnames
 
-const hasOwn = {}.hasOwnProperty;
-
-type ClassNamesArg = string|{
+type ClassNamesArg = string|number|{
 	[key: string]: any;
 }|string[]|{
 	[key: string]: any;
@@ -28,7 +26,7 @@ export function classNames(...args: ClassNamesArg[]) {
 				[key: string]: any;
 			};
 			for (var key in objArg) {
-				if (hasOwn.call(objArg, key) && objArg[key]) {
+				if (objArg[key]) {
 					classes.push(key);
 				}
 			}
