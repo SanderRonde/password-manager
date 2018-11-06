@@ -646,7 +646,7 @@ export class RoutesApiPassword {
 				res.status(500);
 				res.json({
 					success: false,
-					error: 'failed to create record',
+					error: 'failed to delete record',
 					ERR: API_ERRS.SERVER_ERROR
 				});
 				return;
