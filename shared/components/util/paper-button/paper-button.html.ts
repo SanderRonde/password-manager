@@ -1,15 +1,14 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { classNames } from '../../../lib/webcomponent-util';
 import { PaperButton } from "./paper-button";
 
 export const PaperButtonHTML = new TemplateFn<PaperButton>(function(html, props) {
 	return html`
 		${this.__customCSS}
-		<button id="button" class="${classNames(
+		<button id="button" class="${[
 			'mdl-button', 'mdl-js-button', {
 				'mdl-button--raised': !props.flat,
 				'mdl-js-ripple-effect': !props.noRipple
-			})}" label="${props.ariaLabel}"
+			}]}" label="${props.ariaLabel}"
 			aria-label="${props.ariaLabel}"
 			title="${props.ariaLabel}"
 			@mouseup="${this.blurHandler, this}"

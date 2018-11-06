@@ -4,8 +4,8 @@ import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Visible, VisibleHidden } from '../../../icons/visible/visible';
-import { mapArr, classNames } from '../../../../lib/webcomponent-util';
 import { Checkmark } from '../../../icons/checkmark/checkmark';
+import { mapArr } from '../../../../lib/webcomponent-util';
 import { Delete } from '../../../icons/delete/delete';
 import { Cross } from '../../../icons/cross/cross';
 import { Link } from '../../../icons/link/link';
@@ -149,10 +149,10 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 			</div>
 		</material-input>
 		<material-input id="passwordPassword" name="password"
-			class="${classNames({
+			class="${{
 				'hidden': !passwordDetailDataStore[passwordDetailDataSymbol] ||
 					!passwordDetailDataStore[passwordDetailDataSymbol]!.password
-			})}"
+			}}"
 			type="${props.passwordVisible ? 'text' : 'password'}" title="Account password"
 			autoComplete="off" fill label="password"
 			?readonly="${!props.editing}"
@@ -184,17 +184,17 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 		<material-input id="twofactorToken"
 			type="text" title="${props.editing ? '2FA Secret' : '2FA Token'}"
 			autoComplete="off" fill label="${props.editing ? '2FA Secret' : '2FA Token'}"
-			class="${classNames({
+			class="${{
 				'hidden': !passwordDetailDataStore[passwordDetailDataSymbol] ||
 					!passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret
-			})}"
+			}}"
 			custom-css="${twofactorTokenCustomCSS}"
 			?readonly="${!props.editing}"
 		></material-input>
-		<div id="removeTwofactorToken" class="${classNames({
+		<div id="removeTwofactorToken" class="${{
 				'hidden': !props.editing || !(!passwordDetailDataStore[passwordDetailDataSymbol] ||
 					!passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret)
-		})}">
+		}}">
 			<!-- TODO: remove 2FA token button -->
 		</div>
 	</div>
@@ -232,9 +232,9 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 							</icon-button>
 						</material-input>
 					</div>
-					<div class="${classNames('passwordWebsiteRemoveCenterer', {
+					<div class="${['passwordWebsiteRemoveCenterer', {
 						'hidden': !props.editing
-					})}">
+					}]}">
 						${arr.length === 1 ? 
 							html`
 								<icon-button class="passwordWebsiteRemoveField"
@@ -253,9 +253,9 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 				</div>
 			`;
 		}))}
-		<div id="addWebsiteCenterer" class="${classNames({
+		<div id="addWebsiteCenterer" class="${{
 			'hidden': !props.editing
-		})}">
+		}}">
 			<paper-button aria-label="Add website"
 				id="addWebsiteButton"
 				border-color="${theme.accent.main}"
@@ -276,9 +276,9 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 						''}"></material-input>
 		</div>
 	</div>
-	<div id="passwordSettings" class="${classNames({
+	<div id="passwordSettings" class="${{
 			'hidden': !props.editing
-	})}">
+	}}">
 		<div id="passwordSettingsLayout">
 			<div id="passwordSettings2fa">
 				<material-checkbox checked="${props.selectedDisplayed &&
