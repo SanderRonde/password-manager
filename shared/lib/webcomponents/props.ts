@@ -1,7 +1,8 @@
-import { isDefined } from '../webcomponent-util';
-import { refPrefix } from './template-manager';
-import { CHANGE_TYPE } from './base';
 import { hookIntoMount, awaitMounted } from './template-util';
+import { isDefined } from '../webcomponent-util';
+import { CHANGE_TYPE } from './base';
+
+export const refPrefix = '___complex_ref';
 
 function getterWithVal<R>(component: {
 	getParentRef(ref: string): any;

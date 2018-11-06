@@ -4,10 +4,10 @@ import {
 	isPrimitive, noChange 
 } from 'lit-html';
 import { RenderOptions } from 'lit-html/lib/render-options';
+import { WebComponent, refPrefix } from '../webcomponents';
 import { WebComponentThemeManger } from './theme-manager';
 import { classNames } from '../webcomponent-util';
 import { TemplateFn, CHANGE_TYPE } from './base';
-import { WebComponent } from '../webcomponents';
 import { EventListenerObj } from './listener';
 import { bindToClass } from '../decorators';
 
@@ -180,7 +180,6 @@ class ComplexTemplateProcessor implements TemplateProcessor {
 	}
 }
 
-export const refPrefix = '___complex_ref';
 type ComplexValue = TemplateFn|Function|Object;
 export abstract class WebComponentTemplateManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
 	private __reffed: ComplexValue[] = [];
