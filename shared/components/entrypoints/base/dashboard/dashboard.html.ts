@@ -27,11 +27,11 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (html, props, _t
 								CustomDashboardCSS.templateList
 							)}" 
 								window id="placeholderList"
-								item-size="${() => this.getItemSize(null, {
+								#item-size="${() => this.getItemSize(null, {
 									isMin: true
 								})}"
-								ref="${this}"
-								data="${this.getPlaceholderList()}"
+								#ref="${this}"
+								#data="${this.getPlaceholderList()}"
 							>
 								<template slot="template">
 									<md-card level="3"
@@ -60,22 +60,22 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (html, props, _t
 						${!(props.metaPasswords && props.metaPasswords.length) ? '' : html`
 							<infinite-list custom-css="${CustomDashboardCSS.infiniteList}" 
 								window id="infiniteList" data-name="password" 
-								item-size="${this.getItemSize}"
-								ref="${this}"
-								default-item-data="${{
+								#item-size="${this.getItemSize}"
+								#ref="${this}"
+								#default-item-data="${{
 									selected: false
 								}}"
-								data="${props.metaPasswords || []}"
+								#data="${props.metaPasswords || []}"
 							>
 								<template slot="template">
 									<password-preview id="password.id"
-										websites="password.websites"
+										#websites="password.websites"
 										username="password.username"
 										twofactor_enabled="password.twofactor_enabled"
 										u2f_enabled="password.u2f_enabled"
 										selected="password_data.selected"
 										index="_index"
-										ref="_this"
+										#ref="_this"
 									></password-preview>
 								</template>
 							</infinite-list>
@@ -84,9 +84,9 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (html, props, _t
 					<div id="passwordDetail">
 						<div id="passwordDetailTop"></div>
 						<password-detail id="passwordFocus"
-							selected="${this.selectedPassword}"
-							auth-data="${this.loginData}"
-							ref="${this}"
+							#selected="${this.selectedPassword}"
+							#auth-data="${this.loginData}"
+							#ref="${this}"
 						></password-detail>
 					</div>
 				</div>
