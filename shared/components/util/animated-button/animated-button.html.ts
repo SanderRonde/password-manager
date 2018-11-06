@@ -12,9 +12,9 @@ export const AnimatedButtonHTML = new TemplateFn<AnimatedButton>(function (html,
 			label="${props.ariaLabel}"
 			aria-label="${props.ariaLabel}"
 			title="${props.ariaLabel}"
-			@mouseup="${this.blurHandler, this, true}"
-			@mouseleave="${this.blurHandler, this, true}"
-			@click="${this.onButtonClick, this, true}"
+			@mouseup="${this.blurHandler}"
+			@mouseleave="${this.blurHandler}"
+			@click="${this.onButtonClick}"
 		>
 			<div id="content">
 				<span id="regularContent" class="visible">

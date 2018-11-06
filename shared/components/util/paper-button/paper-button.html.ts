@@ -11,9 +11,9 @@ export const PaperButtonHTML = new TemplateFn<PaperButton>(function(html, props)
 			}]}" label="${props.ariaLabel}"
 			aria-label="${props.ariaLabel}"
 			title="${props.ariaLabel}"
-			@mouseup="${this.blurHandler, this}"
-			@mouseleave="${this.blurHandler, this}"
-			@click="${this.buttonClick, this}"
+			@mouseup="${this.blurHandler}"
+			@mouseleave="${this.blurHandler}"
+			@click="${this.buttonClick}"
 		>
 			<slot></slot>
 			${props.content ? html`<span>${props.content}</span>` : ''}

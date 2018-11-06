@@ -19,7 +19,7 @@ export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>(function (htm
 			padding-vertical="0"
 			padding-horizontal="0"
 			custom-css="${props.selected ? invertedCardCSS : noCustomCSS}"
-			@click="${this.containerClick, this}"
+			@click="${this.containerClick}"
 		>
 			<div id="content">
 				<div id="websites">

@@ -142,7 +142,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 				</icon-button>
 				<icon-button tabIndex="-1" class="copyDone"
 					aria-label="Copy username" title="Copy username"
-					@click="${this.copyCredential, this}"
+					@click="${this.copyCredential}"
 				>
 					${Checkmark}
 				</icon-button>
@@ -163,19 +163,19 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 				<icon-button tabIndex="-1"
 					aria-label="Copy username first and password 5s later" 
 					title="Copy username first and password 5s later"
-					@click="${this.onToggleShowPasswordClick, this}"
+					@click="${this.onToggleShowPasswordClick}"
 				>
 					${props.passwordVisible ? Visible : VisibleHidden}
 				</icon-button>
 				<icon-button tabIndex="-1" class="copy"
 					aria-label="Copy username" title="Copy username"
-					@click="${this.copyCredential, this}"
+					@click="${this.copyCredential}"
 				>
 					${Copy}
 				</icon-button>
 				<icon-button tabIndex="-1" class="copyDone"
 					aria-label="Copy username" title="Copy username"
-					@click="${this.copyCredential, this}"
+					@click="${this.copyCredential}"
 				>
 					${Checkmark}
 				</icon-button>
@@ -212,7 +212,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 						>
 							<icon-button tabIndex="-1" slot="postIcon"
 								aria-label="Open URL" title="Open URL"
-								@click="${this.onLinkClick, this}"
+								@click="${this.onLinkClick}"
 							>
 								${Link}
 							</icon-button>
@@ -226,7 +226,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 						>
 							<icon-button tabIndex="-1" slot="postIcon"
 								aria-label="Open URL" title="Open URL"
-								@click="${this.onLinkClick, this}"
+								@click="${this.onLinkClick}"
 							>
 								${Link}
 							</icon-button>
@@ -240,13 +240,13 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 								<icon-button class="passwordWebsiteRemoveField"
 									tabIndex="-1" aria-label="Last website can't be removed"
 									title="Last website can't be removed" disabled
-									@click="${this.removeLastWebsite, this}"
+									@click="${this.removeLastWebsite}"
 								>${Cross}</div>
 							` : html`
 								<icon-button class="passwordWebsiteRemoveField"
 									tabIndex="-1" aria-label="Remove website"
 									title="Remove website"
-									@click="${this.removeWebsite, this}"
+									@click="${this.removeWebsite}"
 								>${Cross}</div>
 							`}
 					</div>
