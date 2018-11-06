@@ -3,4 +3,3 @@ export { cancelTimeout, createCancellableTimeout } from './template-util/timeout
 export { awaitMounted, hookIntoMount } from './template-util/mounting';
 export { changeOpacity, isDark } from './template-util/color';
 export { joinTemplates } from './template-util/templates';
-export { attribute } from './template-util/directives';
