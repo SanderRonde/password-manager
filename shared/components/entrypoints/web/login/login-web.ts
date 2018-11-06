@@ -18,24 +18,24 @@ export function reportDefaultResponseErrors(response: {
 	success:false;
 	ERR: API_ERRS;
 	error: string;
-}, paperToast: typeof PaperToast) {
+}) {
 	switch (response.ERR) {
 		case API_ERRS.CLIENT_ERR:
-			paperToast.createHidable('Failed to send request');
+			PaperToast.createHidable('Failed to send request');
 			break;
 		case API_ERRS.INVALID_CREDENTIALS:
-			paperToast.createHidable('Invalid credentials');
+			PaperToast.createHidable('Invalid credentials');
 			break;
 		case API_ERRS.INVALID_PARAM_TYPES:
 		case API_ERRS.MISSING_PARAMS:
 		case API_ERRS.NO_REQUEST_BODY:
-			paperToast.createHidable('Invalid request');
+			PaperToast.createHidable('Invalid request');
 			break;
 		case API_ERRS.SERVER_ERROR:
-			paperToast.createHidable('Server error');
+			PaperToast.createHidable('Server error');
 			break;
 		case API_ERRS.TOO_MANY_REQUESTS:
-			paperToast.createHidable('Too many requests');
+			PaperToast.createHidable('Too many requests');
 			break;
 	}
 }
@@ -92,8 +92,7 @@ export class LoginWeb extends Login {
 				response: await request.fn()
 			};
 			if (res.response.success === false) {
-				reportDefaultResponseErrors(res.response,
-					PaperToast);
+				reportDefaultResponseErrors(res.response);
 			}
 			return res;
 		} catch(e) {

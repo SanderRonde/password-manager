@@ -134,7 +134,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 					return TWOFACTOR_CHECK_STATE.IN_PROGRESS;
 				}
 			} else {
-				reportDefaultResponseErrors(response, PaperToast);
+				reportDefaultResponseErrors(response);
 				return TWOFACTOR_CHECK_STATE.FAILED;
 			}
 			return TWOFACTOR_CHECK_STATE.SUCCEEDED;
@@ -175,7 +175,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 					PaperToast.createHidable('U2F is not set up for this account,' + 
 						' applying all non-u2f changes', PaperToast.DURATION.LONG);
 				} else {
-					reportDefaultResponseErrors(response, PaperToast);
+					reportDefaultResponseErrors(response);
 					return TWOFACTOR_CHECK_STATE.FAILED;
 				}
 				return TWOFACTOR_CHECK_STATE.SUCCEEDED;
@@ -281,7 +281,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		if (response.success) {
 			this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
 		} else {
-			reportDefaultResponseErrors(response, PaperToast);;
+			reportDefaultResponseErrors(response);
 			this._showFailedView(() => {
 				this.deletePassword(password);
 			});
@@ -590,7 +590,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			}
 			this._nextView();
 		} else {
-			reportDefaultResponseErrors(response, PaperToast);
+			reportDefaultResponseErrors(response);
 			this._showFailedView(this._signU2F);
 		}
 	}
@@ -746,7 +746,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 					this.$.passwordForm.setSelected(this.props.selected);
 				});
 		} else {
-			reportDefaultResponseErrors(response, PaperToast);
+			reportDefaultResponseErrors(response);
 			this._showFailedView(this._getPasswordDetails);
 		}
 	}
