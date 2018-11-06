@@ -321,6 +321,11 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				encrypted: this._ifEnabled(changed.password || changed.notes,
 					encryptedData)
 			}));
+			this._authState = {
+				u2fToken: null,
+				u2fAuthenticated: null,
+				twofactorAuthentication: null
+			};
 			const requestProm = request.fn();
 			await this._quickAnimateSelected(requestProm);
 			const response = await request;
