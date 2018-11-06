@@ -1,4 +1,4 @@
-import { WebComponentTemplateManager } from './template-manager';
+import { WebComponentTemplateManager, CUSTOM_CSS_PROP_NAME } from './template-manager';
 import { CHANGE_TYPE, TemplateFn } from './base';
 import { EventListenerObj } from './listener';
 
@@ -13,7 +13,7 @@ export abstract class WebComponentCustomCSSManager<E extends EventListenerObj> e
 		const originalSetAttr = this.setAttribute;
 		this.setAttribute = (key: string, val: string) => {
 			originalSetAttr.bind(this)(key, val);
-			if (key === 'custom-css' && this.isMounted) {
+			if (key === CUSTOM_CSS_PROP_NAME && this.isMounted) {
 				this.renderToDOM(CHANGE_TYPE.ALWAYS);
 			}
 		}
@@ -23,8 +23,8 @@ export abstract class WebComponentCustomCSSManager<E extends EventListenerObj> e
 		if (this.___hasCustomCSS !== null) {
 			return this.___hasCustomCSS;
 		}
-		if (!this.hasAttribute('custom-css') ||
-			!this.getParentRef(this.getAttribute('custom-css')!)) {
+		if (!this.hasAttribute(CUSTOM_CSS_PROP_NAME) ||
+			!this.getParentRef(this.getAttribute(CUSTOM_CSS_PROP_NAME)!)) {
 				//No custom CSS applies
 				if (this.isMounted) {
 					this.___hasCustomCSS = false;
@@ -40,7 +40,7 @@ export abstract class WebComponentCustomCSSManager<E extends EventListenerObj> e
 			return this.__noCustomCSS;
 		}
 
-		return this.getParentRef(this.getAttribute('custom-css')!) as TemplateFn<any>
+		return this.getParentRef(this.getAttribute(CUSTOM_CSS_PROP_NAME)!) as TemplateFn<any>
 	}
 
 	protected customCSS() {
