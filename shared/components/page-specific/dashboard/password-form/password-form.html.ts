@@ -1,5 +1,5 @@
 import { passwordDetailDataStore, passwordDetailDataSymbol } from '../password-detail/password-detail.html';
-import { changeOpacity, inlineListener } from '../../../../lib/webcomponents/template-util';
+import { changeOpacity } from '../../../../lib/webcomponents/template-util';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
@@ -130,7 +130,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 		<material-input id="passwordUsername" name="username"
 			type="text" title="Account username"
 			autoComplete="off" fill label="username"
-			readonly="${!props.editing}"
+			?readonly="${!props.editing}"
 			value="${getString(props.selectedDisplayed && props.selectedDisplayed.username, '')}"
 		>
 			<div slot="postIcon">
@@ -155,7 +155,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 			})}"
 			type="${props.passwordVisible ? 'text' : 'password'}" title="Account password"
 			autoComplete="off" fill label="password"
-			readonly="${!props.editing}"
+			?readonly="${!props.editing}"
 			value="${getString(passwordDetailDataStore[passwordDetailDataSymbol] &&
 				passwordDetailDataStore[passwordDetailDataSymbol]!.password, '')}"
 		>
@@ -189,7 +189,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 					!passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret
 			})}"
 			custom-css="${twofactorTokenCustomCSS}"
-			readonly="${!props.editing}"
+			?readonly="${!props.editing}"
 		></material-input>
 		<div id="removeTwofactorToken" class="${classNames({
 				'hidden': !props.editing || !(!passwordDetailDataStore[passwordDetailDataSymbol] ||
@@ -208,7 +208,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 							autoComplete="off" fill label="url"
 							@@keydown="${genHostUpdateFn(this, index)}"
 							value="${website.exact || ''}"
-							readonly="${!props.editing}"
+							?readonly="${!props.editing}"
 						>
 							<icon-button tabIndex="-1" slot="postIcon"
 								aria-label="Open URL" title="Open URL"
@@ -269,7 +269,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 		<div id="passwordNotesInput">
 			<material-input multiline id="noteInput" 
 				type="text" title="Notes" rows="4"
-				readonly="${!props.editing}"
+				?readonly="${!props.editing}"
 				autoComplete="off" fill label="Notes" value="${
 					passwordDetailDataStore[passwordDetailDataSymbol] ? 
 						passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n') : 
