@@ -733,14 +733,6 @@ namespace PropsDefiner {
 }
 
 export class Props {
-	public __src!: {
-		[key: string]: DefinePropTypes|DefinePropTypeConfig;
-	} & {
-		[key: string]: DefinePropTypes|DefinePropTypeConfig;
-	}
-
-	constructor() {}
-
 	static define<P extends {
 		[key: string]: DefinePropTypes|DefinePropTypeConfig;
 	}, T extends {
