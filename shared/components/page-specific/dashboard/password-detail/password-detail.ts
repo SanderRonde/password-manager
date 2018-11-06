@@ -243,8 +243,49 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 
 	public async deletePassword(password: MetaPasswords[0]|null) {
 		if (!password) return;
+		if (password.twofactor_enabled && !this._authState.twofactorAuthentication) {
+			await this._animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
+				this.$$('.twofactorDigit').forEach((el: HTMLInputElement) => {
+					el.value = '';
+				});
+			});
+			this._postViewCallback = () => {
+				this.deletePassword(password);
+			};
+			const firstDigit = this.$('#digit0') as HTMLInputElement;
+			firstDigit && firstDigit.focus();
+		}
+
 		//TODO: confirm deletion
-		//TODO: actually delete
+		const request = createClientAPIRequest({
+			publicKey: this.props.authData.server_public_key
+		}, '/api/password/remove', {
+			instance_id: this.props.authData.instance_id
+		}, {...{
+			//Auth stuff
+			token: this.getRoot().getAPIToken(),
+			count: this.getRoot().getRequestCount(),
+			password_id: password.id,
+		}, ...filterUndefined({
+			twofactor_token: (password.twofactor_enabled ?
+				this._authState.twofactorAuthentication! : undefined)
+		})});
+		this._authState = {
+			u2fToken: null,
+			u2fAuthenticated: null,
+			twofactorAuthentication: null
+		};
+		const requestProm = request.fn();
+		this._animateView('loadingView', STATIC_VIEW_HEIGHT);
+		const response = await requestProm;
+		if (response.success) {
+			this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
+		} else {
+			reportDefaultResponseErrors(response, PaperToast);;
+			this._showFailedView(() => {
+				this.deletePassword(password);
+			});
+		}
 	}
 
 	public async saveChanges(newData: PasswordDetailChanges, 
