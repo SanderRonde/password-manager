@@ -1,4 +1,3 @@
-import { inlineListener } from '../../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { LockClosed } from "../../../icons/lockClosed/lockClosed";
 import { LockOpen } from "../../../icons/lockOpen/lockOpen";
@@ -17,16 +16,15 @@ export const LoginHTML = new TemplateFn<Login>(function (html, props, _) {
 								type="email" title="Account's email"
 								error="Please enter a valid email address"
 								autoComplete="username" fill required
-								wc-valid="${inlineListener(this.updateValidity, this)}"
-								wc-keydown="${inlineListener(this.onKeyDown, this)}"
+								@@valid="${this.updateValidity}"
+								@@keydown="${this.onKeyDown}"
 								autoFocus label="Email"
 							>
 								<icon-button tabIndex="-1" slot="postIcon"
 									aria-label="Remember email"
 									title="Remember email"
 									id="lockButton"
-									on-click="${inlineListener(
-										this.handleEmailRememberToggle, this)}"
+									@click="${this.handleEmailRememberToggle}"
 								>
 									${props.emailRemembered ?
 										LockClosed : LockOpen
@@ -36,20 +34,20 @@ export const LoginHTML = new TemplateFn<Login>(function (html, props, _) {
 								type="password" title="Account password"
 								error="Please enter a password"
 								autoComplete="password" fill required
-								wc-valid="${inlineListener(this.updateValidity, this)}"
-								wc-keydown="${inlineListener(this.onKeyDown, this)}"
+								@@valid="${this.updateValidity}"
+								@@keydown="${this.onKeyDown}"
 								autoFocus label="Password"></material-input>
 							<material-input id="twofactorInput" name="twofactor"
 								type="tel" autoComplete="off" fill
 								pattern="\\d{6}" error="Enter a 6-digit code"
 								title="Twofactor authentication token (if enabled for the account)"
-								wc-valid="${inlineListener(this.updateValidity, this)}"
-								wc-keydown="${inlineListener(this.onKeyDown, this)}"
+								@@valid="${this.updateValidity}"
+								@@keydown="${this.onKeyDown}"
 								autoComplete="false"
 								autoFocus label="2FA Token (if enabled)"></material-input>
 							<div id="buttonPositioner">
 								<animated-button aria-label="Submit form" id="button" 
-									on-click="${inlineListener(this.onLogin, this)}"
+									@click="${this.onLogin}"
 									content="SUBMIT"
 								></animated-button>
 							</div>

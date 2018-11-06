@@ -1,4 +1,3 @@
-import { inlineListener } from '../../../lib/webcomponents/template-util';
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { CheckmarkSize } from "../../icons/checkmark/checkmark";
 import { CrossSize } from "../../icons/cross/cross";
@@ -13,9 +12,9 @@ export const AnimatedButtonHTML = new TemplateFn<AnimatedButton>(function (html,
 			label="${props.ariaLabel}"
 			aria-label="${props.ariaLabel}"
 			title="${props.ariaLabel}"
-			on-mouseup="${inlineListener(this.blurHandler, this, true)}"
-			on-mouseleave="${inlineListener(this.blurHandler, this, true)}"
-			on-click="${inlineListener(this.onButtonClick, this, true)}"
+			@mouseup="${this.blurHandler, this, true}"
+			@mouseleave="${this.blurHandler, this, true}"
+			@click="${this.onButtonClick, this, true}"
 		>
 			<div id="content">
 				<span id="regularContent" class="visible">

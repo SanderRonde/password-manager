@@ -1,4 +1,3 @@
-import { inlineListener } from '../../../lib/webcomponents/template-util';
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { classNames, mapArr } from '../../../lib/webcomponent-util';
 import { ColorSize } from '../../icons/color/color';
@@ -40,7 +39,7 @@ export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function(html) {
 				}))}
 			</div>
 			<icon-button aria-label="Change theme" id="button" fill="text"
-				on-click="${inlineListener(this.toggleAnimation, this)}"
+				@click="${this.toggleAnimation}"
 				>${ColorSize(30, 30)}</icon-button>
 		</div>
 	`

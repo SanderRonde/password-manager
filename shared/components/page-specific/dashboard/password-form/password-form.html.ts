@@ -136,13 +136,13 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 			<div slot="postIcon">
 				<icon-button tabIndex="-1" class="copy"
 					aria-label="Copy username" title="Copy username"
-					on-click="${inlineListener(this.copyCredential, this)}"
+					@click="${this.copyCredential}"
 				>
 					${Copy}
 				</icon-button>
 				<icon-button tabIndex="-1" class="copyDone"
 					aria-label="Copy username" title="Copy username"
-					on-click="${inlineListener(this.copyCredential, this)}"
+					@click="${this.copyCredential, this}"
 				>
 					${Checkmark}
 				</icon-button>
@@ -163,19 +163,19 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 				<icon-button tabIndex="-1"
 					aria-label="Copy username first and password 5s later" 
 					title="Copy username first and password 5s later"
-					on-click="${inlineListener(this.onToggleShowPasswordClick, this)}"
+					@click="${this.onToggleShowPasswordClick, this}"
 				>
 					${props.passwordVisible ? Visible : VisibleHidden}
 				</icon-button>
 				<icon-button tabIndex="-1" class="copy"
 					aria-label="Copy username" title="Copy username"
-					on-click="${inlineListener(this.copyCredential, this)}"
+					@click="${this.copyCredential, this}"
 				>
 					${Copy}
 				</icon-button>
 				<icon-button tabIndex="-1" class="copyDone"
 					aria-label="Copy username" title="Copy username"
-					on-click="${inlineListener(this.copyCredential, this)}"
+					@click="${this.copyCredential, this}"
 				>
 					${Checkmark}
 				</icon-button>
@@ -206,13 +206,13 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 						<material-input class="passwordWebsiteExact"
 							name="url" type="text" title="website URL"
 							autoComplete="off" fill label="url"
-							wc-keydown="${inlineListener(genHostUpdateFn(this, index))}"
+							@@keydown="${genHostUpdateFn(this, index)}"
 							value="${website.exact || ''}"
 							readonly="${!props.editing}"
 						>
 							<icon-button tabIndex="-1" slot="postIcon"
 								aria-label="Open URL" title="Open URL"
-								on-click="${inlineListener(this.onLinkClick, this)}"
+								@click="${this.onLinkClick, this}"
 							>
 								${Link}
 							</icon-button>
@@ -226,7 +226,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 						>
 							<icon-button tabIndex="-1" slot="postIcon"
 								aria-label="Open URL" title="Open URL"
-								on-click="${inlineListener(this.onLinkClick, this)}"
+								@click="${this.onLinkClick, this}"
 							>
 								${Link}
 							</icon-button>
@@ -240,13 +240,13 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 								<icon-button class="passwordWebsiteRemoveField"
 									tabIndex="-1" aria-label="Last website can't be removed"
 									title="Last website can't be removed" disabled
-									on-click="${inlineListener(this.removeLastWebsite, this)}"
+									@click="${this.removeLastWebsite, this}"
 								>${Cross}</div>
 							` : html`
 								<icon-button class="passwordWebsiteRemoveField"
 									tabIndex="-1" aria-label="Remove website"
 									title="Remove website"
-									on-click="${inlineListener(this.removeWebsite, this)}"
+									@click="${this.removeWebsite, this}"
 								>${Cross}</div>
 							`}
 					</div>
@@ -323,7 +323,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 				background="${theme.error}"
 				ripple-color="white"
 				custom-css="${deleteButtonCustomCSS}"
-				wc-click="${inlineListener(this.onDelete, this)}"
+				@@click="${this.onDelete}"
 			>
 				<div id="deleteButtonIcon">
 					${Delete}
@@ -332,19 +332,19 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 			<paper-button aria-label="Discard changes" color="${theme.error}"
 				border border-color="${theme.error}" flat
 				ripple-color="${theme.error}"
-				wc-click="${inlineListener(this.discardChanges, this)}"
+				@@click="${this.discardChanges}"
 			>
 				Discard
 			</paper-button>
 			<animated-button aria-label="Save changes" 
 				id="saveChanges"
-				wc-click="${inlineListener(this.saveChanges, this)}"
+				@@click="${this.saveChanges}"
 				custom-css="${saveChangesButtonCustomCSS}">
 				Save changes
 			</animated-button>
 		` : html`
 			<floating-action-button aria-label="Edit" 
-				wc-click="${inlineListener(this.onDelete, this)}"
+				@@click="${this.onDelete}"
 			>
 				${Edit}
 			</floating-action-button>

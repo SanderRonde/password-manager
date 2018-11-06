@@ -1,5 +1,4 @@
 import { HollowTriangleArrowSize } from '../../../icons/triangle-arrow/triangle-arrow';
-import { inlineListener } from '../../../../lib/webcomponents/template-util';
 import { QuestionmarkSize } from '../../../icons/questionmark/questionmark';
 import { LockClosedUnfilled } from '../../../icons/lockClosed/lockClosed';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
@@ -20,7 +19,7 @@ export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>(function (htm
 			padding-vertical="0"
 			padding-horizontal="0"
 			custom-css="${props.selected ? invertedCardCSS : noCustomCSS}"
-			on-click="${inlineListener(this.containerClick, this)}"
+			@click="${this.containerClick, this}"
 		>
 			<div id="content">
 				<div id="websites">

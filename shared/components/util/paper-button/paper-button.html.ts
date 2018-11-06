@@ -1,4 +1,3 @@
-import { inlineListener } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { classNames } from '../../../lib/webcomponent-util';
 import { PaperButton } from "./paper-button";
@@ -13,9 +12,9 @@ export const PaperButtonHTML = new TemplateFn<PaperButton>(function(html, props)
 			})}" label="${props.ariaLabel}"
 			aria-label="${props.ariaLabel}"
 			title="${props.ariaLabel}"
-			on-mouseup="${inlineListener(this.blurHandler, this, true)}"
-			on-mouseleave="${inlineListener(this.blurHandler, this, true)}"
-			on-click="${inlineListener(this.buttonClick, this, true)}"
+			@mouseup="${this.blurHandler, this}"
+			@mouseleave="${this.blurHandler, this}"
+			@click="${this.buttonClick, this}"
 		>
 			<slot></slot>
 			${props.content ? html`<span>${props.content}</span>` : ''}

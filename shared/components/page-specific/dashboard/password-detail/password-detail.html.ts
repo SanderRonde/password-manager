@@ -1,6 +1,5 @@
 import { LockClosedUnfilledSize, LockClosedSize } from '../../../icons/lockClosed/lockClosed';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
-import { inlineListener } from '../../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { repeat } from '../../../../lib/webcomponent-util';
 import { CrossSize } from '../../../icons/cross/cross';
@@ -74,7 +73,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (html,
 									<animated-button flat id="retryButton"
 										custom-css="${retryButtonCustomCSS}"
 										aria-label="Retry getting password"
-										on-click="${inlineListener(this.retryRequest, this)}"
+										@click="${this.retryRequest}"
 									>Failed, click to retry</animated-button>
 								</div>
 							</horizontal-centerer>
@@ -120,9 +119,9 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (html,
 					</div>
 					<div id="selectedView" class="view">
 						<password-form id="passwordForm"
-							parent="${this}"
+							#parent="${this}"
 							password-visible="true"
-							visible-websites="${props.visibleWebsites || []}"
+							#visible-websites="${props.visibleWebsites || []}"
 						></password-form>
 					</div>
 				</sizing-block>
