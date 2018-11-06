@@ -261,7 +261,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 				border-color="${theme.accent.main}"
 				color="${theme.accent.main}"
 				flat ripple-color="${theme.accent.weak}"
-				wc-click="${inlineListener(this.addWebsite)}"
+				@@click="${this.addWebsite}"
 			>Add website</paper-button>
 		</div>
 	</div>

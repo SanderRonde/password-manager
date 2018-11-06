@@ -1,44 +1,41 @@
-import { attribute, inlineListener } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { classNames } from "../../../lib/webcomponent-util";
 import { MaterialInput } from "./material-input";
 
 export const MaterialInputHTML = new TemplateFn<MaterialInput>(function (html, props) {
 	return html`
-		<div id="container" class="${classNames(
-			'mdl-textfield', 'mdl-js-textfield', {
+		<div id="container" class="${['mdl-textfield', 'mdl-js-textfield', {
 				'mdl-textfield--floating-label': !props.noFloatingLabel,
 				'fill': props.fill,
 				'is-disabled': props.disabled,
 				'is-dirty': props.readonly || props.disabled
 			}
-		)}">
+		]}">
 			<div id="mainInputContainer">
 				<slot class="iconSlot" name="preIcon"></slot>
 				${props.multiline ? 
 					html`
 						<textarea class="mdl-textfield__input" type="${props.type}" 
 							id="input" rows="${props.rows}"
-							_pattern="${attribute(!!props.pattern, props.pattern)}"
-							_readonly="${attribute(props.readonly || false)}"
+							pattern="${props.pattern || '.*'}"
+							?readonly="${props.readonly}"
 							autocomplete="${props.autocomplete ? 'on' : 'off'}"
-							on-keydown="${inlineListener(this.inputKeyDown, this)}"
-							on-input="${inlineListener(this.updateClasses, this)}"
-							on-focus="${inlineListener(this.onFocus, this)}"
-							on-blur="${inlineListener(this.onBlur, this)}"
-							on-reset="${inlineListener(this.onReset, this)}"
+							@keydown="${this.inputKeyDown}"
+							@input="${this.updateClasses}"
+							@focus="${this.onFocus}"
+							@blur="${this.onBlur}"
+							@reset="${this.onReset}"
 							aria-labelledby="label">${props.value}</textarea>
 					` : html`
 						<input class="mdl-textfield__input" type="${props.type}" 
 							id="input" value="${props.value}" 
-							_pattern="${attribute(!!props.pattern, props.pattern)}"
-							_readonly="${attribute(props.readonly || false)}"
+							pattern="${props.pattern || '.*'}"
+							?readonly="${props.readonly}"
 							autocomplete="${props.autocomplete ? 'on' : 'off'}"
-							on-keydown="${inlineListener(this.inputKeyDown, this)}"
-							on-input="${inlineListener(this.updateClasses, this)}"
-							on-focus="${inlineListener(this.onFocus, this)}"
-							on-blur="${inlineListener(this.onBlur, this)}"
-							on-reset="${inlineListener(this.onReset, this)}"
+							@keydown="${this.inputKeyDown}"
+							@input="${this.updateClasses}"
+							@focus="${this.onFocus}"
+							@blur="${this.onBlur}"
+							@reset="${this.onReset}"
 							aria-labelledby="label">
 					`}
 				<slot class="iconSlot" name="postIcon"></slot>
