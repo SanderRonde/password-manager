@@ -1,5 +1,5 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
-import { classNames, mapArr } from '../../../lib/webcomponent-util';
+import { mapArr } from '../../../lib/webcomponent-util';
 import { ColorSize } from '../../icons/color/color';
 import { theme } from '../../theming/theme/theme';
 import { ThemeSelector } from "./theme-selector";
@@ -31,9 +31,9 @@ export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function(html) {
 									</div>
 								</div>
 							</div>
-							<div class="${classNames('activeThemeHighlighter', {
+							<div class="${['activeThemeHighlighter', {
 								active: themeName === currentThemeName 
-							})}"></div>
+							}]}"></div>
 						</div>
 					`
 				}))}
