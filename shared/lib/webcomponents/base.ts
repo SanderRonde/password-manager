@@ -53,8 +53,9 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 			//Args don't matter here as they aren't used
 			this.changeOn = CHANGE_TYPE.NEVER;
 			if (this._fn) {
-				this._template = typeSafeCall(this._fn as any,
-					component) as any;
+				this._template = typeSafeCall(this._fn as TemplateRenderFunction<T>, 
+					component, component.generateHTMLTemplate, component.props, 
+					component.getTheme());
 			} else {
 				this._template = null;
 			}
@@ -91,9 +92,8 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 			!templateMap.has(this)) {
 				//Change, rerender
 				const rendered = typeSafeCall(this._template as TemplateRenderFunction<T>, 
-					component, (strings: TemplateStringsArray, values: any[]) => {
-						return component.complexHTML(html, strings, values);
-					}, component.props, component.getTheme());
+					component, component.generateHTMLTemplate, component.props, 
+					component.getTheme());
 				templateMap.set(this, rendered);
 				return rendered;
 			}
