@@ -7,7 +7,7 @@ export const MaterialInputHTML = new TemplateFn<MaterialInput>(function (html, p
 				'mdl-textfield--floating-label': !props.noFloatingLabel,
 				'fill': props.fill,
 				'is-disabled': props.disabled,
-				'is-dirty': props.readonly || props.disabled
+				'is-dirty': props.readonly || props.disabled || props.value
 			}
 		]}">
 			<div id="mainInputContainer">
