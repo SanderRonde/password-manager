@@ -152,6 +152,38 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 		});
 	}
 
+	static createConfirmationDialog(contents: string|{
+		question: string;
+		confirm?: string;
+		cancel?: string;
+	}, maxDuration: number = this.DURATION.FOREVER, defaultAction: boolean = false): Promise<boolean> {
+		const { 
+			question,
+			cancel = 'No', 
+			confirm = 'Yes'
+		} = typeof contents === 'string' ? {
+			question: contents
+		} : contents;
+
+		return new Promise<boolean>((resolve) => {
+			this.create({
+				content: question,
+				buttons: [{
+					content: confirm,
+					listener() {
+						resolve(true);
+					}
+				}, {
+					content: cancel,
+					listener() {
+						resolve(false);
+					}
+				}],
+				duration: maxDuration
+			}).listen('hide', () => resolve(defaultAction));
+		});
+	}
+
 	static create(config: {
 		content: string;
 		buttons?: ToastButton[];

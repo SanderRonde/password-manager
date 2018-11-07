@@ -269,7 +269,10 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			firstDigit && firstDigit.focus();
 		}
 
-		//TODO: confirm deletion
+		if (!await PaperToast.createConfirmationDialog({
+			question: 'Are you sure you want to delete this password?'
+		})) return;
+		
 		const request = createClientAPIRequest({
 			publicKey: this.props.authData.server_public_key
 		}, '/api/password/remove', {
