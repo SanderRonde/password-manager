@@ -14,6 +14,7 @@ import { LoadingSpinner } from '../../../util/loading-spinner/loading-spinner';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
+import { PasswordPreview } from '../password-preview/password-preview';
 import { API_ERRS, APISuccessfulReturns } from '../../../../types/api';
 import { SizingBlock } from '../../../util/sizing-block/sizing-block';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
@@ -191,13 +192,13 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		return undefined;
 	}
 
-	private async _fetchFavicon(url: string): Promise<{
-		mime: string;
-		content: string;
+	private async _readFaviconDataURI(url: string): Promise<{
+		dataURI: string;
+		res: Response;
 	}|null> {
 		return new Promise<{
-			mime: string;
-			content: string;
+			dataURI: string;
+			res: Response;
 		}|null>((resolve) => {
 			fetch(`http://s2.googleusercontent.com/s2/favicons?domain_url=${url}`).then(async (res) => {
 				res.blob().then((blob) => {
@@ -205,8 +206,8 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 					reader.readAsDataURL(blob); 
 					reader.onloadend = () => {
 						resolve({
-							mime: res.headers.get('Content-Type') || 'image/png',
-							content: reader.result!.toString().split(',')[1]
+							dataURI: reader.result!.toString(),
+							res: res
 						});
 					}
 				});
@@ -214,6 +215,18 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				resolve(null);
 			});
 		});
+	}
+
+	private async _fetchFavicon(url: string): Promise<{
+		mime: string;
+		content: string;
+	}|null> {
+		const data = await this._readFaviconDataURI(url);
+		if (data === null) return null;
+		return {
+			mime: data.res.headers.get('Content-Type') || 'image/png',
+			content: data.dataURI.split(',')[1]
+		};
 	}
 
 	private _getWebsiteDiff(newData: PasswordDetailChanges) {
@@ -291,6 +304,31 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				this.deletePassword(password);
 			});
 		}
+	}
+
+	private async _applyChanges(newData: PasswordDetailChanges) {
+		//Update public stuff
+		this.props.selected.twofactor_enabled = newData.twofactor_enabled;
+		this.props.selected.u2f_enabled = newData.u2f_enabled;
+		this.props.selected.username = newData.username;
+		this.props.selected.websites = await Promise.all(newData.websites.map(async (website) => {
+			const dataURI = await this._readFaviconDataURI(website.url);
+			const favicon = dataURI === null ? null :
+				dataURI.dataURI
+			return {
+				exact: website.url,
+				host: getHost(website.url),
+				favicon: favicon
+			}
+		}));
+		this.$.passwordForm.setSelected(this.props.selected);
+
+		//Update private stuff
+		if (!passwordDetailDataStore[passwordDetailDataSymbol]) return;
+		passwordDetailDataStore[passwordDetailDataSymbol]!.notes = newData.notes;
+		passwordDetailDataStore[passwordDetailDataSymbol]!.password = newData.password;
+		passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret = 
+			newData.twofactor_secret;
 	}
 
 	public async saveChanges(newData: PasswordDetailChanges, 
@@ -376,11 +414,32 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			await this._quickAnimateSelected(requestProm);
 			const response = await request;
 
+			//Update object
+			this._applyChanges(newData);
 			if (changed.twofactor_enabled || changed.u2f_enabled ||
 				changed.websites || changed.username) {
 					//Update preview
-					this.props.ref && this.props.ref.fetchMeta();
+					for (const preview of this.props.ref.$.infiniteList.rendered as PasswordPreview[]) {
+						if (preview.props.id === this.props.selected.id) {
+							preview.props.websites = await Promise.all(newData.websites.map(async (website) => {
+								const dataURI = await this._readFaviconDataURI(website.url);
+								const favicon = dataURI === null ? null :
+									dataURI.dataURI
+								return {
+									exact: website.url,
+									host: getHost(website.url),
+									favicon: favicon
+								}
+							}));
+							preview.props.username = newData.username;
+							preview.props.twofactor_enabled = newData.twofactor_enabled;
+							preview.props.u2f_enabled = newData.u2f_enabled;
+						}
+					}
+					
 				}
+
+			
 
 			return response;
 		}
