@@ -141,11 +141,11 @@ class ComponentEventPart extends EventPart {
 }
 
 class ComplexTemplateProcessor implements TemplateProcessor {
-	constructor(public genRef: (value: ComplexValue) => string) { }
+	constructor(public component: WebComponentTemplateManager<any>,
+		public genRef: (value: ComplexValue) => string) { }
 
 	handleAttributeExpressions(
-		element: Element, name: string, strings: string[],
-		options: RenderOptions): Part[] {
+		element: Element, name: string, strings: string[]): Part[] {
 			const prefix = name[0];
 			if (prefix === '.') {
 				//Property
@@ -153,10 +153,10 @@ class ComplexTemplateProcessor implements TemplateProcessor {
       			return comitter.parts;
 			} else if (prefix === '@') {
 				if (name[1] === '@') {
-					return [new ComponentEventPart(element, name.slice(2), options.eventContext)];
+					return [new ComponentEventPart(element, name.slice(2), this.component)];
 				} else {
 					//Listeners
-					return [new EventPart(element, name.slice(1), options.eventContext)];
+					return [new EventPart(element, name.slice(1), this.component)];
 				}
 			} else if (prefix === '?') {
 				//Booleans
@@ -183,7 +183,7 @@ class ComplexTemplateProcessor implements TemplateProcessor {
 type ComplexValue = TemplateFn|Function|Object;
 export abstract class WebComponentTemplateManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
 	private __reffed: ComplexValue[] = [];
-	private __templateProcessor = new ComplexTemplateProcessor(this.__genRef);
+	private __templateProcessor = new ComplexTemplateProcessor(this, this.__genRef);
 
 	@bindToClass
 	private __genRef(value: ComplexValue) {
