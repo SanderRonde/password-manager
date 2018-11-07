@@ -280,6 +280,11 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		const response = await requestProm;
 		if (response.success) {
 			this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
+			//Remove from list
+			this.props.ref.props.metaPasswords = 
+				this.props.ref.props.metaPasswords.filter((pw) => {
+					return pw.id !== password.id
+				});
 		} else {
 			reportDefaultResponseErrors(response);
 			this._showFailedView(() => {
