@@ -195,7 +195,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 				'hidden': !props.editing || !(!passwordDetailDataStore[passwordDetailDataSymbol] ||
 					!passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret)
 		}}">
-			<!-- TODO: remove 2FA token button -->
+			<!-- TODO: implement remove 2FA token button -->
 		</div>
 	</div>
 	<div id="passwordWebsites">
