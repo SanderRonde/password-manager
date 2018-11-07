@@ -191,12 +191,6 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 			custom-css="${twofactorTokenCustomCSS}"
 			?readonly="${!props.editing}"
 		></material-input>
-		<div id="removeTwofactorToken" class="${{
-				'hidden': !props.editing || !(!passwordDetailDataStore[passwordDetailDataSymbol] ||
-					!passwordDetailDataStore[passwordDetailDataSymbol]!.twofactor_secret)
-		}}">
-			<!-- TODO: implement remove 2FA token button -->
-		</div>
 	</div>
 	<div id="passwordWebsites">
 		${mapArr((props.visibleWebsites || []).map((website, index, arr) => {
