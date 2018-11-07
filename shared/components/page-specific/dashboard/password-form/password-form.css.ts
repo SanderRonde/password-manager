@@ -66,5 +66,15 @@ export const PasswordFormCSS = new TemplateFn<PasswordForm>((html, _props, theme
 		.hidden {
 			display: none!important;
 		}
+
+		#editButton {
+			margin-top: 50px;
+			position: absolute;
+		}
+
+		#editButtonContainer {
+			float: right;
+			width: 56px;
+		}
 	</style>`;
 }, CHANGE_TYPE.THEME);

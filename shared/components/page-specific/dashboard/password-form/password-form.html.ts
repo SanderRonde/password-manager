@@ -342,12 +342,17 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 				custom-css="${saveChangesButtonCustomCSS}">
 				Save changes
 			</animated-button>
-		` : html`
-			<floating-action-button aria-label="Edit" 
+		` : ''}
+	</div>
+	<div id="editButtonContainer">
+		${!props.editing ? html`
+			<floating-action-button aria-label="Edit" id="editButton"
 				no-float @@click="${this.enableEditing}"
+				background-color="#FFC107" fill="white"
 			>
 				${Edit}
 			</floating-action-button>
-		`}
-	</div>`;
+		` : ''}
+	</div>
+	`;
 }, CHANGE_TYPE.ALWAYS);
