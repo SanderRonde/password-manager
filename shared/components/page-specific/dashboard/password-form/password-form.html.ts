@@ -344,7 +344,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 			</animated-button>
 		` : html`
 			<floating-action-button aria-label="Edit" 
-				no-float @@click="${this.onDelete}"
+				no-float @@click="${this.enableEditing}"
 			>
 				${Edit}
 			</floating-action-button>

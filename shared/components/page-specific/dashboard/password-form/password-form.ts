@@ -74,6 +74,10 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 	private static readonly TWOFACTOR_TIME_STEP = 30; //Seconds
 	private _shouldRefresh2FA: boolean = true;
 
+	public enableEditing() {
+		this.props.editing = true;
+	}
+
 	@bindToClass
 	private async _refresh2FA() {		
 		const secretContainer = passwordDetailDataStore[passwordDetailDataSymbol];
