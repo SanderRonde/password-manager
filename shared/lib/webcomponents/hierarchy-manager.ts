@@ -1,11 +1,18 @@
 import { EventListenerObj, WebComponentListenable } from "./listener";
-import { GlobalProperties } from '../../types/shared-types';
 import { ConfigurableWebComponent } from './configurable';
 import { bindToClass } from '../decorators';
 
+type GlobalPropsFunctions<G extends {
+	[key: string]: any;
+}> = {
+	all: G;
+	get<K extends keyof G>(key: Extract<K, string>): G[K];
+	set<K extends keyof G, V extends G[K]>(key: Extract<K, string>, value: V): void;
+}
+
 export abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends WebComponentListenable<E & {
 	globalPropChange: {
-		args: [keyof GlobalProperties, GlobalProperties[keyof GlobalProperties]]
+		args: [string, string]
 	}
 }> {
 	private __children: Set<WebComponentHierarchyManager<any>> = new Set();
@@ -16,26 +23,24 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		return this.__parent as T;
 	}
 
-	private __getGlobalProperties() {
+	private __getGlobalProperties<G extends {
+		[key: string]: string;
+	}>() {
 		if (!this.__isRoot) {
 			return {};
 		}
 
-		const props: Partial<GlobalProperties> = {};
+		const props: Partial<G> = {};
 		for (let i = 0; i < this.attributes.length; i++) {
 			const attr = this.attributes[i];
 			if (attr.name.startsWith('prop_')) {
-				props[attr.name.slice('prop_'.length) as keyof GlobalProperties] = 
+				props[attr.name.slice('prop_'.length) as keyof G] = 
 					decodeURIComponent(
-						attr.value as GlobalProperties[keyof GlobalProperties] as string);
+						attr.value as string);
 			}
 		}
 
 		return props;
-	}
-
-	public get globalProperties() {
-		return this.__internals.globalProperties;
 	}
 
 	connectedCallback() {
@@ -117,7 +122,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		this.__parent = root;
 		const newProps = {...root.registerChild(this)};
 		for (const key in newProps) {
-			this.__setGlobalProperty(key as keyof typeof newProps, 
+			this.__setGlobalProperty(key as Extract<keyof typeof newProps, string>, 
 				newProps[key as keyof typeof newProps]);
 		}
 	}
@@ -132,13 +137,17 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		}
 	}
 
-	public registerChild(element: WebComponentHierarchyManager<any>): GlobalProperties {
+	public registerChild<G extends {
+		[key: string]: any;
+	}>(element: WebComponentHierarchyManager<any>): G {
 		this.__clearNonExistentChildren();
 		this.__children.add(element);
-		return this.__internals.globalProperties;
+		return this.__internals.globalProperties as G;
 	}
 
-	private __setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
+	private __setGlobalProperty<G extends {
+		[key: string]: any;
+	}, P extends keyof G = keyof G, V extends G[P] = G[P]>(key: Extract<P, string>,
 		value: V) {
 			if (this.__internals.globalProperties[key] !== value) {
 				this.__internals.globalProperties[key] = value;
@@ -165,24 +174,37 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		}
 	}
 
-	public getGlobalProperty<P extends keyof GlobalProperties>(key: P): GlobalProperties[P]|undefined {
-		if (!this.__internals.globalProperties) {
-			return undefined;
+	private __globalPropsFns: GlobalPropsFunctions<any>|null = null;
+	public globalProps<G extends {
+		[key: string]: any;
+	}>(): GlobalPropsFunctions<G> {
+		if (this.__globalPropsFns) {
+			return this.__globalPropsFns;
 		}
-		return this.__internals.globalProperties[key] as any;
-	}
 
-	public setGlobalProperty<P extends keyof GlobalProperties, V extends GlobalProperties[P]>(key: P,
-		value: V) {
-			if (!this.__parent && !this.__isRoot) {
-				console.warn(`Failed to propagate global property "${key}" since this element has no registered parent`);
-				return;
+		const __this = this;
+		const fns: GlobalPropsFunctions<G> = {
+			get all() {
+				return __this.__internals.globalProperties;
+			},
+			get<K extends keyof G>(key: Extract<K, string>): G[K] {
+				if (!__this.__internals.globalProperties) {
+					return undefined;
+				}
+				return __this.__internals.globalProperties[key] as any;
+			},
+			set<K extends keyof G, V extends G[K]>(key: Extract<K, string>, value: V): void {
+				if (!__this.__parent && !__this.__isRoot) {
+					console.warn(`Failed to propagate global property "${key}" since this element has no registered parent`);
+					return;
+				}
+				__this.__propagateThroughTree((element) => {
+					element.__setGlobalProperty<G>(key, value);
+				});
 			}
-			this.__propagateThroughTree((element) => {
-				element.__setGlobalProperty(key, value);
-			});
-		}
-
+		};
+		return (this.__globalPropsFns = fns);
+	}
 	public getRoot<T>(): T {
 		if (this.__isRoot) {
 			return <T><any>this;

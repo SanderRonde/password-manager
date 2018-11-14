@@ -1,11 +1,12 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
+import { GlobalProperties } from '../../../types/shared-types';
 import { mapArr } from '../../../lib/webcomponent-util';
 import { ColorSize } from '../../icons/color/color';
 import { theme } from '../../theming/theme/theme';
 import { ThemeSelector } from "./theme-selector";
 
 export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function(html) {
-	const currentThemeName = this.getGlobalProperty('theme');
+	const currentThemeName = this.globalProps<GlobalProperties>().get('theme');
 	return html`
 		<div id="container">
 			<icon-button aria-label="Change theme" id="button" fill="text"

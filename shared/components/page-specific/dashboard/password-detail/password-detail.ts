@@ -13,6 +13,7 @@ import { createClientAPIRequest, filterUndefined } from '../../../../lib/apirequ
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { LoadingSpinner } from '../../../util/loading-spinner/loading-spinner';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
+import { ENTRYPOINT, GlobalProperties } from '../../../../types/shared-types';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
 import { PasswordPreview } from '../password-preview/password-preview';
@@ -22,7 +23,6 @@ import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { PasswordDetailIDMap } from './password-detail-querymap';
 import { getHost } from '../password-form/password-form.html';
 import { PasswordForm } from '../password-form/password-form';
-import { ENTRYPOINT } from '../../../../types/shared-types';
 import { bindToClass } from '../../../../lib/decorators';
 import { isSupported, sign } from 'u2f-api';
 import { U2FSignResponse } from 'u2f';
@@ -622,11 +622,11 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		if (!clientPrivateKey && !document.body.classList.contains('dev')) {
 			PaperToast.createHidable(
 				'Failed to set up public and/or private key with server' + 
-					(this.getGlobalProperty('isWeb') === 'true' ? 
+					(this.globalProps<GlobalProperties>().get('isWeb') === 'true' ? 
 						', redirecting to login page...' :
 						', please delete this instance and create a new instance to fix it'),
 				PaperToast.DURATION.LONG);
-			if (this.getGlobalProperty('isWeb') === 'true') {
+			if (this.globalProps<GlobalProperties>().get('isWeb') === 'true') {
 				this.getRoot<GlobalController>().changePage(ENTRYPOINT.LOGIN);
 			}
 			this._showFailedView(this._signU2F);
@@ -747,11 +747,11 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		if (!clientPrivateKey && !document.body.classList.contains('dev')) {
 			PaperToast.createHidable(
 				'Failed to set up public and/or private key with server' + 
-					(this.getGlobalProperty('isWeb') === 'true' ? 
+					(this.globalProps<GlobalProperties>().get('isWeb') === 'true' ? 
 						', redirecting to login page...' :
 						', please delete this instance and create a new instance to fix it'),
 				PaperToast.DURATION.LONG);
-			if (this.getGlobalProperty('isWeb') === 'true') {
+			if (this.globalProps<GlobalProperties>().get('isWeb') === 'true') {
 				this.getRoot<GlobalController>().changePage(ENTRYPOINT.LOGIN);
 			}
 			this._showFailedView(this._getPasswordDetails);

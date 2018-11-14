@@ -2,7 +2,7 @@
 import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
 import { isNewElement, listenWithIdentifier } from "../../../lib/webcomponent-util";
 import { ThemeSelectorIDMap } from "./theme-selector-querymap";
-import { VALID_THEMES_T } from '../../../types/shared-types';
+import { VALID_THEMES_T, GlobalProperties } from '../../../types/shared-types';
 import { ThemeSelectorHTML } from './theme-selector.html';
 import { ThemeSelectorCSS } from './theme-selector.css';
 import { IconButton } from '../icon-button/icon-button';
@@ -49,7 +49,7 @@ export class ThemeSelector extends ConfigurableWebComponent<ThemeSelectorIDMap> 
 
 						const expire = Date.now() + (60 * 60 * 1000 * 24 * 365.25 * 1000);
 						document.cookie = `theme=${name}; expires=${expire}; path=/`;
-						this.setGlobalProperty('theme',
+						this.globalProps<GlobalProperties>().set('theme',
 							name as VALID_THEMES_T);
 
 						if (navigator.serviceWorker.controller) {

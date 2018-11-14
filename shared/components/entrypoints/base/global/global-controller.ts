@@ -2,13 +2,13 @@ import { APIToken, Hashed, Padded, MasterPasswordDecryptionpadding, ERRS } from 
 import { StringifiedObjectId, EncryptedInstance, MasterPassword } from '../../../../types/db-types';
 import { ConfigurableWebComponent, Props, PROP_TYPE } from '../../../../lib/webcomponents';
 import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
+import { ENTRYPOINT, GlobalProperties } from '../../../../types/shared-types';
 import { LoadableBlock } from '../../../util/loadable-block/loadable-block';
 import { awaitMounted } from '../../../../lib/webcomponents/template-util';
 import { decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { GlobalControllerIDMap } from './global-controller-querymap';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
-import { ENTRYPOINT } from '../../../../types/shared-types';
 import { Dashboard } from '../../base/dashboard/dashboard';
 import { wait } from '../../../../lib/webcomponent-util';
 import { API_ERRS } from '../../../../types/api';
@@ -256,7 +256,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 			wait(ANIMATE_TIME)
 		]);
 		this.props.page = page;
-		this.setGlobalProperty('page', page);
+		this.globalProps<GlobalProperties>().set('page', page);
 		this._hideNonCurrent();
 		el.classList.remove('invisible', 'hidden');
 		this.$.loadable.finish();
@@ -292,7 +292,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 	}
 	
 	mounted() {
-		this.props.page = this.getGlobalProperty('page')!;
+		this.props.page = this.globalProps<GlobalProperties>().get('page')! as ENTRYPOINT;
 		this.listen('globalPropChange', (key, val) => {
 			if (key === 'page') {
 				this.props.page = val as ENTRYPOINT;

@@ -1,11 +1,11 @@
 /// <reference path="../../../../types/elements.d.ts" />
+import { LoginData, VALID_THEMES_T, GlobalProperties } from '../../../../types/shared-types';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { ConfigurableWebComponent, Props, PROP_TYPE } from "../../../../lib/webcomponents";
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
-import { LoginData, VALID_THEMES_T } from '../../../../types/shared-types';
 import { isDefined, getCookie } from '../../../../lib/webcomponent-util'
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
@@ -35,10 +35,10 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	layoutMounted() {
 		if (!this.getRoot<GlobalController>().getAttribute('prop_theme')) {
 			//This is a non-server-served page
-			const currentTheme = this.getGlobalProperty('theme');
+			const currentTheme = this.globalProps<GlobalProperties>().get('theme');
 			const cookieTheme = getCookie('theme');
 			if (cookieTheme && cookieTheme !== currentTheme) {
-				this.setGlobalProperty('theme', cookieTheme as VALID_THEMES_T);
+				this.globalProps<GlobalProperties>().set('theme', cookieTheme as VALID_THEMES_T);
 			}
 		}
 	}
@@ -65,28 +65,28 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 				server_public_key: string;	
 			}>) => {
 				if (!data.success) return;
-				this.setGlobalProperty('comm_token', data.data.comm_token);
-				this.setGlobalProperty('server_public_key', data.data.server_public_key);
+				this.globalProps<GlobalProperties>().set('comm_token', data.data.comm_token);
+				this.globalProps<GlobalProperties>().set('server_public_key', data.data.server_public_key);
 				resolve();
 			}).catch(reject);
 		});
 	}
 
 	async getData(): Promise<LoginData|null> {
-		if (this.getGlobalProperty('page') !== 'login') {
+		if (this.globalProps<GlobalProperties>().get('page') !== 'login') {
 			throw new Error('Failed to get login data');
 		}
 
-		if (!this.getGlobalProperty('comm_token') ||
-			!this.getGlobalProperty('server_public_key')) {
+		if (!this.globalProps<GlobalProperties>().get('comm_token') ||
+			!this.globalProps<GlobalProperties>().get('server_public_key')) {
 			await this._fetchData().catch(() => {});
-			if (!this.getGlobalProperty('comm_token') ||
-				!this.getGlobalProperty('server_public_key')) {
+			if (!this.globalProps<GlobalProperties>().get('comm_token') ||
+				!this.globalProps<GlobalProperties>().get('server_public_key')) {
 					return null;
 				}
 		}
 
-		return this.globalProperties as LoginData;
+		return this.globalProps<GlobalProperties>().all as LoginData;
 	}
 
 	abstract onLogin(): void;

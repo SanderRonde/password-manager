@@ -2,13 +2,13 @@ import { ERRS, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../
 import { GlobalControllerData, GlobalController } from '../../base/global/global-controller';
 import { decryptWithPrivateKey, hash, pad } from '../../../../lib/browser-crypto';
 import { Dashboard, DashboarDependencies } from '../../base/dashboard/dashboard';
+import { ENTRYPOINT, GlobalProperties } from '../../../../types/shared-types';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { DashboardHTML } from '../../base/dashboard/dashboard.html';
 import { CHANGE_TYPE, config } from '../../../../lib/webcomponents';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { DashboardCSS } from '../../base/dashboard/dashboard.css';
 import { MasterPassword } from '../../../../types/db-types';
-import { ENTRYPOINT } from '../../../../types/shared-types';
 import { Remove } from '../../../../types/serviceworker';
 
 @config({
@@ -77,9 +77,9 @@ export class DashboardWeb extends Dashboard {
 
 		this.renderToDOM(CHANGE_TYPE.PROP);
 
-		if (this.getGlobalProperty('password_meta')) {
+		if (this.globalProps<GlobalProperties>().get('password_meta')) {
 			const decrypted = decryptWithPrivateKey(
-				this.getGlobalProperty('password_meta')!,
+				this.globalProps<GlobalProperties>().get('password_meta')!,
 				this._data.private_key);
 			if (decrypted === ERRS.INVALID_DECRYPT) {
 				this._failNoCredentials('Failed to decrypt data');
