@@ -1,8 +1,9 @@
 import { changeOpacity } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { ProjectTheme } from '../../theming/theme/theme';
 import { MaterialInput } from './material-input';
 
-export const MaterialInputCSS = new TemplateFn<MaterialInput>((html, props, theme) => {
+export const MaterialInputCSS = new TemplateFn<MaterialInput, ProjectTheme>((html, props, theme) => {
 	return html`<style>
 		/** From https://github.com/google/material-design-lite/blob/mdl-1.x/src/textfield/_textfield.scss */
 		/**
@@ -77,11 +78,11 @@ export const MaterialInputCSS = new TemplateFn<MaterialInput>((html, props, them
 			flex-grow: 100;
 			background: none;
 			text-align: left;
-			color: ${theme.textOnBackground};
-			border-bottom: 1px solid ${changeOpacity(theme.textOnBackground, 12)};
+			color: ${theme.text};
+			border-bottom: 1px solid ${changeOpacity(theme.text, 12)};
 		}
 		.iconSlot {
-			border-bottom: 1px solid ${changeOpacity(theme.textOnBackground, 12)};
+			border-bottom: 1px solid ${changeOpacity(theme.text, 12)};
 		}
 
 		.mdl-textfield__input[type=number] {
@@ -104,7 +105,7 @@ export const MaterialInputCSS = new TemplateFn<MaterialInput>((html, props, them
 		}
 		fieldset[disabled] .mdl-textfield .mdl-textfield__input, .mdl-textfield.is-disabled .mdl-textfield__input {
 			background-color: transparent;
-			border-bottom: 1px dotted ${changeOpacity(theme.textOnBackground, 12)};
+			border-bottom: 1px dotted ${changeOpacity(theme.text, 12)};
 			color: ${theme.minOppositeColorText}
 		}
 

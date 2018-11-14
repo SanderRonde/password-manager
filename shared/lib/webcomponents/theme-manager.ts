@@ -5,25 +5,17 @@ import { CHANGE_TYPE } from './base';
 
 const noTheme: Theme = {
 	accent: {
-		heavy: '#F00',
-		hover: '#F00',
 		main: '#F00',
 		weak: '#F00',
 	},
 	background: '#000',
-	card: '#000',
 	error: '#F00',
-	minOppositeColorText: '#000',
-	oppositeBackground: '#FFF',
 	primary: {
-		heavy: '#F00',
-		hover: '#F00',
 		main: '#F00',
 		weak: '#F00',
 	},
 	success: '#0F0',
-	textOnBackground: '#000',
-	textOnNonbackground: '#FFF'
+	text: '#000'
 };
 export abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebComponentHierarchyManager<E> {
 	constructor() {
@@ -50,13 +42,13 @@ export abstract class WebComponentThemeManger<E extends EventListenerObj> extend
 			|| WebComponentThemeManger.__defaultTheme;
 	}
 
-	public getTheme() {
+	public getTheme<T extends Theme = Theme>(): T {
 		if (WebComponentThemeManger.__theme) {
 			if (this.getThemeName() && this.getThemeName() in WebComponentThemeManger.__theme) {
-				return WebComponentThemeManger.__theme[this.getThemeName()];
+				return WebComponentThemeManger.__theme[this.getThemeName()] as T;
 			}
 		}
-		return noTheme;
+		return noTheme as T;
 	}
 
 	private static __theme: {

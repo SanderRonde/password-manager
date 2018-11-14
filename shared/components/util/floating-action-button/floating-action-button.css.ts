@@ -1,8 +1,9 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { FloatingActionButton } from './floating-action-button';
-import { html } from 'lit-html';
-import { getShadow } from '../md-card/md-card.css';
+import { ProjectTheme } from '../../theming/theme/theme';
 import { RippleCSS } from '../../../mixins/ripple';
+import { getShadow } from '../md-card/md-card.css';
+import { html } from 'lit-html';
 
 const floatCSS = html`<style>
 	#floater {
@@ -12,7 +13,7 @@ const floatCSS = html`<style>
 	}
 </style>`;
 
-export const FloatingActionButtonCSS = new TemplateFn<FloatingActionButton>(function (html, props, theme) {
+export const FloatingActionButtonCSS = new TemplateFn<FloatingActionButton, ProjectTheme>(function (html, props, theme) {
 	return html`<style>
 		${RippleCSS.render(CHANGE_TYPE.ALWAYS, this)}
 		${!props.noFloat ? floatCSS : ''}

@@ -50,7 +50,7 @@ export const ThemeSelectorCSS = new TemplateFn<ThemeSelector>((html, _props, the
 			position: absolute;
 			margin-top: 3px;
 			opacity: 0;
-			background-color: ${theme.textOnBackground};
+			background-color: ${theme.text};
 		}
 
 		.themeContainer:hover .activeThemeHighlighter {

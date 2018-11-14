@@ -19,43 +19,43 @@ export const enum CHANGE_TYPE {
 	PROP, THEME, NEVER, ALWAYS
 }
 
-type TemplateRenderFunction<T extends WebComponent<any, any>> = (this: T, 
+type TemplateRenderFunction<C extends WebComponent<any, any>, T extends Theme> = (this: C, 
 	complexHTML: (strings: TemplateStringsArray, ...values: any[]) => TemplateResult,
-	props: T['props'], theme: Theme, ) => TemplateResult;
+	props: C['props'], theme: T) => TemplateResult;
 
 const componentTemplateMap: WeakMap<WebComponent<any, any>, 
-	WeakMap<TemplateFn<any>, TemplateResult|null>> = new WeakMap();
+	WeakMap<TemplateFn<any, any>, TemplateResult|null>> = new WeakMap();
 export type TemplateFnConfig = {
 	changeOn: CHANGE_TYPE.NEVER;
 	template: TemplateResult|null;
 }|{
 	changeOn: CHANGE_TYPE.ALWAYS|CHANGE_TYPE.THEME|CHANGE_TYPE.PROP;
-	template: TemplateRenderFunction<any>
+	template: TemplateRenderFunction<any, any>
 };
-export class TemplateFn<T extends WebComponent<any, any> = any> {
+export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme = Theme> {
 	public changeOn!: CHANGE_TYPE;
-	private _template!: (TemplateRenderFunction<T>)|TemplateResult|null;
+	private _template!: (TemplateRenderFunction<C, T>)|TemplateResult|null;
 	private _initialized: boolean = false;
 
-	constructor(_fn: (TemplateRenderFunction<T>)|null,
+	constructor(_fn: (TemplateRenderFunction<C, T>)|null,
 		_changeType: CHANGE_TYPE.NEVER);
-	constructor(_fn: (TemplateRenderFunction<T>),
+	constructor(_fn: (TemplateRenderFunction<C, T>),
 		_changeType: CHANGE_TYPE.ALWAYS);
-	constructor(_fn: (TemplateRenderFunction<T>),
+	constructor(_fn: (TemplateRenderFunction<C, T>),
 		_changeType: CHANGE_TYPE.PROP);
-	constructor(_fn: (TemplateRenderFunction<T>),
+	constructor(_fn: (TemplateRenderFunction<C, T>),
 		_changeType: CHANGE_TYPE.THEME);
-	constructor(private _fn: (TemplateRenderFunction<T>)|null,
+	constructor(private _fn: (TemplateRenderFunction<C, T>)|null,
 		private _changeType: CHANGE_TYPE) { }
 
-	private _doInitialRender(component: T) {
+	private _doInitialRender(component: C) {
 		if (this._changeType === CHANGE_TYPE.NEVER) {
 			//Args don't matter here as they aren't used
 			this.changeOn = CHANGE_TYPE.NEVER;
 			if (this._fn) {
-				this._template = typeSafeCall(this._fn as TemplateRenderFunction<T>, 
+				this._template = typeSafeCall(this._fn as TemplateRenderFunction<C, T>, 
 					component, component.generateHTMLTemplate, component.props, 
-					component.getTheme());
+					component.getTheme<T>());
 			} else {
 				this._template = null;
 			}
@@ -65,7 +65,7 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 		}
 	}
 
-	public render(changeType: CHANGE_TYPE, component: T) {
+	public render(changeType: CHANGE_TYPE, component: C) {
 		if (!this._initialized) {
 			this._doInitialRender(component);
 			this._initialized = true;
@@ -91,9 +91,9 @@ export class TemplateFn<T extends WebComponent<any, any> = any> {
 			this.changeOn === changeType ||
 			!templateMap.has(this)) {
 				//Change, rerender
-				const rendered = typeSafeCall(this._template as TemplateRenderFunction<T>, 
+				const rendered = typeSafeCall(this._template as TemplateRenderFunction<C, T>, 
 					component, component.generateHTMLTemplate, component.props, 
-					component.getTheme());
+					component.getTheme<T>());
 				templateMap.set(this, rendered);
 				return rendered;
 			}

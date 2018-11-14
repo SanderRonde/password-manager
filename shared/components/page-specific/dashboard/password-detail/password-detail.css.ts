@@ -11,7 +11,7 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((html, _props, t
 		}
 
 		.staticIcon {
-			fill: ${changeOpacity(theme.textOnBackground, 70)};
+			fill: ${changeOpacity(theme.text, 70)};
 		}
 
 		#failedView .staticIcon {
@@ -19,14 +19,14 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((html, _props, t
 		}
 
 		.lowerOpacityIcon {
-			fill: ${changeOpacity(theme.textOnBackground, 25)};
+			fill: ${changeOpacity(theme.text, 25)};
 		}
 
 		.viewIconText {
 			font-size: 150%;
 			font-weight: 500;
 			text-align: center;
-			color: ${changeOpacity(theme.textOnBackground, 60)};
+			color: ${changeOpacity(theme.text, 60)};
 		}
 
 		.view {

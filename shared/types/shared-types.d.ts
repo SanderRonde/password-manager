@@ -35,14 +35,6 @@ export interface Theme {
 		 * The weaker/lighter version of the primary color
 		 */
 		weak: string,
-		/**
-		 * The even lighter version that appears when you hover over it
-		 */
-		hover: string,
-		/**
-		 * The heavier version of the primary color
-		 */
-		heavy: string
 	},
 	/**
 	 * The accent/secondary color
@@ -56,19 +48,7 @@ export interface Theme {
 		 * The lighter version of the accent color
 		 */
 		weak: string,
-		/**
-		 * The even lighter version that appears when you hover over it
-		 */
-		hover: string,
-		/**
-		 * The darker version of the accent color
-		 */
-		heavy: string
-	},
-	/**
-	 * The color of a material design card
-	 */
-	card: string;
+	};
 	/**
 	 * The color of error messages
 	 */
@@ -78,23 +58,11 @@ export interface Theme {
 	 */
 	success: string,
 	/**
-	 * The greyest possible text that still fits the contrast spec on this theme's background
-	 */
-	minOppositeColorText: string,
-	/**
 	 * Regular black text on this theme's background color
 	 */
-	textOnBackground: string,
-	/**
-	 * Regular white text on the opposite of this theme's background color
-	 */
-	textOnNonbackground: string,
+	text: string,
 	/**
 	 * The default page background color
 	 */
 	background: string
-	/**
-	 * A background-color opposite to the regular one in this theme
-	 */
-	oppositeBackground: string;
 }

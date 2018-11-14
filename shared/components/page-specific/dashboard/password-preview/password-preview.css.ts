@@ -1,9 +1,10 @@
 import { changeOpacity } from '../../../../lib/webcomponents/template-util';
 import { CHANGE_TYPE, TemplateFn } from '../../../../lib/webcomponents';
+import { ProjectTheme } from '../../../theming/theme/theme';
 import { RippleCSS } from '../../../../mixins/ripple';
 import { PasswordPreview } from './password-preview';
 
-export const invertedCardCSS = new TemplateFn<PasswordPreview>((html, _props, theme) => {
+export const invertedCardCSS = new TemplateFn<PasswordPreview, ProjectTheme>((html, _props, theme) => {
 	return html`<style>
 		#shadow {
 			background-color: ${theme.oppositeBackground};
@@ -13,7 +14,7 @@ export const invertedCardCSS = new TemplateFn<PasswordPreview>((html, _props, th
 }, CHANGE_TYPE.THEME);
 export const noCustomCSS = new TemplateFn<PasswordPreview>((html) => html``, CHANGE_TYPE.THEME);
 
-export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (html, props, theme) {
+export const PasswordPreviewCSS = new TemplateFn<PasswordPreview, ProjectTheme>(function (html, props, theme) {
 	return html`
 		${RippleCSS.render(CHANGE_TYPE.THEME, this)}
 		<style>
@@ -59,14 +60,14 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (html
 			transition: fill 300ms ease-in-out;
 			fill: ${props.selected ?
 				changeOpacity(theme.textOnNonbackground, 70) :
-				changeOpacity(theme.textOnBackground, 70)};
+				changeOpacity(theme.text, 70)};
 		}
 
 		#pointer .__hollow_arrow {
 			transition: border-color 300ms ease-in-out;
 			border-color: ${props.selected ?
 				changeOpacity(theme.textOnNonbackground, 70) :
-				changeOpacity(theme.textOnBackground, 70)};
+				changeOpacity(theme.text, 70)};
 		}
 
 		#websites {
@@ -77,7 +78,7 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (html
 			transition: color 300ms ease-in-out;
 			color: ${props.selected ? 
 				theme.textOnNonbackground : 
-				theme.textOnBackground};
+				theme.text};
 		}
 
 		.website {
@@ -92,7 +93,7 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview>(function (html
 			transition: color 300ms ease-in-out;
 			color: ${props.selected ? 
 				changeOpacity(theme.textOnNonbackground, 85) :
-				changeOpacity(theme.textOnBackground, 85)};
+				changeOpacity(theme.text, 85)};
 		}
 
 		:host.quicktransition #websites, :host.quicktransition .username {

@@ -1,8 +1,9 @@
 import { changeOpacity } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { ProjectTheme } from '../../theming/theme/theme';
 import { MoreInfo } from './more-info';
 
-export const MoreInfoCSS = new TemplateFn<MoreInfo>(function (html, _props, theme) {
+export const MoreInfoCSS = new TemplateFn<MoreInfo, ProjectTheme>(function (html, _props, theme) {
 	return html`<style>
 		#letter {
 			display: inline;
@@ -15,11 +16,11 @@ export const MoreInfoCSS = new TemplateFn<MoreInfo>(function (html, _props, them
 			border-radius: 50%;
 			cursor: pointer;
 			color: ${theme.background};
-			background: ${changeOpacity(theme.textOnBackground, 50)};
+			background: ${changeOpacity(theme.text, 50)};
 		}
 
 		#circle:hover {
-			background: ${changeOpacity(theme.textOnBackground, 75)};
+			background: ${changeOpacity(theme.text, 75)};
 		}
 
 		#hoverable {
@@ -37,7 +38,7 @@ export const MoreInfoCSS = new TemplateFn<MoreInfo>(function (html, _props, them
 			transform: scale(0);
 			transform-origin: top;
 			transition: transform 200ms ease-in-out;
-			background-color: ${changeOpacity(theme.textOnBackground, 70)};
+			background-color: ${changeOpacity(theme.text, 70)};
 			color: ${theme.textOnNonbackground};
 		}
 

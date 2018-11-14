@@ -1,4 +1,5 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
+import { ProjectTheme } from '../../theming/theme/theme';
 import { MDCard } from './md-card';
 
 export function getShadow(level: number) {
@@ -26,14 +27,14 @@ function assertNumber(value: any, fallback: number): number {
 	return value;
 }
 
-export const MDCardCSS = new TemplateFn<MDCard>((html, props, theme) => {
+export const MDCardCSS = new TemplateFn<MDCard, ProjectTheme>((html, props, theme) => {
 	return html`<style>
 		#shadow {
 			transition: background-color 300ms ease-in-out,
 				color 300ms ease-in-out;
 			${
 				`background-color: ${theme.card};
-				color: ${theme.textOnBackground};
+				color: ${theme.text};
 				padding: ${
 					assertNumber(props.paddingVertical, 20)}px ${
 						assertNumber(props.paddingHorizontal, 20)}px;

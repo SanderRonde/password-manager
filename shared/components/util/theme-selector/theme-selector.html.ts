@@ -18,7 +18,7 @@ export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function(html) {
 						<div class="themeContainer">
 							<div class="theme" themename="${themeName}">
 								<div class="themeHighligher"
-									style="${"background-color: " + currentTheme.textOnBackground}"
+									style="${"background-color: " + currentTheme.text}"
 								>
 									<div class="themeBackground" 
 										style="${"background-color: " + currentTheme.background}"

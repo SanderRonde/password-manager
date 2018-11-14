@@ -1,10 +1,11 @@
 import { changeOpacity } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { AnimatedButton } from '../animated-button/animated-button';
+import { ProjectTheme } from '../../theming/theme/theme';
 import { RippleCSS } from '../../../mixins/ripple';
 import { PaperButton } from './paper-button';
 
-export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>(function (html, _props, theme) {
+export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton, ProjectTheme>(function (html, _props, theme) {
 	return html`
 		${RippleCSS.render(CHANGE_TYPE.THEME, this)}
 		<style>
@@ -197,19 +198,19 @@ export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton>(functio
 		}
 
 		.mdl-button[disabled][disabled], .mdl-button.mdl-button--disabled.mdl-button--disabled {
-			color: ${changeOpacity(theme.textOnBackground, 26)};
+			color: ${changeOpacity(theme.text, 26)};
 		}
 		.mdl-button--fab[disabled][disabled], 
 		.mdl-button--fab.mdl-button--disabled.mdl-button--disabled,
 		.mdl-button--raised[disabled][disabled], 
 		.mdl-button--raised.mdl-button--disabled.mdl-button--disabled {
-			background-color: ${changeOpacity(theme.textOnBackground, 12)};
-			color: ${changeOpacity(theme.textOnBackground, 26)};
+			background-color: ${changeOpacity(theme.text, 12)};
+			color: ${changeOpacity(theme.text, 26)};
 		}
 
 		.mdl-button--colored[disabled][disabled], 
 		.mdl-button--colored.mdl-button--disabled.mdl-button--disabled {
-			color: ${changeOpacity(theme.textOnBackground, 26)};
+			color: ${changeOpacity(theme.text, 26)};
 		}
 
 		.mdl-button .material-icons {
