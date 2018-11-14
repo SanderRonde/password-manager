@@ -33,6 +33,10 @@ export class FloatingActionButton extends ConfigurableWebComponent<FloatingActio
 			hide: {
 				type: PROP_TYPE.BOOL,
 				value: false
+			},
+			noFadeIn: {
+				type: PROP_TYPE.BOOL,
+				value: false
 			}
 		}
 	});

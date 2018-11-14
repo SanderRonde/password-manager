@@ -18,6 +18,42 @@ export const FloatingActionButtonCSS = new TemplateFn<FloatingActionButton, Proj
 		${RippleCSS.render(CHANGE_TYPE.ALWAYS, this)}
 		${!props.noFloat ? floatCSS : ''}
 
+		@keyframes fadeIn {
+			0% {
+				transform: scale(0);
+			}
+			100% {
+				transform: scale(1);
+			}
+		}
+
+		@-webkit-keyframes fadeIn {
+			0% {
+				-webkit-transform: scale(0);
+			}
+			100% {
+				-webkit-transform: scale(1);
+			}
+		}
+
+		@-moz-keyframes fadeIn {
+			0% {
+				-moz-transform: scale(0);
+			}
+			100% {
+				-moz-transform: scale(1);
+			}
+		}
+
+		@-o-keyframes fadeIn {
+			0% {
+				-o-tranform: scale(0);
+			}
+			100% {
+				-o-tranform: scale(1);
+			}
+		}
+
 		#container {
 			padding: 0;
 			cursor: pointer;
@@ -35,6 +71,12 @@ export const FloatingActionButtonCSS = new TemplateFn<FloatingActionButton, Proj
 			background-color: ${props.backgroundColor || theme.primary.main};
 			${getShadow(3)}
 		}
+
+		${(!props.noFadeIn && !props.hide) ? html`
+			#container {
+				animation: fadeIn 250ms ease-in;
+			}
+		` : ''};
 
 		#container.hidden {
 			transform: scale(0);
