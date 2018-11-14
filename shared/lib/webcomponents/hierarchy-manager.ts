@@ -184,9 +184,9 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 			});
 		}
 
-	public getRoot(): GlobalController {
+	public getRoot<T>(): GlobalController|T {
 		if (this.__isRoot) {
-			return <GlobalController><any>this;
+			return <GlobalController|T><any>this;
 		}
 		return this.__parent!.getRoot();
 	}
