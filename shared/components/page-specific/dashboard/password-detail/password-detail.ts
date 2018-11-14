@@ -8,6 +8,7 @@ import { passwordDetailDataStore, passwordDetailDataSymbol } from './password-de
 import { decryptWithPrivateKey, decrypt, encrypt } from '../../../../lib/browser-crypto';
 import { MetaPasswords, Dashboard } from '../../../entrypoints/base/dashboard/dashboard';
 import { reportDefaultResponseErrors } from '../../../entrypoints/web/login/login-web';
+import { GlobalController } from '../../../entrypoints/base/global/global-controller';
 import { createClientAPIRequest, filterUndefined } from '../../../../lib/apirequests';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { LoadingSpinner } from '../../../util/loading-spinner/loading-spinner';
@@ -115,8 +116,8 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			}, '/api/instance/2fa/is_setup', {
 				instance_id: this.props.authData.instance_id
 			}, {
-				token: this.getRoot().getAPIToken(),
-				count: this.getRoot().getRequestCount()
+				token: this.getRoot<GlobalController>().getAPIToken(),
+				count: this.getRoot<GlobalController>().getRequestCount()
 			});
 			const requestProm = request.fn();
 			await this._quickAnimateSelected(requestProm);
@@ -165,8 +166,8 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			}, '/api/instance/u2f/gen_request', {
 				instance_id: this.props.authData.instance_id
 			}, {
-				token: this.getRoot().getAPIToken(),
-				count: this.getRoot().getRequestCount()
+				token: this.getRoot<GlobalController>().getAPIToken(),
+				count: this.getRoot<GlobalController>().getRequestCount()
 			});
 			const requestProm = request.fn();
 			await this._quickAnimateSelected(requestProm);
@@ -284,8 +285,8 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			instance_id: this.props.authData.instance_id
 		}, {...{
 			//Auth stuff
-			token: this.getRoot().getAPIToken(),
-			count: this.getRoot().getRequestCount(),
+			token: this.getRoot<GlobalController>().getAPIToken(),
+			count: this.getRoot<GlobalController>().getRequestCount(),
 			password_id: password.id,
 		}, ...filterUndefined({
 			twofactor_token: (password.twofactor_enabled ?
@@ -362,7 +363,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				}
 			}));
 
-			const decryptHash = this.getRoot().getData('decryptHash');
+			const decryptHash = this.getRoot<GlobalController>().getData('decryptHash');
 			if (!decryptHash) {
 				PaperToast.createHidable('Failed to decrypt server response');
 				return;
@@ -388,9 +389,9 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				instance_id: this.props.authData.instance_id
 			}, filterUndefined({
 				//Auth stuff
-				token: this.getRoot().getAPIToken(),
+				token: this.getRoot<GlobalController>().getAPIToken(),
 				password_id: this.props.selected.id,
-				count: this.getRoot().getRequestCount(),
+				count: this.getRoot<GlobalController>().getRequestCount(),
 				twofactor_token: this.props.selected.twofactor_enabled ?
 					this._authState.twofactorAuthentication! : undefined,
 				response: this.props.selected.u2f_enabled ?
@@ -626,7 +627,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 						', please delete this instance and create a new instance to fix it'),
 				PaperToast.DURATION.LONG);
 			if (this.getGlobalProperty('isWeb') === 'true') {
-				this.getRoot().changePage(ENTRYPOINT.LOGIN);
+				this.getRoot<GlobalController>().changePage(ENTRYPOINT.LOGIN);
 			}
 			this._showFailedView(this._signU2F);
 			return;
@@ -638,8 +639,8 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}, '/api/password/getmeta', {
 			instance_id: this.props.authData.instance_id
 		}, {
-			token: this.getRoot().getAPIToken(),
-			count: this.getRoot().getRequestCount(),
+			token: this.getRoot<GlobalController>().getAPIToken(),
+			count: this.getRoot<GlobalController>().getRequestCount(),
 			password_id: usedId
 		});;
 		const response = await request.fn();
@@ -751,7 +752,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 						', please delete this instance and create a new instance to fix it'),
 				PaperToast.DURATION.LONG);
 			if (this.getGlobalProperty('isWeb') === 'true') {
-				this.getRoot().changePage(ENTRYPOINT.LOGIN);
+				this.getRoot<GlobalController>().changePage(ENTRYPOINT.LOGIN);
 			}
 			this._showFailedView(this._getPasswordDetails);
 			return;
@@ -762,9 +763,9 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}, '/api/password/get', {
 			instance_id: this.props.authData.instance_id
 		}, filterUndefined({
-			token: this.getRoot().getAPIToken(),
+			token: this.getRoot<GlobalController>().getAPIToken(),
 			password_id: this.props.selected.id,
-			count: this.getRoot().getRequestCount(),
+			count: this.getRoot<GlobalController>().getRequestCount(),
 			twofactor_token: this.props.selected.twofactor_enabled ?
 				this._authState.twofactorAuthentication! : undefined,
 			response: this.props.selected.u2f_enabled ?
@@ -802,7 +803,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				return;
 			}
 			const publicKeyDecryptedParsed = parseResult.data;
-			const decryptHash = this.getRoot().getData('decryptHash');
+			const decryptHash = this.getRoot<GlobalController>().getData('decryptHash');
 			if (!decryptHash) {
 				this._failDecryptServerResponse(() => {
 					this._getPasswordDetails(passwordMeta);

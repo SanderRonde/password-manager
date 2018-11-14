@@ -1,7 +1,7 @@
 import { ERRS, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../../types/crypto';
+import { GlobalControllerData, GlobalController } from '../../base/global/global-controller';
 import { decryptWithPrivateKey, hash, pad } from '../../../../lib/browser-crypto';
 import { Dashboard, DashboarDependencies } from '../../base/dashboard/dashboard';
-import { GlobalControllerData } from '../../base/global/global-controller';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { DashboardHTML } from '../../base/dashboard/dashboard.html';
 import { CHANGE_TYPE, config } from '../../../../lib/webcomponents';
@@ -41,12 +41,12 @@ export class DashboardWeb extends Dashboard {
 		PaperToast.createHidable(message + ', redirecting to login page...',
 			PaperToast.DURATION.LONG);
 		if (!document.body.classList.contains('dev')) {
-			this.getRoot().changePage(ENTRYPOINT.LOGIN);
+			this.getRoot<GlobalController>().changePage(ENTRYPOINT.LOGIN);
 		}
 	}	
 
 	private _initData() {
-		const data = this.getRoot().getData('loginData');
+		const data = this.getRoot<GlobalController>().getData('loginData');
 		if (!data) {
 			return null;
 		}
@@ -71,7 +71,7 @@ export class DashboardWeb extends Dashboard {
 		}
 		const { newData, verifyHashed } = data;
 		this._data = newData as any;
-		this.getRoot().storeData('decryptHash', {
+		this.getRoot<GlobalController>().storeData('decryptHash', {
 			hash: newData.decrypt_hash
 		});
 
@@ -98,8 +98,8 @@ export class DashboardWeb extends Dashboard {
 		}, '/api/password/allmeta', {
 			instance_id: this._data.instance_id
 		}, {
-			count: this.getRoot().getRequestCount(),
-			token: this.getRoot().getAPIToken(),
+			count: this.getRoot<GlobalController>().getRequestCount(),
+			token: this.getRoot<GlobalController>().getAPIToken(),
 			password_hash: verifyHashed
 		});
 		const res = await request.fn();

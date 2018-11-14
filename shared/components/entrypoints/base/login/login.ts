@@ -9,6 +9,7 @@ import { LoginData, VALID_THEMES_T } from '../../../../types/shared-types';
 import { isDefined, getCookie } from '../../../../lib/webcomponent-util'
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
+import { GlobalController } from '../global/global-controller';
 import { bindToClass } from '../../../../lib/decorators';
 import { MDCard } from '../../../util/md-card/md-card';
 import { JSONResponse } from '../../../../types/api';
@@ -32,7 +33,7 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	});
 
 	layoutMounted() {
-		if (!this.getRoot().getAttribute('prop_theme')) {
+		if (!this.getRoot<GlobalController>().getAttribute('prop_theme')) {
 			//This is a non-server-served page
 			const currentTheme = this.getGlobalProperty('theme');
 			const cookieTheme = getCookie('theme');
@@ -43,7 +44,7 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	}
 
 	mounted() {
-		if (!this.getRoot().getAttribute('prop_theme')) {
+		if (!this.getRoot<GlobalController>().getAttribute('prop_theme')) {
 			this._fetchData();
 		}
 		if (document.body.classList.contains('dev')) {

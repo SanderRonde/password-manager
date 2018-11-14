@@ -1,5 +1,6 @@
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { cancelTimeout, createCancellableTimeout } from '../../../../lib/webcomponents/template-util';
+import { GlobalController } from '../../base/global/global-controller';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { Login, LoginDependencies } from '../../base/login/login';
@@ -139,7 +140,7 @@ export class LoginWeb extends Login {
 				return;
 			}
 
-		const root = this.getRoot();
+		const root = this.getRoot<GlobalController>();
 		root.setAPIToken(auth_token, count);
 		root.storeData('loginData', {
 			password,

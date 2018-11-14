@@ -1,4 +1,3 @@
-import { GlobalController } from '../../components/entrypoints/base/global/global-controller';
 import { EventListenerObj, WebComponentListenable } from "./listener";
 import { GlobalProperties } from '../../types/shared-types';
 import { ConfigurableWebComponent } from './configurable';
@@ -184,7 +183,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 			});
 		}
 
-	public getRoot<T = GlobalController>(): T {
+	public getRoot<T>(): T {
 		if (this.__isRoot) {
 			return <T><any>this;
 		}
