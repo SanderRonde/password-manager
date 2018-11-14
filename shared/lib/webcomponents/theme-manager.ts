@@ -1,10 +1,30 @@
 import { WebComponentHierarchyManager } from './hierarchy-manager';
-import { theme } from '../../components/theming/theme/theme';
-import { DEFAULT_THEME } from '../../types/shared-types';
+import { Theme } from '../../types/shared-types';
 import { EventListenerObj } from './listener';
 import { CHANGE_TYPE } from './base';
 
-const defaultTheme: DEFAULT_THEME = 'light';
+const noTheme: Theme = {
+	accent: {
+		heavy: '#F00',
+		hover: '#F00',
+		main: '#F00',
+		weak: '#F00',
+	},
+	background: '#000',
+	card: '#000',
+	error: '#F00',
+	minOppositeColorText: '#000',
+	oppositeBackground: '#FFF',
+	primary: {
+		heavy: '#F00',
+		hover: '#F00',
+		main: '#F00',
+		weak: '#F00',
+	},
+	success: '#0F0',
+	textOnBackground: '#000',
+	textOnNonbackground: '#FFF'
+};
 export abstract class WebComponentThemeManger<E extends EventListenerObj> extends WebComponentHierarchyManager<E> {
 	constructor() {
 		super();
@@ -27,10 +47,38 @@ export abstract class WebComponentThemeManger<E extends EventListenerObj> extend
 
 	public getThemeName() {
 		return (this.__internals.globalProperties && this.__internals.globalProperties.theme) 
-			|| defaultTheme;
+			|| WebComponentThemeManger.__defaultTheme;
 	}
 
 	public getTheme() {
-		return theme[this.getThemeName()!];
+		if (WebComponentThemeManger.__theme) {
+			if (this.getThemeName() && this.getThemeName() in WebComponentThemeManger.__theme) {
+				return WebComponentThemeManger.__theme[this.getThemeName()];
+			}
+		}
+		return noTheme;
+	}
+
+	private static __theme: {
+		[name: string]: Theme;
+	}|null = null;
+	static setTheme<T extends {
+		[name: string]: Theme;
+	}>(theme: T, defaultTheme?: Extract<keyof T, string>) {
+		this.__theme = theme;
+		if (defaultTheme) {
+			this.setDefaultTheme(defaultTheme);
+		}
+	}
+
+	private static __defaultTheme: string;
+	static setDefaultTheme<T extends {
+		[name: string]: Theme;
+	}>(name: Extract<keyof T, string>) {
+		this.__defaultTheme = name;
+	}
+
+	static getTheme() {
+		return this.__theme;
 	}
 }
