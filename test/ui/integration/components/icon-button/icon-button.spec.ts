@@ -35,7 +35,7 @@ context('Icon-Button', () => {
 						return cy.wrap({
 							fill: fill
 						}).should('have.property', 'fill',
-							toRGB(theme.textOnBackground));
+							toRGB(theme.text));
 					});
 				});
 			});

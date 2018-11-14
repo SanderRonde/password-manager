@@ -22,7 +22,7 @@ context('Material-Input', () => {
 						return cy.wrap({
 							color
 						}).should('have.property', 'color',
-							toRGB(theme.textOnBackground));
+							toRGB(theme.text));
 					});
 				});
 			});
