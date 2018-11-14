@@ -1,7 +1,10 @@
+import { WebComponentThemeManger } from "../../../../../shared/lib/webcomponents/theme-manager";
 import { IconButton } from "../../../../../shared/components/util/icon-button/icon-button";
 import { Checkmark } from "../../../../../shared/components/icons/checkmark/checkmark";
+import { theme } from "../../../../../shared/components/theming/theme/theme";
 import { render, html } from "lit-html";
 
+WebComponentThemeManger.setTheme(theme, 'light');
 IconButton.define();
 
 render(html`

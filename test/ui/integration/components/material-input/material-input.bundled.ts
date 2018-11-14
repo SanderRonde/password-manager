@@ -1,10 +1,13 @@
 import { MaterialInput } from "../../../../../shared/components/util/material-input/material-input";
-import { Checkmark } from "../../../../../shared/components/icons/checkmark/checkmark";
+import { WebComponentThemeManger } from "../../../../../shared/lib/webcomponents/theme-manager";
 import { IconButton } from "../../../../../shared/components/util/icon-button/icon-button";
+import { Checkmark } from "../../../../../shared/components/icons/checkmark/checkmark";
+import { theme } from "../../../../../shared/components/theming/theme/theme";
 import { Cross } from "../../../../../shared/components/icons/cross/cross";
 
 import { html, render } from "lit-html";
 
+WebComponentThemeManger.setTheme(theme, 'light');
 MaterialInput.define();
 IconButton.define();
 
