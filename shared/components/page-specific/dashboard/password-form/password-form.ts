@@ -1,6 +1,6 @@
 import { ConfigurableWebComponent, config, Props, ComplexType, PROP_TYPE } from '../../../../lib/webcomponents';
 import { passwordDetailDataStore, passwordDetailDataSymbol } from '../password-detail/password-detail.html';
-import { PasswordDetail, PasswordDetailChanges, ToBools } from '../password-detail/password-detail';
+import { PasswordDetail, PasswordDetailChanges, ToBools, ShowHidableView } from '../password-detail/password-detail';
 import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
 import { createCancellableTimeout } from '../../../../lib/webcomponents/template-util';
 import { MaterialCheckbox } from '../../../util/material-checkbox/material-checkbox';
@@ -74,7 +74,9 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 	private static readonly TWOFACTOR_TIME_STEP = 30; //Seconds
 	private _shouldRefresh2FA: boolean = true;
 
-	public enableEditing() {
+	public async enableEditing() {
+		this.hideFAB();
+		await wait(220);
 		this.props.editing = true;
 	}
 
@@ -97,6 +99,9 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 	}
 
 	public refresh() {
+		if (this.props.editing) {
+			this.showFAB();
+		}
 		this.props.editing = false;
 		this.props.passwordVisible = true;
 	}
@@ -384,5 +389,24 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 				this.$.saveChanges.setState('regular');
 			}, 3000);
 		}
+	}
+
+	@bindToClass
+	hideFAB() {
+		console.log('hidende');
+		this.$.editButton.fadeOut();
+	}
+
+	@bindToClass
+	showFAB() {
+		console.log('showende');
+		this.$.editButton.fadeIn();
+	}
+
+	mounted() {
+		const parent = this.parentNode as ShowHidableView;
+		if (!parent) return;
+		parent.onHide = this.hideFAB;
+		parent.onShow = this.showFAB;
 	}
 }

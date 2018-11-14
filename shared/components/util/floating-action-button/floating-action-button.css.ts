@@ -28,11 +28,16 @@ export const FloatingActionButtonCSS = new TemplateFn<FloatingActionButton, Proj
 			width: 56px;
 			height: 56px;
 			border-radius: 50%;
-			transition: box-shadow 200ms ease-in-out;
+			transition: box-shadow 200ms ease-in-out, transform 300ms ease-in-out;
+			transform: scale(1);
 			color: ${props.color || theme.textOnNonbackground};
 			fill: ${props.color || theme.textOnNonbackground};
 			background-color: ${props.backgroundColor || theme.primary.main};
 			${getShadow(3)}
+		}
+
+		#container.hidden {
+			transform: scale(0);
 		}
 
 		#container:hover {

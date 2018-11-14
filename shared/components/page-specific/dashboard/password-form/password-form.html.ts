@@ -339,14 +339,13 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 		` : ''}
 	</div>
 	<div id="editButtonContainer">
-		${!props.editing ? html`
-			<floating-action-button aria-label="Edit" id="editButton"
-				no-float @@click="${this.enableEditing}"
-				background-color="#FFC107" fill="white"
-			>
-				${Edit}
-			</floating-action-button>
-		` : ''}
+		<floating-action-button aria-label="Edit" id="editButton"
+			no-float @@click="${this.enableEditing}"
+			background-color="#FFC107" fill="white"
+			hide
+		>
+			${Edit}
+		</floating-action-button>
 	</div>
 	`;
 }, CHANGE_TYPE.ALWAYS);

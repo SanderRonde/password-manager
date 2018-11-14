@@ -29,9 +29,21 @@ export class FloatingActionButton extends ConfigurableWebComponent<FloatingActio
 			noFloat: {
 				type: PROP_TYPE.BOOL,
 				value: false
+			},
+			hide: {
+				type: PROP_TYPE.BOOL,
+				value: false
 			}
 		}
 	});
+
+	fadeOut() {
+		this.props.hide = true;
+	}
+
+	fadeIn() {
+		this.props.hide = false;
+	}
 
 	@bindToClass
 	public onClick(e: MouseEvent) {

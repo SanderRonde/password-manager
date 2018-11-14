@@ -55,6 +55,11 @@ const enum TWOFACTOR_CHECK_STATE {
 	SUCCEEDED
 };
 
+export interface ShowHidableView extends Element {
+	onHide?(): void;
+	onShow?(): void;
+}
+
 export const PasswordDetailDependencies = [
 	SizingBlock,
 	VerticalCenterer,
@@ -448,7 +453,12 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}
 
 	private async _hideAll() {
-		this.$$('.view').forEach((view) => {
+		console.log('doing full hide');
+		this.$$('.view').forEach((view: ShowHidableView) => {
+			if (view.classList.contains('visible')) {
+				console.log('calling hide');
+				view.onHide && view.onHide();
+			}
 			view.classList.remove('visible');
 		});
 		await wait(VIEW_FADE_TIME);
@@ -471,6 +481,9 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		between && between();
 		this.$[view].classList.add('displayed');
 		this.$[view].classList.add('visible');
+		console.log('Animating view', this.$[view]);
+		(this.$[view] as ShowHidableView).onShow &&
+			(this.$[view] as ShowHidableView).onShow!();
 		await wait(VIEW_FADE_TIME);
 		this._cancelCurrentAnimation = null;
 	}

@@ -1,10 +1,12 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { FloatingActionButton } from './floating-action-button';
 
-export const FloatingActionButtonHTML = new TemplateFn<FloatingActionButton>(function (html) {
+export const FloatingActionButtonHTML = new TemplateFn<FloatingActionButton>(function (html, props) {
 	return html`
 		<div id="floater">
-			<button id="container" @click="${this.onClick}">
+			<button id="container" @click="${this.onClick}" class="${{
+				hidden: props.hide
+			}}">
 				<div id="rippleContainer">
 					<vertical-centerer>
 						<horizontal-centerer>
