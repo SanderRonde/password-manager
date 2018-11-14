@@ -1,8 +1,9 @@
 import { changeOpacity, isDark } from '../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { ProjectTheme } from '../../theming/theme/theme';
 import { PaperToast } from './paper-toast';
 
-export const PaperToastCSS = new TemplateFn<PaperToast>((html, _props, theme) => {
+export const PaperToastCSS = new TemplateFn<PaperToast, ProjectTheme>((html, _props, theme) => {
 	return html`<style>
 		#toastContainer {
 			display: block;
