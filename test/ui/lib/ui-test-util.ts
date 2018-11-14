@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
-import { Theme, VALID_THEMES_T } from "../../../shared/types/shared-types";
-import { theme } from '../../../shared/components/theming/theme/theme';
+import { theme, ProjectTheme } from '../../../shared/components/theming/theme/theme';
+import { VALID_THEMES_T } from "../../../shared/types/shared-types";
 import { WebComponent } from '../../../shared/lib/webcomponents';
 import { COLOR_NAME_MAP } from "./ui-test-const";
 
@@ -13,7 +13,7 @@ export function chainFunctions(fns: (() => Cypress.Chainable<any>)[]) {
 }
 
 export function iterateThemes<T extends WebComponent>(selector: string, 
-	callback: (currentTheme: Theme, root: ShadowRoot, themeName: VALID_THEMES_T) => Cypress.Chainable<any>|Promise<Cypress.Chainable<any>>,
+	callback: (currentTheme: ProjectTheme, root: ShadowRoot, themeName: VALID_THEMES_T) => Cypress.Chainable<any>|Promise<Cypress.Chainable<any>>,
 	waitTime: number = 0): Cypress.Chainable<any> {
 		return getOriginalElement(selector, (srcEl: T) => {
 			const keyNames = Object.getOwnPropertyNames(theme) as VALID_THEMES_T[];
