@@ -7,7 +7,7 @@ import { VerticalCenterer } from '../vertical-centerer/vertical-centerer';
 import { FloatingActionButtonHTML } from './floating-action-button.html';
 import { FloatingActionButtonCSS } from './floating-action-button.css';
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple';
-import { isNewElement } from '../../../lib/listeners';
+import { isNewElement } from '../../../lib/webcomponents/listeners';
 import { bindToClass } from '../../../lib/decorators';
 
 @config({
