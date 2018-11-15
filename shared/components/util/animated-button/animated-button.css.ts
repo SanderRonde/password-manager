@@ -6,7 +6,7 @@ export const COLOR_FADE_TIME = 300;
 export const FADE_IN_OUT_TIME = COLOR_FADE_TIME / 2;
 export const AnimatedButtonCSS = new TemplateFn<AnimatedButton>(function(html, _props, theme) {
 	return html`
-		${PaperButtonCSS.render(CHANGE_TYPE.THEME, this)}
+		${PaperButtonCSS.renderTemplate(CHANGE_TYPE.THEME, this)}
 		<style>
 
 		#content > * {

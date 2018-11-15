@@ -15,7 +15,7 @@ const floatCSS = html`<style>
 
 export const FloatingActionButtonCSS = new TemplateFn<FloatingActionButton, ProjectTheme>(function (html, props, theme) {
 	return html`<style>
-		${RippleCSS.render(CHANGE_TYPE.ALWAYS, this)}
+		${RippleCSS.renderTemplate(CHANGE_TYPE.ALWAYS, this)}
 		${!props.noFloat ? floatCSS : ''}
 
 		@keyframes fadeIn {

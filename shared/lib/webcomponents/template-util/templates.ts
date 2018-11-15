@@ -27,7 +27,7 @@ export function joinTemplates<T extends WebComponent<any>>(...templates: Templat
 	return new TemplateFn<T>(function (html) {
 		return html`
 			${mapArr(templates.map((template) => {
-				return template.render(changeType, this);
+				return template.renderTemplate(changeType, this);
 			}))}
 		`;
 	}, changeType as any);
