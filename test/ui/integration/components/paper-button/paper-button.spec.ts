@@ -7,7 +7,10 @@ import { UI_TEST_PORT } from '../../../lib/ui-test-const';
 const DEFAULT_THEME: DEFAULT_THEME = 'light';
 
 global.Promise = Cypress.Promise;
-context('Paper-Button', () => {
+context('Paper-Button', function() {
+	this.timeout(5000);
+	this.slow(5000);
+	
 	beforeEach(() => {
 		cy.visit(`http://localhost:${UI_TEST_PORT}/paper-button.html`);
 		onMounted('#main');

@@ -4,7 +4,10 @@ import { getOriginalElement, onMounted } from "../../../lib/ui-test-util";
 import { UI_TEST_PORT } from "../../../lib/ui-test-const";
 
 global.Promise = Cypress.Promise;
-context('Vertical-Centerer', () => {
+context('Vertical-Centerer', function() {
+	this.timeout(5000);
+	this.slow(5000);
+	
 	beforeEach(() => {
 		cy.visit(`http://localhost:${UI_TEST_PORT}/vertical-centerer.html`);
 		onMounted('#main');

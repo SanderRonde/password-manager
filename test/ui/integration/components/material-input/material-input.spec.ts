@@ -4,7 +4,10 @@ import { UI_TEST_PORT } from "../../../lib/ui-test-const";
 
 
 global.Promise = Cypress.Promise;
-context('Material-Input', () => {
+context('Material-Input', function() {
+	this.timeout(5000);
+	this.slow(5000);
+	
 	beforeEach(() => {
 		cy.visit(`http://localhost:${UI_TEST_PORT}/material-input.html`);
 		onMounted('#main','#withContent', '#withProps', '#password');

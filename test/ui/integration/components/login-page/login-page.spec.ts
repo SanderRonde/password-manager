@@ -7,7 +7,10 @@ import { Login } from "../../../../../shared/components/entrypoints/base/login/l
 import { onMounted } from "../../../lib/ui-test-util";
 
 global.Promise = Cypress.Promise;
-context('Login-Page', () => {
+context('Login-Page', function() {
+	this.timeout(5000);
+	this.slow(5000);
+	
 	beforeEach(function() {
 		this.timeout(10000);
 
