@@ -101,8 +101,11 @@ export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme 
 				return cached;
 			}
 			const rendered = this._template === null ?
-				html`` : this._template;
-				templateMap.set(this, rendered as TemplateResult);
+				html`` : (this._template instanceof TemplateResult) ?
+					this._template : typeSafeCall(this._template as TemplateRenderFunction<C, T>, 
+						component, component.generateHTMLTemplate, component.props, 
+						component.getTheme<T>());
+			templateMap.set(this, rendered as TemplateResult);
 			return rendered;
 		}
 		if (this.changeOn === CHANGE_TYPE.ALWAYS || 
@@ -185,6 +188,37 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 
 	private __noHTML = html``;
 
+	private ___fixtures: {
+		css: HTMLElement;
+		html: HTMLElement;
+		customCSS: HTMLElement;
+	}|null = null;
+	private __createFixtures() {
+		//Attribute is just for clarity when looking through devtools
+		const css = document.createElement('span');
+		css.setAttribute('data-type', 'css');
+		const customCSS = document.createElement('span');
+		customCSS.setAttribute('data-type', 'custom-css');
+		const html = document.createElement('span');
+		html.setAttribute('data-type', 'html');
+		
+		this.root.appendChild(css);
+		this.root.appendChild(customCSS);
+		this.root.appendChild(html);
+
+		return {
+			css,
+			customCSS,
+			html
+		}
+	}
+	private get __fixtures() {
+		if (this.___fixtures) {
+			return this.___fixtures;
+		}
+		return (this.___fixtures = this.__createFixtures());
+	}
+
 	@bindToClass
 	/**
 	 * The method that starts the rendering cycle
@@ -194,12 +228,12 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		if (this.__doPreRenderLifecycle() === false) {
 			return;
 		}
-		render(html`${this.css.render(change, this as any)}
-		${this.__hasCustomCSS() ? 
+
+		render(this.css.render(change, this as any), this.__fixtures.css);
+		render(this.__hasCustomCSS() ? 
 			this.customCSS().render(change, this as any) : 
-			this.__noHTML}
-		${this.renderer.render(change, this as any)}`, 
-			this.root);
+			this.__noHTML, this.__fixtures.customCSS);
+		render(this.renderer.render(change, this as any), this.__fixtures.html);
 		this.__doPostRenderLifecycle();
 	}
 
