@@ -196,7 +196,7 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		this.postRender();
 	}
 
-	private ___fixtures: {
+	private ___renderContainers: {
 		css: HTMLElement;
 		html: HTMLElement;
 		customCSS: HTMLElement;
@@ -220,11 +220,11 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 			html
 		}
 	}
-	private get __fixtures() {
-		if (this.___fixtures) {
-			return this.___fixtures;
+	private get __renderContainers() {
+		if (this.___renderContainers) {
+			return this.___renderContainers;
 		}
-		return (this.___fixtures = this.__createFixtures());
+		return (this.___renderContainers = this.__createFixtures());
 	}
 
 	@bindToClass
@@ -239,17 +239,17 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 
 		this.css.render(
 			this.css.renderTemplate(change, this as any), 
-			this.__fixtures.css);
+			this.__renderContainers.css);
 		if (this.__hasCustomCSS()) {
 			this.customCSS().render(
 				this.customCSS().renderTemplate(change, this as any),
-				this.__fixtures.customCSS);
-		} else if (this.__fixtures.customCSS.innerHTML !== '') {
-			this.__fixtures.customCSS.innerHTML = '';
+				this.__renderContainers.customCSS);
+		} else if (this.__renderContainers.customCSS.innerHTML !== '') {
+			this.__renderContainers.customCSS.innerHTML = '';
 		}
 		this.renderer.render(
 			this.renderer.renderTemplate(change, this as any), 
-			this.__fixtures.html);
+			this.__renderContainers.html);
 		this.__doPostRenderLifecycle();
 	}
 
