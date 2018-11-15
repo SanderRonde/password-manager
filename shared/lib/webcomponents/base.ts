@@ -147,9 +147,9 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	private __firstRender: boolean = true;
 
 	/**
-	 * The render method that will render this component
+	 * The render method that will render this component's HTML
 	 */
-	protected abstract renderer: TemplateFn = new TemplateFn(() => {
+	protected abstract html: TemplateFn = new TemplateFn(() => {
 		throw new Error('No render method implemented');	
 	}, CHANGE_TYPE.ALWAYS);
 
@@ -247,8 +247,8 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		} else if (this.__renderContainers.customCSS.innerHTML !== '') {
 			this.__renderContainers.customCSS.innerHTML = '';
 		}
-		this.renderer.render(
-			this.renderer.renderTemplate(change, this as any), 
+		this.html.render(
+			this.html.renderTemplate(change, this as any), 
 			this.__renderContainers.html);
 		this.__doPostRenderLifecycle();
 	}

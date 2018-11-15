@@ -5,7 +5,7 @@ import { WebComponent } from './component';
 export class ConfigurableWebComponent<IDS extends {
 	[key: string]: HTMLElement;
 } = {}, E extends EventListenerObj = {}> extends WebComponent<IDS, E> {
-	protected renderer!: TemplateFn;
+	protected html!: TemplateFn;
 	public static config: WebComponentConfiguration;
 	public config!: WebComponentConfiguration;
 	protected css!: TemplateFn;
@@ -59,7 +59,7 @@ export function config(config: WebComponentConfiguration) {
 			static dependencies = dependencies
 			static config = config;
 			config = config;
-			renderer = html;
+			html = html;
 			css = config.css;
 		}
 		return <any>WebComponentConfig as T;

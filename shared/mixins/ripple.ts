@@ -83,7 +83,7 @@ export function rippleEffect(target: ExtendableComponent): any {
 		protected css!: TemplateFn;
 		protected __hasCustomCSS!: () => boolean;
 		protected customCSS!: () => TemplateFn;
-		protected renderer!: TemplateFn;
+		protected html!: TemplateFn;
 		private _rippleElement!: HTMLElement|null;
 		private _rippleSize!: number;
 		private _ignoringMouseDown!: boolean;
