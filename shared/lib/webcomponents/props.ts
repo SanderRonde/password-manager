@@ -1,5 +1,4 @@
 import { hookIntoMount, awaitMounted } from './template-util';
-import { isDefined } from '../webcomponent-util';
 import { CHANGE_TYPE } from './base';
 
 export const refPrefix = '___complex_ref';
@@ -26,9 +25,9 @@ function getterWithVal<R>(component: {
 		if (strict) {
 			return (value + '') === 'true';
 		}
-		return isDefined(value);
+		return value !== undefined && value !== null && value !== 'false';
 	} else {
-		if (isDefined(value)) {
+		if (value !== undefined && value !== null && value !== 'false') {
 			if (type === 'number') {
 				return ~~value;
 			} else if (type === complex) {

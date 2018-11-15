@@ -22,7 +22,7 @@
     "compileOnSave": true,
     "allowJs": true,
 	"include": [
-        "typings/"
+        "typings/", "shared/lib/webcomponents/listeners.ts"
     ],
 	"references": [{
 		"path": "./server/tsconfig.ts3.json"

@@ -1,4 +1,6 @@
-import { WebComponent } from './webcomponents';
+import { WebComponent } from '../webcomponents';
+export { supportsPassive } from './shared'
+import { supportsPassive } from './shared'
 
 type IDMap = Map<string, (this: any, ev: HTMLElementEventMap[keyof HTMLElementEventMap]) => any>;
 const listenedToElements: WeakMap<WebComponent, {
@@ -12,25 +14,6 @@ const listenedToElements: WeakMap<WebComponent, {
 		map: IDMap;
 	}>;
 }> = new WeakMap();
-let _supportsPassive: boolean | null = null;
-export function supportsPassive() {
-	if (_supportsPassive !== null) {
-		return _supportsPassive;
-	}
-	_supportsPassive = false;
-	try {
-		var opts = Object.defineProperty({}, 'passive', {
-			get: function () {
-				_supportsPassive = true;
-			}
-		});
-		const tempFn = () => { };
-		window.addEventListener("testPassive", tempFn, opts);
-		window.removeEventListener("testPassive", tempFn, opts);
-	}
-	catch (e) { }
-	return _supportsPassive;
-}
 function doListen<I extends {
 	[key: string]: HTMLElement;
 }, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, type: 'element' | 'identifier', 

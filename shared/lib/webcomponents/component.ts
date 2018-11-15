@@ -1,8 +1,8 @@
 import { WebComponentCustomCSSManager } from './custom-css-manager';
-import { removeAllElementListeners } from '../listeners';
+import { removeAllElementListeners } from './listeners';
+import { CHANGE_TYPE, bindToClass } from './base';
 import { EventListenerObj } from './listener';
-import { bindToClass } from '../decorators';
-import { CHANGE_TYPE } from './base';
+
 
 type IDMapFn<IDS> = {
 	/**

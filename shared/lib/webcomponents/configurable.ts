@@ -1,6 +1,6 @@
+import { TemplateFn, WebComponentBase } from './base';
 import { EventListenerObj } from './listener';
 import { WebComponent } from './component';
-import { TemplateFn, WebComponentBase } from './base';
 
 export class ConfigurableWebComponent<IDS extends {
 	[key: string]: HTMLElement;

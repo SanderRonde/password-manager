@@ -1,4 +1,5 @@
-import { VALID_THEMES_T as VALID_THEMES_T, Theme } from '../../../types/shared-types';
+import { VALID_THEMES_T as VALID_THEMES_T } from '../../../types/shared-types';
+import { Theme } from '../../../lib/webcomponents/webcomponent-types';
 
 export const VALID_THEMES: VALID_THEMES_T[] = ['light', 'dark'];
 

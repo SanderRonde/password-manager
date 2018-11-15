@@ -1,4 +1,4 @@
-import { supportsPassive } from '../../listeners';
+import { supportsPassive } from '../shared';
 
 export function createDisposableListener<T extends HTMLElement, E extends keyof HTMLElementEventMap>(
 	target: T, event: E, listener: (ev: HTMLElementEventMap[E]) => any, 

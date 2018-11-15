@@ -1,51 +1,8 @@
-export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './listeners';
-import { TemplateResult } from 'lit-html';
-
-// From https://github.com/JedWatson/classnames
-
-type ClassNamesArg = string|number|{
-	[key: string]: any;
-}|string[]|{
-	[key: string]: any;
-}[];
-export function classNames(...args: ClassNamesArg[]) {
-	var classes = [];
-
-	for (const arg of args) {
-		if (!arg) continue;
-
-		if (typeof arg === 'string' || typeof arg === 'number') {
-			classes.push(arg);
-		} else if (Array.isArray(arg) && arg.length) {
-			var inner = classNames.apply(null, arg);
-			if (inner) {
-				classes.push(inner);
-			}
-		} else if (typeof arg === 'object') {
-			const objArg = arg as {
-				[key: string]: any;
-			};
-			for (var key in objArg) {
-				if (objArg[key]) {
-					classes.push(key);
-				}
-			}
-		}
-	}
-
-	return classes.join(' ');
-}
+export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './webcomponents/listeners';
+export { wait, mapArr, classNames } from './webcomponents/shared';
 
 export function isDefined<U extends string>(value: null|undefined|U): value is U {
 	return value !== undefined && value !== null && value !== 'false';
-}
-
-export function wait(time: number): Promise<void> {
-	return new Promise((resolve) => {
-		setTimeout(() => {
-			resolve();
-		}, time);
-	});
 }
 
 export function getCookie(name: string) {
@@ -105,15 +62,4 @@ export function findElementInPath<E extends HTMLElement>(path: HTMLElement[], qu
 			}
 	}
 	return null;
-}
-
-/**
- * Map an array but return an empty string if its length is 0
- * this avoids the inlining of a complex value 0-length array
- */
-export function mapArr(result: any[], fallback: string|TemplateResult = '') {
-	if (result.length === 0) {
-		return fallback;
-	}
-	return result;
 }

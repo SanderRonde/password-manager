@@ -1,8 +1,27 @@
 import { TemplateResult, html, render } from 'lit-html';
-import { Theme } from '../../types/shared-types';
 import { WebComponentDefiner } from './definer';
-import { bindToClass } from '../decorators';
+import { Theme } from './webcomponent-types';
 import { WebComponent } from './component';
+
+export function bindToClass<T extends Function>(_target: object, propertyKey: string, 
+	descriptor: TypedPropertyDescriptor<T>): TypedPropertyDescriptor<T> | void {
+		if(!descriptor || (typeof descriptor.value !== 'function')) {
+			throw new TypeError(`Only methods can be decorated with @bind. <${propertyKey}> is not a method!`);
+		}
+		
+		return {
+			configurable: true,
+			get(this: T): T {
+				const bound: T = descriptor.value!.bind(this);
+				Object.defineProperty(this, propertyKey, {
+					value: bound,
+					configurable: true,
+					writable: true
+				});
+				return bound;
+			}
+		};
+	}
 
 type InferThis<T extends (this: any, ...args: any[]) => any> = 
 	T extends (this: infer D, ...args: any[]) => any ? D : void;

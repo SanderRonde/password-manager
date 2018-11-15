@@ -5,7 +5,7 @@ import {
 } from 'lit-html';
 import { RenderOptions } from 'lit-html/lib/render-options';
 import { WebComponentThemeManger } from './theme-manager';
-import { classNames } from '../webcomponent-util';
+import { classNames, ClassNamesArg } from './shared';
 import { TemplateFn, CHANGE_TYPE } from './base';
 import { EventListenerObj } from './listener';
 import { bindToClass } from '../decorators';
@@ -13,11 +13,6 @@ import { refPrefix } from './props';
 
 export const CUSTOM_CSS_PROP_NAME = 'custom-css';
 
-type ClassNamesArg = string|{
-	[key: string]: any;
-}|string[]|{
-	[key: string]: any;
-}[];
 class ClassAttributePart implements Part {
 	public value: any = undefined;
 	private _pendingValue: any = undefined;

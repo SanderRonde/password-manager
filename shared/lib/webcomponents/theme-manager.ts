@@ -1,6 +1,6 @@
 import { WebComponentHierarchyManager } from './hierarchy-manager';
-import { Theme } from '../../types/shared-types';
 import { EventListenerObj } from './listener';
+import { Theme } from './webcomponent-types';
 import { CHANGE_TYPE } from './base';
 
 const noTheme: Theme = {

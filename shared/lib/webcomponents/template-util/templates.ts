@@ -1,7 +1,6 @@
 import { TemplateFn, CHANGE_TYPE } from '../base';
-import { mapArr } from '../../webcomponent-util';
 import { WebComponent } from '../component';
-import { html } from 'lit-html';
+import { mapArr } from '../shared';
 
 export function joinTemplates<T extends WebComponent<any>>(...templates: TemplateFn<T>[]): TemplateFn<T> {
 	const changeType = templates.reduce((prev, template) => {
@@ -25,7 +24,7 @@ export function joinTemplates<T extends WebComponent<any>>(...templates: Templat
 			}
 		return CHANGE_TYPE.NEVER;
 	}, CHANGE_TYPE.NEVER);
-	return new TemplateFn<T>(function () {
+	return new TemplateFn<T>(function (html) {
 		return html`
 			${mapArr(templates.map((template) => {
 				return template.render(changeType, this);
