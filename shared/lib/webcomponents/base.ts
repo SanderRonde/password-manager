@@ -86,7 +86,7 @@ export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme 
 			}
 		}
 
-		public renderTemplate(changeType: CHANGE_TYPE, component: C) {
+		public renderTemplate(changeType: CHANGE_TYPE, component: C): R {
 			if (!this._initialized) {
 				this._doInitialRender(component);
 				this._initialized = true;
@@ -107,8 +107,8 @@ export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme 
 						this._template : typeSafeCall(this._template as TemplateRenderFunction<C, T, R>, 
 							component, component.generateHTMLTemplate, component.props, 
 							component.getTheme<T>());
-				templateMap.set(this, rendered as TemplateResult);
-				return rendered;
+				templateMap.set(this, rendered);
+				return rendered as R;
 			}
 			if (this.changeOn === CHANGE_TYPE.ALWAYS || 
 				changeType === CHANGE_TYPE.ALWAYS ||
@@ -196,8 +196,6 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		this.postRender();
 	}
 
-	private __noHTML = html``;
-
 	private ___fixtures: {
 		css: HTMLElement;
 		html: HTMLElement;
@@ -239,11 +237,19 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 			return;
 		}
 
-		render(this.css.renderTemplate(change, this as any), this.__fixtures.css);
-		render(this.__hasCustomCSS() ? 
-			this.customCSS().renderTemplate(change, this as any) : 
-			this.__noHTML, this.__fixtures.customCSS);
-		render(this.renderer.renderTemplate(change, this as any), this.__fixtures.html);
+		this.css.render(
+			this.css.renderTemplate(change, this as any), 
+			this.__fixtures.css);
+		if (this.__hasCustomCSS()) {
+			this.customCSS().render(
+				this.customCSS().renderTemplate(change, this as any),
+				this.__fixtures.customCSS);
+		} else if (this.__fixtures.customCSS.innerHTML !== '') {
+			this.__fixtures.customCSS.innerHTML = '';
+		}
+		this.renderer.render(
+			this.renderer.renderTemplate(change, this as any), 
+			this.__fixtures.html);
 		this.__doPostRenderLifecycle();
 	}
 
