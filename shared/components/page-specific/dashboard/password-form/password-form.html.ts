@@ -342,7 +342,7 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 		<floating-action-button aria-label="Edit" id="editButton"
 			no-float @@click="${this.enableEditing}"
 			background-color="#FFC107" fill="white"
-			hide
+			hide title="Edit"
 		>
 			${Edit}
 		</floating-action-button>
