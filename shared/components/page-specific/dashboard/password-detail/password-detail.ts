@@ -482,7 +482,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		between && between();
 		this.$[view].classList.add('displayed');
 		this.$[view].classList.add('visible');
-		console.log('Animating view', this.$[view]);
 		(this.$[view] as ShowHidableView).onShow &&
 			(this.$[view] as ShowHidableView).onShow!();
 		await wait(VIEW_FADE_TIME);
