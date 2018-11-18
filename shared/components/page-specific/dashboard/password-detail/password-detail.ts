@@ -454,10 +454,8 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}
 
 	private async _hideAll() {
-		console.log('doing full hide');
 		this.$$('.view').forEach((view: ShowHidableView) => {
 			if (view.classList.contains('visible')) {
-				console.log('calling hide');
 				view.onHide && view.onHide();
 			}
 			view.classList.remove('visible');
