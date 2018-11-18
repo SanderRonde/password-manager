@@ -76,7 +76,7 @@ export const FloatingActionButtonCSS = new TemplateFn<FloatingActionButton, Proj
 			#container {
 				animation: fadeIn 250ms ease-in;
 			}
-		` : ''};
+		` : ''}
 
 		#container.hidden {
 			transform: scale(0);
