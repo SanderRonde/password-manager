@@ -1,6 +1,7 @@
 import { PasswordPreview } from "../components/page-specific/dashboard/password-preview/password-preview";
 import { FloatingActionButton } from "../components/util/floating-action-button/floating-action-button";
 import { PasswordDetail } from "../components/page-specific/dashboard/password-detail/password-detail";
+import { PasswordCreate } from "../components/page-specific/dashboard/password-create/password-create";
 import { PasswordForm } from "../components/page-specific/dashboard/password-form/password-form";
 import { HorizontalCenterer } from "../components/util/horizontal-centerer/horizontal-centerer";
 import { MaterialCheckbox } from "../components/util/material-checkbox/material-checkbox";
@@ -36,12 +37,13 @@ declare global {
 	type HTMLThemeSelectorElement = ThemeSelector;
 	type HTMLAnimatedButtonElement = AnimatedButton;
 	type HTMLPasswordDetailElement = PasswordDetail;
+	type HTMLPasswordCreateElement = PasswordCreate;
 	type HTMLLoadingSpinnerElement = LoadingSpinner;
 	type HTMLPasswordPreviewElement = PasswordPreview;
 	type HTMLVerticalCentererElement = VerticalCenterer;
 	type HTMLMaterialCheckboxElement = MaterialCheckbox;
-	type HTMLInfiniteListElement = InfiniteList<any, any, any>;
 	type HTMLHorizontalCentererElement = HorizontalCenterer;
+	type HTMLInfiniteListElement = InfiniteList<any, any, any>;
 	type HTMLFloatingActionButtonElement = FloatingActionButton;
 
 	type HTMLPathElement = any;
@@ -61,6 +63,7 @@ declare global {
 		'theme-selector': ThemeSelector;
 		'animated-button': AnimatedButton;
 		'password-detail': PasswordDetail;
+		'password-create': PasswordCreate;
 		'loading-spinner': LoadingSpinner;
 		'password-preview': PasswordPreview;
 		'vertical-centerer': VerticalCenterer;
