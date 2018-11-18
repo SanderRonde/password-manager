@@ -117,7 +117,7 @@ const deleteButtonCustomCSS = new TemplateFn<PasswordForm>((html) => {
 	</style>`;
 }, CHANGE_TYPE.NEVER);
 
-function getString(base: unknown, fallback: string): string {
+export function getString(base: unknown, fallback: string): string {
 	if (typeof base === 'string') {
 		return base;
 	}
@@ -161,8 +161,8 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 		>
 			<div slot="postIcon">
 				<icon-button tabIndex="-1"
-					aria-label="Copy username first and password 5s later" 
-					title="Copy username first and password 5s later"
+					aria-label="Toggle showing password" 
+					title="Toggle showing password"
 					@click="${this.onToggleShowPasswordClick}"
 				>
 					${props.passwordVisible ? Visible : VisibleHidden}
