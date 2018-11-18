@@ -10,6 +10,7 @@ import { PasswordPreviewHTML } from './password-preview.html';
 import { PasswordPreviewCSS } from './password-preview.css';
 import { bindToClass } from '../../../../lib/decorators';
 import { MDCard } from '../../../util/md-card/md-card';
+import { PaperToast } from '../../../util/paper-toast/paper-toast';
 
 export interface PasswordPreviewHost {
 	props: {
@@ -77,7 +78,11 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		const isSelected = !this.props.selected;
 		const list = this.props.ref;
 
-		if (!list) return;
+		if (!list) {
+			PaperToast.createHidable(
+				'Please click "cancel" or "save" to finish creating a password');
+			return;
+		}
 
 		//Deselect all other items data-wise
 		list.mapData((data) => {
