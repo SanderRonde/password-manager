@@ -128,7 +128,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 						' applying all non-2fa changes', PaperToast.DURATION.LONG);
 				} else {
 					//Get a valid 2FA token
-					await this._animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
+					await this.animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
 						this.$$('.twofactorDigit').forEach((el: HTMLInputElement) => {
 							el.value = '';
 						});
@@ -263,7 +263,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 	public async deletePassword(password: MetaPasswords[0]|null) {
 		if (!password) return;
 		if (password.twofactor_enabled && !this._authState.twofactorAuthentication) {
-			await this._animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
+			await this.animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
 				this.$$('.twofactorDigit').forEach((el: HTMLInputElement) => {
 					el.value = '';
 				});
@@ -298,10 +298,10 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			twofactorAuthentication: null
 		};
 		const requestProm = request.fn();
-		this._animateView('loadingView', STATIC_VIEW_HEIGHT);
+		this.animateView('loadingView', STATIC_VIEW_HEIGHT);
 		const response = await requestProm;
 		if (response.success) {
-			this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
+			this.animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
 			//Remove from list
 			this.props.ref.props.metaPasswords = 
 				this.props.ref.props.metaPasswords.filter((pw) => {
@@ -467,7 +467,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 	}
 
 	private _cancelCurrentAnimation: null|(() => void) = null;
-	private async _animateView(view: keyof PasswordDetailIDMap, newSize: number, between?: () => void) {
+	public async animateView(view: keyof PasswordDetailIDMap, newSize: number, between?: () => void) {
 		let stop: boolean = false;
 
 		this._cancelCurrentAnimation = () => {
@@ -512,7 +512,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			this._getPasswordDetails(newValue);
 		} else if (oldValue !== null) {
 			this._deselect();
-			await this._animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
+			await this.animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
 		} else {
 			this._deselect();
 		}
@@ -538,7 +538,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 
 	private async _showFailedView(retryFn: () => void) {
 		this._postViewCallback = retryFn;
-		await this._animateView('failedView', STATIC_VIEW_HEIGHT, () => {
+		await this.animateView('failedView', STATIC_VIEW_HEIGHT, () => {
 			//Reset auth state
 			this._authState.twofactorAuthentication = null;
 			this._authState.u2fAuthenticated = null;
@@ -691,13 +691,13 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			if (!resolved) {
 				//Wait resolved, not the request, show loading view
 				await Promise.all([
-					this._animateView('loadingView', STATIC_VIEW_HEIGHT),
+					this.animateView('loadingView', STATIC_VIEW_HEIGHT),
 					promise
 				]);
 			}
 		} else {
 			await Promise.all([
-				this._animateView('loadingView', STATIC_VIEW_HEIGHT),
+				this.animateView('loadingView', STATIC_VIEW_HEIGHT),
 				promise
 			]);
 		}
@@ -721,13 +721,13 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				});
 				return;
 			}
-			await this._animateView('u2fRequiredView', STATIC_VIEW_HEIGHT, () => {
+			await this.animateView('u2fRequiredView', STATIC_VIEW_HEIGHT, () => {
 				this._signU2F();
 			});
 			this._postViewCallback = this._getPasswordDetails;
 			return;
 		} else if (passwordMeta.twofactor_enabled && this._authState.twofactorAuthentication === null) {
-			await this._animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
+			await this.animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
 				this.$$('.twofactorDigit').forEach((el: HTMLInputElement) => {
 					el.value = '';
 				});
@@ -817,7 +817,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			}
 			passwordDetailDataStore[passwordDetailDataSymbol] = decryptedPasswordData;
 
-			await this._animateView('selectedView', 
+			await this.animateView('selectedView', 
 				this.$.passwordForm.getSelectedViewSize(passwordMeta), () => {
 					//This will re-render the DOM so no need to do it because of 
 					// selected password change
