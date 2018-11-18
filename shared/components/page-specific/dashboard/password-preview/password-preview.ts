@@ -49,7 +49,7 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 			},
 			ref: {
 				type: ComplexType<InfiniteList<MetaPasswords[0], MetaPasswordsPreviewData, 
-					PasswordPreviewHost>>()
+					PasswordPreviewHost>|void>()
 			},
 			index: PROP_TYPE.NUMBER
 		}
@@ -77,6 +77,8 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		const isSelected = !this.props.selected;
 		const list = this.props.ref;
 
+		if (!list) return;
+
 		//Deselect all other items data-wise
 		list.mapData((data) => {
 			if (data !== null) {
@@ -102,7 +104,7 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		}
 
 		//Signal to dashboard that the selected item changed
-		this.props.ref.props.ref.props.selected = isSelected ?
+		list.props.ref.props.selected = isSelected ?
 			this.props.index : -1;
 
 		//Rerender card
