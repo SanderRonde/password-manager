@@ -393,13 +393,11 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 
 	@bindToClass
 	hideFAB() {
-		console.log('hidende');
 		this.$.editButton.fadeOut();
 	}
 
 	@bindToClass
 	showFAB() {
-		console.log('showende');
 		this.$.editButton.fadeIn();
 	}
 
