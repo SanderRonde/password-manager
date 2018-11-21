@@ -91,6 +91,8 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview, ProjectTheme>(
 
 		.username {
 			transition: color 300ms ease-in-out;
+			text-overflow: ellipsis;
+			overflow: hidden;
 			color: ${props.selected ? 
 				changeOpacity(theme.textOnNonbackground, 85) :
 				changeOpacity(theme.text, 85)};
@@ -110,6 +112,9 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview, ProjectTheme>(
 		.url {
 			font-weight: 500;
 			font-size: 150%;
+			max-width: 310px;
+			text-overflow: ellipsis;
+			overflow: hidden;
 		}
 
 		.mdl-ripple {
