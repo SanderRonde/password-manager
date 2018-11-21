@@ -2,7 +2,8 @@ import { PasswordPreview, PasswordPreviewHost } from '../../../page-specific/das
 import { PasswordDetailWeb } from '../../../page-specific/dashboard/web/password-detail-web/password-detail-web';
 import { PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
 import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
-import { WebComponentBase, Props, ComplexType, PROP_TYPE } from "../../../../lib/webcomponents";
+import { PasswordCreate } from '../../../page-specific/dashboard/password-create/password-create';
+import { WebComponentBase, Props, ComplexType, PROP_TYPE, CHANGE_TYPE } from "../../../../lib/webcomponents";
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
@@ -13,6 +14,7 @@ import { APISuccessfulReturns } from '../../../../types/api';
 import { wait } from '../../../../lib/webcomponent-util';
 import { MDCard } from '../../../util/md-card/md-card';
 import * as devPasswords from './dev-passwords';
+import { STATIC_VIEW_HEIGHT } from '../../../page-specific/dashboard/password-detail/password-detail.css';
 
 export type MetaPasswords = PublicKeyDecrypted<APISuccessfulReturns['/api/password/allmeta']['encrypted']>;
 export const DashboarDependencies: (typeof WebComponentBase)[] = [
@@ -23,7 +25,8 @@ export const DashboarDependencies: (typeof WebComponentBase)[] = [
 	MDCard,
 	PasswordPreview,
 	PasswordDetailWeb,
-	FloatingActionButton
+	FloatingActionButton,
+	PasswordCreate
 ]
 
 export interface MetaPasswordsPreviewData {
@@ -41,6 +44,11 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 			selected: {
 				type: PROP_TYPE.NUMBER,
 				defaultValue: -1
+			},
+			newPassword: {
+				type: ComplexType<MetaPasswords[0]|null>(),
+				defaultValue: null,
+				isPrivate: true
 			}
 		}
 	});
@@ -149,6 +157,26 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		return new Array(Math.ceil(window.innerHeight / this.getItemSize(null, {
 			isMin: true
 		}))).fill('').map((_) => {});
+	}
+
+	public addPassword() {
+		this.props.newPassword = {
+			id: '0' as any,
+			twofactor_enabled: false,
+			u2f_enabled: false,
+			username: 'username',
+			websites: [{
+				exact: 'http://www.example.com',
+				favicon: null,
+				host: 'http://www.example.com'
+			}]
+		};
+		this.$.passwordFocus.animateView('newPasswordView', STATIC_VIEW_HEIGHT);
+	}
+
+	public updateAddedPassword<F extends keyof MetaPasswords[0]>(field: F, value: MetaPasswords[0][F]) {
+		this.props.newPassword![field] = value;
+		this.renderToDOM(CHANGE_TYPE.PROP);
 	}
 
 	private _onMount() {

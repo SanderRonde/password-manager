@@ -14,6 +14,7 @@ import { bindToClass } from '../../../lib/decorators';
 })
 export class MaterialCheckbox extends ConfigurableWebComponent<MaterialCheckboxIDMap, {
 	change: {
+		//First arg is whether it's now checked, second is whether it used to be
 		args: [boolean, boolean]
 	}
 }> {

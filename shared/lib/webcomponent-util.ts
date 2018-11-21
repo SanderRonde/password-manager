@@ -63,3 +63,9 @@ export function findElementInPath<E extends HTMLElement>(path: HTMLElement[], qu
 	}
 	return null;
 }
+
+export function chain(...functions: Function[]) {
+	return (...args: any[]) => {
+		functions.forEach(fn => fn(...args));
+	}
+}

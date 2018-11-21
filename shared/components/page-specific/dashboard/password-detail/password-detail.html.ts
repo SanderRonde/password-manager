@@ -125,6 +125,11 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (html,
 							#visible-websites="${props.visibleWebsites || []}"
 						></password-form>
 					</div>
+					<div id="newPasswordView" class="view">
+						<password-create id="passwordCreate"
+							#parent="${this}"
+						></password-create>
+					</div>
 				</sizing-block>
 			</md-card>
 		</div>

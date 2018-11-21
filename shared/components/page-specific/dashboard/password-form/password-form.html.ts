@@ -4,6 +4,7 @@ import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Visible, VisibleHidden } from '../../../icons/visible/visible';
+import { PasswordCreate } from '../password-create/password-create';
 import { Checkmark } from '../../../icons/checkmark/checkmark';
 import { mapArr } from '../../../../lib/webcomponent-util';
 import { Delete } from '../../../icons/delete/delete';
@@ -14,7 +15,7 @@ import { Edit } from '../../../icons/edit/edit';
 import { PasswordForm } from './password-form';
 
 const hostUpdateFns: (() => void)[] = [];
-function genHostUpdateFn(container: PasswordForm, index: number) {
+export function genHostUpdateFn(container: PasswordForm|PasswordCreate, index: number) {
 	if (hostUpdateFns[index]) {
 		return hostUpdateFns[index];
 	}
@@ -47,7 +48,7 @@ export function getHost(fullUrl: string) {
 	}
 }
 
-const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((html, _, theme) => {
+export const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((html, _, theme) => {
 	return html`<style>
 		#button .mdl-ripple {
 			background: ${theme.success};

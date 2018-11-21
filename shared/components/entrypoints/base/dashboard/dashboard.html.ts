@@ -21,6 +21,18 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (html, props, _t
 				<div id="pageContainer">
 					<div id="passwordList">
 						<div id="passwordTop"></div>
+						${props.newPassword !== null ? html`
+						<div id="newPassword">
+							<password-preview id="newPasswordPreview"
+								#websites="${props.newPassword.websites}"
+								username="${props.newPassword.username}"
+								twofactor_enabled="${props.newPassword.twofactor_enabled}"
+								u2f_enabled="${props.newPassword.u2f_enabled}"
+								selected="${false}"
+								index="-1"
+							></password-preview>
+						</div>
+						` : ''}
 						${props.metaPasswords ? '' : html`
 							<infinite-list custom-css="${joinTemplates(
 								CustomDashboardCSS.infiniteList,
@@ -93,7 +105,9 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (html, props, _t
 			</horizontal-centerer>
 			<theme-selector id="themeSelector"></theme-selector>
 			<floating-action-button id="passwordFab"
-				title="Add Password" aria-label="Add Password">
+				title="Add Password" aria-label="Add Password"
+				@@click="${this.addPassword}"
+			>
 				<span id="passwordFabPlus">+</span>
 			</floating-action-button>
 		</div>`;
