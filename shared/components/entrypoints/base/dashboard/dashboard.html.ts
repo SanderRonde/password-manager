@@ -21,7 +21,7 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (html, props, _t
 				<div id="pageContainer">
 					<div id="passwordList">
 						<div id="passwordTop"></div>
-						${props.newPassword !== null ? html`
+						${props.newPassword ? html`
 						<div id="newPassword">
 							<password-preview id="newPasswordPreview"
 								#websites="${props.newPassword.websites}"
