@@ -24,7 +24,6 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 				type: ComplexType<MetaPasswords[0]['websites']>(),
 				value: []
 			},
-			parent: ComplexType<PasswordDetail>(),
 			passwordVisible: PROP_TYPE.BOOL,
 			selectedDisplayed: ComplexType<MetaPasswords[0]|null>()
 		},
