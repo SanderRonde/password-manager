@@ -8,7 +8,7 @@ import { PasswordPreview } from './password-preview';
 import { Key } from '../../../icons/key/key';
 
 function prefixWithWWW(url: string) {
-	if (url.startsWith('www.')) {
+	if (url.startsWith('www.') || url.startsWith('http')) {
 		return url;
 	}
 	return `www.${url}`;
