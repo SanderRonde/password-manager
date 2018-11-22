@@ -29,7 +29,12 @@ export interface ListRendered {
 	css: InfiniteListCSS,
 	html: InfiniteListHTML
 })
-export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteListIDMap> {
+export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteListIDMap, {
+	disabledclick: {
+		args: [number],
+		returnValue: boolean|void
+	}
+}> {
 	private _htmlTemplate: (data: D, itemData: ID|null, index: number, isTemplate: boolean) => TemplateResult = () => html``;
 	private _usedViewportHeight: number|null = null;
 	private _usedData: D[]|null = null;
@@ -56,6 +61,10 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 			}) => number>(),
 			ref: {
 				type: ComplexType<P>()
+			},
+			disabled: {
+				type: PROP_TYPE.BOOL,
+				value: false
 			}
 		}
 	});
@@ -64,6 +73,10 @@ export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteLis
 
 	public get parent(): P {
 		return this.props.ref;
+	}
+
+	public onDisabledClick(index: number) {
+		return this.fire('disabledclick', index);
 	}
 
 	public get rendered(): HTMLElement[] {

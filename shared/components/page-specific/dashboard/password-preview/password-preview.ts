@@ -78,11 +78,12 @@ export class PasswordPreview extends ConfigurableWebComponent<PasswordPreviewIDM
 		const isSelected = !this.props.selected;
 		const list = this.props.ref;
 
-		if (!list) {
-			PaperToast.createHidable(
-				'Please click "cancel" or "save" to finish creating a password');
-			return;
-		}
+		if (!list || (list.props.disabled && 
+			!list.onDisabledClick(this.props.index).filter(val => val).length)) {
+				PaperToast.createHidable(
+					'Please click "cancel" or "save" to finish creating a password');
+				return;
+			}
 
 		//Deselect all other items data-wise
 		list.mapData((data) => {

@@ -31,5 +31,17 @@ export const InfiniteListCSS = new TemplateFn<InfiniteList<any, any, any>>(funct
 			height: 0;
 			width: 0;
 		}
+
+		#physicalContent .click-capture {
+			pointer-events: none;
+			width: 100%;
+			height: 100%;
+			background-color: transparent;
+			position: absolute;
+		}
+
+		#physicalContent.disabled .click-capture {
+			pointer-events: all;
+		}
 	</style>`;
 }, CHANGE_TYPE.THEME);

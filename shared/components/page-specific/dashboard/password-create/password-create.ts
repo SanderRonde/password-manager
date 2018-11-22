@@ -1,6 +1,6 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, ConfigurableWebComponent, Props, ComplexType, PROP_TYPE } from '../../../../lib/webcomponents';
+import { config, ConfigurableWebComponent, Props, ComplexType, PROP_TYPE, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { MetaPasswords } from '../../../entrypoints/base/dashboard/dashboard';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { findElementInPath, wait } from '../../../../lib/webcomponent-util';
@@ -20,10 +20,6 @@ import { bindToClass } from '../../../../lib/decorators';
 export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap> {
 	props = Props.define(this, {
 		priv: {
-			visibleWebsites: {
-				type: ComplexType<MetaPasswords[0]['websites']>(),
-				value: []
-			},
 			passwordVisible: PROP_TYPE.BOOL,
 			selectedDisplayed: ComplexType<MetaPasswords[0]|null>()
 		},
@@ -41,10 +37,10 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 
 	public getSelectedViewSize(password: MetaPasswords[0]|null,
 		websites: MetaPasswords[0]['websites'] = (password && password.websites) || []) {
-			return 513 + 156 + ((websites.length - 1) * (156 + 10));
+			return 540 + 60 + ((websites.length - 1) * (166));
 		}
 
-	private async _sizeChange(websites: MetaPasswords[0]['websites'] = this.props.visibleWebsites) {	
+	private async _sizeChange(websites: MetaPasswords[0]['websites'] = this.props.selectedDisplayed!.websites) {	
 		await this.props.parent.$.sizer.setSize(this.getSelectedViewSize(
 			this.props.selectedDisplayed, websites));
 	}
@@ -100,7 +96,9 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 
 	private _readWebsitesState() {
 		const container = this.$.passwordWebsites;
-		const websites: MetaPasswords[0]['websites'] = [...container.children].map((child) => {
+		const websites: MetaPasswords[0]['websites'] = [
+			...container.querySelectorAll('.passwordWebsite')
+		].map((child) => {
 			const container = child.querySelector('.passwordWebsiteExact')!;
 			const exact = (container as MaterialInput).value;
 			const host = getHost(exact);
@@ -111,6 +109,11 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 			}
 		});
 		return websites;
+	}
+
+	public async usernameChange() {
+		await wait(0);
+		this.props.parent.props.ref.updateAddedPassword('username', this.$.passwordUsername.value);
 	}
 
 	@bindToClass
@@ -129,12 +132,13 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 			favicon: null
 		}];
 		await this._sizeChange(newWebsites);
-		this.props.visibleWebsites.push({
+		this.props.selectedDisplayed!.websites.push({
 			host: '',
 			exact: '',
 			favicon: null
 		});
 		this._setWebsitesExternal(newWebsites);
+		this.renderToDOM(CHANGE_TYPE.PROP);
 	}
 
 	@bindToClass
@@ -150,9 +154,10 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 
 		const copy = this._readWebsitesState();
 		const newWebsites = [...copy.slice(0, -1)];
-		this.props.visibleWebsites.splice(~~index, 1);
+		this.props.selectedDisplayed!.websites.splice(~~index, 1);
 		await this._sizeChange(newWebsites);
 		this._setWebsitesExternal(newWebsites);
+		this.renderToDOM(CHANGE_TYPE.PROP);
 	}
 
 	@bindToClass
@@ -184,6 +189,6 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 	}
 
 	public discard() {
-		this.props.parent.props.ref.props.newPassword = null;
+		this.props.parent.props.ref.cancelNewPassword();
 	}
 }

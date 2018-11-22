@@ -1,9 +1,10 @@
 import { PasswordPreview, PasswordPreviewHost } from '../../../page-specific/dashboard/password-preview/password-preview';
 import { PasswordDetailWeb } from '../../../page-specific/dashboard/web/password-detail-web/password-detail-web';
+import { WebComponentBase, Props, ComplexType, PROP_TYPE, CHANGE_TYPE } from "../../../../lib/webcomponents";
+import { STATIC_VIEW_HEIGHT } from '../../../page-specific/dashboard/password-detail/password-detail.css';
 import { PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
 import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
 import { PasswordCreate } from '../../../page-specific/dashboard/password-create/password-create';
-import { WebComponentBase, Props, ComplexType, PROP_TYPE, CHANGE_TYPE } from "../../../../lib/webcomponents";
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
@@ -14,7 +15,6 @@ import { APISuccessfulReturns } from '../../../../types/api';
 import { wait } from '../../../../lib/webcomponent-util';
 import { MDCard } from '../../../util/md-card/md-card';
 import * as devPasswords from './dev-passwords';
-import { STATIC_VIEW_HEIGHT } from '../../../page-specific/dashboard/password-detail/password-detail.css';
 
 export type MetaPasswords = PublicKeyDecrypted<APISuccessfulReturns['/api/password/allmeta']['encrypted']>;
 export const DashboarDependencies: (typeof WebComponentBase)[] = [
@@ -159,7 +159,7 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		}))).fill('').map((_) => {});
 	}
 
-	public addPassword() {
+	public async addPassword() {
 		this.props.newPassword = {
 			id: '0' as any,
 			twofactor_enabled: false,
@@ -168,10 +168,18 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 			websites: [{
 				exact: 'http://www.example.com',
 				favicon: null,
-				host: 'http://www.example.com'
+				host: 'www.example.com'
 			}]
 		};
-		this.$.passwordFocus.animateView('newPasswordView', STATIC_VIEW_HEIGHT);
+		this.$.infiniteList.props.disabled = true;
+		await this.$.passwordFocus.animateView('loadingView', STATIC_VIEW_HEIGHT);
+		this.$.passwordFocus.props.selected = this.props.newPassword;
+		this.$.passwordFocus.animateView('newPasswordView', STATIC_VIEW_HEIGHT + 20);
+	}
+
+	public cancelNewPassword() {
+		this.props.newPassword = null;
+		this.$.infiniteList.props.disabled = false;
 	}
 
 	public updateAddedPassword<F extends keyof MetaPasswords[0]>(field: F, value: MetaPasswords[0][F]) {

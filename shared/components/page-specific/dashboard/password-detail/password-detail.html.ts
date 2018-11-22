@@ -128,6 +128,7 @@ export const PasswordDetailHTML = new TemplateFn<PasswordDetail>(function (html,
 					<div id="newPasswordView" class="view">
 						<password-create id="passwordCreate"
 							#parent="${this}"
+							#selected-displayed="${props.selected}"
 						></password-create>
 					</div>
 				</sizing-block>

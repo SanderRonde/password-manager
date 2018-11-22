@@ -1,8 +1,18 @@
+import { PasswordPreview } from '../../../page-specific/dashboard/password-preview/password-preview';
 import { joinTemplates } from '../../../../lib/webcomponents/template-util';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Search } from '../../../icons/search/search';
 import { CustomDashboardCSS } from './dashboard.css';
 import { Dashboard } from './dashboard';
+
+const newPasswordCustomCSS = new TemplateFn<PasswordPreview>((html) => {
+	return html`<style>
+		#content {
+			width: 470px;
+			padding: 5px 0;
+		}
+	</style>`;
+},CHANGE_TYPE.NEVER);
 
 export const DashboardHTML = new TemplateFn<Dashboard>(function (html, props, _theme) {
 	return html`
@@ -30,6 +40,7 @@ export const DashboardHTML = new TemplateFn<Dashboard>(function (html, props, _t
 								u2f_enabled="${props.newPassword.u2f_enabled}"
 								selected="${false}"
 								index="-1"
+								custom-css="${newPasswordCustomCSS}"
 							></password-preview>
 						</div>
 						` : ''}

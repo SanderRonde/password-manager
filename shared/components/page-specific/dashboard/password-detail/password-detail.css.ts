@@ -68,7 +68,7 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((html, _props, t
 			text-align: center;
 		}
 
-		#selectedView {
+		#selectedView, #newPasswordView {
 			padding: 30px;
 		}
 	</style>`

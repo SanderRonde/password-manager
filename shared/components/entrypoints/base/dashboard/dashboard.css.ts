@@ -182,7 +182,6 @@ export const DashboardCSS = new TemplateFn<Dashboard, ProjectTheme>((html, _prop
 
 		#passwordList, #passwordFocus {
 			width: 480px;
-			background-color: grey;
 		}
 
 		#passwordDetail {
@@ -216,6 +215,12 @@ export const DashboardCSS = new TemplateFn<Dashboard, ProjectTheme>((html, _prop
 		#passwordFabPlus {
 			cursor: pointer;
 			font-size: 200%;
+		}
+
+		#newPassword {
+			margin-bottom: 20px;
+			margin-left: 5px;
+			width: 470px;
 		}
 	</style>`
 }, CHANGE_TYPE.THEME);
