@@ -206,17 +206,16 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			dataURI: string;
 			res: Response;
 		}|null>((resolve) => {
-			fetch(`http://s2.googleusercontent.com/s2/favicons?domain_url=${url}`).then(async (res) => {
-				res.blob().then((blob) => {
-					const reader = new FileReader();
-					reader.readAsDataURL(blob); 
-					reader.onloadend = () => {
-						resolve({
-							dataURI: reader.result!.toString(),
-							res: res
-						});
-					}
-				});
+			this.$.passwordCreate.getFavicon(getHost(url)).then(async (res) => {
+				const blob = await res.blob();
+				const reader = new FileReader();
+				reader.onloadend = () => {
+					resolve({
+						dataURI: reader.result!.toString(),
+						res: res
+					});
+				};
+				reader.readAsDataURL(blob); 
 			}).catch(() => {
 				resolve(null);
 			});

@@ -50,6 +50,18 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 		url: string;
 	}> = new Map();
 
+	public getFavicon(host: string) {
+		const fetchURL = `://${host}/favicon.ico`;
+		this._faviconQueries.set(host, {
+			state: 'fetching',
+			url: `https:${fetchURL}`
+		});
+
+		return fetch(`https:${fetchURL}`).catch(() => {
+			return fetch(`http:${fetchURL}`);
+		});
+	}
+
 	private _lastUpdatedState: MetaPasswords[0]['websites'] = [];
 	private _setWebsitesExternal(websites: MetaPasswords[0]['websites']) {
 		//Fetch all favicons
@@ -64,28 +76,25 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 				}
 			} else {
 				//Fetch it then
-				const fetchURL = `http://s2.googleusercontent.com/s2/favicons?domain_url=${website.host}`;
+				const fetchURL = `://${website.host}/favicon.ico`;
 				this._faviconQueries.set(website.host, {
 					state: 'fetching',
-					url: fetchURL
+					url: `https:${fetchURL}`
 				});
-				fetch(fetchURL).then((res) => {
-					return res.text();
-				}).then(async (text) => {
-					if (text === await this._fallbackFavicon) {
-						this._faviconQueries.set(website.host, {
-							state: 'invalid',
-							url: fetchURL
-						});
-					} else {
-						this._faviconQueries.set(website.host, {
-							state: 'found',
-							url: fetchURL
-						});
 
-						//Update the last sent state
-						this._setWebsitesExternal(this._lastUpdatedState);
-					}
+				this.getFavicon(website.host).then((res) => {
+					this._faviconQueries.set(website.host, {
+						state: 'found',
+						url: new URL(res.url).origin
+					});
+
+					//Update the last sent state
+					this._setWebsitesExternal(this._lastUpdatedState);
+				}).catch(() => {
+					this._faviconQueries.set(website.host, {
+						state: 'invalid',
+						url: fetchURL
+					});
 				});
 			}
 			return website;
@@ -172,12 +181,9 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 		this.props.parent.props.ref.updateAddedPassword('u2f_enabled', isChecked);
 	}
 
-	private _fallbackFavicon: Promise<string>|null = null;
-
 	init() {
 		this.props.selectedDisplayed = {...this.props.parent.props.ref.props.newPassword!};
 		this.props.passwordVisible = false;
-		this._fallbackFavicon = fetch('http://s2.googleusercontent.com/s2/favicons?domain_url=fallback').then(res => res.text());
 	}
 	
 	onToggleShowPasswordClick() {
