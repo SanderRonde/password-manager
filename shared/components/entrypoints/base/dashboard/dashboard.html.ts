@@ -8,7 +8,8 @@ import { Dashboard } from './dashboard';
 const newPasswordCustomCSS = new TemplateFn<PasswordPreview>((html) => {
 	return html`<style>
 		#content {
-			width: 470px;
+			border: 3px solid #4CAF50;
+			width: 464px;
 			padding: 5px 0;
 		}
 	</style>`;
