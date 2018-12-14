@@ -8,7 +8,7 @@ export function registerServiceWorker() {
 		window.addEventListener('load', () => {
 			navigator.serviceWorker.register('/serviceworker.js', {
 				scope: '/',
-				type: document.body.classList.contains('dev') ? 'module' : 'classic'
+				type: 'classic'
 			});
 		});
 

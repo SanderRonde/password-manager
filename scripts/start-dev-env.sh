@@ -7,6 +7,7 @@ cd $script_path/../
 terminal -e tsc -p server/tsconfig.json -w
 terminal -e tsc -p shared/tsconfig.json -w
 terminal -e tsc -p server/app/actions/server/webserver/client/tsconfig.json -w
+terminal -e gulp watch
 mkdir "$script_path/../database/"
 terminal -e mongod --dbpath=$script_path/../database/
 nodemon

@@ -4,6 +4,7 @@ const requireHacker = require('require-hacker');
 const htmlMinifier = require('html-minifier');
 const htmlTypings = require('html-typings');
 const uglifyCSS = require('uglifycss');
+const watch = require('gulp-watch');
 const uglify = require('uglify-es');
 const babel = require('babel-core');
 const rollup = require('rollup');
@@ -225,40 +226,46 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 })();
 
 /* Dashboard */
-(() => {
+const dashboard = (() => {
 	const SRC_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/src/');
 	const BUILD_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/build/');
 	const ROUTES = ['login', 'dashboard'];
 
-	gulp.task('dashboard.bundle.serviceworker', genTask('Bundles the serviceworker',
+	async function rollupServiceWorker() {
+		const input = path.join(SRC_DIR, `serviceworker.js`);
+		const output = path.join(BUILD_DIR, `serviceworker.js`);	
+
+		const bundle = await rollup.rollup({
+			input,
+			onwarn(warning) {
+				if (typeof warning !== 'string' && warning.code === 'THIS_IS_UNDEFINED') {
+					//Typescript inserted helper method, ignore it
+					return;
+				}
+				console.log(warning);
+			},
+			plugins: [
+				rollupResolve({
+					module: true,
+					browser: true
+				}),
+				rollupCommonJs()
+			]
+		});
+
+		await bundle.write({
+			format: 'iife',
+			file: output
+		});
+	}
+
+	gulp.task('dashboard.bundle.serviceworker.bundle', genTask('Bundles the serviceworker',
 		gulp.series(
-			async function rollupServiceWorker() {
-				const input = path.join(SRC_DIR, `serviceworker.js`);
-				const output = path.join(BUILD_DIR, `serviceworker.js`);	
-
-				const bundle = await rollup.rollup({
-					input,
-					onwarn(warning) {
-						if (typeof warning !== 'string' && warning.code === 'THIS_IS_UNDEFINED') {
-							//Typescript inserted helper method, ignore it
-							return;
-						}
-						console.log(warning);
-					},
-					plugins: [
-						rollupResolve({
-							module: true,
-							browser: true
-						}),
-						rollupCommonJs()
-					]
-				});
-
-				await bundle.write({
-					format: 'iife',
-					file: output
-				});
-			}, 
+			rollupServiceWorker
+		)));
+	gulp.task('dashboard.bundle.serviceworker', genTask('Bundles the serviceworker and minifies it',
+		gulp.series(
+			'dashboard.bundle.serviceworker.bundle',
 			async function minifyServiceWorker() {
 				const file = await fs.readFile(
 					path.join(BUILD_DIR, `serviceworker.js`), {
@@ -454,6 +461,11 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		'dashboard.bundle',
 		'dashboard.meta'
 	));
+
+	return {
+		SRC_DIR,
+		rollupServiceWorker
+	}
 })();
 
 /** Testing */
@@ -562,4 +574,14 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		'pretest.genbundles',
 		'pretest.genhtml'
 	));
+})();
+
+/** Watching */
+(() => {
+	gulp.task('watch.serviceworker', genTask('Bundles the serviceworker on change', () => {
+		dashboard.rollupServiceWorker();
+		return watch(path.join(dashboard.SRC_DIR, `serviceworker.js`), dashboard.rollupServiceWorker);
+	}));
+
+	gulp.task('watch', gulp.parallel('watch.serviceworker'));
 })();
