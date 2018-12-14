@@ -444,6 +444,15 @@ export class RoutesApiPassword {
 				await this.server.Router.verifyAndGetInstance(instance_id, res);
 			if (decryptedInstance === null || accountPromise === null) return;
 
+			if (!mongo.ObjectId.isValid(password_id)) {
+				res.status(200);
+				res.json({
+					success: false,
+					error: 'objectID invalid',
+					ERR: API_ERRS.INVALID_PARAM_TYPES
+				});
+				return;
+			}
 			const { password } = await this._getPasswordIfOwner(password_id,
 				decryptedInstance, res);
 			if (!password) return;

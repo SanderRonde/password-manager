@@ -90,8 +90,12 @@ export class WebserverRouter {
 			}
 			return record;
 		}
-
+	
 	async getInstance(id: StringifiedObjectId<EncryptedInstance>) {
+		if (!mongo.ObjectId.isValid(id)) {
+			return null;
+		}
+
 		const objectId = new mongo.ObjectId(id);
 		const instance = await this.parent.database.Manipulation.findOne(COLLECTIONS.INSTANCES, {
 			_id: objectId
