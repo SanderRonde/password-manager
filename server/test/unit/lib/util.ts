@@ -383,7 +383,6 @@ export function genURL(host: string = `www.${genRandomString(20)}.${genRandomStr
 export async function setPasword(toSet: {
 	websites: string[];
 	twofactor_enabled: boolean;
-	u2f_enabled: boolean;
 	username: string;
 	password: string;
 	notes: string[];
@@ -397,7 +396,6 @@ export async function setPasword(toSet: {
 		}
 	});
 	const expected2FAEnabled = toSet.twofactor_enabled;
-	const expectedU2FEnabled = toSet.u2f_enabled;
 	const expectedEncrypted = encrypt({
 		twofactor_secret: null,
 		password: toSet.password,
@@ -414,7 +412,6 @@ export async function setPasword(toSet: {
 		token: token!,
 		websites: expectedWebsites,
 		twofactor_enabled: expected2FAEnabled,
-		u2f_enabled: expectedU2FEnabled,
 		encrypted: expectedEncrypted,
 		count: count,
 		username: expectedUsername

@@ -5,7 +5,6 @@ import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { invertedCardCSS, noCustomCSS } from './password-preview.css';
 import { mapArr } from '../../../../lib/webcomponent-util';
 import { PasswordPreview } from './password-preview';
-import { Key } from '../../../icons/key/key';
 
 function prefixWithWWW(url: string) {
 	if (url.startsWith('www.') || url.startsWith('http')) {
@@ -50,11 +49,6 @@ export const PasswordPreviewHTML = new TemplateFn<PasswordPreview>(function (htm
 					}))}
 				</div>
 				<div id="pointer">
-					${props.u2f_enabled ? html`<div id="u2fEnabled"
-							title="U2F is enabled for this password"
-						>
-							${Key}
-						</div>` : html``}
 					${props.twofactor_enabled ? 
 						html`<div id="twofactorEnabled"
 							title="Twofactor authentication is enabled for this password"

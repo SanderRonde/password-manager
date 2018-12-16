@@ -713,10 +713,6 @@ export declare namespace APIRoutes {
 			 */
 			username: string;
 			/**
-			 * Whether U2F should be enabled for this password
-			 */
-			u2f_enabled: boolean;
-			/**
 			 * Whether 2FA should be enabled for this password
 			 */
 			twofactor_enabled: boolean;
@@ -808,10 +804,6 @@ export declare namespace APIRoutes {
 			 */
 			username: string;
 			/**
-			 * Whether U2F should be enabled for this password
-			 */
-			u2f_enabled: boolean;
-			/**
 			 * Whether 2FA should be enabled for this password
 			 */
 			twofactor_enabled: boolean;
@@ -849,10 +841,6 @@ export declare namespace APIRoutes {
 			 * The response to the U2F request
 			 */
 			response: U2FSignResponse;
-			/**
-			 * A U2F token
-			 */
-			u2f_token: U2FToken;
 		}): JSONResponse<{}>;
 
 		/**
@@ -913,10 +901,6 @@ export declare namespace APIRoutes {
 			 * The response to the U2F request
 			 */
 			response: U2FSignResponse;
-			/**
-			 * A U2F token
-			 */
-			u2f_token: U2FToken;
 		}): JSONResponse<{
 			/**
 			 * The password data. Encrypted with instance public key and user password
@@ -1008,41 +992,6 @@ export declare namespace APIRoutes {
 				 * Whether 2FA is enabled for this password
 				 */
 				twofactor_enabled: boolean;
-				/**
-				 * Whether U2F is enabled for this password
-				 */
-				u2f_enabled: boolean;
-				/**
-				 * The requests, one of which has to be solved
-				 */
-				requests: {
-					/**
-					 * The main request
-					 */
-					main: {
-						/**
-						 * The request that has to be solved
-						 */
-						request: U2FRequest;
-						/**
-						 * A token to identify the request
-						 */
-						u2f_token: U2FToken;
-					}
-					/**
-					 * A backup request
-					 */
-					backup: {
-						/**
-						 * The request that has to be solved
-						 */
-						request: U2FRequest;
-						/**
-						 * A token to identify the request
-						 */
-						u2f_token: U2FToken;
-					}
-				}|null;
 			}>, InstancePublicKey>;
 		}>;
 
@@ -1101,10 +1050,6 @@ export declare namespace APIRoutes {
 				 * Whether 2Fa is enabled for this password
 				 */
 				twofactor_enabled: boolean;
-				/**
-				 * Whether U2F is enabled for this password
-				 */
-				u2f_enabled: boolean;
 			}[]>, InstancePublicKey>;
 		}>;
 
@@ -1163,10 +1108,6 @@ export declare namespace APIRoutes {
 				 * Whether 2Fa is enabled for this password
 				 */
 				twofactor_enabled: boolean;
-				/**
-				 * Whether U2F is enabled for this password
-				 */
-				u2f_enabled: boolean;
 			}[]>, InstancePublicKey>;
 		}>;
 	}

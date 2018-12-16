@@ -260,7 +260,6 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 			password: this.$.passwordPassword.value,
 			notes: this.$.noteInput.value.split('\n'),
 			twofactor_enabled: this.$.passwordSettings2faCheckbox.checked,
-			u2f_enabled: this.$.passwordSettingsu2fCheckbox.checked,
 			websites: this._getWebsites(),
 			twofactor_secret: this.$.twofactorToken.value
 		};
@@ -305,7 +304,6 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 			notes: !PasswordForm._areSame(newPassword.notes.join('\n'),
 				passwordDetailDataStore[passwordDetailDataSymbol]!.notes.join('\n')),
 			twofactor_enabled: this.props.selectedDisplayed!.twofactor_enabled !== newPassword.twofactor_enabled,
-			u2f_enabled: this.props.selectedDisplayed!.u2f_enabled !== newPassword.u2f_enabled,
 			websites: websitesChanged
 		};
 	}
@@ -315,7 +313,6 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 			changed.password ||
 			changed.notes ||
 			changed.twofactor_enabled ||
-			changed.u2f_enabled ||
 			changed.websites;
 	}
 

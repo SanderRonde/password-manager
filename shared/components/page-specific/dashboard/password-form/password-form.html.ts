@@ -290,25 +290,6 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 						}"></more-info>
 				</material-checkbox>
 			</div>
-			<div id="passwordSettingsu2f">
-				<material-checkbox checked="${props.selectedDisplayed &&
-						props.selectedDisplayed.u2f_enabled}"
-						disabled="${!(props.parent &&
-							props.parent.u2fSupported())}"
-						id="passwordSettingsu2fCheckbox">
-					Enable U2F
-					<more-info info="${'U2F requires you to' +
-						' connect a trusted device (usually a USB key)' + 
-						' to your computer. Since there is only one' +
-						' key out there that works for you and it\'s' + 
-						' in your possession, no-one else can read your' +
-						' passwords.' +
-						' To use U2F, it needs to be set up for your' +
-						' account on the settings page and you need to' +
-						' register an instance, not the web dashboard.'
-					}"></more-info>
-				</material-checkbox>
-			</div>
 		</div>
 	</div>
 	<div id="passwordButtons">

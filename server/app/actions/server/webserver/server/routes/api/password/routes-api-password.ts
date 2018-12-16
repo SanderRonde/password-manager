@@ -1,6 +1,6 @@
 import { StringifiedObjectId, EncryptedInstance, MasterPassword, EncryptedPassword, DecryptedInstance, MongoRecord, EncryptedAsset, EncryptedAccount } from "../../../../../../../../../shared/types/db-types";
 import { Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, encryptWithPublicKey, MasterPasswordVerificationPadding, genRSAKeyPair, encrypt, hash, pad } from "../../../../../../../lib/crypto";
-import { UnstringifyObjectIDs, APIToken, U2FToken, EncryptionAlgorithm } from "../../../../../../../../../shared/types/crypto";
+import { UnstringifyObjectIDs, APIToken, EncryptionAlgorithm } from "../../../../../../../../../shared/types/crypto";
 import { SERVER_ROOT, MAX_FILE_BYTES, ENCRYPTION_ALGORITHM } from "../../../../../../../lib/constants";
 import { filterUndefined } from "../../../../../../../database/libs/db-manipulation";
 import { genTimeBasedString, genRandomString } from "../../../../../../../lib/util";
@@ -13,7 +13,6 @@ import * as mongo from 'mongodb'
 import * as icojs from 'icojs';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as u2f from 'u2f';
 import * as url from 'url'
 
 export class RoutesApiPassword {
@@ -203,7 +202,6 @@ export class RoutesApiPassword {
 			}[]
 			username: string;
 			twofactor_enabled: boolean;
-			u2f_enabled: boolean;
 			encrypted: EncodedString<{
 				data: Encrypted<EncodedString<{
 					twofactor_secret: string|null,
@@ -216,11 +214,11 @@ export class RoutesApiPassword {
 			unencrypted: ['instance_id'], 
 			encrypted: [
 				'token', 'count', 'websites', 'encrypted', 
-				'twofactor_enabled', 'username', 'u2f_enabled'
+				'twofactor_enabled', 'username'
 			]
 		}, {}, async (toCheck, { 
 			count, instance_id, token, websites, 
-			encrypted, twofactor_enabled, username, u2f_enabled
+			encrypted, twofactor_enabled, username
 		}) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
@@ -244,9 +242,6 @@ export class RoutesApiPassword {
 			}, {
 				val: 'username',
 				type: 'string'
-			}, {
-				val: 'u2f_enabled',
-				type: 'boolean'
 			}])) return;
 
 			if (!this.server.Router.verifyLoginToken(token, count, instance_id, res)) return;
@@ -303,13 +298,9 @@ export class RoutesApiPassword {
 				}
 			}[];
 
-			//Check if U2F is enabled for the instance
-			const u2fEnabledOnInstance = decryptedInstance.u2f !== null;
-
 			//All don't exist
 			const record: EncryptedPassword = {
 				user_id: account._id,
-				u2f_enabled: this.server.database.Crypto.dbEncryptWithSalt(u2fEnabledOnInstance && u2f_enabled),
 				twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled),
 				websites: filteredWebsites.map(({ host, exact, favicon }) => {
 					return {
@@ -362,7 +353,6 @@ export class RoutesApiPassword {
 			}[];
 			username: string;
 			twofactor_enabled: boolean;
-			u2f_enabled: boolean;
 			twofactor_token: string;
 			encrypted: EncodedString<{
 				data: Encrypted<EncodedString<{
@@ -372,16 +362,13 @@ export class RoutesApiPassword {
 				}>, Hashed<Padded<MasterPassword, MasterPasswordDecryptionpadding>>>;
 				algorithm: EncryptionAlgorithm;
 			}>;
-			response: u2f.U2FSignResponse;
-			u2f_token: U2FToken;
 		}>({
 			unencrypted: ['instance_id'], 
 			encrypted: ['token', 'count', 'password_id']
 		}, {
 			encrypted: [
 				'encrypted', 'twofactor_enabled', 'addedWebsites',
-				'twofactor_token', 'username', 'u2f_enabled',
-				'response', 'u2f_token', 'removedWebsites'
+				'twofactor_token', 'username', 'removedWebsites'
 			]
 		}, async (toCheck, { 
 			token, 
@@ -393,10 +380,7 @@ export class RoutesApiPassword {
 			addedWebsites,
 			removedWebsites,
 			count,
-			username,
-			u2f_enabled,
-			response,
-			u2f_token
+			username
 		}) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
@@ -429,12 +413,6 @@ export class RoutesApiPassword {
 				type: 'number'
 			}, {
 				val: 'username',
-				type: 'string'
-			}, {
-				val: 'u2f_enabled',
-				type: 'boolean'
-			}, {
-				val: 'u2f_token',
 				type: 'string'
 			}])) return;
 
@@ -472,39 +450,6 @@ export class RoutesApiPassword {
 				password, res)) return;
 
 			const decryptedPasword = this.server.database.Crypto.dbDecryptPasswordRecord(password);
-			if (decryptedPasword.u2f_enabled) {
-				if (decryptedInstance.u2f === null) {
-					res.status(200);
-					res.json({
-						success: false,
-						ERR: API_ERRS.INVALID_CREDENTIALS,
-						error: 'u2f not set up for this instance'
-					});
-					return;
-				}
-
-				if (!response || !u2f_token) {
-					this._respondInvalidCredentials(res);
-					return;
-				}
-
-				const verifiedToken = this.server.Auth.verifyU2FToken(u2f_token,
-					instance_id);
-				if (!verifiedToken.isValid || verifiedToken.type !== 'verify') {
-					this._respondInvalidCredentials(res);
-					return;
-				}
-
-				const registration = decryptedInstance.u2f;
-
-				if (!u2f.checkSignature(verifiedToken.request!, response as u2f.U2FSignResponse, 
-						registration.main.publicKey).successful && 
-					!u2f.checkSignature(verifiedToken.request!, response as u2f.U2FSignResponse, 
-						registration.backup.publicKey).successful) {
-							this._respondInvalidCredentials(res);
-							return;
-						}
-			}
 
 			const prevWebsites = decryptedPasword.websites.filter((website) => {
 				for (const removedWebsite of removedWebsites || []) {
@@ -556,14 +501,9 @@ export class RoutesApiPassword {
 			}[];
 			const newWebsites = [...prevWebsites, ...filteredWebsites || []];
 
-			//Check if U2F is enabled for the instance
-			const u2fEnabledOnInstance = decryptedInstance.u2f !== null;
-
 			if (!await this.server.database.Manipulation.findAndUpdateOne(COLLECTIONS.PASSWORDS, {
 				_id: new mongo.ObjectId(password_id)
 			}, filterUndefined({
-				u2f_enabled: typeof u2f_enabled === 'boolean' ? 
-					this.server.database.Crypto.dbEncryptWithSalt(u2fEnabledOnInstance && u2f_enabled) : undefined,
 				twofactor_enabled: typeof twofactor_enabled === 'boolean' ?
 					this.server.database.Crypto.dbEncryptWithSalt(twofactor_enabled) : undefined,
 				websites: Array.isArray(newWebsites) ?
@@ -686,21 +626,17 @@ export class RoutesApiPassword {
 			password_id: StringifiedObjectId<EncryptedPassword>;
 		}, {
 			twofactor_token: string;
-			response: u2f.U2FSignResponse;
-			u2f_token: U2FToken;
 		}>({
 			unencrypted: ['instance_id'],
 			encrypted: ['token', 'count', 'password_id']
 		}, {
-			encrypted: ['twofactor_token', 'response' ,'u2f_token']
+			encrypted: ['twofactor_token']
 		}, async (toCheck, { 
 			count, 
 			token, 
 			instance_id, 
 			password_id, 
-			twofactor_token,
-			response,
-			u2f_token
+			twofactor_token
 		}) => {
 			if (!this.server.Router.typeCheck(toCheck, res, [{
 				val: 'instance_id',
@@ -717,9 +653,6 @@ export class RoutesApiPassword {
 			}, {
 				val: 'count',
 				type: 'number'
-			}, {
-				val: 'u2f_token',
-				type: 'string'
 			}])) return;
 
 			if (this.server.config.development && password_id.startsWith('idabcde')) {
@@ -738,7 +671,6 @@ export class RoutesApiPassword {
 							}],
 							username: 'username',
 							twofactor_enabled: false,
-							u2f_enabled: false,
 							encrypted: encrypt({
 								password: 'websitepassword' + genRandomString(10),
 								notes: new Array(Math.floor(Math.random() * 10)).fill(0).map(() => {
@@ -768,41 +700,8 @@ export class RoutesApiPassword {
 			if (!this._verify2FAIfEnabled(account.twofactor_secret, twofactor_token,
 				password, res)) return;
 
-			const { encrypted, websites, twofactor_enabled, username, u2f_enabled } = this.server.database.Crypto
+			const { encrypted, websites, twofactor_enabled, username } = this.server.database.Crypto
 				.dbDecryptPasswordRecord(password);
-
-			if (u2f_enabled) {
-				if (decryptedInstance.u2f === null) {
-					res.status(200);
-					res.json({
-						success: false,
-						ERR: API_ERRS.INVALID_CREDENTIALS,
-						error: 'u2f not set up for this instance'
-					});
-					return;
-				}
-
-				if (!response || !u2f_token) {
-					this._respondInvalidCredentials(res);
-					return;
-				}
-
-				const verifiedToken = this.server.Auth.verifyU2FToken(u2f_token,
-					instance_id);
-				if (!verifiedToken.isValid || verifiedToken.type !== 'verify') {
-					this._respondInvalidCredentials(res);
-					return;
-				}
-
-				const registration = decryptedInstance.u2f;
-				if (!u2f.checkSignature(verifiedToken.request!, response as u2f.U2FSignResponse, 
-						registration.main.publicKey).successful && 
-					!u2f.checkSignature(verifiedToken.request!, response as u2f.U2FSignResponse, 
-						registration.backup.publicKey).successful) {
-							this._respondInvalidCredentials(res);
-							return;
-						}
-			}
 
 			res.status(200);
 			res.json({
@@ -823,7 +722,6 @@ export class RoutesApiPassword {
 						})),
 						username,
 						twofactor_enabled: twofactor_enabled,
-						u2f_enabled: u2f_enabled,
 						encrypted: encrypted
 					}), decryptedInstance.public_key)
 				}
@@ -866,7 +764,7 @@ export class RoutesApiPassword {
 				decryptedInstance, res);
 			if (!password) return;
 
-			const { websites, twofactor_enabled, username, u2f_enabled } = this.server.database.Crypto
+			const { websites, twofactor_enabled, username } = this.server.database.Crypto
 				.dbDecryptPasswordRecord(password);
 
 			res.status(200);
@@ -888,10 +786,6 @@ export class RoutesApiPassword {
 						})),
 						username,
 						twofactor_enabled: twofactor_enabled,
-						u2f_enabled: u2f_enabled,
-						requests: decryptedInstance.u2f !== null ? 
-							this.server.Router.genRequests(decryptedInstance.u2f,
-								instance_id, decryptedInstance.user_id.toHexString()) : null,
 					}), decryptedInstance.public_key)
 				}
 			});
@@ -1012,8 +906,7 @@ export class RoutesApiPassword {
 										'/' + path.relative(this.server.assetPath, assetPath!)
 								}
 							})),
-							twofactor_enabled: decrypted.twofactor_enabled,
-							u2f_enabled: decrypted.u2f_enabled
+							twofactor_enabled: decrypted.twofactor_enabled
 						}
 					}))), decryptedInstance.public_key)
 				}
@@ -1149,8 +1042,7 @@ export class RoutesApiPassword {
 										'/' + path.relative(this.server.assetPath, assetPath!)
 								}
 							})),
-							twofactor_enabled: decrypted.twofactor_enabled,
-							u2f_enabled: decrypted.u2f_enabled
+							twofactor_enabled: decrypted.twofactor_enabled
 						}
 					}))), decryptedInstance.public_key)
 				}

@@ -20,7 +20,6 @@ export function passwordSetTest() {
 			token: 'string',
 			count: 'number',
 			websites: 'array',
-			u2f_enabled: 'boolean',
 			twofactor_enabled: 'boolean',
 			encrypted: 'string',
 			username: 'string'
@@ -37,7 +36,6 @@ export function passwordSetTest() {
 
 			const expectedWebsites = [genURL(), genURL(), genURL()];
 			const expected2FAEnabled = Math.random() > 0.5;
-			const expectedU2FEnabled = Math.random() > 0.5;
 			const expectedEncrypted = encrypt({
 				twofactor_secret: null,
 				password: genRandomString(25),
@@ -61,7 +59,6 @@ export function passwordSetTest() {
 				}),
 				username: expectedUsername,
 				twofactor_enabled: expected2FAEnabled,
-				u2f_enabled: expectedU2FEnabled,
 				encrypted: expectedEncrypted
 			}));
 
@@ -94,11 +91,6 @@ export function passwordSetTest() {
 				dbpw);
 			assert.notStrictEqual(decryptedTwofactorEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
 			assert.strictEqual(decryptedTwofactorEnabled, expected2FAEnabled, 'twofactor enabled is the same');
-
-			const decryptedU2fEnabled = decryptWithSalt(password.u2f_enabled,
-				dbpw);
-			assert.notStrictEqual(decryptedU2fEnabled, ERRS.INVALID_DECRYPT, 'is not an invalid decrypt');
-			assert.strictEqual(decryptedU2fEnabled, false, 'U2F is disabled since U2F is not set up');
 
 			const actualWebsites = password.websites.map(({ exact, host }) => {
 				return {
@@ -149,7 +141,6 @@ export function passwordSetTest() {
 					count: 0,
 					websites: [],
 					twofactor_enabled: false,
-					u2f_enabled: false,
 					username: 'someusername',
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{
@@ -184,7 +175,6 @@ export function passwordSetTest() {
 					count: count++,
 					websites: [],
 					twofactor_enabled: false,
-					u2f_enabled: false,
 					username: 'someusername',
 					encrypted: 'somestr' as EncodedString<{
 						data: Encrypted<EncodedString<{

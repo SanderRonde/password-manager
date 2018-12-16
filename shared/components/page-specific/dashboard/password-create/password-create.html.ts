@@ -110,7 +110,7 @@ export const PasswordCreateHTML = new TemplateFn<PasswordCreate>(function (html,
 					<div id="passwordSettings2fa">
 						<material-checkbox checked="${props.selectedDisplayed &&
 								props.selectedDisplayed.twofactor_enabled}"
-								@@change="${this.u2fSelectedChange}"
+								@@change="${this.twofactorSelectedChange}"
 								id="passwordSettings2faCheckbox">
 							Enable 2FA
 							<more-info info="${'2FA requires you to enter' +
@@ -121,24 +121,6 @@ export const PasswordCreateHTML = new TemplateFn<PasswordCreate>(function (html,
 								' To use 2FA, it needs to be set up for your' +
 								' account on the settings page.'
 								}"></more-info>
-						</material-checkbox>
-					</div>
-					<div id="passwordSettingsu2f">
-						<material-checkbox checked="${props.selectedDisplayed &&
-								props.selectedDisplayed.u2f_enabled}"
-								@@change="${this.twofactorSelectedChange}"
-								id="passwordSettingsu2fCheckbox">
-							Enable U2F
-							<more-info info="${'U2F requires you to' +
-								' connect a trusted device (usually a USB key)' + 
-								' to your computer. Since there is only one' +
-								' key out there that works for you and it\'s' + 
-								' in your possession, no-one else can read your' +
-								' passwords.' +
-								' To use U2F, it needs to be set up for your' +
-								' account on the settings page and you need to' +
-								' register an instance, not the web dashboard.'
-							}"></more-info>
 						</material-checkbox>
 					</div>
 				</div>

@@ -175,12 +175,6 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 		this.props.parent.props.ref.updateAddedPassword('twofactor_enabled', isChecked);
 	}
 
-	@bindToClass
-	public u2fSelectedChange(isChecked: boolean) {
-		this.props.selectedDisplayed!.u2f_enabled = isChecked;
-		this.props.parent.props.ref.updateAddedPassword('u2f_enabled', isChecked);
-	}
-
 	init() {
 		this.props.selectedDisplayed = {...this.props.parent.props.ref.props.newPassword!};
 		this.props.passwordVisible = false;

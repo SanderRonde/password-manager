@@ -93,23 +93,20 @@ function genPassword(websites: {
     host: string;
     exact: string;
     favicon: string|null;
-}[], twofactorEnabled: boolean, u2fEnabled: boolean) {
+}[], twofactorEnabled: boolean) {
 	return {
 		id: getIncrementedId() as any,
 		websites: websites,
 		username: genRandomString(25),
-		twofactor_enabled: twofactorEnabled,
-		u2f_enabled: u2fEnabled
+		twofactor_enabled: twofactorEnabled
 	}
 }
 
 function genGooglePassword({
 	twofactorEnabled = false,
-	u2fEnabled = false,
 	noFavicon = false
 }: {
 	twofactorEnabled?: boolean;
-	u2fEnabled?: boolean;
 	noFavicon?: boolean;
 } = {}): {
 	id: StringifiedObjectId<UnstringifyObjectIDs<EncryptedPassword>>;
@@ -120,11 +117,10 @@ function genGooglePassword({
 		favicon: string|null;
 	}[];
 	twofactor_enabled: boolean;
-	u2f_enabled: boolean;
 } {
 	return genPassword([{...googleWebsite, ...noFavicon ? {
 		favicon: null
-	} : {}}], twofactorEnabled, u2fEnabled)
+	} : {}}], twofactorEnabled)
 }
 
 function range<T>(from: number, to: number, fn: () => T): T[] {
@@ -140,16 +136,14 @@ function getDevPasswords() {
 		genGooglePassword(),
 		genGooglePassword(),
 		genGooglePassword({
-			u2fEnabled: true,
 			twofactorEnabled: true
 		}),
 		genGooglePassword({
-			u2fEnabled: true
 		}),
 		genGooglePassword({
 			twofactorEnabled: true
 		}),
-		genPassword([{...googleWebsite}, {...redditWebsite}], false, false),
+		genPassword([{...googleWebsite}, {...redditWebsite}], false),
 		genGooglePassword({
 			noFavicon: true
 		}),
@@ -244,7 +238,6 @@ export class MockMongoCollection<R> implements TypedCollection<R> {
 						_id: new mongo.ObjectId() as TypedObjectID<EncryptedPassword>,
 						user_id: userId!,
 						twofactor_enabled: encryptWithSalt(password.twofactor_enabled, dbpw, ENCRYPTION_ALGORITHM),
-						u2f_enabled: encryptWithSalt(password.u2f_enabled, dbpw, ENCRYPTION_ALGORITHM),
 						username: encrypt(password.username, dbpw, ENCRYPTION_ALGORITHM),
 						websites: password.websites.map((website) => {
 							const favicon = website.favicon === null ? null :
@@ -555,8 +548,7 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 			exact: 'www.google.com/login',
 			favicon: null
 		}],
-		twofactor_enabled: false,
-		u2f_enabled: false
+		twofactor_enabled: false
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		username: 'somefacebookuser',
@@ -573,8 +565,7 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 			exact: 'www.whatsapp.com/somelogin',
 			favicon: null
 		}],
-		twofactor_enabled: false,
-		u2f_enabled: false
+		twofactor_enabled: false
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		username: 'other.email@google.com',
@@ -583,8 +574,7 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 			exact: 'www.google.com/login',
 			favicon: null
 		}],
-		twofactor_enabled: true,
-		u2f_enabled: true
+		twofactor_enabled: true
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		username: 'redditusername',
@@ -593,8 +583,7 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 			exact: 'www.reddit.com/login',
 			favicon: null
 		}],
-		twofactor_enabled: false,
-		u2f_enabled: true
+		twofactor_enabled: false
 	}, {
 		id: new mongo.ObjectId().toHexString() as StringifiedObjectId<EncryptedPassword>,
 		username: 'username',
@@ -606,7 +595,6 @@ export function getMockPasswordMeta(): APISuccessfulReturns['/api/password/allme
 						genRandomString(50)}`,
 			favicon: null
 		}],
-		twofactor_enabled: false,
-		u2f_enabled: false
+		twofactor_enabled: false
 	}]), 'dev_public_key');
 }

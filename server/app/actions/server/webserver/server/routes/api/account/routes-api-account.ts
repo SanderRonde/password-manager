@@ -142,8 +142,7 @@ export class RoutesAPIAccount {
 							_id: encryptedPassword._id
 						}, {
 							encrypted: this.server.database.Crypto.dbEncrypt(reEncrypted),
-							twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false),
-							u2f_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
+							twofactor_enabled: this.server.database.Crypto.dbEncryptWithSalt(false)
 						})) {
 							updatedPasswordIndexes.push(index);
 							resolve(true)

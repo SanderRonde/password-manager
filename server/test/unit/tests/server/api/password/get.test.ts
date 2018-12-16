@@ -19,8 +19,7 @@ export function passwordGetTest() {
 			count: 'number',
 			password_id: 'string',
 		}, {
-			twofactor_token: 'string',
-			u2f_token: 'string'
+			twofactor_token: 'string'
 		});
 		it('can get the password if 2FA is disabled', async () => {
 			const config = await genUserAndDb({
@@ -39,7 +38,6 @@ export function passwordGetTest() {
 			const passwordId = await setPasword({
 				websites,
 				twofactor_enabled: false,
-				u2f_enabled: false,
 				username,
 				password,
 				notes,
@@ -104,7 +102,6 @@ export function passwordGetTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: true,
-				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -152,7 +149,6 @@ export function passwordGetTest() {
 			const passwordId = await setPasword({
 				websites,
 				twofactor_enabled: false,
-				u2f_enabled: false,
 				username,
 				password,
 				notes,
@@ -220,7 +216,6 @@ export function passwordGetTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
-				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -258,7 +253,6 @@ export function passwordGetTest() {
 			const passwordId = await setPasword({
 				websites: [],
 				twofactor_enabled: false,
-				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		
@@ -297,7 +291,6 @@ export function passwordGetTest() {
 			await setPasword({
 				websites: [],
 				twofactor_enabled: false,
-				u2f_enabled: false,
 				username: 'username',
 				password: 'password',
 				notes: []		

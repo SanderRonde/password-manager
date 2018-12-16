@@ -90,7 +90,7 @@ export class DatabaseEncryption {
 	}
 
 	public dbDecryptPasswordRecord({ 
-		user_id, encrypted, websites, twofactor_enabled, username, u2f_enabled
+		user_id, encrypted, websites, twofactor_enabled, username
 	}: EncryptedPassword|UnstringifyObjectIDs<EncryptedPassword>): DecryptedPassword {
 		return {
 			user_id: user_id,
@@ -103,8 +103,7 @@ export class DatabaseEncryption {
 				}
 			}),
 			encrypted: this.dbDecrypt(encrypted),
-			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled),
-			u2f_enabled: this.dbDecryptWithSalt(u2f_enabled),
+			twofactor_enabled: this.dbDecryptWithSalt(twofactor_enabled)
 		}
 	}
 

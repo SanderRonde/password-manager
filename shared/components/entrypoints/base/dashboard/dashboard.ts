@@ -163,7 +163,6 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		this.props.newPassword = {
 			id: '0' as any,
 			twofactor_enabled: false,
-			u2f_enabled: false,
 			username: 'username',
 			websites: [{
 				exact: 'http://www.example.com',

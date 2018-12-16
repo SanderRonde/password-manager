@@ -1,7 +1,7 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { APIToken, ERRS, U2FToken, Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, EncryptionAlgorithm } from '../../../../types/crypto';
-import { StringifiedObjectId, EncryptedInstance, ServerPublicKey, PublicKeyDecrypted, MasterPassword } from '../../../../types/db-types';
+import { APIToken, ERRS, Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, EncryptionAlgorithm } from '../../../../types/crypto';
+import { StringifiedObjectId, EncryptedInstance, ServerPublicKey, MasterPassword } from '../../../../types/db-types';
 import { wait, isNewElement, listenWithIdentifier } from '../../../../lib/webcomponent-util';
 import { ConfigurableWebComponent, Props, ComplexType } from '../../../../lib/webcomponents';
 import { passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
@@ -17,15 +17,12 @@ import { ENTRYPOINT, GlobalProperties } from '../../../../types/shared-types';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
 import { PasswordPreview } from '../password-preview/password-preview';
-import { API_ERRS, APISuccessfulReturns } from '../../../../types/api';
 import { SizingBlock } from '../../../util/sizing-block/sizing-block';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { PasswordDetailIDMap } from './password-detail-querymap';
 import { getHost } from '../password-form/password-form.html';
 import { PasswordForm } from '../password-form/password-form';
 import { bindToClass } from '../../../../lib/decorators';
-import { isSupported, sign } from 'u2f-api';
-import { U2FSignResponse } from 'u2f';
 
 const MIN_LOADING_TIME = 100;
 
@@ -41,7 +38,6 @@ export interface PasswordDetailChanges {
 	twofactor_secret: string|null;
 	notes: string[];
 	twofactor_enabled: boolean;
-	u2f_enabled: boolean;
 	websites: {
 		url: string
 	}[];
@@ -85,18 +81,12 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 	});
 
 	private _authState: {
-		u2fToken: null|U2FToken;
-		u2fAuthenticated: null|U2FSignResponse;
 		twofactorAuthentication: null|string;
 	} = {
-		u2fToken: null,
-		u2fAuthenticated: null,
 		twofactorAuthentication: null
 	};
 
 	private _postViewCallback: (() => void)|null = null;
-
-	public abstract u2fSupported(): boolean;
 
 	constructor() {
 		super();
@@ -147,47 +137,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				return TWOFACTOR_CHECK_STATE.FAILED;
 			}
 			return TWOFACTOR_CHECK_STATE.SUCCEEDED;
-		}
-
-	private async _checkU2fChanges(newData: PasswordDetailChanges,
-		changed: ToBools<PasswordDetailChanges>, callback: (success: boolean) => void) {
-			if (!changed.u2f_enabled) {
-				return;
-			}
-
-			if (!this._assertU2f()) {
-				this._showFailedView(() => {
-					this.saveChanges(newData, changed, callback);
-				});
-				return;
-			}
-
-			//Combine these two requests
-			const request = createClientAPIRequest({
-				publicKey: this.props.authData.server_public_key
-			}, '/api/instance/u2f/gen_request', {
-				instance_id: this.props.authData.instance_id
-			}, {
-				token: this.getRoot<GlobalController>().getAPIToken(),
-				count: this.getRoot<GlobalController>().getRequestCount()
-			});
-			const requestProm = request.fn();
-			await this._quickAnimateSelected(requestProm);
-			const response = await requestProm;
-			if (response.success) {
-				this._signU2FRequest(response.data.request).then(() => {
-					this.saveChanges(newData, changed, callback);
-				});
-				return TWOFACTOR_CHECK_STATE.IN_PROGRESS;
-			} else if (response.ERR === API_ERRS.INVALID_CREDENTIALS && 
-				response.error === 'U2F not enabled') {
-					PaperToast.createHidable('U2F is not set up for this account,' + 
-						' applying all non-u2f changes', PaperToast.DURATION.LONG);
-				} else {
-					reportDefaultResponseErrors(response);
-					return TWOFACTOR_CHECK_STATE.FAILED;
-				}
-				return TWOFACTOR_CHECK_STATE.SUCCEEDED;
 		}
 
 	private _ifEnabled<T>(enabled: boolean, value: T): T|undefined;
@@ -294,8 +243,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				this._authState.twofactorAuthentication! : undefined)
 		})});
 		this._authState = {
-			u2fToken: null,
-			u2fAuthenticated: null,
 			twofactorAuthentication: null
 		};
 		const requestProm = request.fn();
@@ -319,7 +266,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 	private async _applyChanges(newData: PasswordDetailChanges) {
 		//Update public stuff
 		this.props.selected.twofactor_enabled = newData.twofactor_enabled;
-		this.props.selected.u2f_enabled = newData.u2f_enabled;
 		this.props.selected.username = newData.username;
 		this.props.selected.websites = await Promise.all(newData.websites.map(async (website) => {
 			const dataURI = await this._readFaviconDataURI(website.url);
@@ -343,12 +289,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 
 	public async saveChanges(newData: PasswordDetailChanges, 
 		changed: ToBools<PasswordDetailChanges>, callback: (success: boolean) => void) {
-			if (!changed.twofactor_enabled && this._authState.u2fAuthenticated === null) {
-				if (await this._checkU2fChanges(newData, changed, callback) !== TWOFACTOR_CHECK_STATE.SUCCEEDED) {
-					//Either it's waiting for the next view or it failed
-					return;
-				}
-			}
 			if (!changed.twofactor_enabled && this._authState.twofactorAuthentication === null) {
 				if (await this._check2faChanges(newData, changed, callback) !== TWOFACTOR_CHECK_STATE.SUCCEEDED) {
 					//Either it's waiting for the next view or it failed
@@ -395,10 +335,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				count: this.getRoot<GlobalController>().getRequestCount(),
 				twofactor_token: this.props.selected.twofactor_enabled ?
 					this._authState.twofactorAuthentication! : undefined,
-				response: this.props.selected.u2f_enabled ?
-					this._authState.u2fAuthenticated! : undefined,
-				u2f_token: (this.props.selected.u2f_enabled ?
-					this._authState.u2fToken! : undefined),
 
 				//Changes
 				removedWebsites: this._ifEnabled(changed.websites, removed.map((website) => {
@@ -410,14 +346,10 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				username: this._ifEnabled(changed.username, newData.username),
 				twofactor_enabled: this._ifEnabled(changed.twofactor_enabled, 
 					newData.twofactor_enabled),
-				u2f_enabled: this._ifEnabled(changed.u2f_enabled,
-					newData.u2f_enabled),
 				encrypted: this._ifEnabled(changed.password || changed.notes,
 					encryptedData)
 			}));
 			this._authState = {
-				u2fToken: null,
-				u2fAuthenticated: null,
 				twofactorAuthentication: null
 			};
 			const requestProm = request.fn();
@@ -426,8 +358,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 
 			//Update object
 			this._applyChanges(newData);
-			if (changed.twofactor_enabled || changed.u2f_enabled ||
-				changed.websites || changed.username) {
+			if (changed.twofactor_enabled || changed.websites || changed.username) {
 					//Update preview
 					for (const preview of this.props.ref.$.infiniteList.rendered as PasswordPreview[]) {
 						if (preview.props.id === this.props.selected.id) {
@@ -443,7 +374,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 							}));
 							preview.props.username = newData.username;
 							preview.props.twofactor_enabled = newData.twofactor_enabled;
-							preview.props.u2f_enabled = newData.u2f_enabled;
 						}
 					}
 					
@@ -505,8 +435,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 
 		if (newValue !== null) {
 			this._authState = {
-				u2fToken: null,
-				u2fAuthenticated: null,
 				twofactorAuthentication: null
 			};
 
@@ -542,7 +470,6 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		await this.animateView('failedView', STATIC_VIEW_HEIGHT, () => {
 			//Reset auth state
 			this._authState.twofactorAuthentication = null;
-			this._authState.u2fAuthenticated = null;
 			this.$.retryButton.setState('regular');
 		});
 	}
@@ -553,125 +480,9 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		this._showFailedView(retryFn);
 	}
 
-	private _activeRequests: PublicKeyDecrypted<
-		APISuccessfulReturns['/api/password/getmeta']['encrypted']>['requests'] = null;
-	private async _signU2FRequest(requests: Exclude<PublicKeyDecrypted<
-		APISuccessfulReturns['/api/password/getmeta']['encrypted']>['requests'], null>) {
-			this._activeRequests = requests;
-			const { signed, request } = await Promise.race([
-				new Promise<{
-					signed: U2FSignResponse;
-					request: U2FToken;
-				}>((resolve) => {
-					sign(requests.main.request).then((signed) => {
-						resolve({
-							signed: signed as any,
-							request: requests.main.u2f_token
-						});
-					});
-				}),
-				new Promise<{
-					signed: U2FSignResponse;
-					request: U2FToken;
-				}>((resolve) => {
-					sign(requests.backup.request).then((signed) => {
-						resolve({
-							signed: signed as any,
-							request: requests.backup.u2f_token
-						});
-					});
-				})
-			]);
-			if (this._activeRequests !== requests) {
-				return;
-			}
-			
-			this._authState.u2fAuthenticated = signed;
-			this._authState.u2fToken = request;
-		}
-
 	private _nextView() {
 		this._postViewCallback && this._postViewCallback();
 		this._postViewCallback = null;
-	}
-	
-	@bindToClass
-	private async _signU2F() {
-		const supported = await isSupported();
-		if (!supported) {
-			PaperToast.createHidable('U2F is not supported in your browser',
-				PaperToast.DURATION.LONG);
-			this._showFailedView(this._signU2F);
-			return;
-		}
-
-		if (!this.props.authData.server_public_key || 
-			!this.props.authData.instance_id) {
-				PaperToast.createHidable(
-					'Failed to set up public and/or private key with server',
-					PaperToast.DURATION.LONG);
-				this._showFailedView(this._signU2F);
-				return;
-			}
-
-		//Do the request
-		const clientPrivateKey = localStorage.getItem('instance_private_key');
-
-		if (!clientPrivateKey && !document.body.classList.contains('dev')) {
-			PaperToast.createHidable(
-				'Failed to set up public and/or private key with server' + 
-					(this.globalProps<GlobalProperties>().get('isWeb') === 'true' ? 
-						', redirecting to login page...' :
-						', please delete this instance and create a new instance to fix it'),
-				PaperToast.DURATION.LONG);
-			if (this.globalProps<GlobalProperties>().get('isWeb') === 'true') {
-				this.getRoot<GlobalController>().changePage(ENTRYPOINT.LOGIN);
-			}
-			this._showFailedView(this._signU2F);
-			return;
-		}
-
-		const usedId = this.props.selected.id;
-		const request = createClientAPIRequest({
-			publicKey: this.props.authData.server_public_key
-		}, '/api/password/getmeta', {
-			instance_id: this.props.authData.instance_id
-		}, {
-			token: this.getRoot<GlobalController>().getAPIToken(),
-			count: this.getRoot<GlobalController>().getRequestCount(),
-			password_id: usedId
-		});;
-		const response = await request.fn();
-
-		if (usedId !== this.props.selected.id) {
-			return;
-		}
-
-		if (response.success) {
-			//Decrypt with public key
-			const publicKeyDecrypted = decryptWithPrivateKey(response.data.encrypted,
-				clientPrivateKey || (document.body.classList.contains('dev') ?
-					(response.data as any).privateKey : clientPrivateKey));
-			if (publicKeyDecrypted === ERRS.INVALID_DECRYPT) {
-				this._failDecryptServerResponse(this._signU2F);
-				return;
-			}
-
-			const parseResult = PasswordDetail._tryParse(publicKeyDecrypted);
-			if (parseResult.success === false) {
-				this._failDecryptServerResponse(this._signU2F);
-				return;
-			}
-			const publicKeyDecryptedParsed = parseResult.data;
-			await this._signU2FRequest(publicKeyDecryptedParsed.requests!);
-			if (usedId !== this.props.selected.id) {
-				return;
-			}
-			this._nextView();
-		} else {
-			reportDefaultResponseErrors(response);
-			this._showFailedView(this._signU2F);
-		}
 	}
 
 	private async _quickAnimateSelected(promise: Promise<any>) {
@@ -704,30 +515,9 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}
 	}
 
-	private _assertU2f() {
-		if (this.u2fSupported()) {
-			return true;
-		}
-		PaperToast.createHidable('U2F is not supported on the dashboard since a ' + 
-			'registration is unique to a computer, please register an instance intead');
-		return false;
-	}
-
 	@bindToClass
 	private async _getPasswordDetails(passwordMeta: MetaPasswords[0] = this.props.selected) {
-		if (passwordMeta.u2f_enabled && this._authState.u2fAuthenticated === null) {
-			if (!this._assertU2f()) {
-				this._showFailedView(() => {
-					this._getPasswordDetails(passwordMeta);
-				});
-				return;
-			}
-			await this.animateView('u2fRequiredView', STATIC_VIEW_HEIGHT, () => {
-				this._signU2F();
-			});
-			this._postViewCallback = this._getPasswordDetails;
-			return;
-		} else if (passwordMeta.twofactor_enabled && this._authState.twofactorAuthentication === null) {
+		if (passwordMeta.twofactor_enabled && this._authState.twofactorAuthentication === null) {
 			await this.animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
 				this.$$('.twofactorDigit').forEach((el: HTMLInputElement) => {
 					el.value = '';
@@ -765,19 +555,13 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			password_id: this.props.selected.id,
 			count: this.getRoot<GlobalController>().getRequestCount(),
 			twofactor_token: this.props.selected.twofactor_enabled ?
-				this._authState.twofactorAuthentication! : undefined,
-			response: this.props.selected.u2f_enabled ?
-				this._authState.u2fAuthenticated! : undefined,
-			u2f_token: (this.props.selected.u2f_enabled ?
-				this._authState.u2fToken! : undefined)
+				this._authState.twofactorAuthentication! : undefined
 		}));
 		const requestProm = request.fn();
 
 		//Reset authstate
 		this._authState = {
 			twofactorAuthentication: null,
-			u2fAuthenticated: null,
-			u2fToken: null
 		};
 		await this._quickAnimateSelected(requestProm);
 		const response = await requestProm;

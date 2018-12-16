@@ -35,21 +35,18 @@ export function passwordAllmetaTest() {
 				username: genRandomString(20),
 				password: genRandomString(20),
 				notes: [genRandomString(10), genRandomString(10), genRandomString(10)],
-				twofactorEnabled: false,
-				u2fEnabled: false
+				twofactorEnabled: false
 			}, {
 				websites: [genURL(), genURL()],
 				username: genRandomString(20),
 				password: genRandomString(20),
 				notes: [genRandomString(10), genRandomString(10), genRandomString(10)],
-				twofactorEnabled: true,
-				u2fEnabled: false
+				twofactorEnabled: true
 			}];
 			const passwordIds = [
 				await setPasword({
 					websites: expectedPasswords[0].websites,
 					twofactor_enabled: expectedPasswords[0].twofactorEnabled,
-					u2f_enabled: expectedPasswords[0].u2fEnabled,
 					username: expectedPasswords[0].username,
 					password: expectedPasswords[0].password,
 					notes: expectedPasswords[0].notes
@@ -57,7 +54,6 @@ export function passwordAllmetaTest() {
 				await setPasword({
 					websites: expectedPasswords[1].websites,
 					twofactor_enabled: expectedPasswords[1].twofactorEnabled,
-					u2f_enabled: expectedPasswords[1].u2fEnabled,
 					username: expectedPasswords[1].username,
 					password: expectedPasswords[1].password,
 					notes: expectedPasswords[1].notes
@@ -105,7 +101,6 @@ export function passwordAllmetaTest() {
 					assert.strictEqual(actualWebsite.exact, expectedWebsite, 'exact urls match');
 				}
 				assert.strictEqual(parsedValue.twofactor_enabled, expected.twofactorEnabled, 'twofactor enabled is the same');
-				assert.strictEqual(parsedValue.u2f_enabled, expected.u2fEnabled, 'u2f enabled is the same');
 			}
 		});
 		it('fails if auth token is wrong', async () => {
