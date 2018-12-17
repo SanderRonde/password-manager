@@ -96,7 +96,7 @@ export class RoutesApiPassword {
 			};
 		}
 
-		let imageBuffer = Buffer.from(image.content);
+		let imageBuffer = Buffer.from(image.content, 'base64');
 
 		const [ fileType, format ] = image.mime.split('/');
 		if (fileType !== 'image') {
