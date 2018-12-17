@@ -1,21 +1,38 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
 import { config, ConfigurableWebComponent, Props, ComplexType, PROP_TYPE, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { GlobalController } from '../../../entrypoints/base/global/global-controller';
+import { MaterialCheckbox } from '../../../util/material-checkbox/material-checkbox';
+import { getDefaultResponseError } from '../../../entrypoints/web/login/login-web';
+import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MetaPasswords } from '../../../entrypoints/base/dashboard/dashboard';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { findElementInPath, wait } from '../../../../lib/webcomponent-util';
+import { PaperButton } from '../../../util/paper-button/paper-button';
+import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { PasswordDetail } from '../password-detail/password-detail';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
+import { IconButton } from '../../../util/icon-button/icon-button';
 import { PasswordCreateIDMap } from './password-create-querymap';
 import { getHost } from '../password-form/password-form.html';
 import { PasswordCreateHTML } from './password-create.html';
 import { PasswordCreateCSS } from './password-create.css';
 import { bindToClass } from '../../../../lib/decorators';
+import { encrypt } from '../../../../lib/browser-crypto';
+import { JSONResponse } from '../../../../types/api';
 
 @config({
 	is: 'password-create',
 	css: PasswordCreateCSS,
-	html: PasswordCreateHTML
+	html: PasswordCreateHTML,
+	dependencies: [
+		MaterialInput,
+		PaperToast,
+		IconButton,
+		PaperButton,
+		MaterialCheckbox,
+		AnimatedButton
+	]
 })
 export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap> {
 	props = Props.define(this, {
@@ -184,8 +201,73 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 		this.props.passwordVisible = !this.props.passwordVisible;
 	}
 
-	public finish() {
-		//TODO: check U2F and 2FA support
+	private _completedCreate() {
+		this.props.parent.props.ref.props.newPassword = null;
+		this.props.parent.props.ref.$.infiniteList.props.disabled = false;
+		this.props.parent.props.ref.fetchMeta();
+	}
+
+	public async finish() {
+		const encryptHash = this.getRoot<GlobalController>().getData('decryptHash');
+		if (!encryptHash) {
+			PaperToast.createHidable('Failed to get encryption hash');
+			return;
+		}
+		const request = createClientAPIRequest({
+			publicKey: this.props.parent.props.authData.server_public_key
+		}, '/api/password/set', {
+			instance_id: this.props.parent.props.authData.instance_id
+		}, {
+			token: this.getRoot<GlobalController>().getAPIToken(),
+			count: this.getRoot<GlobalController>().getRequestCount(),
+			websites: await Promise.all(this._readWebsitesState().map(async (website) => {
+				const favicon = await this.props.parent.fetchFavicon(website.exact);
+				return {
+					url: website.exact,
+					favicon: favicon
+				}
+			})),
+			twofactor_enabled: this.props.selectedDisplayed!.twofactor_enabled,
+			username: this.$.passwordUsername.value,
+			encrypted: encrypt({
+				twofactor_secret: this.$.twofactorToken.value || null,
+				password: this.$.passwordPassword.value,
+				notes: this.$.noteInput.value.split('\n')
+			}, encryptHash.hash, 'aes-256-ctr')
+		});
+
+		let prom = request.fn();
+		let res: JSONResponse<any>;
+		PaperToast.createLoading({
+			loading: 'Creating password',
+			get failure() {
+				return getDefaultResponseError((res || {}) as any);
+			},
+			success: 'Created password'
+		}, new Promise((resolve, reject) => {
+			prom.then((res) => {
+				if (res.success) {
+					resolve();
+				} else {
+					reject();
+				}
+			});
+		}), () => {
+			this.$.saveChanges.setState('loading');
+			prom = request.fn();
+			prom.then((response) => {
+				res = response;
+				if (res.success) {
+					this._completedCreate();
+				}
+			});
+			return prom;
+		});
+		this.$.saveChanges.setState('loading');
+		res = await prom;
+		if (res.success) {
+			this._completedCreate();
+		}
 	}
 
 	public discard() {

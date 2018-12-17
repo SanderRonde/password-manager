@@ -150,7 +150,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		return undefined;
 	}
 
-	private async _readFaviconDataURI(url: string): Promise<{
+	public async readFaviconDataURI(url: string): Promise<{
 		dataURI: string;
 		res: Response;
 	}|null> {
@@ -174,11 +174,11 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		});
 	}
 
-	private async _fetchFavicon(url: string): Promise<{
+	public async fetchFavicon(url: string): Promise<{
 		mime: string;
 		content: string;
 	}|null> {
-		const data = await this._readFaviconDataURI(url);
+		const data = await this.readFaviconDataURI(url);
 		if (data === null) return null;
 		return {
 			mime: data.res.headers.get('Content-Type') || 'image/png',
@@ -256,7 +256,15 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 					return getDefaultResponseError((response || {}) as any);
 				},
 				success: 'Deleted password'
-			}, requestProm, () => {
+			}, new Promise((resolve, reject) => {
+				requestProm.then((res) => {
+					if (res.success) {
+						resolve();
+					} else {
+						reject();
+					}
+				});
+			}), () => {
 				return this.deletePassword(password, false);
 			});
 		}
@@ -278,7 +286,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		this.props.selected.twofactor_enabled = newData.twofactor_enabled;
 		this.props.selected.username = newData.username;
 		this.props.selected.websites = await Promise.all(newData.websites.map(async (website) => {
-			const dataURI = await this._readFaviconDataURI(website.url);
+			const dataURI = await this.readFaviconDataURI(website.url);
 			const favicon = dataURI === null ? null :
 				dataURI.dataURI
 			return {
@@ -310,13 +318,13 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			const addedWithFavicons = await Promise.all(added.map(async (addedWebsite) => {
 				return {
 					url: addedWebsite.url,
-					favicon: await this._fetchFavicon(addedWebsite.url)
+					favicon: await this.fetchFavicon(addedWebsite.url)
 				}
 			}));
 
-			const decryptHash = this.getRoot<GlobalController>().getData('decryptHash');
-			if (!decryptHash) {
-				PaperToast.createHidable('Failed to decrypt server response');
+			const encryptHash = this.getRoot<GlobalController>().getData('decryptHash');
+			if (!encryptHash) {
+				PaperToast.createHidable('Failed to get encryption hash');
 				return;
 			}
 			const encryptedData: EncodedString<{
@@ -331,7 +339,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 					twofactor_secret: newData.twofactor_secret,
 					password: newData.password,
 					notes: newData.notes
-				}, decryptHash.hash, 'aes-256-ctr');
+				}, encryptHash.hash, 'aes-256-ctr');
 
 			//Apply changes
 			const request = createClientAPIRequest({
@@ -373,7 +381,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 					for (const preview of this.props.ref.$.infiniteList.rendered as PasswordPreview[]) {
 						if (preview.props.id === this.props.selected.id) {
 							preview.props.websites = await Promise.all(newData.websites.map(async (website) => {
-								const dataURI = await this._readFaviconDataURI(website.url);
+								const dataURI = await this.readFaviconDataURI(website.url);
 								const favicon = dataURI === null ? null :
 									dataURI.dataURI
 								return {
