@@ -250,7 +250,8 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 				duration: PaperToast.DURATION.SHORT
 			});
 		} else {
-			this.props.parent.deletePassword(this.props.selectedDisplayed);
+			this.props.parent.deletePassword(this.props.selectedDisplayed,
+				true);
 		}
 	}
 
