@@ -253,18 +253,22 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 				}
 			});
 		}), () => {
-			this.$.saveChanges.setState('loading');
-			prom = request.fn();
-			prom.then((response) => {
-				res = response;
-				if (res.success) {
-					this._completedCreate();
-				}
-				this.$.saveChanges.setState(
-					res.success ?
-						'success' : 'failure');
+			return new Promise((resolve, reject) => {
+				this.$.saveChanges.setState('loading');
+				prom = request.fn();
+				prom.then((response) => {
+					res = response;
+					if (res.success) {
+						this._completedCreate();
+						resolve();
+					} else {
+						reject();
+					}
+					this.$.saveChanges.setState(
+						res.success ?
+							'success' : 'failure');
+				});
 			});
-			return prom;
 		});
 		this.$.saveChanges.setState('loading');
 		res = await prom;
