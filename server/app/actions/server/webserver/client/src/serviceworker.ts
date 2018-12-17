@@ -8,6 +8,8 @@ declare const self: ServiceworkerSelf;
 
 const CACHE_NAME = 'password-manager';
 const SERVER_PUBLIC_KEY = `SERVER_PUBLIC_KEY_START SERVER_PUBLIC_KEY_END`;
+const KEY_PREFIX = 'SERVER_PUBLIC_KEY';
+const DEFAULT_PUBLIC_KEY = `${KEY_PREFIX}_START ${KEY_PREFIX}_END`;
 let keys: pgp.key.Key[]|null = null;
 
 type OpenPGPBase = typeof import("openpgp");
@@ -182,6 +184,11 @@ async function getKey() {
 }
 
 async function checkHeaders(handler: Promise<Response>) {
+	if (SERVER_PUBLIC_KEY === DEFAULT_PUBLIC_KEY) {
+		//Don't check them
+		return handler;
+	}
+
 	try {
 		const [ response, keys ] = await Promise.all([
 			handler,
