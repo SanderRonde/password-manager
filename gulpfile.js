@@ -530,9 +530,11 @@ const dashboard = (() => {
 					versions['/serviceworker.js'] = await signContent(sw, keyObj, shouldSign);
 				})()
 			]);
-			await fs.writeFile(path.join(__dirname, 
+			const versionsPath = path.join(__dirname, 
 				'server/app/actions/server/webserver/client/build/',
-				'versions.json'), JSON.stringify(versions, null, '\t'), {
+				'versions.json');
+			await fs.mkdirp(versionsPath);
+			await fs.writeFile(versionsPath, JSON.stringify(versions, null, '\t'), {
 					encoding: 'utf8'
 				});
 		}));
