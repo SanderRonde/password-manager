@@ -211,6 +211,15 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}
 	}
 
+	private _deleteDone(password: MetaPasswords[0]) {
+		this.animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
+		//Remove from list
+		this.props.ref.props.metaPasswords = 
+			this.props.ref.props.metaPasswords.filter((pw) => {
+				return pw.id !== password.id
+			});
+	}
+
 	public async deletePassword(password: MetaPasswords[0]|null, first: boolean) {
 		if (!password) return;
 		if (password.twofactor_enabled && !this._authState.twofactorAuthentication) {
@@ -265,20 +274,24 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 					}
 				});
 			}), () => {
-				return this.deletePassword(password, false);
+				return new Promise((resolve, reject) => {
+					const prom = request.fn();
+					prom.then((res) => {
+						if (res && res.success) {
+							this._deleteDone(password);
+							resolve();
+						} else {
+							reject();
+						}
+					});
+				})
 			});
 		}
 			
 		response = await requestProm;
 		if (response.success) {
-			this.animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
-			//Remove from list
-			this.props.ref.props.metaPasswords = 
-				this.props.ref.props.metaPasswords.filter((pw) => {
-					return pw.id !== password.id
-				});
+			this._deleteDone(password);
 		}
-		return requestProm;
 	}
 
 	private async _applyChanges(newData: PasswordDetailChanges) {
