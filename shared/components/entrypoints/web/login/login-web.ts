@@ -15,30 +15,34 @@ import { ERRS } from '../../../../types/crypto';
 
 type ServerLoginResponse = APIReturns['/api/dashboard/login'];
 
-export function reportDefaultResponseErrors(response: {
+export function getDefaultResponseError(response: {
 	success:false;
 	ERR: API_ERRS;
 	error: string;
 }) {
 	switch (response.ERR) {
 		case API_ERRS.CLIENT_ERR:
-			PaperToast.createHidable('Failed to send request');
-			break;
+			return 'Failed to send request';
 		case API_ERRS.INVALID_CREDENTIALS:
-			PaperToast.createHidable('Invalid credentials');
-			break;
+			return 'Invalid credentials';
 		case API_ERRS.INVALID_PARAM_TYPES:
 		case API_ERRS.MISSING_PARAMS:
 		case API_ERRS.NO_REQUEST_BODY:
-			PaperToast.createHidable('Invalid request');
-			break;
+			return 'Invalid request';
 		case API_ERRS.SERVER_ERROR:
-			PaperToast.createHidable('Server error');
-			break;
+			return 'Server error';
 		case API_ERRS.TOO_MANY_REQUESTS:
-			PaperToast.createHidable('Too many requests');
-			break;
+			return 'Too many requests';
 	}
+	return 'unknown error';
+}
+
+export function reportDefaultResponseErrors(response: {
+	success:false;
+	ERR: API_ERRS;
+	error: string;
+}) {
+	PaperToast.createHidable(getDefaultResponseError(response));
 }
 
 @config({
