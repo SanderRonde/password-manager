@@ -220,7 +220,7 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 		loading: string;
 		success: string;
 		failure: string;
-	}, promise: Promise<void>, retryCallback?: () => Promise<any>) {
+	}, promise: Promise<any>, retryCallback?: () => Promise<any>) {
 		const toast = this.create({
 			content: <string><any>(html`${texts.loading}<loading-spinner class="inlineIcon" dimensions="30"></loading-spinner>`),
 			duration: Infinity,
