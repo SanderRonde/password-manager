@@ -172,6 +172,7 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 		};
 		this.$.infiniteList.props.disabled = true;
 		await this.$.passwordFocus.animateView('loadingView', STATIC_VIEW_HEIGHT);
+		console.log('adding pw');
 		this.$.passwordFocus.props.selected = this.props.newPassword;
 		this.$.passwordFocus.animateView('newPasswordView', STATIC_VIEW_HEIGHT + 20);
 	}
