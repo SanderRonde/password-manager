@@ -2,14 +2,16 @@
 import { createCancellableTimeout, awaitMounted } from '../../../lib/webcomponents/template-util';
 import { ConfigurableWebComponent, config, Props, PROP_TYPE } from '../../../lib/webcomponents';
 import { isNewElement, wait } from '../../../lib/webcomponent-util';
+import { CheckmarkSize } from '../../icons/checkmark/checkmark';
 import { PaperButton } from '../paper-button/paper-button';
 import { PaperToastIDMap } from './paper-toast-querymap';
 import { rippleEffect } from '../../../mixins/ripple';
 import { PaperToastHTML } from './paper-toast.html';
 import { PaperToastCSS } from './paper-toast.css';
+import { html } from 'lit-html';
 
 interface ToastButton {
-	content: string;
+	content?: string;
 	listener: (e: MouseEvent, toast: PaperToast) => void;
 }
 
@@ -102,10 +104,10 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 	}) {
 		const el = document.createElement(TOAST_NAME) as PaperToast;
 		el.props.content = content;
-		if (buttons[0]) {
+		if (buttons[0] && buttons[0].content) {
 			el.props.button1 = buttons[0].content;
 		}
-		if (buttons[1]) {
+		if (buttons[1] && buttons[1].content) {
 			el.props.button1 = buttons[1].content;
 		}
 		el.listen('buttonClick', (index, e) => {
@@ -182,6 +184,50 @@ export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
 				duration: maxDuration
 			}).listen('hide', () => resolve(defaultAction));
 		});
+	}
+
+	private static _attachLoadingListeners(texts: {
+		loading: string;
+		success: string;
+		failure: string;
+	}, toast: PaperToast, promise: Promise<any>, first: boolean, retryCallback?: () => Promise<any>) {
+		if (!first) {
+			toast.props.content = <string><any>(html`${texts.loading}<loading-spinner class="inlineIcon" dimensions="30"></loading-spinner>`);
+		}
+
+		promise.then(async () => {
+			toast.props.content = <string><any>(html`${texts.success}<span class="inlineIcon checkmark">${CheckmarkSize(30)}</span>`);
+			await wait(2500);
+		}).catch(async () => {
+			toast.props.content = <string><any>(html`${texts.failure}`);
+			if (retryCallback) {
+				toast.props.button1 = 'RETRY';
+				toast.listen('buttonClick', (index) => {
+					if (index === 0) {
+						toast.props.button1 = null as any;
+						this._attachLoadingListeners(texts, toast, retryCallback(),
+							false, retryCallback);
+					}
+				}, true);
+				await wait(10000);
+			} else {
+				await wait(5000);
+			}
+		});
+	}
+	
+	static createLoading(texts: {
+		loading: string;
+		success: string;
+		failure: string;
+	}, promise: Promise<void>, retryCallback?: () => Promise<any>) {
+		const toast = this.create({
+			content: <string><any>(html`${texts.loading}<loading-spinner class="inlineIcon" dimensions="30"></loading-spinner>`),
+			duration: Infinity,
+			buttons: [{listener: () => {}}]
+		});
+		this._attachLoadingListeners(texts, toast, promise, true, retryCallback);
+		return toast;
 	}
 
 	static create(config: {

@@ -53,5 +53,23 @@ export const PaperToastCSS = new TemplateFn<PaperToast, ProjectTheme>((html, _pr
 			margin-bottom: -10px;
 			padding-left: 13px;
 		}
+
+		#toastText {
+			flex-grow: 100;
+		}
+
+		.inlineIcon {
+			position: absolute;
+			margin-top: -7.5px;
+			right: 15px;
+		}
+
+		.checkmark {
+			fill: ${theme.success};
+		}
+
+		loading-spinner {
+			float: right;
+		}
 	</style>`
 }, CHANGE_TYPE.THEME);
