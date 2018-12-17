@@ -2,12 +2,12 @@
 
 import { APIToken, ERRS, Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, EncryptionAlgorithm } from '../../../../types/crypto';
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey, MasterPassword } from '../../../../types/db-types';
+import { reportDefaultResponseErrors, getDefaultResponseError } from '../../../entrypoints/web/login/login-web';
 import { wait, isNewElement, listenWithIdentifier } from '../../../../lib/webcomponent-util';
 import { ConfigurableWebComponent, Props, ComplexType } from '../../../../lib/webcomponents';
 import { passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
 import { decryptWithPrivateKey, decrypt, encrypt } from '../../../../lib/browser-crypto';
 import { MetaPasswords, Dashboard } from '../../../entrypoints/base/dashboard/dashboard';
-import { reportDefaultResponseErrors } from '../../../entrypoints/web/login/login-web';
 import { GlobalController } from '../../../entrypoints/base/global/global-controller';
 import { createClientAPIRequest, filterUndefined } from '../../../../lib/apirequests';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
@@ -23,6 +23,7 @@ import { PasswordDetailIDMap } from './password-detail-querymap';
 import { getHost } from '../password-form/password-form.html';
 import { PasswordForm } from '../password-form/password-form';
 import { bindToClass } from '../../../../lib/decorators';
+import { JSONResponse } from '../../../../types/api';
 
 const MIN_LOADING_TIME = 100;
 
@@ -210,7 +211,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 		}
 	}
 
-	public async deletePassword(password: MetaPasswords[0]|null) {
+	public async deletePassword(password: MetaPasswords[0]|null, first: boolean) {
 		if (!password) return;
 		if (password.twofactor_enabled && !this._authState.twofactorAuthentication) {
 			await this.animateView('twofactorRequiredView', STATIC_VIEW_HEIGHT, () => {
@@ -219,7 +220,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				});
 			});
 			this._postViewCallback = () => {
-				this.deletePassword(password);
+				this.deletePassword(password, true);
 			};
 			const firstDigit = this.$('#digit0') as HTMLInputElement;
 			firstDigit && firstDigit.focus();
@@ -246,8 +247,21 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 			twofactorAuthentication: null
 		};
 		const requestProm = request.fn();
-		this.animateView('loadingView', STATIC_VIEW_HEIGHT);
-		const response = await requestProm;
+		
+		let response: JSONResponse<{}>;
+		if (first) {
+			PaperToast.createLoading({
+				loading: 'Removing password',
+				get failure() {
+					return getDefaultResponseError((response || {}) as any);
+				},
+				success: 'Deleted password'
+			}, requestProm, () => {
+				return this.deletePassword(password, false);
+			});
+		}
+			
+		response = await requestProm;
 		if (response.success) {
 			this.animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
 			//Remove from list
@@ -255,12 +269,8 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 				this.props.ref.props.metaPasswords.filter((pw) => {
 					return pw.id !== password.id
 				});
-		} else {
-			reportDefaultResponseErrors(response);
-			this._showFailedView(() => {
-				this.deletePassword(password);
-			});
 		}
+		return requestProm;
 	}
 
 	private async _applyChanges(newData: PasswordDetailChanges) {
