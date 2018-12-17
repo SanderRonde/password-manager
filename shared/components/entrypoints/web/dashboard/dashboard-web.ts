@@ -1,7 +1,7 @@
 import { ERRS, Hashed, Padded, MasterPasswordDecryptionpadding } from '../../../../types/crypto';
 import { GlobalControllerData, GlobalController } from '../../base/global/global-controller';
 import { decryptWithPrivateKey, hash, pad } from '../../../../lib/browser-crypto';
-import { Dashboard, DashboarDependencies } from '../../base/dashboard/dashboard';
+import { Dashboard, DashboardDependencies } from '../../base/dashboard/dashboard';
 import { ENTRYPOINT, GlobalProperties } from '../../../../types/shared-types';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { DashboardHTML } from '../../base/dashboard/dashboard.html';
@@ -15,7 +15,7 @@ import { Remove } from '../../../../types/serviceworker';
 	is: 'dashboard-page',
 	css: DashboardCSS,
 	html: DashboardHTML,
-	dependencies: [...DashboarDependencies, PaperToast]
+	dependencies: [...DashboardDependencies, PaperToast]
 })
 export class DashboardWeb extends Dashboard { 
 	private _data!: Remove<GlobalControllerData['loginData'], 'password' & {

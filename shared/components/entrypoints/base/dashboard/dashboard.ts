@@ -17,7 +17,7 @@ import { MDCard } from '../../../util/md-card/md-card';
 import * as devPasswords from './dev-passwords';
 
 export type MetaPasswords = PublicKeyDecrypted<APISuccessfulReturns['/api/password/allmeta']['encrypted']>;
-export const DashboarDependencies: (typeof WebComponentBase)[] = [
+export const DashboardDependencies: (typeof WebComponentBase)[] = [
 	MaterialInput,
 	InfiniteList,
 	ThemeSelector,
