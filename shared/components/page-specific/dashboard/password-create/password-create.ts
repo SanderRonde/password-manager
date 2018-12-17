@@ -260,11 +260,17 @@ export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap
 				if (res.success) {
 					this._completedCreate();
 				}
+				this.$.saveChanges.setState(
+					res.success ?
+						'success' : 'failure');
 			});
 			return prom;
 		});
 		this.$.saveChanges.setState('loading');
 		res = await prom;
+		this.$.saveChanges.setState(
+			res.success ?
+				'success' : 'failure');
 		if (res.success) {
 			this._completedCreate();
 		}
