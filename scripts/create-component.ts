@@ -40,10 +40,9 @@ export class ${capitalize(dashesToUppercase(name))} extends ConfigurableWebCompo
 const htmlTemplate = 
 (name: string) => `import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { ${capitalize(dashesToUppercase(name))} } from './${name}';
-import { html } from 'lit-html';
 
 export const ${capitalize(dashesToUppercase(name))}HTML = new TemplateFn<${
-	capitalize(dashesToUppercase(name))}>((_props) => {
+	capitalize(dashesToUppercase(name))}>((html) => {
 	return html\`
 		<div></div>
 	\`
@@ -53,10 +52,9 @@ export const ${capitalize(dashesToUppercase(name))}HTML = new TemplateFn<${
 const cssTemplate = 
 (name: string) => `import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { ${capitalize(dashesToUppercase(name))} } from './${name}';
-import { html } from 'lit-html';
 
 export const ${capitalize(dashesToUppercase(name))}CSS = new TemplateFn<${
-	capitalize(dashesToUppercase(name))}>((_props) => {
+	capitalize(dashesToUppercase(name))}>((html) => {
 		return html\`<style>
 			
 		</style>\`
