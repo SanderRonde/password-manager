@@ -397,6 +397,11 @@ const dashboard = (() => {
 											'ensureSupport',
 											'register',
 											'sign'
+										],
+										'node_modules/openpgp/dist/openpgp.js': [
+											'key',
+											'cleartext',
+											'verify'
 										]
 									}
 								})
