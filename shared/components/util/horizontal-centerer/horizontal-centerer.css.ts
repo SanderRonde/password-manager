@@ -9,6 +9,10 @@ export const HorizontalCentererCSS = new TemplateFn<HorizontalCenterer>((html) =
 			justify-content: center
 		}
 
+		#container.fullscreen {
+			width: 100vh;
+		}
+
 		#content {
 			display: block;
 		}
