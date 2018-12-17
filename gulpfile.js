@@ -504,7 +504,7 @@ const dashboard = (() => {
 					});
 					const content = await fakeRender(route[page.slice(1)].bind(route))
 
-					versions[page] = signContent(content, keyObj, shouldSign);
+					versions[page] = await signContent(content, keyObj, shouldSign);
 				}),
 				...CACHE_COMPONENTS.map(async (component) => {
 					const filePath = path.join(__dirname, 
@@ -513,14 +513,14 @@ const dashboard = (() => {
 					const content = await fs.readFile(filePath, {
 						encoding: 'utf8'
 					});
-					versions[page] = signContent(content, keyObj, shouldSign);
+					versions[page] = await signContent(content, keyObj, shouldSign);
 				}),
 				(async () => {
 					const sw = await fs.readFile(
 						path.join(BUILD_DIR, `serviceworker.js`), {
 							encoding: 'utf8'
 						});
-					versions['/serviceworker.js'] = signContent(sw, keyObj, shouldSign);
+					versions['/serviceworker.js'] = await signContent(sw, keyObj, shouldSign);
 				})()
 			]);
 			await fs.writeFile(path.join(__dirname, 
