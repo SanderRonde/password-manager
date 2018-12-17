@@ -19,5 +19,8 @@ export interface ServiceworkerSelf extends Window {
 	skipWaiting(): void;
 	clients: {
 		claim(): Promise<any>;
+		matchAll(): Promise<{
+			postMessage(data: any): void;
+		}[]>;
 	}
 }

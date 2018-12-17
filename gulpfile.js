@@ -8,6 +8,7 @@ const watch = require('gulp-watch');
 const uglify = require('uglify-es');
 const babel = require('babel-core');
 const rollup = require('rollup');
+const pgp = require('openpgp');
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const path = require('path');
@@ -102,6 +103,29 @@ function dashesToUppercase(str) {
 		}
 	}
 	return newStr;
+}
+
+/**
+ * Attempt to read a file
+ * 
+ * @param {string} filepath - The path to the file
+ * 
+ * @returns {Promise<{success: boolean;content: string;}>} - The read value and the state
+ */
+async function tryReadFile(filepath) {
+	try {
+		return {
+			success: true,
+			content: await fs.readFile(filepath, {
+				encoding: 'utf8'
+			})
+		}
+	} catch(e) {
+		return {
+			success: false,
+			content: ''
+		}
+	}
 }
 
 /* Shared */
@@ -266,6 +290,22 @@ const dashboard = (() => {
 	gulp.task('dashboard.bundle.serviceworker', genTask('Bundles the serviceworker and minifies it',
 		gulp.series(
 			'dashboard.bundle.serviceworker.bundle',
+			async function sign() {
+				const { content: key, success } = await tryReadFile(path.join(__dirname, 'certs/versions.pub'));
+				if (!succes) {
+					console.log('Failed to find public key in certs/versions.pub, not signing serviceworker');
+					return;
+				}
+				const file = await fs.readFile(
+					path.join(BUILD_DIR, `serviceworker.js`), {
+						encoding: 'utf8'
+					});
+				await fs.writeFile(path.join(BUILD_DIR, `serviceworker.js`), 
+					file.replace(/\SERVER_PUBLIC_KEY_START.*SERVER_PUBLIC_KEY_END/,
+						`${key}`), {
+						encoding: 'utf8'
+					});
+			},
 			async function minifyServiceWorker() {
 				const file = await fs.readFile(
 					path.join(BUILD_DIR, `serviceworker.js`), {
@@ -424,31 +464,68 @@ const dashboard = (() => {
 		});
 	}
 
+	async function signContent(content, key, shouldSign) {
+		if (shouldSign) {
+			return (await pgp.sign({
+				message: pgp.cleartext.fromText(content),
+				privateKeys: [key],
+				detached: true
+			})).signature;
+		} else {
+			return md5(content);
+		}
+	}
+
 	gulp.task('dashboard.meta.versions', genTask('Generates the hashes for all ' +
-		'cached files', async () => {
+		'cached files and signs them using the certs/versions.priv and certs/versions.pub ' +
+		'keys', async () => {
+			const { content: key, success: shouldSign } = await tryReadFile(path.join(__dirname, 'certs/versions.priv'));
+			if (!shouldSign) {
+				console.log('Failed to find private key in certs/versions.priv, ' + 
+					'not signing versions.json file contents');
+			}
+
+			const pgpKey = await pgp.key.readArmored(key);
+			if (pgpKey.err) {
+				console.log('Error readng PGP key', pgpKey.err);
+				return;
+			}
+			const keyObj = shouldSign ? pgpKey.keys[0] : null;
+			if (shouldSign) {
+				await keyObj.decrypt('');
+			}
+
 			const versions = {};
 			await Promise.all([
-				Promise.all(CACHE_PAGES.map(async (page) => {
+				...CACHE_PAGES.map(async (page) => {
 					const { RoutesDashboard } = require('./server/app/actions/server/webserver/server/routes/dashboard/routes-dashboard');
 					const route = new RoutesDashboard({
 						config: {}
 					});
 					const content = await fakeRender(route[page.slice(1)].bind(route))
-					versions[page] = md5(content);
-				})),
-				Promise.all(CACHE_COMPONENTS.map(async (component) => {
+
+					versions[page] = signContent(content, keyObj, shouldSign);
+				}),
+				...CACHE_COMPONENTS.map(async (component) => {
 					const filePath = path.join(__dirname, 
 						'server/app/actions/server/webserver/client/build/',
 						component.slice(1));
 					const content = await fs.readFile(filePath, {
 						encoding: 'utf8'
 					});
-					versions[component] = md5(content);
-				}))
+					versions[page] = signContent(content, keyObj, shouldSign);
+				}),
+				(async () => {
+					const sw = await fs.readFile(
+						path.join(BUILD_DIR, `serviceworker.js`), {
+							encoding: 'utf8'
+						});
+					versions['/serviceworker.js'] = signContent(sw, keyObj, shouldSign);
+				})()
 			]);
 			await fs.writeFile(path.join(__dirname, 
 				'server/app/actions/server/webserver/client/build/',
-				'versions.json'), JSON.stringify(versions), {
+				'versions.json'), JSON.stringify(versions, null, '\t'), {
 					encoding: 'utf8'
 				});
 		}));

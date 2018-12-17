@@ -7,15 +7,23 @@ import { COUNT } from "../../modules/auth";
 import * as express from 'express'
 import * as path from 'path'
 import { ENTRYPOINT } from "../../../../../../../../shared/types/shared-types";
+import { SERVER_ROOT } from "../../../../../../lib/constants";
+import * as fs from 'fs-extra';
 
 const routesBase = path.join(__dirname, '../../../client/');
 
 export class RoutesDashboard {
 	serveDir: string;
+	versions: {
+		[key: string]: string;
+	}
 
 	constructor(public server: Webserver) { 
 		this.serveDir = path.join(routesBase, server.config.development ?
 			'src/' : 'dest/');
+		this.versions = JSON.parse(fs.readFileSync(path.join(SERVER_ROOT, 'app/actions/server/webserver/client/build/versions.json'), {
+			encoding: 'utf8'
+		}));
 	}
 
 	public checkDashboardAuthentication(req: express.Request, res: ServerResponse) {
@@ -48,6 +56,7 @@ export class RoutesDashboard {
 				comm_token: token,
 				server_public_key: publicKey
 			},
+			hash: this.versions['/login_offline'],
 			rootElement: 'login-page',
 			script: 'entrypoints/login/login-page.js',
 			title: 'Log in to your dashboard',
@@ -61,6 +70,7 @@ export class RoutesDashboard {
 				isWeb: 'true',
 				page: ENTRYPOINT.LOGIN
 			},
+			hash: this.versions['/login_offline'],
 			rootElement: 'login-page',
 			script: 'entrypoints/login/login-page.js',
 			title: 'Log in to your dashboard',
@@ -105,6 +115,7 @@ export class RoutesDashboard {
 					theme: this.server.Router.getTheme(req, res)
 				}
 			},
+			hash: this.versions['/dashboard_offline'],
 			rootElement: 'dashboard-page',
 			script: 'entrypoints/dashboard/dashboard-page.js',
 			title: 'Your Dashboard',
@@ -118,6 +129,7 @@ export class RoutesDashboard {
 				isWeb: 'true',
 				page: ENTRYPOINT.DASHBOARD
 			},
+			hash: this.versions['/dashboard_offline'],
 			rootElement: 'dashboard-page',
 			script: 'entrypoints/dashboard/dashboard-page.js',
 			title: 'Your Dashboard',

@@ -40,11 +40,18 @@ export class Webserver {
 	public Router: WebserverRouter;
 	public Auth: WebserverAuth = new WebserverAuth();
 
+	private _versions: {
+		[key: string]: string;
+	}
+
 	constructor(public database: Database, public config: ServerConfig) {
 		this.app = express();
 		this.debug = !!config.debug;
 		this.Routes = new WebserverRoutes(this);
 		this.Router = new WebserverRouter(this);
+		this._versions = JSON.parse(fs.readFileSync(path.join(SERVER_ROOT, 'app/actions/server/webserver/client/build/versions.json'), {
+			encoding: 'utf8'
+		}));
 	}
 
 	public get assetPath() {
@@ -61,6 +68,13 @@ export class Webserver {
 		this.app.use(bodyParser.json({
 			limit: MAX_FILE_SIZE
 		}));
+		this.app.use((req, res, next) => {
+			if (this._versions[req.url]) {
+				console.log('setting to', this._versions[req.url]);
+				res.header('Signed-Hash', this._versions[req.url]);
+			}
+			next();
+		});
 		this.app.use(compression());
 		this.app.use(serveStatic(STATIC_SERVE_PATH, {
 			maxAge: 1000 * 60 * 60 * 24 * 7 * 4,

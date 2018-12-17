@@ -2,10 +2,33 @@ import { ServiceworkerSelf } from '../../../../../../../shared/types/servicework
 import { theme } from '../../../../../../../shared/components/theming/theme/theme';
 import { VALID_THEMES_T } from '../../../../../../../shared/types/shared-types';
 import { set, get } from 'idb-keyval';
+import * as pgp from 'openpgp';
 
 declare const self: ServiceworkerSelf;
 
 const CACHE_NAME = 'password-manager';
+const SERVER_PUBLIC_KEY = `SERVER_PUBLIC_KEY_START SERVER_PUBLIC_KEY_END`;
+let keys: pgp.key.Key[]|null = null;
+
+type OpenPGPBase = typeof import("openpgp");
+type PGPSignature = any;
+interface PGP extends OpenPGPBase {
+	verify(options: {
+		message: pgp.cleartext.CleartextMessage;
+		signature: PGPSignature;
+		publicKeys: pgp.key.Key[];
+	}): Promise<{
+		signatures: {
+			valid: boolean;
+			keyid: {
+				toHex(): string;
+			}
+		}[];
+	}>;
+	signature: {
+		readArmored(text: string): Promise<PGPSignature>;
+	}
+}
 
 const CACHE_STATIC = [
 	'/versions.json'
@@ -74,9 +97,9 @@ async function save(req: Request, res: Promise<Response>) {
 }
 
 async function fastest(req: Request) {
-	return race(caches.match(req), fetch(req, {
+	return race(caches.match(req), checkHeaders(fetch(req, {
 		credentials: 'include'
-	}));
+	})));
 }
 
 function cacheFirst(req: Request|string): Promise<Response> {
@@ -133,6 +156,68 @@ function renderTheme(prom: Promise<Response|undefined>): Promise<Response> {
 	});
 }
 
+async function notifyCompromised() {
+	//Send a notification to the webpage and a separate one to
+	// the user's desktop to be sure
+	const clients = await (self as ServiceworkerSelf).clients.matchAll();
+	clients.forEach(client => client.postMessage({
+		type: 'compromised'
+	}));
+
+	const reg = (self as any).registration as ServiceWorkerRegistration;
+	reg.showNotification('Connection compromised', {
+		body: 'The connection you have with the server seems to be compromised' + 
+			' this can either be because of a MITM attack or a compromised server' +
+			', please investigate this further and be don\'t enter your password anywhere',
+		renotify: true,
+		actions: undefined
+	})
+}
+
+async function getKey() {
+	if (keys !== null) {
+		return keys;
+	}
+	return (keys = (await pgp.key.readArmored(SERVER_PUBLIC_KEY)).keys);
+}
+
+async function checkHeaders(handler: Promise<Response>) {
+	try {
+		const [ response, keys ] = await Promise.all([
+			handler,
+			getKey()
+		]);
+
+		if (!keys) {
+			notifyCompromised();
+			return undefined;
+		}
+
+		const header = response.headers.get('Signed-Hash');
+		if (!header) {
+			notifyCompromised();
+			return undefined;
+		}
+
+		const content = await response.clone().text();
+		const extendedPGP = pgp as PGP;
+		const verified = (await extendedPGP.verify({
+			message: pgp.cleartext.fromText(content),
+			publicKeys: keys,
+			signature: (await extendedPGP.key.readArmored(header)).keys
+		})).signatures[0].valid;
+
+		if (!verified) {
+			notifyCompromised();
+			return undefined;
+		}
+
+		return response;
+	} catch(e) {
+		return undefined;
+	}
+}
+
 self.addEventListener('fetch', (event) => {
 	const { pathname, hostname } = new URL(event.request.url);
 	if (pathname.startsWith('/api')) {
@@ -152,18 +237,18 @@ self.addEventListener('fetch', (event) => {
 			//Redirect to /login anyway
 			event.respondWith(race(
 				renderTheme(caches.match('/login_offline')),
-				fetch('/login', {
+				checkHeaders(fetch('/login', {
 					credentials: 'include'
-				})
+				}))
 			));
 			break;
 		case '/dashboard':
 			if (navigator.onLine) {
 				event.respondWith(race(
 					renderTheme(caches.match('/dashboard_offline')),
-					fetch('/dashboard', {
+					checkHeaders(fetch('/dashboard', {
 						credentials: 'include'
-					})
+					}))
 				));
 			} else {
 				event.respondWith(cacheFirst('/dashboard_offline'));

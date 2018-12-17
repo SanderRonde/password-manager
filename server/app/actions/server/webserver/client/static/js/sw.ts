@@ -26,6 +26,14 @@ export function registerServiceWorker() {
 			navigator.serviceWorker.controller.postMessage({
 				type: 'checkVersions'
 			});
+
+			navigator.serviceWorker.addEventListener('message', (e) => {
+				if (e.data.type === 'compromised') {
+					alert('The connection you have with the server seems to be compromised' + 
+						' this can either be because of a MITM attack or a compromised server' +
+						', please investigate this further and be don\'t enter your password anywhere');
+				}
+			});
 		}
 	}
 }

@@ -41,9 +41,10 @@ function pushAll(res: ServerResponse, arr: {
 }
 
 export async function render(res: ServerResponse, {
-	title, script, isDevelopment, data, rootElement, isOffline = false
+	title, script, isDevelopment, data, rootElement, hash, isOffline = false
 }: {
 	data: GlobalProperties;
+	hash: string;
 	title: string;
 	script: string;
 	isOffline?: boolean;
@@ -62,6 +63,7 @@ export async function render(res: ServerResponse, {
 		]);
 	}
 
+	res.header('Signed-Hash', hash);
 	res.write(await preAppHTML({
 		title,
 		development: isDevelopment,
