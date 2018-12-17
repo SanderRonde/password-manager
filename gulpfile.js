@@ -291,8 +291,8 @@ const dashboard = (() => {
 		gulp.series(
 			'dashboard.bundle.serviceworker.bundle',
 			async function sign() {
-				const { content: key, success } = await tryReadFile(path.join(__dirname, 'certs/versions.pub'));
-				if (!succes) {
+				const res = await tryReadFile(path.join(__dirname, 'certs/versions.pub'));
+				if (!res.succes) {
 					console.log('Failed to find public key in certs/versions.pub, not signing serviceworker');
 					return;
 				}
@@ -302,7 +302,7 @@ const dashboard = (() => {
 					});
 				await fs.writeFile(path.join(BUILD_DIR, `serviceworker.js`), 
 					file.replace(/\SERVER_PUBLIC_KEY_START.*SERVER_PUBLIC_KEY_END/,
-						`${key}`), {
+						`${res.content}`), {
 						encoding: 'utf8'
 					});
 			},
@@ -484,14 +484,16 @@ const dashboard = (() => {
 	gulp.task('dashboard.meta.versions', genTask('Generates the hashes for all ' +
 		'cached files and signs them using the certs/versions.priv and certs/versions.pub ' +
 		'keys', async () => {
-			const { content: key, success: shouldSign } = await tryReadFile(path.join(__dirname, 'certs/versions.priv'));
+			const res = await tryReadFile(path.join(__dirname, 'certs/versions.priv'));
+			const shouldSign = res.success;
+			const key = res.content;
 			if (!shouldSign) {
 				console.log('Failed to find private key in certs/versions.priv, ' + 
 					'not signing versions.json file contents');
 			}
 
-			const pgpKey = await pgp.key.readArmored(key);
-			if (pgpKey.err) {
+			const pgpKey = shouldSign ? await pgp.key.readArmored(key) : null;
+			if (pgpKey && pgpKey.err) {
 				console.log('Error readng PGP key', pgpKey.err);
 				return;
 			}
@@ -518,7 +520,7 @@ const dashboard = (() => {
 					const content = await fs.readFile(filePath, {
 						encoding: 'utf8'
 					});
-					versions[page] = await signContent(content, keyObj, shouldSign);
+					versions[component] = await signContent(content, keyObj, shouldSign);
 				}),
 				(async () => {
 					const sw = await fs.readFile(
