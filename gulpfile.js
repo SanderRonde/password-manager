@@ -273,7 +273,15 @@ const dashboard = (() => {
 					module: true,
 					browser: true
 				}),
-				rollupCommonJs()
+				rollupCommonJs({
+					namedExports: {
+						'node_modules/openpgp/dist/openpgp.js': [
+							'key',
+							'cleartext',
+							'verify'
+						]
+					}
+				})
 			]
 		});
 
@@ -397,11 +405,6 @@ const dashboard = (() => {
 											'ensureSupport',
 											'register',
 											'sign'
-										],
-										'node_modules/openpgp/dist/openpgp.js': [
-											'key',
-											'cleartext',
-											'verify'
 										]
 									}
 								})
