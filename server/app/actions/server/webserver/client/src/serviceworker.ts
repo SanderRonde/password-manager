@@ -207,11 +207,10 @@ async function checkHeaders(handler: Promise<Response>) {
 		}
 
 		const content = await response.clone().text();
-		const extendedPGP = pgp as PGP;
-		const verified = (await extendedPGP.verify({
+		const verified = (await (pgp as PGP).verify({
 			message: pgp.cleartext.fromText(content),
 			publicKeys: keys,
-			signature: (await extendedPGP.key.readArmored(header)).keys
+			signature: (await (pgp as PGP).key.readArmored(header)).keys
 		})).signatures[0].valid;
 
 		if (!verified) {
