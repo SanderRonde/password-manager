@@ -10,4 +10,4 @@ export const HorizontalCentererHTML = new TemplateFn<HorizontalCenterer>((html, 
 				<slot></slot>
 			</div>
 		</div>`
-}, CHANGE_TYPE.NEVER);
+}, CHANGE_TYPE.PROP);
