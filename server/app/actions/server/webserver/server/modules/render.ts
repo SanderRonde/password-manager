@@ -63,7 +63,7 @@ export async function render(res: ServerResponse, {
 		]);
 	}
 
-	res.set('Signed-Hash', hash);
+	res.header('Signed-Hash', hash);
 	res.write(await preAppHTML({
 		title,
 		development: isDevelopment,
