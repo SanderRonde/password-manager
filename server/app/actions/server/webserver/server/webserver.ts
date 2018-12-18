@@ -70,7 +70,6 @@ export class Webserver {
 		}));
 		this.app.use((req, res, next) => {
 			if (this._versions[req.url]) {
-				console.log('setting to', this._versions[req.url]);
 				res.header('Signed-Hash', this._versions[req.url]);
 			}
 			next();
