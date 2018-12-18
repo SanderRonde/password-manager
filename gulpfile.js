@@ -462,9 +462,8 @@ const dashboard = (() => {
 				write(data) {
 					content += data;
 				},
-				contentType() {
-
-				},
+				contentType() {},
+				header() {},
 				end() {
 					resolve(content);
 				}
