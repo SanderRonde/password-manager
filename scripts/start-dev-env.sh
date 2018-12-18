@@ -13,6 +13,9 @@ $TERM -e "bash -c \"tsc -p server/tsconfig.json -w\""
 $TERM -e "bash -c \"tsc -p shared/tsconfig.json -w\""
 $TERM -e "bash -c \"tsc -p server/app/actions/server/webserver/client/tsconfig.json -w\""
 $TERM -e "bash -c \"gulp watch\""
-mkdir "$script_path/../database/"
-$TERM -e "bash -c \"mongod --dbpath=$script_path/../database/\""
+if [ "$1" == "-d" ]; then
+	echo "doing"
+	mkdir "$script_path/../database/" || echo "dir already exists"
+	$TERM -e "bash -c \"mongod --dbpath=$script_path/../database/\""
+fi
 nodemon
