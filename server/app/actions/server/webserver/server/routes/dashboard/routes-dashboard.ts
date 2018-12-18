@@ -1,13 +1,13 @@
 import { APIReturns, APISuccessfulReturns } from "../../../../../../../../shared/types/api";
+import { ENTRYPOINT } from "../../../../../../../../shared/types/shared-types";
 import { getMockPasswordMeta } from "../../../../../../database/mocks";
+import { SERVER_ROOT } from "../../../../../../lib/constants";
 import { ServerResponse } from "../../modules/ratelimit";
 import { render } from "../../modules/render";
 import { Webserver } from "../../webserver";
 import { COUNT } from "../../modules/auth";
 import * as express from 'express'
 import * as path from 'path'
-import { ENTRYPOINT } from "../../../../../../../../shared/types/shared-types";
-import { SERVER_ROOT } from "../../../../../../lib/constants";
 import * as fs from 'fs-extra';
 
 const routesBase = path.join(__dirname, '../../../client/');
@@ -21,9 +21,13 @@ export class RoutesDashboard {
 	constructor(public server: Webserver) { 
 		this.serveDir = path.join(routesBase, server.config.development ?
 			'src/' : 'dest/');
-		this.versions = JSON.parse(fs.readFileSync(path.join(SERVER_ROOT, 'app/actions/server/webserver/client/build/versions.json'), {
-			encoding: 'utf8'
-		}));
+		try {
+			this.versions = JSON.parse(fs.readFileSync(path.join(SERVER_ROOT, 'app/actions/server/webserver/client/build/versions.json'), {
+				encoding: 'utf8'
+			}));
+		} catch(e) {
+			this.versions = {};
+		}
 	}
 
 	public checkDashboardAuthentication(req: express.Request, res: ServerResponse) {
