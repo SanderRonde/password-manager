@@ -7,6 +7,7 @@ import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { isDefined, getCookie } from '../../../../lib/webcomponent-util'
+import { PaperDialog } from '../../../util/paper-dialog/paper-dialog';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { GlobalController } from '../global/global-controller';
@@ -23,7 +24,8 @@ export const LoginDependencies = [
 	AnimatedButton,
 	ThemeSelector,
 	PaperToast,
-	MDCard
+	MDCard,
+	PaperDialog
 ];
 export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	props = Props.define(this, {

@@ -56,5 +56,11 @@ export const LoginHTML = new TemplateFn<Login>(function (html, props, _) {
 				</vertical-centerer>
 			</horizontal-centerer>
 			<theme-selector id="themeSelector"></theme-selector>
+			<paper-dialog title="some title">
+				<div>
+					Hey here's some content
+					<div>And here's some more</div>
+				</div>
+			</paper-dialog>
 		</div>`;
 }, CHANGE_TYPE.PROP);
