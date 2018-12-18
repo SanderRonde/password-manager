@@ -4,17 +4,19 @@ import { PaperDialog } from './paper-dialog';
 export const PaperDialogHTML = new TemplateFn<PaperDialog>((html, props) => {
 	return html`
 		<div id="centerersContainer">
-			<horizontal-centerer>
+			<horizontal-centerer fullscreen>
 				<vertical-centerer fullscreen>
-					<md-card id="dialogContainer">
-						<div id="dialogContent">
-							${props.title ? html`
-								<div id="dialogTitle">
-									${props.title}
-								</div>` : ''}
-							<slot></slot>
-						</div>
-					</md-card>
+					<dialog id="dialogSemantic">
+						<md-card id="dialogContainer" level="3">
+							<div id="dialogContent">
+								${props.title ? html`
+									<div id="dialogTitle">
+										${props.title}
+									</div>` : ''}
+								<slot></slot>
+							</div>
+						</md-card>
+					</dialog>
 				</vertical-centerer>
 			</horizontal-centerer>
 		</div>

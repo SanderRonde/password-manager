@@ -11,6 +11,25 @@ export const PaperDialogCSS = new TemplateFn<PaperDialog>((_props) => {
 				pointer-events: none;
 			}
 
+			/** Reset default styles */
+			#dialogSemantic {
+				display: block;
+				position: relative;
+				left: auto;
+				right: auto;
+				width: auto;
+				height: auto;
+				color: inherit;
+				margin: auto;
+				border: none;
+				padding: none;
+				background: inherit;
+			}
+
+			#dialogContainer {
+				pointer-events: all;
+			}
+
 			/* TODO: show/hide */
 		</style>`
 	}, CHANGE_TYPE.PROP);
