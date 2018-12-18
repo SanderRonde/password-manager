@@ -40,7 +40,7 @@ function serve(root: string, {
 				continue;
 			}
 
-			res.contentType(filePath);
+			res.contentType(path.basename(filePath));
 			res.status(200);
 			if (raw) {
 				res.sendFile(filePath);
