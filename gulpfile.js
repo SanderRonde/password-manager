@@ -535,7 +535,7 @@ const dashboard = (() => {
 			const versionsPath = path.join(__dirname, 
 				'server/app/actions/server/webserver/client/build/',
 				'versions.json');
-			await fs.mkdirp(versionsPath);
+			await fs.mkdirp(path.dirname(versionsPath));
 			await fs.writeFile(versionsPath, JSON.stringify(versions, null, '\t'), {
 					encoding: 'utf8'
 				});
