@@ -52,7 +52,7 @@ export const LoginHTML = new TemplateFn<Login>(function (html, props, _) {
 								></animated-button>
 							</div>
 						</form>
-					</form>
+					</md-card>
 				</vertical-centerer>
 			</horizontal-centerer>
 			<theme-selector id="themeSelector"></theme-selector>
