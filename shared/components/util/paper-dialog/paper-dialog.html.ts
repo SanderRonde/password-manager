@@ -1,14 +1,16 @@
 import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
-import { PaperDialog } from './paper-dialog';
+import { PaperDialog, DISPLAY_MODE } from './paper-dialog';
 
 export const PaperDialogHTML = new TemplateFn<PaperDialog>((html, props) => {
 	return html`
 		<div id="centerersContainer">
 			<horizontal-centerer fullscreen>
 				<vertical-centerer fullscreen>
-					<dialog id="dialogSemantic">
+					<dialog id="dialogSemantic" class="dialog">
 						<md-card id="dialogContainer" level="3">
-							<div id="dialogContent">
+							<div id="dialogContent" class="${{
+								fullscreen: props.mode === DISPLAY_MODE.FULLSCREEN
+							}}">
 								${props.title ? html`
 									<div id="dialogTitle">
 										${props.title}

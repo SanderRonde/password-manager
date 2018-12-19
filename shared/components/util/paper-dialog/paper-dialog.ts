@@ -5,19 +5,19 @@ import { HorizontalCenterer } from '../horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../vertical-centerer/vertical-centerer';
 import { PaperDialogIDMap } from './paper-dialog-querymap';
 import { PaperDialogHTML } from './paper-dialog.html';
+import { wait } from '../../../lib/webcomponent-util';
 import { PaperDialogCSS } from './paper-dialog.css';
 import { MDCard } from '../md-card/md-card';
 
-const enum DISPLAY_MODE {
-	//Fill the page with just the content
-	FILL_CONTENT,
-	//Cover a big part of the page regardless
-	// of content size
-	COVER
+export const enum DISPLAY_MODE {
+	//Cover only the content
+	COVER,
+	//Fullscreen on the page
+	FULLSCREEN
 }
 
 const BACKDROP_OPACITY = 0.3;
-const ANIMATION_DURATION = 400;
+export const ANIMATION_DURATION = 400;
 
 @config({
 	is: 'paper-dialog',
@@ -34,7 +34,7 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 		reflect: {
 			mode: {
 				type: ComplexType<DISPLAY_MODE>(),
-				value: DISPLAY_MODE.FILL_CONTENT
+				value: DISPLAY_MODE.COVER
 			},
 			title: PROP_TYPE.STRING,
 			visible: {
@@ -44,12 +44,19 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 		}
 	});
 
-	show() {
+	async show() {
 		PaperDialog.showBackdrop();
+		this.$.dialogSemantic.setAttribute('open', 'open');
+		await wait(0);
+		this.$.dialogSemantic.classList.add('animate');
+		wait(ANIMATION_DURATION);
 	}
 
-	hide() {
+	async hide() {
+		this.$.dialogSemantic.classList.remove('animate');
+		await wait(ANIMATION_DURATION);
 		PaperDialog.hideBackdrop();
+		this.$.dialogSemantic.removeAttribute('open');
 	}
 
 	private static _backdrop: HTMLElement|null = null;
@@ -60,7 +67,9 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 		el.style.height = '100vh';
 		el.style.backgroundColor = 'black';
 		el.style.opacity = '0';
-		el.style.zIndex = 5000 + '';
+		el.style.zIndex = '5000';
+		el.style.top = '0';
+		el.style.position = 'fixed';
 
 		el.style.display = 'none';
 		el.style.pointerEvents = 'none';
@@ -83,7 +92,8 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 			}, {
 				opacity: BACKDROP_OPACITY
 			}], {
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION,
+				fill: 'forwards'
 			});
 			this._animation.onfinish = () => {
 				this._animation = null;
@@ -104,7 +114,8 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 			}, {
 				opacity: 0
 			}], {
-				duration: ANIMATION_DURATION
+				duration: ANIMATION_DURATION,
+				fill: 'forwards'
 			});
 			this._animation.onfinish = () => {
 				el.style.display = 'none';
