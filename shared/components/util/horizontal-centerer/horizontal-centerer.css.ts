@@ -10,7 +10,7 @@ export const HorizontalCentererCSS = new TemplateFn<HorizontalCenterer>((html) =
 		}
 
 		#container.fullscreen {
-			width: 100vh;
+			width: 100vw;
 		}
 
 		#content {
