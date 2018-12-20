@@ -157,4 +157,10 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 		}
 		return (this._backdrop = this._createBackdrop());
 	}
+
+	mounted() {
+		if (this.props.open) {
+			this.show();
+		}
+	}
 }
