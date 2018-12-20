@@ -70,6 +70,8 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 		wait(ANIMATION_DURATION);
 	}
 
+	open() { return this.show(); }
+
 	async hide() {
 		this._isOpened = false;
 		this.props.open = false;
@@ -79,6 +81,8 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 		PaperDialog.hideBackdrop();
 		this.$.dialogSemantic.removeAttribute('open');
 	}
+
+	close() { return this.hide(); }
 
 	private static _backdrop: HTMLElement|null = null;
 
