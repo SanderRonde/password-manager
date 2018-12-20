@@ -30,6 +30,7 @@ export const ANIMATION_DURATION = 400;
 	]
 })
 export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
+	private _isOpened: boolean = false;
 	props = Props.define(this, {
 		reflect: {
 			mode: {
@@ -37,14 +38,31 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 				value: DISPLAY_MODE.COVER
 			},
 			title: PROP_TYPE.STRING,
-			visible: {
+			open: {
 				type: PROP_TYPE.BOOL,
 				value: false
 			}
 		}
 	});
 
+	constructor() {
+		super();
+		this.listen('propChange', (argname, value) => {
+			if (argname === 'open') {
+				if (this._isOpened === value) return;
+				if (value) {
+					this.show();
+				} else {
+					this.hide();
+				}
+			}
+		});
+	}
+
 	async show() {
+		this._isOpened = true;
+		this.props.open = true;
+
 		PaperDialog.showBackdrop();
 		this.$.dialogSemantic.setAttribute('open', 'open');
 		await wait(0);
@@ -53,6 +71,9 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 	}
 
 	async hide() {
+		this._isOpened = false;
+		this.props.open = false;
+		
 		this.$.dialogSemantic.classList.remove('animate');
 		await wait(ANIMATION_DURATION);
 		PaperDialog.hideBackdrop();
