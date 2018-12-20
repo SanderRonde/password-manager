@@ -118,6 +118,7 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 				opacity: BACKDROP_OPACITY
 			}], {
 				duration: ANIMATION_DURATION,
+				easing: 'cubic-bezier(0.55, 0.06, 0.68, 0.19)',
 				fill: 'forwards'
 			});
 			this._animation.onfinish = () => {
@@ -140,6 +141,7 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 				opacity: 0
 			}], {
 				duration: ANIMATION_DURATION,
+				easing: 'cubic-bezier(0.55, 0.06, 0.68, 0.19)',
 				fill: 'forwards'
 			});
 			this._animation.onfinish = () => {

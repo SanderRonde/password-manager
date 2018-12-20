@@ -26,7 +26,7 @@ export const PaperDialogCSS = new TemplateFn<PaperDialog>((_props) => {
 				background: inherit;
 
 				transform: scale(0);
-				transition: transform ${ANIMATION_DURATION}ms ease-in;
+				transition: transform ${ANIMATION_DURATION}ms cubic-bezier(0.55, 0.06, 0.68, 0.19);
 			}
 
 			#dialogSemantic[open] {
