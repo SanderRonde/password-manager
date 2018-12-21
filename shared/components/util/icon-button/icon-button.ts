@@ -28,7 +28,7 @@ export class IconButton extends ConfigurableWebComponent<IconButtonIDMap> {
 	constructor() {
 		super();
 
-		this.listen('propChange', (name) => {
+		this.listenProp<this['props'], 'disabled'>('propChange', (name) => {
 			if (name === 'disabled') {
 				this._setButtonDisabledState();
 			}

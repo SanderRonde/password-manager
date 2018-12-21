@@ -2,6 +2,7 @@ import { WebComponentCustomCSSManager } from './custom-css-manager';
 import { removeAllElementListeners } from './listeners';
 import { CHANGE_TYPE, bindToClass } from './base';
 import { EventListenerObj } from './listener';
+import { Props } from './props';
 
 
 type IDMapFn<IDS> = {
@@ -14,16 +15,11 @@ type IDMapFn<IDS> = {
 	(selector: string): HTMLElement|null;
 } & IDS;
 
+type PropChangeEvents = 'beforePropChange'|'propChange';
+
 export abstract class WebComponent<IDS extends {
 	[key: string]: HTMLElement;
-} = {}, E extends EventListenerObj = {}> extends WebComponentCustomCSSManager<E & {
-	beforePropChange: {
-		args: [string, any, any];
-	};
-	propChange: {
-		args: [string, any, any];
-	}
-}> {
+} = {}, E extends EventListenerObj = {}> extends WebComponentCustomCSSManager<E> {
 	/**
 	 * An ID map containing maps between queried IDs and elements,
 	 * 	cleared upon render
@@ -63,7 +59,7 @@ export abstract class WebComponent<IDS extends {
 				}
 				const el = __this.root.getElementById(id);
 				if (el) {
-					__this.__idMap.set(id, el);
+					__this.__idMap.set(id, el as IDS[keyof IDS]);
 				}
 				return el;
 			}
@@ -111,4 +107,22 @@ export abstract class WebComponent<IDS extends {
 	 * Called when the component is mounted to the dom and is ready to be manipulated
 	 */
 	mounted() {}
+
+	public listenProp<P extends Props & {
+		[key: string]: any;
+	}>(event: PropChangeEvents, 
+		listener: (key: keyof P, newValue: P[keyof P], oldValue: P[keyof P]) => void,
+		once?: boolean): void;
+	public listenProp<P extends Props & {
+		[key: string]: any;
+	}, PK extends keyof P>(event: PropChangeEvents, 
+		listener: (key: PK, newValue: P[PK], oldValue: P[PK]) => void,
+		once?: boolean): void;
+	public listenProp<P extends Props & {
+		[key: string]: any;
+	}>(event: PropChangeEvents, 
+		listener: (key: keyof P, newValue: P[keyof P], oldValue: P[keyof P]) => void,
+		once: boolean = false) {
+			this._listen(event, listener, once);
+		}
 }

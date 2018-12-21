@@ -48,7 +48,7 @@ export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
 
 	constructor() {
 		super();
-		this.listen('propChange', (name, _from, to) => {
+		this.listenProp<this['props'], 'editing'>('propChange', (name, _from, to) => {
 			if (name === 'editing') {
 				this._sizeChange();
 

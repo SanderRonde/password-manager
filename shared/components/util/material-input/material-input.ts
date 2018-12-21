@@ -77,7 +77,7 @@ export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, 
 	constructor() {
 		super();
 
-		this.listen('propChange', (key, _prevVal, newValue) => {
+		this.listenProp<this['props'], 'value'>('propChange', (key, _prevVal, newValue) => {
 			if (key === 'value') {
 				this.set(newValue, true);
 			}

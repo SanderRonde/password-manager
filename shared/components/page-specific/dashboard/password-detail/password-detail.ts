@@ -92,7 +92,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDe
 	constructor() {
 		super();
 
-		this.listen('propChange', (name, oldValue, newValue) => {
+		this.listenProp<this['props'], 'selected'>('propChange', (name, oldValue, newValue) => {
 			if (name === 'selected') {
 				if (newValue && newValue.id !== '0') {
 					this._selectedChange(oldValue, newValue);

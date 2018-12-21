@@ -29,7 +29,7 @@ export class ThemeSelector extends ConfigurableWebComponent<ThemeSelectorIDMap> 
 	constructor() {
 		super();
 
-		this.listen('globalPropChange', (key, value) => {
+		this.listenGP<GlobalProperties, 'theme'>('globalPropChange', (key, value) => {
 			if (key === 'theme') {
 				this.props.currentTheme = value;
 			}

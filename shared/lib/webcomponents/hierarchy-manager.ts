@@ -10,11 +10,7 @@ type GlobalPropsFunctions<G extends {
 	set<K extends keyof G, V extends G[K]>(key: Extract<K, string>, value: V): void;
 }
 
-export abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends WebComponentListenable<E & {
-	globalPropChange: {
-		args: [string, string]
-	}
-}> {
+export abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends WebComponentListenable<E> {
 	private __children: Set<WebComponentHierarchyManager<any>> = new Set();
 	private __parent: WebComponentHierarchyManager<any>|null = null;
 	private __isRoot!: boolean;
@@ -34,7 +30,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		for (let i = 0; i < this.attributes.length; i++) {
 			const attr = this.attributes[i];
 			if (attr.name.startsWith('prop_')) {
-				props[attr.name.slice('prop_'.length) as keyof G] = 
+				props[attr.name.slice('prop_'.length)] = 
 					decodeURIComponent(
 						attr.value as string);
 			}
@@ -189,7 +185,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 			},
 			get<K extends keyof G>(key: Extract<K, string>): G[K] {
 				if (!__this.__internals.globalProperties) {
-					return undefined;
+					return undefined as any;
 				}
 				return __this.__internals.globalProperties[key] as any;
 			},
@@ -205,6 +201,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		};
 		return (this.__globalPropsFns = fns);
 	}
+
 	public getRoot<T>(): T {
 		if (this.__isRoot) {
 			return <T><any>this;
@@ -214,5 +211,23 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 
 	public runGlobalFunction<R>(fn: (element: ConfigurableWebComponent<any>) => R): R[] {
 		return this.__propagateThroughTree(fn);
+	}
+
+	public listenGP<GP extends {
+		[key: string]: any;
+	}>(event: 'globalPropChange', 
+		listener: (prop: keyof GP, newValue: GP[typeof prop], oldValue: typeof newValue) => void,
+		once?: boolean): void;
+	public listenGP<GP extends {
+		[key: string]: any;
+	}, K extends keyof GP>(event: 'globalPropChange', 
+		listener: (prop: K, newValue: GP[K], oldValue: GP[K]) => void,
+		once?: boolean): void;
+	public listenGP<GP extends {
+		[key: string]: any;
+	}>(event: 'globalPropChange', 
+		listener: (prop: keyof GP, newValue: GP[typeof prop], oldValue: typeof newValue) => void,
+		once: boolean = false) {
+			this._listen(event, listener, once);
 	}
 }

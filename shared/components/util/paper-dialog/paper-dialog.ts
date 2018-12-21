@@ -47,7 +47,7 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 
 	constructor() {
 		super();
-		this.listen('propChange', (argname, value) => {
+		this.listenProp<this['props'], 'open'>('propChange', (argname, value) => {
 			if (argname === 'open') {
 				if (this._isOpened === value) return;
 				if (value) {

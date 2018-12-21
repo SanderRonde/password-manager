@@ -293,9 +293,9 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 	
 	mounted() {
 		this.props.page = this.globalProps<GlobalProperties>().get('page')! as ENTRYPOINT;
-		this.listen('globalPropChange', (key, val) => {
+		this.listenGP<GlobalProperties, 'page'>('globalPropChange', (key, val) => {
 			if (key === 'page') {
-				this.props.page = val as ENTRYPOINT;
+				this.props.page = val!;
 			}
 		});
 		this._handleInitialState();

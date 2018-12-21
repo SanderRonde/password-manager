@@ -80,7 +80,7 @@ export abstract class Dashboard extends DashboardScrollManager implements Passwo
 			debugger;
 			this.mounted();
 		});
-		this.listen('beforePropChange', (key, prevVal: MetaPasswords, newVal: MetaPasswords) => {
+		this.listenProp<this['props'], 'metaPasswords'>('beforePropChange', (key, prevVal, newVal) => {
 			if (key === 'metaPasswords' && this.props.selected !== -1 &&
 				typeof this.props.selected === 'number') {
 					//Check if the currently selected password is still in the new

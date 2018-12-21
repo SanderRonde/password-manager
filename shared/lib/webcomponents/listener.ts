@@ -27,13 +27,17 @@ export abstract class WebComponentListenable<E extends EventListenerObj> extends
 		}
 	}
 
-	public listen<EV extends keyof E>(event: EV, listener: (...args: E[EV]['args']) => E[EV]['returnType'], once: boolean = false) {
+	protected _listen<EV extends keyof E>(event: EV, listener: (...args: E[EV]['args']) => E[EV]['returnType'], once: boolean = false) {
 		this.__assertKeyExists(event, this.__listenerMap);
 		if (once) {
 			this.__insertOnce(this.__listenerMap[event], listener);
 		} else {
 			this.__listenerMap[event].add(listener);
 		}
+	}
+
+	public listen<EV extends keyof E>(event: EV, listener: (...args: E[EV]['args']) => E[EV]['returnType'], once: boolean = false) {
+		this._listen(event, listener, once);
 	}
 
 	public clearListener<EV extends keyof E>(event: EV, listener?: (...args: E[EV]['args']) => E[EV]['returnType']) {

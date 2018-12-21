@@ -515,7 +515,7 @@ namespace PropsDefiner {
 				const newVal = getterWithVal(el.component, val, strict, mapType);
 				
 				el.component.fire('beforePropChange', casingKey, prevVal, newVal);
-				el.propValues[casingKey] = newVal;
+				el.propValues[casingKey] = newVal as any;
 				el.component.fire('propChange', casingKey, prevVal, newVal);
 
 				if (watch) {
@@ -526,7 +526,7 @@ namespace PropsDefiner {
 					return;
 				}
 			} else {
-				el.propValues[casingKey] = val;
+				el.propValues[casingKey] = val as any;
 			}
 			el.setAttr(key, val);
 		}
@@ -744,7 +744,7 @@ export class Props {
 		renderToDOM(changeType: CHANGE_TYPE): void;
 		getParentRef(ref: string): any;
 		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
-			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+			event: EV|any, ...params: DEFAULT_EVENTS[EV]['args']|any): R[]
 	}, props: {
 		reflect: P;
 		priv: T;
@@ -765,7 +765,7 @@ export class Props {
 		renderToDOM(changeType: CHANGE_TYPE): void;
 		getParentRef(ref: string): any;
 		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
-			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+			event: EV|any, ...params: DEFAULT_EVENTS[EV]['args']|any): R[]
 	}, props: {
 		priv?: T;
 	}): Props & {
@@ -783,7 +783,7 @@ export class Props {
 		renderToDOM(changeType: CHANGE_TYPE): void;
 		getParentRef(ref: string): any;
 		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
-			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+			event: EV|any, ...params: DEFAULT_EVENTS[EV]['args']|any): R[]
 	}, props: {
 		reflect: P;
 	}): Props & {
@@ -802,7 +802,7 @@ export class Props {
 		getParentRef(ref: string): any;
 		isMounted: boolean;
 		fire<EV extends keyof DEFAULT_EVENTS, R extends DEFAULT_EVENTS[EV]['returnType']>(
-			event: EV, ...params: DEFAULT_EVENTS[EV]['args']): R[]
+			event: EV|any, ...params: DEFAULT_EVENTS[EV]['args']|any): R[]
 	}, config: {
 		reflect?: P;
 		priv?: T;
