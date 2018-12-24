@@ -2,35 +2,13 @@ import { ServiceworkerSelf } from '../../../../../../../shared/types/servicework
 import { theme } from '../../../../../../../shared/components/theming/theme/theme';
 import { VALID_THEMES_T } from '../../../../../../../shared/types/shared-types';
 import { set, get } from 'idb-keyval';
-import * as pgp from 'openpgp';
 
 declare const self: ServiceworkerSelf;
 
 const CACHE_NAME = 'password-manager';
-const SERVER_PUBLIC_KEY = `SERVER_PUBLIC_KEY_START SERVER_PUBLIC_KEY_END`;
+const SERVER_PUBLIC_KEY = `SERVER_PUBLIC_KEY_START SERVER_PUBLIC_KEY_END` as EncodedString<JsonWebKey>;
 const KEY_PREFIX = 'SERVER_PUBLIC_KEY';
 const DEFAULT_PUBLIC_KEY = `${KEY_PREFIX}_START ${KEY_PREFIX}_END`;
-let keys: pgp.key.Key[]|null = null;
-
-type OpenPGPBase = typeof import("openpgp");
-type PGPSignature = any;
-interface PGP extends OpenPGPBase {
-	verify(options: {
-		message: pgp.cleartext.CleartextMessage;
-		signature: PGPSignature;
-		publicKeys: pgp.key.Key[];
-	}): Promise<{
-		signatures: {
-			valid: boolean;
-			keyid: {
-				toHex(): string;
-			}
-		}[];
-	}>;
-	signature: {
-		readArmored(text: string): Promise<PGPSignature>;
-	}
-}
 
 const CACHE_STATIC = [
 	'/versions.json'
@@ -165,22 +143,41 @@ async function notifyCompromised() {
 	clients.forEach(client => client.postMessage({
 		type: 'compromised'
 	}));
-
-	const reg = (self as any).registration as ServiceWorkerRegistration;
-	reg.showNotification('Connection compromised', {
-		body: 'The connection you have with the server seems to be compromised' + 
-			' this can either be because of a MITM attack or a compromised server' +
-			', please investigate this further and be don\'t enter your password anywhere',
-		renotify: true,
-		actions: undefined
-	})
 }
 
+let key: CryptoKey|null = null;
 async function getKey() {
-	if (keys !== null) {
-		return keys;
+	if (key) {
+		return key;
 	}
-	return (keys = (await pgp.key.readArmored(SERVER_PUBLIC_KEY)).keys);
+	if (!SERVER_PUBLIC_KEY) {
+		return null;
+	}
+	try {
+		debugger;
+		return (key = await crypto.subtle.importKey('jwk', 
+			JSON.parse(SERVER_PUBLIC_KEY), {
+				name: 'RSASSA-PKCS1-v1_5',
+				hash: 'SHA-256'
+			}, false, ['verify']));
+	} catch(e) {
+		return null;
+	}
+}
+
+function hexToBuffer(hexString: string) {
+	if ( hexString.length % 2 ) hexString = '0'+hexString;
+    const buffer = new Uint8Array(hexString.length/2);
+    for ( let i = 0; i < hexString.length; i += 2 ) {
+        buffer[i>>1] = parseInt( hexString.substr(i,2), 16 );
+    }
+    return buffer;
+}
+
+function stringToBuffer(str: string) {
+    const buffer = new Uint8Array(str.length);
+    for ( let i = 0; i < str.length; i++ ) buffer[i] = str.charCodeAt(i);
+    return buffer;
 }
 
 async function checkHeaders(handler: Promise<Response>) {
@@ -190,28 +187,19 @@ async function checkHeaders(handler: Promise<Response>) {
 	}
 
 	try {
-		const [ response, keys ] = await Promise.all([
-			handler,
-			getKey()
+		const [response, cryptoKey ] = await Promise.all([
+			handler, getKey()
 		]);
 
-		if (!keys) {
-			notifyCompromised();
-			return undefined;
-		}
-
 		const header = response.headers.get('Signed-Hash');
-		if (!header) {
+		if (!header || !cryptoKey) {
 			notifyCompromised();
 			return undefined;
 		}
 
 		const content = await response.clone().text();
-		const verified = (await (pgp as PGP).verify({
-			message: pgp.cleartext.fromText(content),
-			publicKeys: keys,
-			signature: (await (pgp as PGP).key.readArmored(header)).keys
-		})).signatures[0].valid;
+		const verified = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', 
+			cryptoKey, hexToBuffer(header), stringToBuffer(content));
 
 		if (!verified) {
 			notifyCompromised();

@@ -1,5 +1,6 @@
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonJs = require('rollup-plugin-commonjs');
+const WebCrypto = require('node-webcrypto-ossl');
 const requireHacker = require('require-hacker');
 const htmlMinifier = require('html-minifier');
 const htmlTypings = require('html-typings');
@@ -7,8 +8,8 @@ const uglifyCSS = require('uglifycss');
 const watch = require('gulp-watch');
 const uglify = require('uglify-es');
 const babel = require('babel-core');
+const crypto = require('crypto');
 const rollup = require('rollup');
-const pgp = require('openpgp');
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const path = require('path');
@@ -272,15 +273,6 @@ const dashboard = (() => {
 				rollupResolve({
 					module: true,
 					browser: true
-				}),
-				rollupCommonJs({
-					namedExports: {
-						'node_modules/openpgp/dist/openpgp.js': [
-							'key',
-							'cleartext',
-							'verify'
-						]
-					}
 				})
 			]
 		});
@@ -471,13 +463,22 @@ const dashboard = (() => {
 		});
 	}
 
-	async function signContent(content, key, shouldSign) {
+	/**
+	 * Signs given string using the given key (if shouldSign is true)
+	 * 
+	 * @param {string} content - The data to sign
+	 * @param {WebCrypto} webcrypto - The webcrypto object
+	 * @param {NodeWebcryptoOpenSSL.CryptoKey} key - The key to use
+	 * @param {boolean} shouldSign - Whether to sign the data
+	 * 
+	 * @returns {Promise<string>} The signed data
+	 */
+	async function signContent(content, webcrypto, key, shouldSign) {
 		if (shouldSign) {
-			return (await pgp.sign({
-				message: pgp.cleartext.fromText(content),
-				privateKeys: [key],
-				detached: true
-			})).signature;
+			return Buffer.from(await webcrypto.subtle.sign({
+				name: 'RSASSA-PKCS1-v1_5',
+				hash: 'SHA-256'
+			}, key, Buffer.from(content, 'utf8'))).toString('hex');
 		} else {
 			return md5(content);
 		}
@@ -494,15 +495,12 @@ const dashboard = (() => {
 					'not signing versions.json file contents');
 			}
 
-			const pgpKey = shouldSign ? await pgp.key.readArmored(key) : null;
-			if (pgpKey && pgpKey.err) {
-				console.log('Error readng PGP key', pgpKey.err);
-				return;
-			}
-			const keyObj = shouldSign ? pgpKey.keys[0] : null;
-			if (shouldSign) {
-				await keyObj.decrypt('');
-			}
+			const webcrypto = new WebCrypto();
+			const cryptoKey = shouldSign ? await webcrypto.subtle.importKey('jwk', 
+				JSON.parse(key), {
+					name: 'RSASSA-PKCS1-v1_5',
+					hash: 'SHA-256'
+				}, false, ['sign']) : null;
 
 			const versions = {};
 			await Promise.all([
@@ -513,7 +511,7 @@ const dashboard = (() => {
 					});
 					const content = await fakeRender(route[page.slice(1)].bind(route))
 
-					versions[page] = await signContent(content, keyObj, shouldSign);
+					versions[page] = await signContent(content, webcrypto, cryptoKey, shouldSign);
 				}),
 				...CACHE_COMPONENTS.map(async (component) => {
 					const filePath = path.join(__dirname, 
@@ -522,14 +520,14 @@ const dashboard = (() => {
 					const content = await fs.readFile(filePath, {
 						encoding: 'utf8'
 					});
-					versions[component] = await signContent(content, keyObj, shouldSign);
+					versions[component] = await signContent(content, webcrypto, cryptoKey, shouldSign);
 				}),
 				(async () => {
 					const sw = await fs.readFile(
 						path.join(BUILD_DIR, `serviceworker.js`), {
 							encoding: 'utf8'
 						});
-					versions['/serviceworker.js'] = await signContent(sw, keyObj, shouldSign);
+					versions['/serviceworker.js'] = await signContent(sw, webcrypto, cryptoKey, shouldSign);
 				})()
 			]);
 			const versionsPath = path.join(__dirname, 
