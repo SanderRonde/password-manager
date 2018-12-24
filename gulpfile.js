@@ -300,7 +300,7 @@ const dashboard = (() => {
 			'dashboard.bundle.serviceworker.bundle',
 			async function sign() {
 				const res = await tryReadFile(path.join(__dirname, 'certs/versions.pub'));
-				if (!res.succes) {
+				if (!res.success) {
 					console.log('Failed to find public key in certs/versions.pub, not signing serviceworker');
 					return;
 				}
