@@ -143,6 +143,15 @@ async function notifyCompromised() {
 	clients.forEach(client => client.postMessage({
 		type: 'compromised'
 	}));
+
+	const reg = (self as any).registration as ServiceWorkerRegistration;
+	reg.showNotification('Connection compromised', {
+		body: 'The connection you have with the server seems to be compromised' + 
+			' this can either be because of a MITM attack or a compromised server' +
+			', please investigate this further and be don\'t enter your password anywhere',
+		renotify: true,
+		actions: undefined
+	})
 }
 
 let key: CryptoKey|null = null;
