@@ -253,7 +253,9 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 
 /* Run mode (dev/prod) */
 /**
- * @type {'prod'|'dev'} mode - The type of run (development or production)
+ * The type of run (development or production)
+ * 
+ * @type {'prod'|'dev'}
  */
 let mode = "prod";
 (() => {
@@ -274,6 +276,9 @@ const dashboard = (() => {
 	const BUILD_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/build/');
 	const ROUTES = ['login', 'dashboard'];
 
+	/**
+	 * Bundles the serviceworker and writes it
+	 */
 	async function rollupServiceWorker() {
 		const input = path.join(SRC_DIR, `serviceworker.js`);
 		const output = path.join(BUILD_DIR, `serviceworker.js`);	
@@ -470,6 +475,14 @@ const dashboard = (() => {
 		'/entrypoints/dashboard/dashboard-page.js'
 	];
 
+	/**
+	 * Calls the render function without actually
+	 *  having any requests/responses
+	 * 
+	 * @param {(req: Request, res: Response) => void} fn - The function to call
+	 * 
+	 * @returns {Promise<string>} A promise with the rendered content
+	 */
 	function fakeRender(fn) {
 		return new Promise((resolve) => {
 			let content = '';
@@ -587,6 +600,12 @@ const dashboard = (() => {
 
 /** Testing */
 (() => {
+	/**
+	 * Generates bundles for every component, allowing them
+	 *  to be loaded at test time
+	 * 
+	 * @returns {Promise<string[]>} The bundled components
+	 */
 	function getComponentFiles() {
 		return new Promise((resolve, reject) => {
 			glob(path.join(__dirname, 'test/ui/integration/components') +
@@ -600,6 +619,14 @@ const dashboard = (() => {
 		});
 	}
 
+	/**
+	 * Converts dashes to uppercase chars
+	 * 	for example: a-bc-de -> aBcDe
+	 * 
+	 * @param {string} str - The string to convert
+	 * 
+	 * @returns {string} The converted string
+	 */
 	function dashesToUppercase(str) {
 		let newStr = '';
 		for (let i = 0; i < str.length; i++) {
@@ -691,7 +718,7 @@ const dashboard = (() => {
 			'dashboard',
 			'pretest.genbundles',
 			'pretest.genhtml'
-	));
+		)));
 })();
 
 /** Watching */
