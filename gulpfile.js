@@ -247,7 +247,8 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		}));
 	}));
 
-	gulp.task('defs', gulp.parallel('defs.components'));
+	gulp.task('defs', genTask('Generates TS definitions required for development and compilation', 
+		gulp.parallel('defs.components')));
 })();
 
 /* Dashboard */
@@ -433,9 +434,10 @@ const dashboard = (() => {
 					}))
 			})))));
 
-	gulp.task('dashboard.bundle', gulp.parallel(
-		'dashboard.bundle.js'
-	));
+	gulp.task('dashboard.bundle', genTask('Runs bundling tasks', 
+		gulp.parallel(
+			'dashboard.bundle.js'
+		)));
 
 	const CACHE_PAGES = [
 		'/login_offline',
@@ -539,14 +541,16 @@ const dashboard = (() => {
 				});
 		}));
 
-	gulp.task('dashboard.meta', gulp.parallel(
-		'dashboard.meta.signPrivate'
-	));
+	gulp.task('dashboard.meta', genTask('Runs meta tasks (not directly related to the content served)',
+		gulp.parallel(
+			'dashboard.meta.signPrivate'
+		)));
 
-	gulp.task('dashboard', gulp.series(
-		'dashboard.bundle',
-		'dashboard.meta'
-	));
+	gulp.task('dashboard', genTask('Runs tasks for the dashboard (web version)', 
+		gulp.series(
+			'dashboard.bundle',
+			'dashboard.meta'
+		)));
 
 	return {
 		SRC_DIR,
