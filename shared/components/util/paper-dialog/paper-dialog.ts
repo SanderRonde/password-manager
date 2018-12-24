@@ -3,10 +3,10 @@
 import { ConfigurableWebComponent, config, Props, ComplexType, PROP_TYPE } from '../../../lib/webcomponents';
 import { HorizontalCenterer } from '../horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../vertical-centerer/vertical-centerer';
+import { PaperDialogCSS, ANIMATION_DURATION } from './paper-dialog.css';
 import { PaperDialogIDMap } from './paper-dialog-querymap';
 import { PaperDialogHTML } from './paper-dialog.html';
 import { wait } from '../../../lib/webcomponent-util';
-import { PaperDialogCSS } from './paper-dialog.css';
 import { MDCard } from '../md-card/md-card';
 
 export const enum DISPLAY_MODE {
@@ -17,7 +17,6 @@ export const enum DISPLAY_MODE {
 }
 
 const BACKDROP_OPACITY = 0.3;
-export const ANIMATION_DURATION = 400;
 
 @config({
 	is: 'paper-dialog',
