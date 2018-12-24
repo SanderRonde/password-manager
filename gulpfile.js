@@ -10,6 +10,7 @@ const uglify = require('uglify-es');
 const babel = require('babel-core');
 const crypto = require('crypto');
 const rollup = require('rollup');
+const chalk = require('chalk');
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const path = require('path');
@@ -19,13 +20,38 @@ const md5 = require('md5');
 /**
  * Generates a task with given description
  * 
- * @param {string|any} description - The description of the task
+ * @param {string} description - The description of the task
  * @param {any} [toRun] - The function to execute
  * 
  * @returns {any} The task
  */
 function genTask(description, toRun) {
 	toRun.description = description;
+	return toRun;
+}
+
+/**
+ * Dictionary with the descriptions for the tasks that registered one
+ * 
+ * @type {Map<string, string>}
+ */
+const descriptions = new Map();
+
+/**
+ * Generates a root task with given description
+ * 	root tasks are meant to be called, contrary to
+ *  child tasks which are just there to preserve
+ *  structure and to be called for specific reasons.
+ * 
+ * @param {string} name - The name of the task
+ * @param {string} description - The description of the task
+ * @param {any} [toRun] - The function to execute
+ * 
+ * @returns {any} The task
+ */
+function genRootTask(name, description, toRun) {
+	toRun.description = description;
+	descriptions.set(name, description);
 	return toRun;
 }
 
@@ -247,7 +273,8 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		}));
 	}));
 
-	gulp.task('defs', genTask('Generates TS definitions required for development and compilation', 
+	gulp.task('defs', genRootTask('defs', 
+		'Generates TS definitions required for development and compilation', 
 		gulp.parallel('defs.components')));
 })();
 
@@ -259,12 +286,12 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
  */
 let mode = "prod";
 (() => {
-	gulp.task('env:dev', genTask('Sets the type of run to development mode', 
+	gulp.task('env:dev', genTask('Sets the type of run to development mode for the following tasks', 
 		async function setEnv() {
 			mode = 'dev';
 		}));
 
-	gulp.task('env:prod', genTask('Sets the type of run to production mode', 
+	gulp.task('env:prod', genTask('Sets the type of run to production mode for the following tasks', 
 		async function setEnv() {
 			mode = 'prod';
 		}));
@@ -586,10 +613,12 @@ const dashboard = (() => {
 			'dashboard.meta'
 		)));
 
-	gulp.task('dashboard:dev', genTask('Runs the dashboard task in development mode',
+	gulp.task('dashboard:dev', genRootTask('dashboard:dev',
+		'Runs the dashboard task in development mode',
 		gulp.series('env:dev', 'dashboard')));
 
-	gulp.task('dashboard:prod',	genTask('Runs the dashboard task in production mode',
+	gulp.task('dashboard:prod',	genRootTask('dashboard:prod',
+		'Runs the dashboard task in production mode',
 		gulp.series('env:prod', 'dashboard')));
 
 	return {
@@ -713,7 +742,7 @@ const dashboard = (() => {
 			}));
 		}));
 
-	gulp.task('pretest', genTask('Prepares the project for testing', 
+	gulp.task('pretest', genRootTask('pretest', 'Prepares the project for testing', 
 		gulp.series(
 			'dashboard',
 			'pretest.genbundles',
@@ -728,5 +757,40 @@ const dashboard = (() => {
 		return watch(path.join(dashboard.SRC_DIR, `serviceworker.js`), dashboard.rollupServiceWorker);
 	}));
 
-	gulp.task('watch', gulp.parallel('watch.serviceworker'));
+	gulp.task('watch', genRootTask('watch', 'Watches files for changes' + 
+		' and runs necessary tasks on change', 
+			gulp.series('env:dev', gulp.parallel('watch.serviceworker'))));
+})();
+
+/** Meta */
+(() => {
+	/**
+	 * Repeats given {char} {amount} times
+	 * 
+	 * @param {string} char - The char to repeat
+	 * @param {number} amount - The amount of times to repeat it
+	 * 
+	 * @returns {string} The new string
+	 */
+	function repeat(char, amount) {
+		return new Array(amount).fill(char).join('');
+	}
+
+	gulp.task('tasks', genRootTask('tasks', 'Lists all top-level tasks', async () => {
+		console.log('These are the top-level tasks:');
+		console.log('');
+
+		const longest = Array.from(descriptions.keys()).map(k => k.length)
+			.reduce((prev, current) => {
+				return Math.max(prev, current);
+			}, 0);
+
+		for (const [ task, description ] of descriptions.entries()) {
+			console.log(`${chalk.bold(task)}${
+				repeat(' ', longest - task.length)} - ${description}`);
+		}
+	}));
+
+	gulp.task('default', genRootTask('default' ,'The default task (runs everything)', 
+		gulp.series('dashboard')));
 })();
