@@ -290,7 +290,7 @@ const dashboard = (() => {
 	gulp.task('dashboard.bundle.serviceworker', genTask('Bundles the serviceworker and minifies it',
 		gulp.series(
 			'dashboard.bundle.serviceworker.bundle',
-			async function sign() {
+			async function signPublic() {
 				const res = await tryReadFile(path.join(__dirname, 'certs/versions.pub'));
 				if (!res.success) {
 					console.log('Failed to find public key in certs/versions.pub, not signing serviceworker');
@@ -484,7 +484,7 @@ const dashboard = (() => {
 		}
 	}
 
-	gulp.task('dashboard.meta.versions', genTask('Generates the hashes for all ' +
+	gulp.task('dashboard.meta.signPrivate', genTask('Generates the hashes for all ' +
 		'cached files and signs them using the certs/versions.priv and certs/versions.pub ' +
 		'keys', async () => {
 			const res = await tryReadFile(path.join(__dirname, 'certs/versions.priv'));
@@ -540,7 +540,7 @@ const dashboard = (() => {
 		}));
 
 	gulp.task('dashboard.meta', gulp.parallel(
-		'dashboard.meta.versions'
+		'dashboard.meta.signPrivate'
 	));
 
 	gulp.task('dashboard', gulp.series(
