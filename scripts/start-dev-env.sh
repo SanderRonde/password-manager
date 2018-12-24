@@ -12,7 +12,7 @@ cd $script_path/../
 $TERM -e "bash -c \"tsc -p server/tsconfig.json -w\""
 $TERM -e "bash -c \"tsc -p shared/tsconfig.json -w\""
 $TERM -e "bash -c \"tsc -p server/app/actions/server/webserver/client/tsconfig.json -w\""
-$TERM -e "bash -c \"gulp watch\""
+$TERM -e "bash -c \"gulp env:dev watch\""
 if [ "$1" == "-d" ]; then
 	echo "doing"
 	mkdir "$script_path/../database/" || echo "dir already exists"

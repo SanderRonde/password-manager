@@ -251,6 +251,23 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		gulp.parallel('defs.components')));
 })();
 
+/* Run mode (dev/prod) */
+/**
+ * @type {'prod'|'dev'} mode - The type of run (development or production)
+ */
+let mode = "prod";
+(() => {
+	gulp.task('env:dev', genTask('Sets the type of run to development mode', 
+		async function setEnv() {
+			mode = 'dev';
+		}));
+
+	gulp.task('env:prod', genTask('Sets the type of run to production mode', 
+		async function setEnv() {
+			mode = 'prod';
+		}));
+})();
+
 /* Dashboard */
 const dashboard = (() => {
 	const SRC_DIR = path.join(__dirname, 'server/app/actions/server/webserver/client/src/');
@@ -292,6 +309,10 @@ const dashboard = (() => {
 		gulp.series(
 			'dashboard.bundle.serviceworker.bundle',
 			async function signPublic() {
+				if (mode === 'dev') {
+					return;
+				}
+
 				const res = await tryReadFile(path.join(__dirname, 'certs/versions.pub'));
 				if (!res.success) {
 					console.log('Failed to find public key in certs/versions.pub, not signing serviceworker');
@@ -552,6 +573,12 @@ const dashboard = (() => {
 			'dashboard.meta'
 		)));
 
+	gulp.task('dashboard:dev', genTask('Runs the dashboard task in development mode',
+		gulp.series('env:dev', 'dashboard')));
+
+	gulp.task('dashboard:prod',	genTask('Runs the dashboard task in production mode',
+		gulp.series('env:prod', 'dashboard')));
+
 	return {
 		SRC_DIR,
 		rollupServiceWorker
@@ -668,7 +695,7 @@ const dashboard = (() => {
 
 /** Watching */
 (() => {
-	gulp.task('watch.serviceworker', genTask('Bundles the serviceworker on change', () => {
+	gulp.task('watch.serviceworker', genTask('Bundles the serviceworker on change', async () => {
 		dashboard.rollupServiceWorker();
 		return watch(path.join(dashboard.SRC_DIR, `serviceworker.js`), dashboard.rollupServiceWorker);
 	}));
