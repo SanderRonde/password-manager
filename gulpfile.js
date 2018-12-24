@@ -686,10 +686,11 @@ const dashboard = (() => {
 			}));
 		}));
 
-	gulp.task('pretest', gulp.series(
-		'dashboard',
-		'pretest.genbundles',
-		'pretest.genhtml'
+	gulp.task('pretest', genTask('Prepares the project for testing', 
+		gulp.series(
+			'dashboard',
+			'pretest.genbundles',
+			'pretest.genhtml'
 	));
 })();
 
