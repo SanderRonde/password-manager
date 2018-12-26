@@ -18,14 +18,15 @@ const glob = require('glob');
 const md5 = require('md5');
 
 /**
- * Generates a task with given description
+ * Adds a description to given function
  * 
+ * @template T
  * @param {string} description - The description of the task
- * @param {any} [toRun] - The function to execute
+ * @param {T} [toRun] - The function to execute
  * 
- * @returns {any} The task
+ * @returns {T} The task
  */
-function genTask(description, toRun) {
+function addDescription(description, toRun) {
 	toRun.description = description;
 	return toRun;
 }
@@ -263,7 +264,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		}
 	}
 
-	gulp.task('defs.components', genTask('Generates ID definitions for components', async () => {
+	gulp.task('defs.components', addDescription('Generates ID definitions for components', async () => {
 		await Promise.all((await findWithGlob('shared/components/**/*.html.ts')).map(async (fileName) => {
 			const componentName = fileName.split('/').pop().split('.')[0];
 			const defs = await htmlTypings.extractFileTypes(fileName, true);
@@ -286,12 +287,12 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
  */
 let mode = "prod";
 (() => {
-	gulp.task('env:dev', genTask('Sets the type of run to development mode for the following tasks', 
+	gulp.task('env:dev', addDescription('Sets the type of run to development mode for the following tasks', 
 		async function setEnv() {
 			mode = 'dev';
 		}));
 
-	gulp.task('env:prod', genTask('Sets the type of run to production mode for the following tasks', 
+	gulp.task('env:prod', addDescription('Sets the type of run to production mode for the following tasks', 
 		async function setEnv() {
 			mode = 'prod';
 		}));
@@ -333,11 +334,11 @@ const dashboard = (() => {
 		});
 	}
 
-	gulp.task('dashboard.bundle.serviceworker.bundle', genTask('Bundles the serviceworker',
+	gulp.task('dashboard.bundle.serviceworker.bundle', addDescription('Bundles the serviceworker',
 		gulp.series(
 			rollupServiceWorker
 		)));
-	gulp.task('dashboard.bundle.serviceworker', genTask('Bundles the serviceworker and minifies it',
+	gulp.task('dashboard.bundle.serviceworker', addDescription('Bundles the serviceworker and minifies it',
 		gulp.series(
 			'dashboard.bundle.serviceworker.bundle',
 			async function signPublic() {
@@ -379,7 +380,7 @@ const dashboard = (() => {
 			}
 		)));
 
-	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
+	gulp.task('dashboard.bundle.js', addDescription('Bundles the TSX files into a single bundle',
 		gulp.series(
 			gulp.parallel(
 				async function minifyCSS() {
@@ -487,7 +488,7 @@ const dashboard = (() => {
 					}))
 			})))));
 
-	gulp.task('dashboard.bundle', genTask('Runs bundling tasks', 
+	gulp.task('dashboard.bundle', addDescription('Runs bundling tasks', 
 		gulp.parallel(
 			'dashboard.bundle.js'
 		)));
@@ -547,7 +548,7 @@ const dashboard = (() => {
 		}
 	}
 
-	gulp.task('dashboard.meta.signPrivate', genTask('Generates the hashes for all ' +
+	gulp.task('dashboard.meta.signPrivate', addDescription('Generates the hashes for all ' +
 		'cached files and signs them using the certs/versions.priv and certs/versions.pub ' +
 		'keys', async () => {
 			const res = await tryReadFile(path.join(__dirname, 'certs/versions.priv'));
@@ -602,12 +603,12 @@ const dashboard = (() => {
 				});
 		}));
 
-	gulp.task('dashboard.meta', genTask('Runs meta tasks (not directly related to the content served)',
+	gulp.task('dashboard.meta', addDescription('Runs meta tasks (not directly related to the content served)',
 		gulp.parallel(
 			'dashboard.meta.signPrivate'
 		)));
 
-	gulp.task('dashboard', genTask('Runs tasks for the dashboard (web version)', 
+	gulp.task('dashboard', addDescription('Runs tasks for the dashboard (web version)', 
 		gulp.series(
 			'dashboard.bundle',
 			'dashboard.meta'
@@ -670,7 +671,7 @@ const dashboard = (() => {
 		return newStr;
 	}
 
-	gulp.task('pretest.genbundles', genTask('Generates component bundles', 
+	gulp.task('pretest.genbundles', addDescription('Generates component bundles', 
 		async function genComponentBundles() {
 			const files = await getComponentFiles();
 			await Promise.all(files.map(async (file) => {
@@ -719,7 +720,7 @@ const dashboard = (() => {
 		}
 	));
 
-	gulp.task('pretest.genhtml', genTask('Generates servable HTML files',
+	gulp.task('pretest.genhtml', addDescription('Generates servable HTML files',
 		async function genWebPages() {
 			const files = await findWithGlob(`${
 				path.join(__dirname, 'test/ui/integration/components/')
@@ -752,7 +753,7 @@ const dashboard = (() => {
 
 /** Watching */
 (() => {
-	gulp.task('watch.serviceworker', genTask('Bundles the serviceworker on change', async () => {
+	gulp.task('watch.serviceworker', addDescription('Bundles the serviceworker on change', async () => {
 		dashboard.rollupServiceWorker();
 		return watch(path.join(dashboard.SRC_DIR, `serviceworker.js`), dashboard.rollupServiceWorker);
 	}));
