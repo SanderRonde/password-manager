@@ -44,11 +44,12 @@ const descriptions = new Map();
  *  child tasks which are just there to preserve
  *  structure and to be called for specific reasons.
  * 
+ * @template T
  * @param {string} name - The name of the task
  * @param {string} description - The description of the task
- * @param {any} [toRun] - The function to execute
+ * @param {T} [toRun] - The function to execute
  * 
- * @returns {any} The task
+ * @returns {T} The task
  */
 function genRootTask(name, description, toRun) {
 	toRun.description = description;
