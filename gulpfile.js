@@ -387,7 +387,7 @@ const dashboard = (() => {
 						result.code, {
 							encoding: 'utf8'
 						});
-				});
+				})
 		)));
 
 	gulp.task('dashboard.bundle.js', addDescription('Bundles the TSX files into a single bundle',
