@@ -12,7 +12,7 @@ export class SlideInAnimation<T extends HTMLElement> extends AnimationDescriptor
 		root.style.display = 'block';
 
 		//Start the animation
-		root.animate([{
+		(root.animate as any)([{
 			transform: 'translateY(-60px)'
 		}, {
 			transform: 'translateY(0)'
@@ -22,7 +22,7 @@ export class SlideInAnimation<T extends HTMLElement> extends AnimationDescriptor
 			duration: ANIMATION_DURATION
 		});
 
-		root.animate([{
+		(root.animate as any)([{
 			opacity: '0'
 		}, {
 			opacity: '1'

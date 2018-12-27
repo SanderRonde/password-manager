@@ -104,7 +104,7 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 	private static _animation: Animation|null = null;
 	static showBackdrop() {
 		return new Promise((resolve) => {
-			document.documentElement.style.overflow = 'hidden';
+			document.documentElement!.style.overflow = 'hidden';
 
 			const el = this.backdrop;
 			el.style.display = 'block';
@@ -132,7 +132,7 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 			const el = this.backdrop;
 
 			el.style.pointerEvents = 'none';
-			document.documentElement.style.overflow = 'auto';
+			document.documentElement!.style.overflow = 'auto';
 			this._animation && this._animation.cancel();
 			this._animation = el.animate([{
 				opacity: BACKDROP_OPACITY
