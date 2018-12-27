@@ -8,6 +8,7 @@ import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { isDefined, getCookie } from '../../../../lib/webcomponent-util'
 import { PaperDialog } from '../../../util/paper-dialog/paper-dialog';
+import { PaperButton } from '../../../util/paper-button/paper-button';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { GlobalController } from '../global/global-controller';
@@ -25,7 +26,8 @@ export const LoginDependencies = [
 	ThemeSelector,
 	PaperToast,
 	MDCard,
-	PaperDialog
+	PaperDialog,
+	PaperButton
 ];
 export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 	props = Props.define(this, {
@@ -122,7 +124,7 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 		const password = this.$.passwordInput.value;
 		const twofactor = this.$.twofactorInput.value;
 		
-		if (!this.$.emailInput.valid || 
+	if (!this.$.emailInput.valid || 
 			!this.$.passwordInput.valid ||
 			!this.$.twofactorInput.valid) {
 				return {
