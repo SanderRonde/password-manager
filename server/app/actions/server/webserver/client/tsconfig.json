@@ -2,8 +2,6 @@
     "compilerOptions": {
 		"baseUrl": ".",
 		"paths": { "*": ["types/*"] },
-		"baseUrl": ".",
-		"paths": { "*": ["types/*"] },
         "alwaysStrict": true,
         "forceConsistentCasingInFileNames": true,
         "module": "esnext",
