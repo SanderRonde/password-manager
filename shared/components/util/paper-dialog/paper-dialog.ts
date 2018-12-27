@@ -111,7 +111,7 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 			el.style.pointerEvents = 'all';
 
 			this._animation && this._animation.cancel();
-			this._animation = el.animate([{
+			this._animation = (el.animate as any)([{
 				opacity: 0
 			}, {
 				opacity: BACKDROP_OPACITY
@@ -120,7 +120,7 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 				easing: 'cubic-bezier(0.55, 0.06, 0.68, 0.19)',
 				fill: 'forwards'
 			});
-			this._animation.onfinish = () => {
+			this._animation!.onfinish = () => {
 				this._animation = null;
 				resolve();
 			};
@@ -134,7 +134,7 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 			el.style.pointerEvents = 'none';
 			document.documentElement!.style.overflow = 'auto';
 			this._animation && this._animation.cancel();
-			this._animation = el.animate([{
+			this._animation = (el.animate as any)([{
 				opacity: BACKDROP_OPACITY
 			}, {
 				opacity: 0
@@ -143,7 +143,7 @@ export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
 				easing: 'cubic-bezier(0.55, 0.06, 0.68, 0.19)',
 				fill: 'forwards'
 			});
-			this._animation.onfinish = () => {
+			this._animation!.onfinish = () => {
 				el.style.display = 'none';
 
 				this._animation = null;
