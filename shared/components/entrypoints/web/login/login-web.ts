@@ -1,11 +1,13 @@
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { cancelTimeout, createCancellableTimeout } from '../../../../lib/webcomponents/template-util';
+import { SlideInAnimation } from '../../../animations/slide-in-animation';
 import { GlobalController } from '../../base/global/global-controller';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { Login, LoginDependencies } from '../../base/login/login';
 import { API_ERRS, APIReturns } from '../../../../types/api';
 import { ENTRYPOINT } from '../../../../types/shared-types';
+import { animation } from '../../../animations/animation';
 import { wait } from '../../../../lib/webcomponent-util';
 import { bindToClass } from '../../../../lib/decorators';
 import { LoginHTML } from '../../base/login/login.html';
@@ -51,6 +53,7 @@ export function reportDefaultResponseErrors(response: {
 	html: LoginHTML,
 	dependencies: LoginDependencies
 })
+@animation(SlideInAnimation)
 export class LoginWeb extends Login {
 	private async _doLoginRequest({
 		email, password, twofactor_token
