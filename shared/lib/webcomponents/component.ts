@@ -108,6 +108,11 @@ export abstract class WebComponent<IDS extends {
 	 */
 	mounted() {}
 
+	/**
+	 * Called when the component is removed from the dom
+	 */
+	unmounted() {}
+
 	public listenProp<P extends Props & {
 		[key: string]: any;
 	}>(event: PropChangeEvents, 
