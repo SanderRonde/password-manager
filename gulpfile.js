@@ -18,14 +18,15 @@ const glob = require('glob');
 const md5 = require('md5');
 
 /**
- * Generates a task with given description
+ * Adds a description to given function
  * 
+ * @template T
  * @param {string} description - The description of the task
- * @param {any} [toRun] - The function to execute
+ * @param {T} [toRun] - The function to execute
  * 
- * @returns {any} The task
+ * @returns {T} The task
  */
-function genTask(description, toRun) {
+function addDescription(description, toRun) {
 	toRun.description = description;
 	return toRun;
 }
@@ -43,11 +44,12 @@ const descriptions = new Map();
  *  child tasks which are just there to preserve
  *  structure and to be called for specific reasons.
  * 
+ * @template T
  * @param {string} name - The name of the task
  * @param {string} description - The description of the task
- * @param {any} [toRun] - The function to execute
+ * @param {T} [toRun] - The function to execute
  * 
- * @returns {any} The task
+ * @returns {T} The task
  */
 function genRootTask(name, description, toRun) {
 	toRun.description = description;
@@ -58,10 +60,11 @@ function genRootTask(name, description, toRun) {
 /**
  * Generates a function with a dynamic name
  * 
+ * @template T
  * @param {string} name - The name of the function
- * @param {Function} target - The content of the function
+ * @param {T} target - The content of the function
  * 
- * @returns {(done: (error?: any) => void) => any} The function with the new name
+ * @returns {T} The function with the new name
  */
 function dynamicFunctionName(name, target) {
 	const fn = new Function('target', `return function ${name}(){ return target() }`);
@@ -73,12 +76,17 @@ function dynamicFunctionName(name, target) {
  * 
  * @param {string} name - The name of the function
  * @param {Function} target - The content of the function
+ * @param {string} [description] - A description for the function
  * 
  * @returns {(done: (error?: any) => void) => any} The function with the new name
  */
-function dynamicFunctionNameAsync(name, target) {
-	const fn = new Function('target', `return async function ${name}(){ return await target() }`);
-	return fn(target);
+function dynamicFunctionNameAsync(name, target, description) {
+	let fn = new Function('target', `return async function ${name}(){ return await target() }`);
+	if (description) {
+		return addDescription(description, fn(target));
+	} else {
+		return fn(target);
+	}
 }
 
 /**
@@ -263,7 +271,7 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 		}
 	}
 
-	gulp.task('defs.components', genTask('Generates ID definitions for components', async () => {
+	gulp.task('defs.components', addDescription('Generates ID definitions for components', async () => {
 		await Promise.all((await findWithGlob('shared/components/**/*.html.ts')).map(async (fileName) => {
 			const componentName = fileName.split('/').pop().split('.')[0];
 			const defs = await htmlTypings.extractFileTypes(fileName, true);
@@ -286,12 +294,12 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
  */
 let mode = "prod";
 (() => {
-	gulp.task('env:dev', genTask('Sets the type of run to development mode for the following tasks', 
+	gulp.task('env:dev', addDescription('Sets the type of run to development mode for the following tasks', 
 		async function setEnv() {
 			mode = 'dev';
 		}));
 
-	gulp.task('env:prod', genTask('Sets the type of run to production mode for the following tasks', 
+	gulp.task('env:prod', addDescription('Sets the type of run to production mode for the following tasks', 
 		async function setEnv() {
 			mode = 'prod';
 		}));
@@ -306,100 +314,104 @@ const dashboard = (() => {
 	/**
 	 * Bundles the serviceworker and writes it
 	 */
-	async function rollupServiceWorker() {
-		const input = path.join(SRC_DIR, `serviceworker.js`);
-		const output = path.join(BUILD_DIR, `serviceworker.js`);	
+	const rollupServiceWorker = addDescription('Bundles the serviceworker',
+		async function rollupServiceWorker() {
+			const input = path.join(SRC_DIR, `serviceworker.js`);
+			const output = path.join(BUILD_DIR, `serviceworker.js`);	
 
-		const bundle = await rollup.rollup({
-			input,
-			onwarn(warning) {
-				if (typeof warning !== 'string' && warning.code === 'THIS_IS_UNDEFINED') {
-					//Typescript inserted helper method, ignore it
-					return;
-				}
-				console.log(warning);
-			},
-			plugins: [
-				rollupResolve({
-					module: true,
-					browser: true
-				})
-			]
+			const bundle = await rollup.rollup({
+				input,
+				onwarn(warning) {
+					if (typeof warning !== 'string' && warning.code === 'THIS_IS_UNDEFINED') {
+						//Typescript inserted helper method, ignore it
+						return;
+					}
+					console.log(warning);
+				},
+				plugins: [
+					rollupResolve({
+						module: true,
+						browser: true
+					})
+				]
+			});
+
+			await bundle.write({
+				format: 'iife',
+				file: output
+			});
 		});
 
-		await bundle.write({
-			format: 'iife',
-			file: output
-		});
-	}
-
-	gulp.task('dashboard.bundle.serviceworker.bundle', genTask('Bundles the serviceworker',
+	gulp.task('dashboard.bundle.serviceworker.bundle', addDescription('Bundles the serviceworker',
 		gulp.series(
 			rollupServiceWorker
 		)));
-	gulp.task('dashboard.bundle.serviceworker', genTask('Bundles the serviceworker and minifies it',
+	gulp.task('dashboard.bundle.serviceworker', addDescription('Bundles the serviceworker and minifies it',
 		gulp.series(
 			'dashboard.bundle.serviceworker.bundle',
-			async function signPublic() {
-				if (mode === 'dev') {
-					return;
-				}
+			addDescription('Puts the server\'s public key in the serviceworker', 
+				async function signPublic() {
+					if (mode === 'dev') {
+						return;
+					}
 
-				const res = await tryReadFile(path.join(__dirname, 'certs/versions.pub'));
-				if (!res.success) {
-					console.log('Failed to find public key in certs/versions.pub, not signing serviceworker');
-					return;
-				}
-				const file = await fs.readFile(
-					path.join(BUILD_DIR, `serviceworker.js`), {
-						encoding: 'utf8'
+					const res = await tryReadFile(path.join(__dirname, 'certs/versions.pub'));
+					if (!res.success) {
+						console.log('Failed to find public key in certs/versions.pub, not signing serviceworker');
+						return;
+					}
+					const file = await fs.readFile(
+						path.join(BUILD_DIR, `serviceworker.js`), {
+							encoding: 'utf8'
+						});
+					await fs.writeFile(path.join(BUILD_DIR, `serviceworker.js`), 
+						file.replace(/\SERVER_PUBLIC_KEY_START.*SERVER_PUBLIC_KEY_END/,
+							`${res.content}`), {
+							encoding: 'utf8'
+						});
+				}),
+			addDescription('Minifies the serviceworker',
+				async function minifyServiceWorker() {
+					const file = await fs.readFile(
+						path.join(BUILD_DIR, `serviceworker.js`), {
+							encoding: 'utf8'
+						});
+					const result = uglify.minify(file, {
+						keep_classnames: true,
+						ecma: 6
 					});
-				await fs.writeFile(path.join(BUILD_DIR, `serviceworker.js`), 
-					file.replace(/\SERVER_PUBLIC_KEY_START.*SERVER_PUBLIC_KEY_END/,
-						`${res.content}`), {
-						encoding: 'utf8'
-					});
-			},
-			async function minifyServiceWorker() {
-				const file = await fs.readFile(
-					path.join(BUILD_DIR, `serviceworker.js`), {
-						encoding: 'utf8'
-					});
-				const result = uglify.minify(file, {
-					keep_classnames: true,
-					ecma: 6
+					if (result.error) {
+						throw result.error;
+					}
+					await fs.writeFile(path.join(BUILD_DIR, `serviceworker.js`), 
+						result.code, {
+							encoding: 'utf8'
+						});
 				});
-				if (result.error) {
-					throw result.error;
-				}
-				await fs.writeFile(path.join(BUILD_DIR, `serviceworker.js`), 
-					result.code, {
-						encoding: 'utf8'
-					});
-			}
 		)));
 
-	gulp.task('dashboard.bundle.js', genTask('Bundles the TSX files into a single bundle',
+	gulp.task('dashboard.bundle.js', addDescription('Bundles the TSX files into a single bundle',
 		gulp.series(
 			gulp.parallel(
-				async function minifyCSS() {
-					const files = await findWithGlob('shared/components/**/*.css.js');
-					await Promise.all(files.map(async (file) => {
-						const content = await fs.readFile(file, {
-							encoding: 'utf8'
-						});
-						const startIndex = content.indexOf('<style>') + '<style>'.length;
-						const endIndex = content.lastIndexOf('</style>');
-						const html = content.slice(startIndex, endIndex);
-						const minified = uglifyCSS.processString(html, { });
+				addDescription('Minifies the CSS of components',
+					async function minifyCSS() {
+						const files = await findWithGlob('shared/components/**/*.css.js');
+						await Promise.all(files.map(async (file) => {
+							const content = await fs.readFile(file, {
+								encoding: 'utf8'
+							});
+							const startIndex = content.indexOf('<style>') + '<style>'.length;
+							const endIndex = content.lastIndexOf('</style>');
+							const html = content.slice(startIndex, endIndex);
+							const minified = uglifyCSS.processString(html, { });
 
-						const replaced = content.slice(0, startIndex) +
-							minified + content.slice(endIndex);
-						await fs.writeFile(file, replaced, {
-							encoding: 'utf8'
-						});
-					}));
-				}
+							const replaced = content.slice(0, startIndex) +
+								minified + content.slice(endIndex);
+							await fs.writeFile(file, replaced, {
+								encoding: 'utf8'
+							});
+						}));
+					})
 			),
 			gulp.parallel('dashboard.bundle.serviceworker', ...ROUTES.map((route) => {
 				const input = path.join(SRC_DIR, 'entrypoints/', route, `${route}-page.js`);
@@ -469,7 +481,7 @@ const dashboard = (() => {
 								.split('\n').slice(0, -2).join('\n') +
 									`\n}({}));`)
 						}
-					}),
+					}, `Bundles the files for the ${route} route`),
 					dynamicFunctionNameAsync(`minifyJS${capitalize(route)}`, async () => {
 						const file = await fs.readFile(output, {
 							encoding: 'utf8'
@@ -484,10 +496,10 @@ const dashboard = (() => {
 						await fs.writeFile(output, result.code, {
 							encoding: 'utf8'
 						});
-					}))
+					}, `Minifies the bundle for the ${route} route`))
 			})))));
 
-	gulp.task('dashboard.bundle', genTask('Runs bundling tasks', 
+	gulp.task('dashboard.bundle', addDescription('Runs bundling tasks', 
 		gulp.parallel(
 			'dashboard.bundle.js'
 		)));
@@ -547,7 +559,7 @@ const dashboard = (() => {
 		}
 	}
 
-	gulp.task('dashboard.meta.signPrivate', genTask('Generates the hashes for all ' +
+	gulp.task('dashboard.meta.signPrivate', addDescription('Generates the hashes for all ' +
 		'cached files and signs them using the certs/versions.priv and certs/versions.pub ' +
 		'keys', async () => {
 			const res = await tryReadFile(path.join(__dirname, 'certs/versions.priv'));
@@ -602,12 +614,12 @@ const dashboard = (() => {
 				});
 		}));
 
-	gulp.task('dashboard.meta', genTask('Runs meta tasks (not directly related to the content served)',
+	gulp.task('dashboard.meta', addDescription('Runs meta tasks (not directly related to the content served)',
 		gulp.parallel(
 			'dashboard.meta.signPrivate'
 		)));
 
-	gulp.task('dashboard', genTask('Runs tasks for the dashboard (web version)', 
+	gulp.task('dashboard', addDescription('Runs tasks for the dashboard (web version)', 
 		gulp.series(
 			'dashboard.bundle',
 			'dashboard.meta'
@@ -670,7 +682,7 @@ const dashboard = (() => {
 		return newStr;
 	}
 
-	gulp.task('pretest.genbundles', genTask('Generates component bundles', 
+	gulp.task('pretest.genbundles', addDescription('Generates component bundles', 
 		async function genComponentBundles() {
 			const files = await getComponentFiles();
 			await Promise.all(files.map(async (file) => {
@@ -719,7 +731,7 @@ const dashboard = (() => {
 		}
 	));
 
-	gulp.task('pretest.genhtml', genTask('Generates servable HTML files',
+	gulp.task('pretest.genhtml', addDescription('Generates servable HTML files',
 		async function genWebPages() {
 			const files = await findWithGlob(`${
 				path.join(__dirname, 'test/ui/integration/components/')
@@ -752,7 +764,7 @@ const dashboard = (() => {
 
 /** Watching */
 (() => {
-	gulp.task('watch.serviceworker', genTask('Bundles the serviceworker on change', async () => {
+	gulp.task('watch.serviceworker', addDescription('Bundles the serviceworker on change', async () => {
 		dashboard.rollupServiceWorker();
 		return watch(path.join(dashboard.SRC_DIR, `serviceworker.js`), dashboard.rollupServiceWorker);
 	}));
