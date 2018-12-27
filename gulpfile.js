@@ -756,7 +756,7 @@ const dashboard = (() => {
 
 	gulp.task('pretest', genRootTask('pretest', 'Prepares the project for testing', 
 		gulp.series(
-			'dashboard',
+			'dashboard:dev',
 			'pretest.genbundles',
 			'pretest.genhtml'
 		)));
