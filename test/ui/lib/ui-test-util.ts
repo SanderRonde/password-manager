@@ -147,6 +147,7 @@ export function toRGB(color: string) {
 export type GetFirstArg<T> = T extends (arg1: infer E, ...args: any[]) => void ? E : any;
 export function listenForEvent<T extends WebComponent>(el: T, event: GetFirstArg<T['listen']>, activator: () => void) {
 	let wasCalled: boolean = false;
+	//@ts-ignore
 	el.listen(event, () => {
 		wasCalled = true;
 		return null as any;
