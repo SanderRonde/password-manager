@@ -15,7 +15,10 @@ export const PaperDialogHTML = new TemplateFn<PaperDialog>((html, props) => {
 									<div id="dialogTitle">
 										${props.title}
 									</div>` : ''}
-								<slot></slot>
+								<slot name="content"></slot>
+								<div id="buttons">
+									<slot name="buttons"></slot>
+								</div>
 							</div>
 						</md-card>
 					</dialog>
