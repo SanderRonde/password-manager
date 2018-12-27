@@ -19,6 +19,7 @@ before_script:
 - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 script:
 - gulp defs
+- tsc -v
 - tsc --build --force
 - gulp pretest
 - mocha test/unit/unit.test.js --exit
