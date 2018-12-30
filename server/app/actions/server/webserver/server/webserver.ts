@@ -2,7 +2,7 @@ import { initDevelopmentMiddleware } from "./modules/development";
 import { MAX_FILE_SIZE, SERVER_ROOT } from "../../../../lib/constants";
 import { Database } from "../../../../database/database";
 import { initPeriodicals } from "./modules/periodicals";
-import { optionalArrayFn } from "../../../../lib/util";
+import { optionalArrayFn, exitWith } from "../../../../lib/util";
 import { WebserverRouter } from "./modules/routing";
 import { WebserverRoutes } from "./modules/routes";
 import { WebserverAuth } from "./modules/auth";
@@ -103,6 +103,22 @@ export class Webserver {
 		this.app.use(bodyParser.urlencoded({ extended: false }));
 	}
 
+	private async _readCredentials() {
+		try {
+			return {
+				key: await fs.readFile(path.join(process.cwd(), this.config.httpsKey!), {
+					encoding: 'utf8'
+				}),
+				cert: await fs.readFile(path.join(process.cwd(), this.config.httpsCert!), {
+					encoding: 'utf8'
+				})
+			};
+		} catch(e) {
+			exitWith('Cert files are missing');
+			return null;
+		}
+	}
+
 	async init() {
 		await this._initMiddleware();
 		this.Router.init();
@@ -111,14 +127,7 @@ export class Webserver {
 		new Cache().warmup();
 		await Promise.all([...optionalArrayFn(() => {
 				return new Promise(async (resolve) => {
-					const credentials = {
-						key: await fs.readFile(path.join(process.cwd(), this.config.httpsKey!), {
-							encoding: 'utf8'
-						}),
-						cert: await fs.readFile(path.join(process.cwd(), this.config.httpsCert!), {
-							encoding: 'utf8'
-						})
-					};
+					const credentials = (await this._readCredentials())!;
 					const useSpdy = ~~process.version.match(/^v(\d+)/)![1] < 10;
 					if (useSpdy) {
 						spdy.createServer(credentials, this.app).listen(this.config.https, () => {
