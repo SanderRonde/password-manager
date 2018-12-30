@@ -1,5 +1,5 @@
 import { ServiceworkerSelf } from '../../../../../../../shared/types/serviceworker';
-import { theme } from '../../../../../../../shared/components/theming/theme/theme';
+import { theme } from '../../../../../../../shared/components/theming/theme/theme.cjs';
 import { VALID_THEMES_T } from '../../../../../../../shared/types/shared-types';
 import { set, get } from 'idb-keyval';
 

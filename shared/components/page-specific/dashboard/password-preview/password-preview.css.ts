@@ -1,6 +1,6 @@
 import { changeOpacity } from '../../../../lib/webcomponents/template-util';
 import { CHANGE_TYPE, TemplateFn } from '../../../../lib/webcomponents';
-import { ProjectTheme } from '../../../theming/theme/theme';
+import { ProjectTheme } from '../../../theming/theme/theme.es';
 import { RippleCSS } from '../../../../mixins/ripple';
 import { PasswordPreview } from './password-preview';
 

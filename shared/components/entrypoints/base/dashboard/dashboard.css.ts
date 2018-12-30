@@ -2,7 +2,7 @@ import { changeOpacity } from '../../../../lib/webcomponents/template-util';
 import { pythagoras } from '../../../icons/triangle-arrow/triangle-arrow';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { ProjectTheme } from '../../../theming/theme/theme';
+import { ProjectTheme } from '../../../theming/theme/theme.es';
 import { Dashboard } from './dashboard';
 
 const PAGE_TOP = 130;

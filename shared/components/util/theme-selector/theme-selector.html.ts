@@ -1,8 +1,8 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { GlobalProperties } from '../../../types/shared-types';
 import { mapArr } from '../../../lib/webcomponent-util';
+import { theme } from '../../theming/theme/theme.es';
 import { ColorSize } from '../../icons/color/color';
-import { theme } from '../../theming/theme/theme';
 import { ThemeSelector } from "./theme-selector";
 
 export const ThemeSelectorHTML = new TemplateFn<ThemeSelector>(function(html) {

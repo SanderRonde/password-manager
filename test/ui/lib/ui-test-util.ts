@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 import { VALID_THEMES_T, GlobalProperties } from "../../../shared/types/shared-types";
-import { theme, ProjectTheme } from '../../../shared/components/theming/theme/theme';
+import { theme, ProjectTheme } from '../../../shared/components/theming/theme/theme.es';
 import { WebComponent } from '../../../shared/lib/webcomponents';
 import { COLOR_NAME_MAP } from "./ui-test-const";
 

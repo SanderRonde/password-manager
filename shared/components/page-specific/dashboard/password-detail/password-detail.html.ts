@@ -1,7 +1,7 @@
 import { LockClosedUnfilledSize, LockClosedSize } from '../../../icons/lockClosed/lockClosed';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
-import { ProjectTheme } from '../../../theming/theme/theme';
+import { ProjectTheme } from '../../../theming/theme/theme.es';
 import { repeat } from '../../../../lib/webcomponent-util';
 import { CrossSize } from '../../../icons/cross/cross';
 import { PasswordDetail } from './password-detail';

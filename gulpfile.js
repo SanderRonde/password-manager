@@ -284,6 +284,22 @@ export type ${prefix}TagMap = ${formatTypings(tags)}`
 	gulp.task('defs', genRootTask('defs', 
 		'Generates TS definitions required for development and compilation', 
 		gulp.parallel('defs.components')));
+
+	gulp.task('copytheme', 
+		addDescription('Duplicates the theme file, allowing it to be used' + 
+			'in both CommonJS and ES6 import files', async () => {
+				const baseDir = path.join(__dirname, 'shared/components/theming/theme');
+				const src = await fs.readFile(
+					path.join(baseDir, 'theme.ts')); 
+				await Promise.all([
+					fs.writeFile(path.join(baseDir, 'theme.cjs.ts'), src),
+					fs.writeFile(path.join(baseDir, 'theme.es.ts'), src)
+				]);
+			}));
+
+	gulp.task('precompile', genRootTask('precompile',
+		'Tasks that should be run before compiling typescript',
+		gulp.parallel('defs', 'copytheme')));
 })();
 
 /* Run mode (dev/prod) */

@@ -1,4 +1,4 @@
-import { ProjectTheme } from '../components/theming/theme/theme';
+import { ProjectTheme } from '../components/theming/theme/theme.es';
 import { listenWithIdentifier } from '../lib/webcomponent-util';
 import { TemplateFn, CHANGE_TYPE } from '../lib/webcomponents';
 import { ExtendableComponent } from '../lib/decorators';

@@ -1,5 +1,5 @@
 import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
-import { ProjectTheme } from '../../theming/theme/theme';
+import { ProjectTheme } from '../../theming/theme/theme.es';
 import { MDCard } from './md-card';
 
 export function getShadow(level: number) {
