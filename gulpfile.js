@@ -1,6 +1,5 @@
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonJs = require('rollup-plugin-commonjs');
-const WebCrypto = require('node-webcrypto-ossl');
 const requireHacker = require('require-hacker');
 const htmlMinifier = require('html-minifier');
 const htmlTypings = require('html-typings');
@@ -586,6 +585,7 @@ const dashboard = (() => {
 					'not signing versions.json file contents');
 			}
 
+			const WebCrypto = require('node-webcrypto-ossl');
 			const webcrypto = new WebCrypto();
 			const cryptoKey = shouldSign ? await webcrypto.subtle.importKey('jwk', 
 				JSON.parse(key), {
