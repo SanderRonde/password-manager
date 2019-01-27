@@ -200,7 +200,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		return this._token!;
 	}
 
-	protected abstract _loadEntrypoint(page: ENTRYPOINT): void;
+	public abstract loadEntrypoint(page: ENTRYPOINT): void;
 
 	protected _getEntrypointValue(entrypoint: ENTRYPOINT) {
 		switch (entrypoint) {
@@ -211,7 +211,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		}
 	}
 
-	private _addNewPage(page: ENTRYPOINT): EntrypointPage {
+	public addNewPage(page: ENTRYPOINT): EntrypointPage {
 		const newEl = document.createElement(`${this._getEntrypointValue(page)}-page`);
 		newEl.classList.add('hidden', 'newpage', 'invisible');
 
@@ -219,7 +219,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		return newEl as EntrypointPage;
 	}
 
-	private _hideNonCurrent() {
+	public hideNonCurrent() {
 		//Remove everything that is not the current page first
 		const currentContent = this.currentContent;
 		this.content.filter((node) => {
@@ -241,26 +241,7 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 		}
 	}
 
-	async changePage(page: ENTRYPOINT, replace: boolean = false) {
-		if (this.props.page === page) {
-			return;
-		}
-
-		this._hideNonCurrent();
-		this._loadEntrypoint(page);
-		const el = this._addNewPage(page);
-		this.$.loadable.load();
-		await wait(500);
-		await Promise.all([
-			awaitMounted(el),
-			wait(ANIMATE_TIME)
-		]);
-		this.props.page = page;
-		this.globalProps<GlobalProperties>().set('page', page);
-		this._hideNonCurrent();
-		el.classList.remove('invisible', 'hidden');
-		this.$.loadable.finish();
-
+	public setHistoryState(page: ENTRYPOINT, replace: boolean = false) {
 		if (replace) {
 			window.history.replaceState({
 				page: page
@@ -274,6 +255,29 @@ export abstract class GlobalController extends ConfigurableWebComponent<GlobalCo
 				GlobalController._entrypointURLs[page]);
 			this._setTitle(GlobalController._entrypointTitles[page]);
 		}
+	}
+
+	async changePage(page: ENTRYPOINT, replace: boolean = false) {
+		if (this.props.page === page) {
+			return;
+		}
+
+		this.hideNonCurrent();
+		this.loadEntrypoint(page);
+		const el = this.addNewPage(page);
+		this.$.loadable.load();
+		await wait(500);
+		await Promise.all([
+			awaitMounted(el),
+			wait(ANIMATE_TIME)
+		]);
+		this.props.page = page;
+		this.globalProps<GlobalProperties>().set('page', page);
+		this.hideNonCurrent();
+		el.classList.remove('invisible', 'hidden');
+		this.$.loadable.finish();
+
+		this.setHistoryState(page, replace);
 	}
 
 	find<T extends keyof WebComponentElementsByTag>(tagName: T): WebComponentElementsByTag[T]|null {

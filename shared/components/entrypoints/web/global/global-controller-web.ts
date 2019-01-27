@@ -11,7 +11,7 @@ import { config } from '../../../../lib/webcomponents';
 	dependencies: GlobalControllerDependencies
 })
 export class GlobalControllerWeb extends GlobalController {
-	protected _loadEntrypoint(page: ENTRYPOINT) {
+	public loadEntrypoint(page: ENTRYPOINT) {
 		const entrypoint = this._getEntrypointValue(page);
 		if (customElements.get(`${entrypoint}-page`)) {
 			return;

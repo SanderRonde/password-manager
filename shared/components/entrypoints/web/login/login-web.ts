@@ -6,7 +6,6 @@ import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { Login, LoginDependencies } from '../../base/login/login';
 import { API_ERRS, APIReturns } from '../../../../types/api';
-import { ENTRYPOINT } from '../../../../types/shared-types';
 import { animation } from '../../../animations/animation';
 import { wait } from '../../../../lib/webcomponent-util';
 import { bindToClass } from '../../../../lib/decorators';
@@ -156,7 +155,7 @@ export class LoginWeb extends Login {
 			private_key: privateKey,
 			instance_id: instance_id
 		});
-		await root.changePage(ENTRYPOINT.DASHBOARD);
+		await this.onLoginSuccess();
 	}
 
 	@bindToClass

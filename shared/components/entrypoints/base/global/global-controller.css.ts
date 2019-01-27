@@ -17,5 +17,9 @@ export const GlobalControllerCSS = new TemplateFn<GlobalController>((html, _prop
 		#content .newpage {
 			opacity: 0;
 		}
+
+		#content {
+			position: absolute;
+		}
 	</style>`
 }, CHANGE_TYPE.NEVER);

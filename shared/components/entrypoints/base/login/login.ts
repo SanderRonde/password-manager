@@ -1,12 +1,12 @@
 /// <reference path="../../../../types/elements.d.ts" />
-import { LoginData, VALID_THEMES_T, GlobalProperties } from '../../../../types/shared-types';
+import { LoginData, VALID_THEMES_T, GlobalProperties, ENTRYPOINT } from '../../../../types/shared-types';
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { ConfigurableWebComponent, Props, PROP_TYPE } from "../../../../lib/webcomponents";
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
+import { isDefined, getCookie, wait } from '../../../../lib/webcomponent-util'
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
-import { isDefined, getCookie } from '../../../../lib/webcomponent-util'
 import { PaperDialog } from '../../../util/paper-dialog/paper-dialog';
 import { PaperButton } from '../../../util/paper-button/paper-button';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
@@ -16,6 +16,9 @@ import { bindToClass } from '../../../../lib/decorators';
 import { MDCard } from '../../../util/md-card/md-card';
 import { JSONResponse } from '../../../../types/api';
 import { LoginIDMap } from './login-querymap';
+import { DIALOG_FADE_TIME, KEY_TURN_TIME, SPLIT_TIME } from './login.css';
+import { awaitMounted } from '../../../../lib/webcomponents/template-util';
+import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
 
 export const LoginDependencies = [
 	VerticalCenterer, 
@@ -139,6 +142,54 @@ export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
 					twofactor_token: twofactor.trim()
 				}
 			}
+	}
+
+	public async onLoginSuccess() {
+		const root = this.getRoot<GlobalController>();
+		root.loadEntrypoint(ENTRYPOINT.DASHBOARD);
+		const dashboardEl = root.addNewPage(ENTRYPOINT.DASHBOARD);
+		this.$.lockAnimationContainer.classList.add('changeColor');
+		this.$.pageContainer.classList.add('invisible');
+		await wait(DIALOG_FADE_TIME);
+		this.$.pageContainer.classList.add('hidden');
+		await wait(100);
+
+		this.$.lockAnimationKeySlot.classList.add('turned');
+		await wait(KEY_TURN_TIME);
+
+		if (dashboardEl.isMounted) {
+			dashboardEl.classList.remove('invisible', 'hidden');
+		}
+
+		await wait(100);
+
+		this.$.lockAnimationContainer.classList.add('split');
+
+		let splitDone = false;
+		awaitMounted(dashboardEl).then(() => {
+			if (!splitDone) {
+				dashboardEl.classList.remove('invisible', 'hidden');
+			}
+		});
+		await wait(SPLIT_TIME);
+		splitDone = true;
+
+		this.$.lockAnimationContainer.classList.add('hidden');
+
+		if (!dashboardEl.isMounted) {
+			root.$.loadable.load();
+			await Promise.all([
+				awaitMounted(dashboardEl),
+				wait(ANIMATE_TIME)
+			]);
+			root.$.loadable.finish();
+		}
+
+		root.props.page = ENTRYPOINT.DASHBOARD;
+		root.globalProps<GlobalProperties>().set('page', ENTRYPOINT.DASHBOARD);
+		root.hideNonCurrent();
+		dashboardEl.classList.remove('invisible', 'hidden');
+		root.setHistoryState(ENTRYPOINT.DASHBOARD);
 	}
 
 	@bindToClass

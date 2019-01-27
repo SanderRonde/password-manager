@@ -1,22 +1,28 @@
-interface ColorRepresentation {
+interface RGBAColorRepresentation {
 	r: number;
 	g: number;
 	b: number;
 	a: number;
+}
+interface RGBColorRepresentation {
+	r: number;
+	g: number;
+	b: number;
+	a?: number;
 }
 
 const HEX_REGEX = /#([a-fA-F\d]{2})([a-fA-F\d]{2})([a-fA-F\d]{2})/;
 const HEX_ALPHA_REGEX = /#([a-fA-F\d]{2})([a-fA-F\d]{2})([a-fA-F\d]{2})([a-fA-F\d]{2})/;
 const RGB_REGEX = /rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\s*\)/;
 const RGBA_REGEX = /rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d\.)?(\d+)\s*\)/;
-const BLACK: ColorRepresentation = {
+const BLACK: RGBAColorRepresentation = {
 	r: 0,
 	g: 0,
 	b: 0,
 	a: 100
 };
 
-function getColorRepresentation(color: string): ColorRepresentation {
+function getColorRepresentation(color: string): RGBAColorRepresentation {
 	if (color.startsWith('#') && HEX_ALPHA_REGEX.exec(color)) {
 		const match = HEX_ALPHA_REGEX.exec(color);
 		if (!match) return BLACK;
@@ -69,7 +75,7 @@ function getColorRepresentation(color: string): ColorRepresentation {
 	return BLACK;
 }
 
-function toStringColor(color: ColorRepresentation) {
+function toStringColor(color: RGBAColorRepresentation) {
 	return `rgba(${color.r}, ${color.g}, ${color.b}, ${
 		color.a === 100 ? '1' : 
 			color.a < 10 ? `0.0${color.a}` : `0.${color.a}`	
@@ -241,4 +247,43 @@ export function changeOpacity(color: string, opacity: number) {
 export function isDark(color: string) {
 	const { r, g, b, a } = getColorRepresentation(color);
 	return r * a < 100 && g * a < 100 && b * a < 100;
+}
+
+export function RGBToRGBA(color: RGBColorRepresentation, alpha?: number): RGBAColorRepresentation {
+	if (typeof alpha !== 'number') {
+		alpha = 100;
+	}
+	if (typeof color.a === 'number') {
+		return color as RGBAColorRepresentation;
+	}
+	return {...color, a: alpha }
+}
+
+export function mergeColors(color1: string|RGBColorRepresentation, color2: string|RGBColorRepresentation, negate: boolean = false): string {
+	console.log('merging', color1, color2, negate);
+	if (typeof color1 === 'string') {
+		color1 = getColorRepresentation(color1);
+	} else {
+		color1 = RGBToRGBA(color1);
+	}
+	if (typeof color2 === 'string') {
+		color2 = getColorRepresentation(color2);
+	} else {
+		color2 = RGBToRGBA(color2, 0);
+	}
+	console.log(color1, color2);
+
+	if (negate) {
+		color2.r *= -1;
+		color2.g *= -1;
+		color2.b *= -1;
+		(color2 as RGBAColorRepresentation).a *= -1;
+	}
+
+	return toStringColor({
+		r: color1.r + color2.r,
+		g: color1.g + color2.g,
+		b: color1.b + color2.b,
+		a: (color1 as RGBAColorRepresentation).a + (color2 as RGBAColorRepresentation).a
+	});
 }

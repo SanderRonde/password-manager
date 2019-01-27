@@ -134,6 +134,7 @@ export const DashboardCSS = new TemplateFn<Dashboard, ProjectTheme>((html, _prop
 	return html`<style>
 		#container {
 			background-color: ${theme.background};
+			width: 100vw;
 		}
 
 		#titleBar {
