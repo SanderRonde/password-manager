@@ -101,7 +101,7 @@
   },
   "scripts": {
     "compile": "gulp defs && tsc --build tsconfig.json --force",
-    "build": "yarn compile && yarn compile:server:modules && gulp dashboard",
+    "build": "yarn compile && gulp dashboard",
     "test": "tsc --build --force test/tsconfig.json && mocha test/unit/unit.test.js --exit"
   }
 }
