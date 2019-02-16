@@ -29,8 +29,6 @@
 	}, {
 		"path": "./server/app/actions/server/webserver/client"
 	}, {
-        "path": "./test/tsconfig.json"
-    }, {
         "path": "./scripts/tsconfig.json"
     }]
 }
