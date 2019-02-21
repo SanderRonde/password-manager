@@ -20,6 +20,7 @@ before_script:
 script:
 - gulp precompile
 - tsc -v
+- tsc --build --force test/tsconfig.json
 - tsc --build --force
 - gulp pretest
 - mocha test/unit/unit.test.js --exit
