@@ -25,6 +25,8 @@ export function serverTest() {
 				'--debug'
 			]);
 
+			proc.onText(console.log);
+
 			proc.expectWrite(`HTTP server listening on port ${http}`)
 			proc.expectExit(-1);
 
@@ -43,6 +45,8 @@ export function serverTest() {
 				'-d', uri,
 				'--debug'
 			]);
+
+			proc.onText(console.log);
 
 			proc.expectWrite('You enabled HTTPS only mode but haven\'t provided HTTPS certs,' + 
 				' this means all requests are redirected to a non-existent server');
@@ -100,6 +104,8 @@ export function serverTest() {
 				'--no-https-only',
 				'--debug'
 			]);
+
+			proc.onText(console.log);
 
 			proc.expectWrite(`HTTP server listening on port ${httpPort}`)
 			proc.expectExit(-1);
