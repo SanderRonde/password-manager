@@ -40,7 +40,7 @@ export class Webserver {
 	public Router: WebserverRouter;
 	public Auth: WebserverAuth = new WebserverAuth();
 
-	private _versions: {
+	private _versions!: {
 		[key: string]: string;
 	}
 
@@ -49,9 +49,6 @@ export class Webserver {
 		this.debug = !!config.debug;
 		this.Routes = new WebserverRoutes(this);
 		this.Router = new WebserverRouter(this);
-		this._versions = JSON.parse(fs.readFileSync(path.join(SERVER_ROOT, 'app/actions/server/webserver/client/build/versions.json'), {
-			encoding: 'utf8'
-		}));
 	}
 
 	public get assetPath() {
@@ -120,6 +117,14 @@ export class Webserver {
 	}
 
 	async init() {
+		try {
+			this._versions = JSON.parse(fs.readFileSync(path.join(SERVER_ROOT, 'app/actions/server/webserver/client/build/versions.json'), {
+				encoding: 'utf8'
+			}));
+		} catch(e) {
+			exitWith('Failed to read versions.json');
+		}
+
 		await this._initMiddleware();
 		this.Router.init();
 		initPeriodicals(this);
