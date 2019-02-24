@@ -20,9 +20,9 @@ before_script:
 script:
 - gulp precompile
 - tsc -v
+- tsc --build --force
 - tsc --build --force test/tsconfig.json
 - mocha test/unit/unit.test.js --exit
-- tsc --build --force
 - gulp pretest
 - node test/ui/test-cypress.js
 notifications:
