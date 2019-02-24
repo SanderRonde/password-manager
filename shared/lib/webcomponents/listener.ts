@@ -23,7 +23,7 @@ export abstract class WebComponentListenable<E extends EventListenerObj> extends
 		[P in keyof E]: Set<(...params: E[P]['args']) => E[P]['returnType']>;
 	}>(key: EV, value: T) {
 		if (!(key in value)) {
-			value[key] = new Set();
+			value[key] = new Set() as any;
 		}
 	}
 
