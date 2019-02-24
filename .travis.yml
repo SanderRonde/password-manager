@@ -18,12 +18,8 @@ before_script:
 - sleep 15
 - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
 script:
-- gulp precompile
 - tsc -v
-- tsc --build --force
-- gulp pretest
-- tsc --build --force test/tsconfig.json
-- mocha test/unit/unit.test.js --exit
+- yarn test
 - node test/ui/test-cypress.js
 notifications:
   email:

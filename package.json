@@ -100,8 +100,9 @@
     "webpack-stream": "^5.0.0"
   },
   "scripts": {
-    "compile": "gulp defs && tsc --build tsconfig.json --force",
+    "compile": "gulp precompile && tsc --build tsconfig.json --force",
     "build": "yarn compile && gulp dashboard",
-    "test": "tsc --build --force test/tsconfig.json && mocha test/unit/unit.test.js --exit"
+    "pretest": "yarn compile && gulp pretest && tsc --build --force test/tsconfig.json",
+    "test": "yarn pretest && mocha test/unit/unit.test.js --exit"
   }
 }
