@@ -21,9 +21,9 @@ script:
 - gulp precompile
 - tsc -v
 - tsc --build --force test/tsconfig.json
+- mocha test/unit/unit.test.js --exit
 - tsc --build --force
 - gulp pretest
-- mocha test/unit/unit.test.js --exit
 - node test/ui/test-cypress.js
 notifications:
   email:
