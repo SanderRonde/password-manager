@@ -415,17 +415,19 @@ const dashboard = (() => {
 							const content = await fs.readFile(file, {
 								encoding: 'utf8'
 							});
-							let tagIndex;
-							while (tagIndex = content.indexOf('<style>') !== -1) {
-								const startIndex = tagIndex + '<style>'.length;
-								const endIndex = content.slice(startIndex).indexOf('</style>') + startIndex;
-								const html = content.slice(startIndex, endIndex);
-								const minified = uglifyCSS.processString(html, { });
 
-								content = content.slice(0, startIndex) +
+							const replaced = doWhilePatternFound(content, (content) => {
+								return content.indexOf('<style>') !== -1;
+							}, (content) => {
+								const startIndex = content.indexOf('<style>') + '<style>'.length;
+								const endIndex = content.slice(startIndex).indexOf('</style>') + startIndex;
+								const css = content.slice(startIndex, endIndex);
+								
+								return content.slice(0, startIndex) +
 									minified + content.slice(endIndex);
-							}
-							await fs.writeFile(file, content, {
+							});
+
+							await fs.writeFile(file, replaced, {
 								encoding: 'utf8'
 							});
 						}));
