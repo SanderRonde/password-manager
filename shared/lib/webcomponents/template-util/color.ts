@@ -260,7 +260,6 @@ export function RGBToRGBA(color: RGBColorRepresentation, alpha?: number): RGBACo
 }
 
 export function mergeColors(color1: string|RGBColorRepresentation, color2: string|RGBColorRepresentation, negate: boolean = false): string {
-	console.log('merging', color1, color2, negate);
 	if (typeof color1 === 'string') {
 		color1 = getColorRepresentation(color1);
 	} else {
@@ -271,7 +270,6 @@ export function mergeColors(color1: string|RGBColorRepresentation, color2: strin
 	} else {
 		color2 = RGBToRGBA(color2, 0);
 	}
-	console.log(color1, color2);
 
 	if (negate) {
 		color2.r *= -1;
