@@ -1,7 +1,7 @@
 import { createNumberList, any, listenWithIdentifier, isNewElement, listen, wait } from '../../../lib/webcomponent-util';
 import { ConfigurableWebComponent, config, Props, PROP_TYPE, ComplexType } from '../../../lib/webcomponents';
 import { createDisposableWindowListener } from '../../../lib/webcomponents/template-util';
-import { InfiniteListIDMap } from './infinite-list-querymap';
+import { InfiniteListIDMap, InfiniteListClassMap } from './infinite-list-querymap';
 import { TemplateResult, html, render } from 'lit-html';
 import { InfiniteListHTML } from './infinite-list.html';
 import { InfiniteListCSS } from './infinite-list.css';
@@ -29,7 +29,10 @@ export interface ListRendered {
 	css: InfiniteListCSS,
 	html: InfiniteListHTML
 })
-export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<InfiniteListIDMap, {
+export class InfiniteList<D, ID, P> extends ConfigurableWebComponent<{
+	IDS: InfiniteListIDMap;
+	CLASSES: InfiniteListClassMap;
+}, {
 	disabledclick: {
 		args: [number],
 		returnValue: boolean|void

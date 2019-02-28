@@ -2,7 +2,7 @@
 
 import { ConfigurableWebComponent, config, Props, PROP_TYPE } from '../../../lib/webcomponents';
 import { listen, isNewElement } from '../../../lib/webcomponent-util';
-import { MaterialCheckboxIDMap } from './material-checkbox-querymap';
+import { MaterialCheckboxIDMap, MaterialCheckboxClassMap } from './material-checkbox-querymap';
 import { MaterialCheckboxHTML } from './material-checkbox.html';
 import { MaterialCheckboxCSS } from './material-checkbox.css';
 import { bindToClass } from '../../../lib/decorators';
@@ -12,7 +12,10 @@ import { bindToClass } from '../../../lib/decorators';
 	css: MaterialCheckboxCSS,
 	html: MaterialCheckboxHTML
 })
-export class MaterialCheckbox extends ConfigurableWebComponent<MaterialCheckboxIDMap, {
+export class MaterialCheckbox extends ConfigurableWebComponent<{
+	IDS: MaterialCheckboxIDMap;
+	CLASSES: MaterialCheckboxClassMap;
+}, {
 	change: {
 		//First arg is whether it's now checked, second is whether it used to be
 		args: [boolean, boolean]

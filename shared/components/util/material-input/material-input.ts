@@ -1,7 +1,7 @@
 /// <reference path="../../../types/elements.d.ts" />
 import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
 import { listen, isNewElement } from '../../../lib/webcomponent-util';
-import { MaterialInputIDMap } from './material-input-querymap';
+import { MaterialInputIDMap, MaterialInputClassMap } from './material-input-querymap';
 import { MaterialInputHTML } from './material-input.html';
 import { MaterialInputCSS } from './material-input.css';
 import { bindToClass } from '../../../lib/decorators';
@@ -15,7 +15,10 @@ import { bindToClass } from '../../../lib/decorators';
 	css: MaterialInputCSS,
 	html: MaterialInputHTML
 })
-export class MaterialInput extends ConfigurableWebComponent<MaterialInputIDMap, {
+export class MaterialInput extends ConfigurableWebComponent<{
+	IDS: MaterialInputIDMap;
+	CLASSES: MaterialInputClassMap;
+}, {
 	valid: {
 		args: [boolean]
 	},

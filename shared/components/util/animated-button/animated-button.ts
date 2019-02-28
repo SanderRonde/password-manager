@@ -4,7 +4,7 @@ import { AnimatedButtonCSS, FADE_IN_OUT_TIME, COLOR_FADE_TIME } from './animated
 import { isNewElement, wait } from '../../../lib/webcomponent-util';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
-import { AnimatedButtonIDMap } from './animated-button-querymap';
+import { AnimatedButtonIDMap, AnimatedButtonClassMap } from './animated-button-querymap';
 import { AnimatedButtonHTML } from './animated-button.html';
 import { bindToClass } from '../../../lib/decorators';
 
@@ -15,7 +15,10 @@ import { bindToClass } from '../../../lib/decorators';
 	dependencies: [ LoadingSpinner ]
 })
 @rippleEffect
-export class AnimatedButton extends ConfigurableWebComponent<AnimatedButtonIDMap, {
+export class AnimatedButton extends ConfigurableWebComponent<{
+	IDS: AnimatedButtonIDMap;
+	CLASSES: AnimatedButtonClassMap;
+}, {
 	click: {
 		args: [MouseEvent]
 	}

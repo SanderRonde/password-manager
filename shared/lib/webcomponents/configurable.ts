@@ -2,9 +2,17 @@ import { TemplateFn, WebComponentBase } from './base';
 import { EventListenerObj } from './listener';
 import { WebComponent } from './component';
 
-export class ConfigurableWebComponent<IDS extends {
-	[key: string]: HTMLElement;
-} = {}, E extends EventListenerObj = {}> extends WebComponent<IDS, E> {
+export class ConfigurableWebComponent<ELS extends {
+	IDS: {
+		[key: string]: HTMLElement|SVGElement;
+	};
+	CLASSES: {
+		[key: string]: HTMLElement|SVGElement;
+	}
+} = {
+	IDS: {};
+	CLASSES: {}
+}, E extends EventListenerObj = {}> extends WebComponent<ELS, E> {
 	protected html!: TemplateFn;
 	public static config: WebComponentConfiguration;
 	public config!: WebComponentConfiguration;
@@ -50,11 +58,16 @@ export function config(config: WebComponentConfiguration) {
 		is, html,
 		dependencies = []	
 	} = config;
-	return <I extends {
-		[key: string]: HTMLElement;
-	}, T, E extends EventListenerObj = {}>(target: T): T => {
+	return <ELS extends {
+	IDS: {
+		[key: string]: HTMLElement|SVGElement;
+	};
+	CLASSES: {
+		[key: string]: HTMLElement|SVGElement;
+	}
+}, T, E extends EventListenerObj = {}>(target: T): T => {
 		const targetComponent = <any>target as typeof WebComponent;
-		class WebComponentConfig extends targetComponent<I, E> implements WebComponentBase {
+		class WebComponentConfig extends targetComponent<ELS, E> implements WebComponentBase {
 			static is = genIs(is, WebComponentConfig);
 			static dependencies = dependencies
 			static config = config;

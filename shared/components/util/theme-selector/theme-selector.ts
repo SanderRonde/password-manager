@@ -1,7 +1,7 @@
 /// <reference path="../../../types/elements.d.ts" />
 import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
 import { isNewElement, listenWithIdentifier } from "../../../lib/webcomponent-util";
-import { ThemeSelectorIDMap } from "./theme-selector-querymap";
+import { ThemeSelectorIDMap, ThemeSelectorClassMap } from "./theme-selector-querymap";
 import { VALID_THEMES_T, GlobalProperties } from '../../../types/shared-types';
 import { ThemeSelectorHTML } from './theme-selector.html';
 import { ThemeSelectorCSS } from './theme-selector.css';
@@ -16,7 +16,10 @@ import { bindToClass } from '../../../lib/decorators';
 		IconButton
 	]
 })
-export class ThemeSelector extends ConfigurableWebComponent<ThemeSelectorIDMap> { 
+export class ThemeSelector extends ConfigurableWebComponent<{
+	IDS: ThemeSelectorIDMap;
+	CLASSES: ThemeSelectorClassMap;
+}> { 
 	props = Props.define(this, {
 		reflect: {
 			currentTheme: {

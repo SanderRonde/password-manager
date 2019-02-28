@@ -1,7 +1,7 @@
 /// <reference path="../../../types/elements.d.ts" />
 
 import { ConfigurableWebComponent, TemplateFn, CHANGE_TYPE, config, Props, PROP_TYPE } from '../../../lib/webcomponents';
-import { SizingBlockIDMap } from './sizing-block-querymap';
+import { SizingBlockIDMap, SizingBlockClassMap } from './sizing-block-querymap';
 import { SizingBlockHTML } from './sizing-block.html';
 import { wait } from '../../../lib/webcomponent-util';
 import { html } from 'lit-html';
@@ -15,7 +15,10 @@ function px(num: number): string {
 	css: new TemplateFn<SizingBlock>(null, CHANGE_TYPE.NEVER),
 	html: SizingBlockHTML
 })
-export class SizingBlock extends ConfigurableWebComponent<SizingBlockIDMap> {
+export class SizingBlock extends ConfigurableWebComponent<{
+	IDS: SizingBlockIDMap;
+	CLASSES: SizingBlockClassMap;
+}> {
 	private _currentHeight: number = 0;
 	private _supportsAnimate = !!HTMLElement.prototype.animate;
 	private static readonly ANIMATE_DURATION = 300;

@@ -13,7 +13,7 @@ import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { PasswordDetail } from '../password-detail/password-detail';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
-import { PasswordCreateIDMap } from './password-create-querymap';
+import { PasswordCreateIDMap, PasswordCreateClassMap } from './password-create-querymap';
 import { getHost } from '../password-form/password-form.html';
 import { PasswordCreateHTML } from './password-create.html';
 import { PasswordCreateCSS } from './password-create.css';
@@ -34,7 +34,10 @@ import { JSONResponse } from '../../../../types/api';
 		AnimatedButton
 	]
 })
-export class PasswordCreate extends ConfigurableWebComponent<PasswordCreateIDMap> {
+export class PasswordCreate extends ConfigurableWebComponent<{
+	IDS: PasswordCreateIDMap;
+	CLASSES: PasswordCreateClassMap;
+}> {
 	props = Props.define(this, {
 		priv: {
 			passwordVisible: PROP_TYPE.BOOL,

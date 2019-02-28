@@ -7,7 +7,7 @@ import { LoadableBlock } from '../../../util/loadable-block/loadable-block';
 import { awaitMounted } from '../../../../lib/webcomponents/template-util';
 import { decryptWithPrivateKey } from '../../../../lib/browser-crypto';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
-import { GlobalControllerIDMap } from './global-controller-querymap';
+import { GlobalControllerIDMap, GlobalControllerClassMap } from './global-controller-querymap';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { Dashboard } from '../../base/dashboard/dashboard';
 import { wait } from '../../../../lib/webcomponent-util';
@@ -36,7 +36,10 @@ export const GlobalControllerDependencies = [
 	LoadableBlock,
 	PaperToast
 ];
-export abstract class GlobalController extends ConfigurableWebComponent<GlobalControllerIDMap> {
+export abstract class GlobalController extends ConfigurableWebComponent<{
+	IDS: GlobalControllerIDMap;
+	CLASSES: GlobalControllerClassMap;
+}> {
 	private _data: Map<keyof GlobalControllerData, 
 		GlobalControllerData[keyof GlobalControllerData]> = new Map();
 	private static readonly _entrypointURLs = {

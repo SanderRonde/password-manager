@@ -17,14 +17,111 @@ type IDMapFn<IDS> = {
 
 type PropChangeEvents = 'beforePropChange'|'propChange';
 
-export abstract class WebComponent<IDS extends {
-	[key: string]: HTMLElement;
-} = {}, E extends EventListenerObj = {}> extends WebComponentCustomCSSManager<E> {
+class Style<C> {
+	private _id?: string;
+	private _className?: string;
+	private _tag?: string;
+
+	constructor({
+		className, id, tag
+	}: {
+		id?: string;
+		className?: string;
+		tag?: string;
+	}, private _link?: {
+		type: 'and'|'or';
+		style: Style<any>;
+	}) {
+		this._id = id;
+		this._tag = tag;
+		this._className = className;
+	}
+
+	private _connectLinks(dataType: 'id'|'class'|'tag'): string {
+		if (!this._link) {
+			return '';
+		}
+		if (this._link.type === 'and') {
+			return this._link.style.getDataType(dataType);
+		} else if (this._link.type === 'or') {
+			return `, ${this._link.style.getDataType(dataType)}`;
+		}
+		return '';
+	}
+
+	public getDataType(dataType: 'id'|'class'|'tag'): string {
+		switch (dataType) {
+			case 'id':
+				return this.id;
+			case 'class':
+				return this.className;
+			case 'tag':
+				return this.tag;
+		}
+	}
+
+	public get id(): string {
+		return `#${this._id || 'undef'}${this._connectLinks('id')}`;
+	}
+
+	public get className(): string {
+		return `.${this._className || 'undef'}${this._connectLinks('class')}`;
+	}
+
+	public get tag(): string {
+		return `${this._tag || 'undef'}${this._connectLinks('tag')}`;
+	}
+
+	private _clone() {
+		return {
+			id: this._id,
+			className: this._className,
+			tag: this._tag
+		}
+	}
+
+	public or(style: Style<any>) {
+		return new Style<C>(this._clone(), {
+			type: 'or',
+			style
+		});
+	}
+
+	public and(style: Style<any>) {
+		return new Style<C>(this._clone(), {
+			type: 'and',
+			style
+		});
+	}
+
+	public withClass(className: string) {
+		return new Style<C>(this._clone(), {
+			type: 'and',
+			style: new Style<any>({
+				className: className
+			})
+		});
+	}
+
+	public MARKER = '';
+}
+
+export abstract class WebComponent<ELS extends {
+	IDS: {
+		[key: string]: HTMLElement|SVGElement;
+	};
+	CLASSES: {
+		[key: string]: HTMLElement|SVGElement;
+	}
+} = {
+	IDS: {};
+	CLASSES: {}
+}, E extends EventListenerObj = {}> extends WebComponentCustomCSSManager<E> {
 	/**
 	 * An ID map containing maps between queried IDs and elements,
 	 * 	cleared upon render
 	 */
-	private __idMap: Map<keyof IDS, IDS[keyof IDS]> = new Map();
+	private __idMap: Map<keyof ELS["IDS"], ELS["IDS"][keyof ELS["IDS"]]> = new Map();
 	protected disposables: (() => void)[] = [];
 	public isMounted: boolean = false;
 
@@ -44,7 +141,7 @@ export abstract class WebComponent<IDS extends {
 	/**
 	 * Access this component's children based on their IDs or query something
 	 */
-	$: IDMapFn<IDS> = (() => {
+	$: IDMapFn<ELS["IDS"]> = (() => {
 		const __this = this;
 		return new Proxy((selector: string) => {
 			return this.root.querySelector(selector) as HTMLElement;
@@ -59,12 +156,59 @@ export abstract class WebComponent<IDS extends {
 				}
 				const el = __this.root.getElementById(id);
 				if (el) {
-					__this.__idMap.set(id, el as IDS[keyof IDS]);
+					__this.__idMap.set(id, el as ELS["IDS"][keyof ELS["IDS"]]);
 				}
 				return el;
 			}
 		});
-	})() as IDMapFn<IDS>
+	})() as IDMapFn<ELS["IDS"]>;
+
+	/**
+	 * Generate styles for this component in a type-safe manner
+	 */
+	styles: {
+		id: {
+			[P in keyof ELS["IDS"]]: Style<ELS["IDS"][P]>;
+		}
+		class: {
+			[P in keyof ELS["CLASSES"]]: Style<ELS["CLASSES"][P]>;
+		}
+		tag: {
+			[P in keyof WebComponentElementsByTag]: Style<WebComponentElementsByTag[P]>;
+		}
+	} = {
+		id: new Proxy({}, {
+			get(_, id) {
+				return new Style({
+					id: id as string
+				});
+			}
+		}),
+		class: new Proxy({}, {
+			get(_, className) {
+				return new Style({
+					className: className as string
+				});
+			}
+		}),
+		tag: new Proxy({}, {
+			get(_, tag) {
+				return new Style({
+					tag: tag as string
+				});
+			}
+		})
+	} as {
+		id: {
+			[P in keyof ELS["IDS"]]: Style<ELS["IDS"][P]>;
+		}
+		class: {
+			[P in keyof ELS["CLASSES"]]: Style<ELS["CLASSES"][P]>;
+		}
+		tag: {
+			[P in keyof WebComponentElementsByTag]: Style<WebComponentElementsByTag[P]>;
+		}
+	};
 
 	/**
 	 * Apply querySelectorAll to this component's root

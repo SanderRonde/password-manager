@@ -2,7 +2,7 @@
 import { awaitMounted, createCancellableTimeout } from '../../../lib/webcomponents/template-util';
 import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
 import { LoadableBlockCSS, ANIMATE_TIME } from './loadable-block.css';
-import { LoadableBlockIDMap } from './loadable-block-querymap';
+import { LoadableBlockIDMap, LoadableBlockClassMap } from './loadable-block-querymap';
 import { LoadableBlockHTML } from './loadable-block.html';
 import { wait } from "../../../lib/webcomponent-util";
 
@@ -11,7 +11,10 @@ import { wait } from "../../../lib/webcomponent-util";
 	css: LoadableBlockCSS,
 	html: LoadableBlockHTML
 })
-export class LoadableBlock extends ConfigurableWebComponent<LoadableBlockIDMap> {
+export class LoadableBlock extends ConfigurableWebComponent<{
+	IDS: LoadableBlockIDMap;
+	CLASSES: LoadableBlockClassMap;
+}> {
 	private __dimensions: {
 		x: number;
 		y: number;

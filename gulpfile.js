@@ -405,9 +405,150 @@ const dashboard = (() => {
 				})
 		)));
 
-	gulp.task('dashboard.bundle.js', addDescription('Bundles the TSX files into a single bundle',
+	/**
+	 * Does {onFound} to content while {findPattern} returns true
+	 * 
+	 * @param {string} content - The content to manipulate
+	 * @param {() => boolean} findPattern - The function to test whether to continue
+	 * @param {(content: string) => string} onFound - The function to call while 
+	 * 	the pattern is being found
+	 * 
+	 * @returns {string} - The final content
+	 */
+	function doWhilePatternFound(content, findPattern, onFound) {
+		while (findPattern(content)) {
+			content = onFound(content);
+		}
+		return content;
+	}
+
+
+	class Style {	
+		constructor({
+			className, id, tag
+		}, _link) {
+			this._link = _link;
+			this._id = id;
+			this._tag = tag;
+			this._className = className;
+			this.MARKER = '';
+		}
+	
+		_connectLinks(dataType) {
+			if (!this._link) {
+				return '';
+			}
+			if (this._link.type === 'and') {
+				return this._link.style.getDataType(dataType);
+			} else if (this._link.type === 'or') {
+				return `, ${this._link.style.getDataType(dataType)}`;
+			}
+			return '';
+		}
+	
+		getDataType(dataType) {
+			switch (dataType) {
+				case 'id':
+					return this.id;
+				case 'class':
+					return this.className;
+				case 'tag':
+					return this.tag;
+			}
+		}
+	
+		get id() {
+			return `#${this._id || 'undef'}${this._connectLinks('id')}`;
+		}
+	
+		get className() {
+			return `.${this._className || 'undef'}${this._connectLinks('class')}`;
+		}
+	
+		get tag() {
+			return `${this._tag || 'undef'}${this._connectLinks('tag')}`;
+		}
+	
+		_clone() {
+			return {
+				id: this._id,
+				className: this._className,
+				tag: this._tag
+			}
+		}
+	
+		or(style) {
+			return new Style(this._clone(), {
+				type: 'or',
+				style
+			});
+		}
+	
+		and(style) {
+			return new Style(this._clone(), {
+				type: 'and',
+				style
+			});
+		}
+	
+		withClass(className) {
+			return new Style(this._clone(), {
+				type: 'and',
+				style: new Style({
+					className: className
+				})
+			});
+		}
+
+		static styles() {
+			return {
+				id: new Proxy({}, {
+					get(_, id) {
+						return new Style({
+							id: id
+						});
+					}
+				}),
+				class: new Proxy({}, {
+					get(_, className) {
+						return new Style({
+							className: className
+						});
+					}
+				}),
+				tag: new Proxy({}, {
+					get(_, tag) {
+						return new Style({
+							tag: tag
+						});
+					}
+				})
+			}
+		}
+	}
+
+	gulp.task('dashboard.bundle.js', addDescription('Bundles the TS files into a single bundle',
 		gulp.series(
-			gulp.parallel(
+			gulp.series(
+				addDescription('Preprocesses CSS selectors', 
+					async function preprocessCSS() {
+						const files = await findWithGlob('shared/components/**/*.css.js');
+						await Promise.all(files.map(async (file) => {
+							const content = await fs.readFile(file, {
+								encoding: 'utf8'
+							});
+
+							const replaced = content.replace(/<style>((.|\n|\r)*?)<\/style>/g, (_, innerContent) => {
+								return `<style>${innerContent.replace(/\${(this\.styles\.(.|\n)*)\}/g, (_, expression) => {
+									return eval(expression.replace(/this\.styles\./g, 'Style.styles().'));
+								})}</style>`;
+							});
+
+							await fs.writeFile(file, replaced, {
+								encoding: 'utf8'
+							});
+						}));
+					}),
 				addDescription('Minifies the CSS of components',
 					async function minifyCSS() {
 						const files = await findWithGlob('shared/components/**/*.css.js');
@@ -416,15 +557,8 @@ const dashboard = (() => {
 								encoding: 'utf8'
 							});
 
-							const replaced = doWhilePatternFound(content, (content) => {
-								return content.indexOf('<style>') !== -1;
-							}, (content) => {
-								const startIndex = content.indexOf('<style>') + '<style>'.length;
-								const endIndex = content.slice(startIndex).indexOf('</style>') + startIndex;
-								const css = content.slice(startIndex, endIndex);
-								
-								return content.slice(0, startIndex) +
-									minified + content.slice(endIndex);
+							const replaced = content.replace(/<style>((.|\n|\r)*?)<\/style>/g, (substring, innerContent) => {
+								return `<style>${uglifyCSS.processString(innerContent, { })}</style>`;
 							});
 
 							await fs.writeFile(file, replaced, {

@@ -10,7 +10,7 @@ import { MaterialInput } from '../../../util/material-input/material-input';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { MoreInfo } from '../../../util/more-info/more-info';
-import { PasswordFormIDMap } from './password-form-querymap';
+import { PasswordFormIDMap, PasswordFormClassMap } from './password-form-querymap';
 import { bindToClass } from '../../../../lib/decorators';
 import { PasswordFormHTML } from './password-form.html';
 import { PasswordFormCSS } from './password-form.css';
@@ -27,7 +27,10 @@ import { totp } from '../../../../lib/browser-crypto';
 		FloatingActionButton
 	]
 })
-export class PasswordForm extends ConfigurableWebComponent<PasswordFormIDMap> {
+export class PasswordForm extends ConfigurableWebComponent<{
+	IDS: PasswordFormIDMap;
+	CLASSES: PasswordFormClassMap;
+}> {
 	props = Props.define(this, {
 		priv: {
 			visibleWebsites: {

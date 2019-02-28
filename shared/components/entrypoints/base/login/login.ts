@@ -15,7 +15,7 @@ import { GlobalController } from '../global/global-controller';
 import { bindToClass } from '../../../../lib/decorators';
 import { MDCard } from '../../../util/md-card/md-card';
 import { JSONResponse } from '../../../../types/api';
-import { LoginIDMap } from './login-querymap';
+import { LoginIDMap, LoginClassMap } from './login-querymap';
 import { DIALOG_FADE_TIME, KEY_TURN_TIME, SPLIT_TIME } from './login.css';
 import { awaitMounted } from '../../../../lib/webcomponents/template-util';
 import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
@@ -32,7 +32,10 @@ export const LoginDependencies = [
 	PaperDialog,
 	PaperButton
 ];
-export abstract class Login extends ConfigurableWebComponent<LoginIDMap> {
+export abstract class Login extends ConfigurableWebComponent<{
+	IDS: LoginIDMap;
+	CLASSES: LoginClassMap;
+}> {
 	props = Props.define(this, {
 		priv: {
 			emailRemembered: PROP_TYPE.BOOL

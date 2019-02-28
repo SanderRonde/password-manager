@@ -4,7 +4,7 @@ import { ConfigurableWebComponent, config, Props, ComplexType, PROP_TYPE } from 
 import { HorizontalCenterer } from '../horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../vertical-centerer/vertical-centerer';
 import { PaperDialogCSS, ANIMATION_DURATION } from './paper-dialog.css';
-import { PaperDialogIDMap } from './paper-dialog-querymap';
+import { PaperDialogIDMap, PaperDialogClassMap } from './paper-dialog-querymap';
 import { PaperDialogHTML } from './paper-dialog.html';
 import { wait } from '../../../lib/webcomponent-util';
 import { MDCard } from '../md-card/md-card';
@@ -28,7 +28,10 @@ const BACKDROP_OPACITY = 0.3;
 		MDCard
 	]
 })
-export class PaperDialog extends ConfigurableWebComponent<PaperDialogIDMap> {
+export class PaperDialog extends ConfigurableWebComponent<{
+	IDS: PaperDialogIDMap;
+	CLASSES: PaperDialogClassMap;
+}> {
 	private _isOpened: boolean = false;
 	props = Props.define(this, {
 		reflect: {

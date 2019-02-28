@@ -3,7 +3,7 @@ import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib
 import { changeOpacity } from '../../../lib/webcomponents/template-util';
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
 import { isNewElement } from '../../../lib/webcomponent-util';
-import { PaperButtonIDMap } from './paper-button-querymap';
+import { PaperButtonIDMap, PaperButtonClassMap } from './paper-button-querymap';
 import { PaperButtonHTML } from './paper-button.html';
 import { bindToClass } from '../../../lib/decorators';
 import { PaperButtonCSS } from './paper-button.css';
@@ -15,7 +15,10 @@ import { html } from 'lit-html';
 	html: PaperButtonHTML
 })
 @rippleEffect
-export class PaperButton extends ConfigurableWebComponent<PaperButtonIDMap, {
+export class PaperButton extends ConfigurableWebComponent<{
+	IDS: PaperButtonIDMap;
+	CLASSES: PaperButtonClassMap;
+}, {
 	click: {
 		args: [MouseEvent]
 	}	

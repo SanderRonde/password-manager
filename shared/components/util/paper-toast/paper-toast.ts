@@ -4,7 +4,7 @@ import { ConfigurableWebComponent, config, Props, PROP_TYPE } from '../../../lib
 import { isNewElement, wait } from '../../../lib/webcomponent-util';
 import { CheckmarkSize } from '../../icons/checkmark/checkmark';
 import { PaperButton } from '../paper-button/paper-button';
-import { PaperToastIDMap } from './paper-toast-querymap';
+import { PaperToastIDMap, PaperToastClassMap } from './paper-toast-querymap';
 import { rippleEffect } from '../../../mixins/ripple';
 import { PaperToastHTML } from './paper-toast.html';
 import { PaperToastCSS } from './paper-toast.css';
@@ -25,7 +25,10 @@ const TOAST_NAME = 'paper-toast';
 	]
 })
 @rippleEffect
-export class PaperToast extends ConfigurableWebComponent<PaperToastIDMap, {
+export class PaperToast extends ConfigurableWebComponent<{
+	IDS: PaperToastIDMap;
+	CLASSES: PaperToastClassMap;
+}, {
 	buttonClick: {
 		args: [number, MouseEvent]
 	};

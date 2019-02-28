@@ -15,7 +15,12 @@ const listenedToElements: WeakMap<WebComponent, {
 	}>;
 }> = new WeakMap();
 function doListen<I extends {
-	[key: string]: HTMLElement;
+	IDS: {
+		[key: string]: HTMLElement|SVGElement;
+	};
+	CLASSES: {
+		[key: string]: HTMLElement|SVGElement;
+	}
 }, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, type: 'element' | 'identifier', 
 	element: HTMLElement, id: string, event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, 
 	options?: boolean | AddEventListenerOptions) {
@@ -60,13 +65,23 @@ function doListen<I extends {
 		}
 	}
 export function listen<I extends {
-	[key: string]: HTMLElement;
+	IDS: {
+		[key: string]: HTMLElement|SVGElement;
+	};
+	CLASSES: {
+		[key: string]: HTMLElement|SVGElement;
+	}
 }, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, id: keyof T['$'], event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
 	const element: HTMLElement = (base.$ as any)[id];
 	doListen(base, 'element', element, id as string, event, listener, options);
 }
 export function listenWithIdentifier<I extends {
-	[key: string]: HTMLElement;
+	IDS: {
+		[key: string]: HTMLElement|SVGElement;
+	};
+	CLASSES: {
+		[key: string]: HTMLElement|SVGElement;
+	}
 }, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, element: HTMLElement, identifier: string, event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
 	doListen(base, 'identifier', element, identifier, event, listener, options);
 }
@@ -86,7 +101,12 @@ export function isNewElement(element: HTMLElement, context: Object = defaultCont
 	return !has;
 }
 export function listenIfNew<I extends {
-	[key: string]: HTMLElement;
+	IDS: {
+		[key: string]: HTMLElement|SVGElement;
+	};
+	CLASSES: {
+		[key: string]: HTMLElement|SVGElement;
+	}
 }, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, id: keyof T['$'], event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, isNew?: boolean, options?: boolean | AddEventListenerOptions) {
 	const element: HTMLElement = (base.$ as any)[id];
 	const isElementNew = typeof isNew === 'boolean' ? isNew : isNewElement(element);

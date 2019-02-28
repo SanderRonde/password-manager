@@ -19,7 +19,7 @@ import { VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
 import { PasswordPreview } from '../password-preview/password-preview';
 import { SizingBlock } from '../../../util/sizing-block/sizing-block';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
-import { PasswordDetailIDMap } from './password-detail-querymap';
+import { PasswordDetailIDMap, PasswordDetailClassMap } from './password-detail-querymap';
 import { getHost } from '../password-form/password-form.html';
 import { PasswordForm } from '../password-form/password-form';
 import { bindToClass } from '../../../../lib/decorators';
@@ -67,7 +67,10 @@ export const PasswordDetailDependencies = [
 	LoadingSpinner,
 	PasswordForm
 ]
-export abstract class PasswordDetail extends ConfigurableWebComponent<PasswordDetailIDMap> {
+export abstract class PasswordDetail extends ConfigurableWebComponent<{
+	IDS: PasswordDetailIDMap;
+	CLASSES: PasswordDetailClassMap;
+}> {
 	props = Props.define(this, {
 		priv: {
 			selected: ComplexType<MetaPasswords[0]>(),

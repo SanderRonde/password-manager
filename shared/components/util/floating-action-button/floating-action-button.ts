@@ -2,7 +2,7 @@
 
 import { ConfigurableWebComponent, config, Props, PROP_TYPE } from '../../../lib/webcomponents';
 import { HorizontalCenterer } from '../horizontal-centerer/horizontal-centerer';
-import { FloatingActionButtonIDMap } from './floating-action-button-querymap';
+import { FloatingActionButtonIDMap, FloatingActionButtonClassMap } from './floating-action-button-querymap';
 import { VerticalCenterer } from '../vertical-centerer/vertical-centerer';
 import { FloatingActionButtonHTML } from './floating-action-button.html';
 import { FloatingActionButtonCSS } from './floating-action-button.css';
@@ -17,7 +17,10 @@ import { bindToClass } from '../../../lib/decorators';
 	dependencies: [HorizontalCenterer, VerticalCenterer]
 })
 @rippleEffect
-export class FloatingActionButton extends ConfigurableWebComponent<FloatingActionButtonIDMap, {
+export class FloatingActionButton extends ConfigurableWebComponent<{
+	IDS: FloatingActionButtonIDMap;
+	CLASSES: FloatingActionButtonClassMap;
+}, {
 	click: {
 		args: [MouseEvent]
 	}

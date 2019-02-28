@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
 import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
-import { IconButtonIDMap } from "./icon-button-querymap";
+import { IconButtonIDMap, IconButtonClassMap } from "./icon-button-querymap";
 import { IconButtonHTML } from "./icon-button.html";
 import { IconButtonCSS } from "./icon-button.css";
 
@@ -9,7 +9,10 @@ import { IconButtonCSS } from "./icon-button.css";
 	css: IconButtonCSS,
 	html: IconButtonHTML
 })
-export class IconButton extends ConfigurableWebComponent<IconButtonIDMap> { 
+export class IconButton extends ConfigurableWebComponent<{
+	IDS: IconButtonIDMap;
+	CLASSES: IconButtonClassMap;
+}> { 
 	props = Props.define(this, {
 		reflect: {
 			fill: {
