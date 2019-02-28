@@ -21,6 +21,31 @@ import { IconButton } from "../components/util/icon-button/icon-button";
 import { MoreInfo } from "../components/util/more-info/more-info";
 import { MDCard } from "../components/util/md-card/md-card";
 
+export type WebComponentElementsByTag = {
+	'md-card': MDCard;
+	'login-web': LoginWeb;
+	'more-info': MoreInfo;
+	'paper-toast': PaperToast;
+	'icon-button': IconButton;
+	'sizing-block': SizingBlock;
+	'paper-button': PaperButton;
+	'password-form': PasswordForm;
+	'dashboard-web': DashboardWeb;
+	'loadable-block': LoadableBlock;
+	'material-input': MaterialInput;
+	'theme-selector': ThemeSelector;
+	'animated-button': AnimatedButton;
+	'password-detail': PasswordDetail;
+	'password-create': PasswordCreate;
+	'loading-spinner': LoadingSpinner;
+	'password-preview': PasswordPreview;
+	'vertical-centerer': VerticalCenterer;
+	'material-checkbox': MaterialCheckbox;
+	'horizontal-centerer': HorizontalCenterer;
+	'infinte-list': InfiniteList<any, any, any>;
+	'floating-action-button': FloatingActionButton;
+}
+
 declare global {
 	type HTMLMdCardElement = MDCard;
 	type HTMLMDCardElement = MDCard;
