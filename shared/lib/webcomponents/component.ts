@@ -236,7 +236,7 @@ export abstract class WebComponent<ELS extends {
 	 * Called when the component is unmounted from the dom
 	 */
 	disconnectedCallback() {
-		removeAllElementListeners(this);
+		removeAllElementListeners(this as any);
 		this.disposables.forEach(disposable => disposable());
 		this.disposables = [];
 		this.isMounted = false;

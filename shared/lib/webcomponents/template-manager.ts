@@ -178,7 +178,7 @@ class ComplexTemplateProcessor implements TemplateProcessor {
 type ComplexValue = TemplateFn|Function|Object;
 export abstract class WebComponentTemplateManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
 	private __reffed: ComplexValue[] = [];
-	private __templateProcessor = new ComplexTemplateProcessor(this, this.__genRef);
+	private __templateProcessor: ComplexTemplateProcessor = new ComplexTemplateProcessor(this, this.__genRef);
 
 	@bindToClass
 	private __genRef(value: ComplexValue) {

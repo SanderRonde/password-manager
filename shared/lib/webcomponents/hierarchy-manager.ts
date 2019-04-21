@@ -49,7 +49,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		this.__registerToParent();
 	}
 
-	private __findLocalRoot() {
+	private __findLocalRoot(): null|WebComponentHierarchyManager<any> {
 		let element: Node|null = this.parentNode;
 		while (element && !(element instanceof (window as any).ShadowRoot) && 
 			(element as any) !== document && !(element instanceof DocumentFragment)) {
@@ -71,7 +71,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		return host;
 	}
 
-	private __findDirectParents() {
+	private __findDirectParents(): null|WebComponentHierarchyManager<any> {
 		let element: Node|null = this.parentNode;
 		while (element && !(element instanceof (window as any).ShadowRoot) && 
 			(element as any) !== document && !(element instanceof DocumentFragment) &&
@@ -96,7 +96,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		return host;
 	}
 
-	private __getRoot() {
+	private __getRoot(): null|WebComponentHierarchyManager<any> {
 		const localRoot = this.__findLocalRoot();
 		if (localRoot !== null && localRoot !== this) {
 			//Found an actual root, use that

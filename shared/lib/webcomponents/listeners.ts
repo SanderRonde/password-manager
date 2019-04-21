@@ -25,14 +25,14 @@ function doListen<I extends {
 	element: HTMLElement, id: string, event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, 
 	options?: boolean | AddEventListenerOptions) {
 		const boundListener = listener.bind(base);
-		if (!listenedToElements.has(base)) {
-			listenedToElements.set(base, {
+		if (!listenedToElements.has(base as any)) {
+			listenedToElements.set(base as any, {
 				identifiers: new Map(),
 				elements: new Map(),
 				self: new Map()
 			});
 		}
-		const { elements: elementIDMap, identifiers: identifiersMap } = listenedToElements.get(base)!;
+		const { elements: elementIDMap, identifiers: identifiersMap } = listenedToElements.get(base as any)!;
 		const usedMap = type === 'element' ?
 			elementIDMap : identifiersMap;
 		if (!usedMap.has(id)) {
@@ -73,7 +73,7 @@ export function listen<I extends {
 	}
 }, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, id: keyof T['$'], event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
 	const element: HTMLElement = (base.$ as any)[id];
-	doListen(base, 'element', element, id as string, event, listener, options);
+	doListen(base as any, 'element', element, id as string, event, listener, options);
 }
 export function listenWithIdentifier<I extends {
 	IDS: {
@@ -83,7 +83,7 @@ export function listenWithIdentifier<I extends {
 		[key: string]: HTMLElement|SVGElement;
 	}
 }, T extends WebComponent<I>, K extends keyof HTMLElementEventMap>(base: T, element: HTMLElement, identifier: string, event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
-	doListen(base, 'identifier', element, identifier, event, listener, options);
+	doListen(base as any, 'identifier', element, identifier, event, listener, options);
 }
 const defaultContext = {};
 const usedElements: WeakMap<any, WeakSet<HTMLElement>> = new WeakMap();
@@ -113,7 +113,7 @@ export function listenIfNew<I extends {
 	if (!isElementNew) {
 		return;
 	}
-	listen(base, id, event, listener, options);
+	listen(base as any, id as string, event, listener, options);
 }
 export function listenToComponent<T extends WebComponent<any>, K extends keyof HTMLElementEventMap>(base: T, event: K, listener: (this: T, ev: HTMLElementEventMap[K]) => any) {
 	if (!listenedToElements.has(base)) {
