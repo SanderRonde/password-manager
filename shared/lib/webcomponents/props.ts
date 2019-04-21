@@ -113,19 +113,19 @@ interface Coerced {
 
 type GetTSType<V extends PROP_TYPE|ComplexType<any>|DefinePropTypeConfig> = 
 	V extends PROP_TYPE.BOOL ? boolean : 
-		V extends PROP_TYPE.NUMBER ?  number : 
-			V extends PROP_TYPE.STRING ? string : 
-				V extends ComplexType<infer R> ? R : 
-					V extends DefinePropTypeConfig ? 
-						V extends ExactTypeHaver ? V['exactType'] :
-							V['type'] extends PROP_TYPE.BOOL ? 
-								V extends Coerced ? boolean : boolean|undefined : 
-							V['type'] extends PROP_TYPE.NUMBER ? 
-								V extends Coerced ? number : number|undefined : 
-							V['type'] extends PROP_TYPE.STRING ? 
-								V extends Coerced ? string : string|undefined : 
-							V['type'] extends ComplexType<infer R> ? R :
-								void : void;
+	V extends PROP_TYPE.NUMBER ?  number : 
+	V extends PROP_TYPE.STRING ? string : 
+	V extends ComplexType<infer R> ? R : 
+	V extends DefineTypeConfig ? 
+		V extends ExactTypeHaver ? V['exactType'] :
+			V['type'] extends PROP_TYPE.BOOL ? 
+				V extends Coerced ? boolean : boolean|undefined : 
+			V['type'] extends PROP_TYPE.NUMBER ? 
+				V extends Coerced ? number : number|undefined : 
+			V['type'] extends PROP_TYPE.STRING ? 
+				V extends Coerced ? string : string|undefined : 
+			V['type'] extends ComplexType<infer R> ? R :
+				void : void;
 
 export const enum PROP_TYPE {
 	STRING = 'string',
@@ -143,8 +143,10 @@ export function ComplexType<T>(): ComplexType<T> {
 }
 
 type DefinePropTypes = PROP_TYPE|ComplexType<any>;
-interface DefinePropTypeConfig {
+interface DefineTypeConfig {
 	type: DefinePropTypes;
+}
+interface DefinePropTypeConfig extends DefineTypeConfig {
 	watch?: boolean;
 	defaultValue?: GetTSType<this['type']>;
 	value?: GetTSType<this['type']>;
