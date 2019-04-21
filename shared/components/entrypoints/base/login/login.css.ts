@@ -104,7 +104,7 @@ export const LoginCSS = new TemplateFn<Login>((html, _props, theme) => {
 			margin-left: auto;
 			margin-right: auto;
 			width: 26vmin;
-			height: 21vmin;
+			height: 18vmin;
 			border-radius: 0px 0px 1vmin 1vmin;
 		}
 
