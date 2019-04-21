@@ -94,3 +94,4 @@ scripts/*.map
 scripts/*.d.ts
 shared/components/theming/theme/theme.cjs.*
 shared/components/theming/theme/theme.es.*
+**/*.tsbuildinfo
