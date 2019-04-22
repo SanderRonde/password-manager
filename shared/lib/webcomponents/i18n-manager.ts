@@ -18,6 +18,8 @@ class I18NClass {
 	private static __loadingLang: string|null = null;
 	public static currentLang: string|null = null;
 	public static defaultLang: string|null = null;
+	public static returner: (promise: Promise<string>, content: string) => any =
+		I18NClass.createWaiter;
 	private _elementLang: string|null = null;
 
 	constructor(private _self: WebComponentI18NManager<any>) { }
@@ -122,15 +124,20 @@ export abstract class WebComponentI18NManager<E extends EventListenerObj> extend
 	
 	public static initI18N({
 		path,
-		defaultLang
+		defaultLang,
+		returner
 	}: {
 		path: string;
 		defaultLang: string;
+		returner?: (promise: Promise<string>, content: string) => any;
 	}) {
 		if (!path.endsWith('/')) {
 			path = path + '/';
 		}
 		I18NClass.path = path;
+		if (returner) {
+			I18NClass.returner = returner;
+		}
 		I18NClass.defaultLang = defaultLang;
 	}
 
