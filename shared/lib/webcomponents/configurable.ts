@@ -13,11 +13,11 @@ export class ConfigurableWebComponent<ELS extends {
 	IDS: {};
 	CLASSES: {}
 }, E extends EventListenerObj = {}> extends WebComponent<ELS, E> {
-	protected html!: TemplateFn;
+	public html!: TemplateFn;
 	public static config: WebComponentConfiguration;
 	public config!: WebComponentConfiguration;
-	protected css!: TemplateFn;
-	protected get self(): typeof ConfiguredComponent { return {} as any}
+	public css!: TemplateFn;
+	public get self(): typeof ConfiguredComponent { return {} as any}
 }
 
 export declare abstract class WebComponentInterface extends WebComponent<any, any> {

@@ -28,6 +28,7 @@ function assertNumber(value: any, fallback: number): number {
 }
 
 export const MDCardCSS = new TemplateFn<MDCard, ProjectTheme>((html, props, theme) => {
+	debugger;
 	return html`<style>
 		:host {
 			position: relative;

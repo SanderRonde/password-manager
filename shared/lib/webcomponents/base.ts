@@ -1,7 +1,7 @@
 import { WebComponentThemeManger } from './theme-manager';
 import { repeat, makeArray } from '../webcomponent-util';
-import { TemplateResult, html, render } from 'lit-html';
 import { ConfiguredComponent } from './configurable';
+import { TemplateResult, render } from 'lit-html';
 import { WebComponentDefiner } from './definer';
 import { Theme } from './webcomponent-types';
 import { WebComponent } from './component';
@@ -103,7 +103,7 @@ export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme 
 						}
 					}
 					const rendered = this._template === null ?
-						html`` : (this._template instanceof TemplateResult) ?
+						templater`` : (this._template instanceof TemplateResult) ?
 							this._template : typeSafeCall(this._template as TemplateRenderFunction<C, T, R|TR>, 
 								component, templater, component.props, 
 								'getTheme' in component ? 
@@ -187,99 +187,67 @@ export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme 
 		}
 	}
 
-export abstract class WebComponentBase extends WebComponentDefiner {
+class BaseClassElementInstance {
+	public ___cssArr: TemplateFn[]|null = null;
+	public ___privateCSS: TemplateFn[]|null = null;
+	public __cssSheets: {
+		sheet: CSSStyleSheet;
+		template: TemplateFn;
+	}[]|null = null;
+}
+
+const baseClassInstances: Map<string, BaseClassElementInstance> = new Map();
+
+class BaseClass {
 	/**
 	 * Whether the render method should be temporarily disabled (to prevent infinite loops)
 	 */
-	private __disableRender: boolean = false;
+	public disableRender: boolean = false;
 
 	/**
 	 * Whether this is the first render
 	 */
 	private __firstRender: boolean = true;
 
-	/**
-	 * The render method that will render this component's HTML
-	 */
-	protected abstract html: TemplateFn = new TemplateFn(() => {
-		throw new Error('No render method implemented');	
-	}, CHANGE_TYPE.ALWAYS);
-
-	/**
-	 * The element's constructor
-	 */
-	protected abstract get self(): typeof ConfiguredComponent;
-
-	/**
-	 * The render method that will render this component's css
-	 */
-	protected abstract css: TemplateFn|TemplateFn[] = new TemplateFn(null, CHANGE_TYPE.NEVER);
-	private static ___cssArr: TemplateFn[]|null = null;
-	private static get __cssArr(): TemplateFn[] {
-		if (this.___cssArr !== null) return this.___cssArr;
-		return (this.___cssArr = 
-			makeArray((<typeof ConfiguredComponent>this).config.css));
+	public get instance() {
+		if (baseClassInstances.has(this._self.self.config.is)) {
+			return baseClassInstances.get(this._self.self.config.is)!;
+		}
+		const classInstance = new BaseClassElementInstance();
+		baseClassInstances.set(this._self.self.config.is, classInstance);
+		return classInstance;
+	}
+	
+	private get __cssArr(): TemplateFn[] {
+		if (this.instance.___cssArr !== null) return this.instance.___cssArr;
+		return (this.instance.___cssArr = 
+			makeArray(this._self.self.config.css));
 	};
-	private static ___privateCSS: TemplateFn[]|null = null;
-	private static get __privateCSS(): TemplateFn[] {
-		if (this.___privateCSS !== null) return this.___privateCSS;
-		return (this.___privateCSS = 
+	public get __privateCSS(): TemplateFn[] {
+		if (this.instance.___privateCSS !== null) return this.instance.___privateCSS;
+		return (this.instance.___privateCSS = 
 			this.__cssArr.filter((template) => {
-				return !(template.changeOn & CHANGE_TYPE.THEME ||
+				return !(template.changeOn === CHANGE_TYPE.THEME ||
 					template.changeOn & CHANGE_TYPE.NEVER);
 			}));
 	};
-	private static __cssSheets: {
-		sheet: CSSStyleSheet;
-		template: TemplateFn;
-	}[]|null = null;
 
-	private static __constructedCSSRendered: boolean = false;
-	protected static _constructedCSSChanged(_element: WebComponentBase): boolean {
-		// Assume nothing can be changed then, only do first render
-		if (this.__constructedCSSRendered) {
-			return false;
-		}
-		this.__constructedCSSRendered = true;
-		return true;
-	}
+	constructor(private _self: WebComponentBase) { }
 
-	/**
-	 * A function signalign whether this component has custom CSS applied to it
-	 */
-	protected abstract __hasCustomCSS(): boolean;
-
-	/**
-	 * The render method that will render this component's css
-	 */
-	protected abstract customCSS(): TemplateFn|TemplateFn[];
-
-	/**
-	 * The root of this component's DOM
-	 */
-	protected root = this.attachShadow({
-		mode: 'open'
-	});
-	
-	/**
-	 * The properties of this component
-	 */
-	props: any = {};
-
-	private __doPreRenderLifecycle() {
-		this.__disableRender = true;
-		const retVal = this.preRender();
-		this.__disableRender = false;
+	public doPreRenderLifecycle() {
+		this.disableRender = true;
+		const retVal = this._self.preRender();
+		this.disableRender = false;
 		return retVal;
 	}
 
-	private __doPostRenderLifecycle() {
-		this.__internals.postRenderHooks.forEach(fn => fn());
+	public doPostRenderLifecycle() {
+		this._self.___definerClass.internals.postRenderHooks.forEach(fn => fn());
 		if (this.__firstRender) {
 			this.__firstRender = false;
-			this.firstRender();
+			this._self.firstRender();
 		}
-		this.postRender();
+		this._self.postRender();
 	}
 
 	private ___renderContainers: {
@@ -290,7 +258,7 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	private __createFixtures() {
 		//Attribute is just for clarity when looking through devtools
 		const css = (() => {
-			return this.self.__cssArr.map(() => {
+			return this.__cssArr.map(() => {
 				const el = document.createElement('span');
 				el.setAttribute('data-type', 'css');
 				return el;
@@ -298,9 +266,9 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		})();
 		
 		const customCSS = (() => {
-			if (this.__hasCustomCSS()) {
+			if (this._self.__hasCustomCSS()) {
 				return repeat(
-					makeArray(this.customCSS()).length).map(() => {
+					makeArray(this._self.customCSS()).length).map(() => {
 						const el = document.createElement('span');
 						el.setAttribute('data-type', 'custom-css');
 						return el;
@@ -312,9 +280,9 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		const html = document.createElement('span');
 		html.setAttribute('data-type', 'html');
 		
-		css.forEach(n => this.root.appendChild(n));
-		customCSS.forEach(n => this.root.appendChild(n));
-		this.root.appendChild(html);
+		css.forEach(n => this._self.root.appendChild(n));
+		customCSS.forEach(n => this._self.root.appendChild(n));
+		this._self.root.appendChild(html);
 
 		return {
 			css,
@@ -322,35 +290,33 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 			html
 		}
 	}
-	private get __renderContainers() {
+	public get renderContainers() {
 		if (this.___renderContainers) {
 			return this.___renderContainers;
 		}
 		return (this.___renderContainers = this.__createFixtures());
 	}
 
-	private static __genConstructedCSS() {
+	private __genConstructedCSS() {
 		// Create them
-		this.__cssSheets = this.__cssSheets || this.__cssArr.filter((template) => {
-			return template.changeOn & CHANGE_TYPE.THEME ||
-				template.changeOn & CHANGE_TYPE.NEVER;
-		}).map(t => ({
-			sheet: new CSSStyleSheet(),
-			template: t
-		}));
-	}
-
-	private get __cssSheets() {
-		return this.self.__cssSheets;
+		this.instance.__cssSheets = this.instance.__cssSheets || this.__cssArr
+			.filter((template) => {
+				return template.changeOn === CHANGE_TYPE.THEME ||
+					template.changeOn & CHANGE_TYPE.NEVER;
+			}).map(t => ({
+				sheet: new CSSStyleSheet(),
+				template: t
+			}));
 	}
 
 	private __sheetsMounted: boolean = false;
-	private __renderConstructedCSS(change: CHANGE_TYPE) {
+	public renderConstructedCSS(change: CHANGE_TYPE) {
 		if (!this.__sheetsMounted) {
-			this.self.__genConstructedCSS();
+			this.__genConstructedCSS();
 
 			// Mount them
-			this.root.adoptedStyleSheets = this.__cssSheets!.map(s => s.sheet);
+			this._self.root.adoptedStyleSheets = 
+				this.instance.__cssSheets!.map(s => s.sheet);
 			this.__sheetsMounted = true;
 
 			// Force new render
@@ -363,18 +329,18 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		}
 
 		// Check if it should render at all
-		if (!this.self._constructedCSSChanged(this)) {
+		if (!this._self.self.__constructedCSSChanged(this._self)) {
 			return
 		}
 
-		this.__cssSheets!.forEach(({ sheet, template }) => {
-			sheet.replaceSync(template.renderAsText(change, this).replace(
+		this.instance.__cssSheets!.forEach(({ sheet, template }) => {
+			sheet.replaceSync(template.renderAsText(change, this._self).replace(
 				/<\/?style>/g, ''));
 		});
 	}
 
 	private ___canUseConstructedCSS: boolean|null = null;
-	private get __canUseConstructedCSS() {
+	public get canUseConstructedCSS() {
 		if (this.___canUseConstructedCSS !== null) {
 			return this.___canUseConstructedCSS;
 		}
@@ -387,48 +353,109 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 			}
 		})());
 	}
+}
+
+export abstract class WebComponentBase extends WebComponentDefiner {
+	private ___baseClass: BaseClass = new BaseClass(this);
+
+	/**
+	 * The render method that will render this component's HTML
+	 */
+	public abstract html: TemplateFn = new TemplateFn(() => {
+		throw new Error('No render method implemented');	
+	}, CHANGE_TYPE.ALWAYS);
+
+	/**
+	 * The element's constructor
+	 */
+	public abstract get self(): typeof ConfiguredComponent;
+
+	/**
+	 * The templates that will render this component's css
+	 */
+	public abstract css: TemplateFn|TemplateFn[] = new TemplateFn(null, CHANGE_TYPE.NEVER);
+
+	/**
+	 * A function signaling whether this component has custom CSS applied to it
+	 */
+	public __hasCustomCSS(): boolean {
+		return false;
+	}
+
+	/**
+	 * Gets this component's custom CSS templates
+	 */
+	public customCSS(): TemplateFn|TemplateFn[] {
+		return [];
+	}
+
+	private static __constructedCSSRendered: boolean = false;
+
+	/**
+	 * Checks whether the constructed CSS has changed
+	 */
+	public static __constructedCSSChanged(_element: WebComponentBase): boolean {
+		// Assume nothing can be changed then, only do first render
+		if (this.__constructedCSSRendered) {
+			return false;
+		}
+		this.__constructedCSSRendered = true;
+		return true;
+	}
+
+	/**
+	 * The root of this component's DOM
+	 */
+	public root = this.attachShadow({
+		mode: 'open'
+	});
+	
+	/**
+	 * The properties of this component
+	 */
+	props: any = {};
 
 	@bindToClass
 	/**
 	 * The method that starts the rendering cycle
 	 */
 	public renderToDOM(change: CHANGE_TYPE = CHANGE_TYPE.ALWAYS) {
-		if (this.__disableRender) return;
-		if (this.__doPreRenderLifecycle() === false) {
+		if (this.___baseClass.disableRender) return;
+		if (this.___baseClass.doPreRenderLifecycle() === false) {
 			return;
 		}
 
-		if (this.__canUseConstructedCSS) {
-			this.__renderConstructedCSS(change);
+		if (this.___baseClass.canUseConstructedCSS) {
+			this.___baseClass.renderConstructedCSS(change);
 		}
-		this.self.__privateCSS.forEach((sheet, index) => {
+		this.___baseClass.__privateCSS.forEach((sheet, index) => {
 			sheet.renderIfNew(
 				sheet.renderTemplate(change, this as any), 
-				this.__renderContainers.css[index]);
+				this.___baseClass.renderContainers.css[index]);
 		});
 		if (this.__hasCustomCSS()) {
 			makeArray(this.customCSS()).forEach((sheet, index) => {
 				sheet.renderIfNew(
 					sheet.renderTemplate(change, this as any),
-					this.__renderContainers.customCSS[index]);
+					this.___baseClass.renderContainers.customCSS[index]);
 			});
 		}
 		this.html.renderIfNew(
 			this.html.renderTemplate(change, this as any), 
-			this.__renderContainers.html);
-		this.__doPostRenderLifecycle();
+			this.___baseClass.renderContainers.html);
+		this.___baseClass.doPostRenderLifecycle();
 	}
 
 	/**
 	 * A method called before rendering (changing props won't trigger additional re-render)
 	 */
-	protected preRender(): false|any {}
+	public preRender(): false|any {}
 	/**
 	 * A method called after rendering
 	 */
-	protected postRender() {}
+	public postRender() {}
 	/**
 	 * A method called after the very first render
 	 */
-	protected firstRender() {}
+	public firstRender() {}
 }

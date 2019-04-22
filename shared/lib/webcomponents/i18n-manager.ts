@@ -4,111 +4,73 @@ import { EventListenerObj } from './listener';
 import { CHANGE_TYPE } from './base';
 import { directive } from 'lit-html';
 
-export abstract class WebComponentI18NManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
-	private static _path: string = '/i18n/';
-	private static _langFiles: {
+class I18NClass {
+	public static path: string = '/i18n/';
+	public static langFiles: {
 		[key: string]: {
 			[key: string]: string;
 		}
 	} = {};
-	private static _langPromises: {
+	private static __langPromises: {
 		[key: string]: Promise<{
 			[key: string]: string;
 		}>;
 	} = {};
-	private static _loadingLang: string|null = null;
-	private static _currentLang: string|null = null;
-	private static _defaultLang: string|null = null;
+	private static __loadingLang: string|null = null;
+	public static currentLang: string|null = null;
+	public static defaultLang: string|null = null;
 	private _elementLang: string|null = null;
 
-	constructor() {
-		super();
+	constructor(private _self: WebComponentI18NManager<any>) { }
 
-		this.listenGP<GlobalProperties, 'lang'>('globalPropChange', (prop, value) => {
-			if (prop === 'lang') {
-				this.__setLang(value!);
-			}
-		});
-		this._setInitialLang();
-	}
-
-	private _setInitialLang() {
-		const lang = this.globalProps<GlobalProperties>().get('lang');
+	public setInitialLang() {
+		const lang = this._self.globalProps<GlobalProperties>().get('lang');
 		if (lang === undefined) {
-			this.__setLang(WebComponentI18NManager._loadingLang!);
+			this.setLang(I18NClass.__loadingLang!);
 		}
 	}
 
-	public setLang<L extends string>(lang: L) {
-		this.globalProps<GlobalProperties>().set('lang', lang);
-	}
-
-	public getLang() {
-		return WebComponentI18NManager._currentLang!;
-	}
-
-	private async __setLang(lang: string) {
-		if (WebComponentI18NManager._loadingLang !== lang) {
-			WebComponentI18NManager._loadingLang = lang;
-			await WebComponentI18NManager._loadLang(lang);
-			WebComponentI18NManager._currentLang = lang;
+	public async setLang(lang: string) {
+		if (I18NClass.__loadingLang !== lang) {
+			I18NClass.__loadingLang = lang;
+			await I18NClass.__loadLang(lang);
+			I18NClass.currentLang = lang;
 		}
 		if (this._elementLang !== lang) {
 			this._elementLang = lang;
-			this.renderToDOM(CHANGE_TYPE.LANG);
+			this._self.renderToDOM(CHANGE_TYPE.LANG);
 		}
 	}
 
-	private static async _loadLang(lang: string) {
-		if (lang in this._langPromises) return;
-		const prom = fetch(`${this._path}${lang}.json`).then(r => r.json());
-		this._langPromises[lang] = prom;
-		this._langFiles[lang] = await prom;
+	private static async __loadLang(lang: string) {
+		if (lang in this.__langPromises) return;
+		const prom = fetch(`${this.path}${lang}.json`).then(r => r.json());
+		this.__langPromises[lang] = prom;
+		this.langFiles[lang] = await prom;
 	}
 
-	public static initI18N({
-		path,
-		defaultLang
-	}: {
-		path: string;
-		defaultLang: string;
-	}) {
-		if (!path.endsWith('/')) {
-			path = path + '/';
-		}
-		this._path = path;
-		this._defaultLang = defaultLang;
+	public get lang() {
+		return I18NClass.currentLang ||
+		I18NClass.__loadingLang! ||
+		I18NClass.defaultLang!
 	}
 
-	private get _lang() {
-		return WebComponentI18NManager._currentLang ||
-			WebComponentI18NManager._loadingLang! ||
-			WebComponentI18NManager._defaultLang!
+	private async __loadCurrentLang() {
+		if (this.lang in I18NClass.__langPromises) return;
+		I18NClass.__loadLang(this.lang);
+		await I18NClass.__langPromises[this.lang];
 	}
 
-	private async _loadCurrentLang() {
-		if (this._lang in WebComponentI18NManager._langPromises) return;
-		WebComponentI18NManager._loadLang(this._lang);
-		await WebComponentI18NManager._langPromises[this._lang];
+	public get isReady() {
+		return this.lang in I18NClass.langFiles;
 	}
 
-	private get _isReady() {
-		return this._lang in WebComponentI18NManager._langFiles;
+	public async waitForKey(key: string) {
+		await this.__loadCurrentLang();
+		return I18NClass.langFiles[this.lang][key];
 	}
 
-	private async _waitForKey(key: string) {
-		await this._loadCurrentLang();
-		return WebComponentI18NManager._langFiles[this._lang][key];
-	}
-
-	public __prom(key: string) {
-		if (this._isReady) {
-			return WebComponentI18NManager._langFiles[this._lang][key]
-		}
-		return this._waitForKey(key);
-	}
-
-	private static _createWaiter(promise: Promise<string>, content: string) {
+	public static createWaiter(promise: Promise<string>, content: string) {
 		return directive((part) => {
 			part.setValue(content);
 			part.commit();
@@ -121,19 +83,64 @@ export abstract class WebComponentI18NManager<E extends EventListenerObj> extend
 		});
 	}
 
-	private _preprocess(prom: Promise<string>, process?: (str: string) => string): Promise<string> {
+	public preprocess(prom: Promise<string>, process?: (str: string) => string): Promise<string> {
 		if (!process) return prom;
 
 		return new Promise<string>(async (resolve) => {
 			resolve(process(await prom));
 		});
 	}
+}
+
+export abstract class WebComponentI18NManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
+	private ___i18nClass: I18NClass = new I18NClass(this);
+
+	constructor() {
+		super();
+
+		this.listenGP<GlobalProperties, 'lang'>('globalPropChange', (prop, value) => {
+			if (prop === 'lang') {
+				this.___i18nClass.setLang(value!);
+			}
+		});
+		this.___i18nClass.setInitialLang();
+	}
+
+	
+	public setLang<L extends string>(lang: L) {
+		this.globalProps<GlobalProperties>().set('lang', lang);
+	}
+
+	public getLang() {
+		return I18NClass.currentLang!;
+	}
+	
+	public static initI18N({
+		path,
+		defaultLang
+	}: {
+		path: string;
+		defaultLang: string;
+	}) {
+		if (!path.endsWith('/')) {
+			path = path + '/';
+		}
+		I18NClass.path = path;
+		I18NClass.defaultLang = defaultLang;
+	}
+
+	public __prom(key: string) {
+		if (this.___i18nClass.isReady) {
+			return I18NClass.langFiles[this.___i18nClass.lang][key]
+		}
+		return this.___i18nClass.waitForKey(key);
+	}
 
 	public __(key: string, process?: (str: string) => string) {
 		const value = this.__prom(key);
 		if (typeof value === 'string') return process ? process(value) : value;
 
-		return WebComponentI18NManager._createWaiter(
-			this._preprocess(value, process), `{{${key}}}`);
+		return I18NClass.createWaiter(
+			this.___i18nClass.preprocess(value, process), `{{${key}}}`);
 	}
 }

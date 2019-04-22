@@ -107,6 +107,34 @@ class Style<C> {
 	public MARKER = '';
 }
 
+class ComponentClass<ELS extends {
+	IDS: {
+		[key: string]: HTMLElement|SVGElement;
+	};
+	CLASSES: {
+		[key: string]: HTMLElement|SVGElement;
+	}
+} = {
+	IDS: {};
+	CLASSES: {}
+}> {
+	/**
+	 * An ID map containing maps between queried IDs and elements,
+	 * 	cleared upon render
+	 */
+	public idMap: Map<keyof ELS["IDS"], ELS["IDS"][keyof ELS["IDS"]]> = new Map();
+
+	constructor() { }
+
+	@bindToClass
+	/**
+	 * Clears the ID map
+	 */
+	public clearMap() {
+		this.idMap.clear();
+	}
+}
+
 export abstract class WebComponent<ELS extends {
 	IDS: {
 		[key: string]: HTMLElement|SVGElement;
@@ -118,25 +146,15 @@ export abstract class WebComponent<ELS extends {
 	IDS: {};
 	CLASSES: {}
 }, E extends EventListenerObj = {}> extends WebComponentCustomCSSManager<E> {
-	/**
-	 * An ID map containing maps between queried IDs and elements,
-	 * 	cleared upon render
-	 */
-	private __idMap: Map<keyof ELS["IDS"], ELS["IDS"][keyof ELS["IDS"]]> = new Map();
+	private ___componentClass: ComponentClass<ELS> = new ComponentClass<ELS>();
+
 	protected disposables: (() => void)[] = [];
 	public isMounted: boolean = false;
 
 	constructor() {
 		super();
-		this.__internals.postRenderHooks.push(this.__clearMap);
-	}
-
-	@bindToClass
-	/**
-	 * Clears the ID map
-	 */
-	private __clearMap() {
-		this.__idMap.clear();
+		this.___definerClass.internals.postRenderHooks.push(
+			this.___componentClass.clearMap);
 	}
 
 	/**
@@ -151,13 +169,13 @@ export abstract class WebComponent<ELS extends {
 				if (typeof id !== 'string') {
 					return null;
 				}
-				const cached = __this.__idMap.get(id);
+				const cached = __this.___componentClass.idMap.get(id);
 				if (cached && __this.shadowRoot!.contains(cached)) {
 					return cached;
 				}
 				const el = __this.root.getElementById(id);
 				if (el) {
-					__this.__idMap.set(id, el as ELS["IDS"][keyof ELS["IDS"]]);
+					__this.___componentClass.idMap.set(id, el as ELS["IDS"][keyof ELS["IDS"]]);
 				}
 				return el;
 			}
@@ -229,7 +247,7 @@ export abstract class WebComponent<ELS extends {
 		this.renderToDOM(CHANGE_TYPE.ALWAYS);
 		this.layoutMounted();
 
-		this.__internals.connectedHooks.filter(fn => fn());
+		this.___definerClass.internals.connectedHooks.filter(fn => fn());
 	}
 
 	/**
@@ -273,6 +291,6 @@ export abstract class WebComponent<ELS extends {
 	}>(event: PropChangeEvents, 
 		listener: (key: keyof P, newValue: P[keyof P], oldValue: P[keyof P]) => void,
 		once: boolean = false) {
-			this._listen(event, listener, once);
+			this.___listenableClass.listen(event, listener, once);
 		}
 }

@@ -38,7 +38,7 @@ export abstract class WebComponentThemeManger<E extends EventListenerObj> extend
 	}
 
 	public getThemeName() {
-		return (this.__internals.globalProperties && this.__internals.globalProperties.theme) 
+		return (this.___definerClass.internals.globalProperties && this.___definerClass.internals.globalProperties.theme) 
 			|| WebComponentThemeManger.__defaultTheme;
 	}
 
@@ -79,7 +79,7 @@ export abstract class WebComponentThemeManger<E extends EventListenerObj> extend
 	}
 
 	private static __lastRenderedTheme: string|null = null;
-	protected static _constructedCSSChanged(element: WebComponentThemeManger<any>): boolean {
+	public static __constructedCSSChanged(element: WebComponentThemeManger<any>): boolean {
 		const theme = element.getThemeName();
 		if (this.__lastRenderedTheme === theme) {
 			return false;

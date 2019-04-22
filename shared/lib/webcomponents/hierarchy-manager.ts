@@ -10,25 +10,27 @@ type GlobalPropsFunctions<G extends {
 	set<K extends keyof G, V extends G[K]>(key: Extract<K, string>, value: V): void;
 }
 
-export abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends WebComponentListenable<E> {
-	private __children: Set<WebComponentHierarchyManager<any>> = new Set();
-	private __parent: WebComponentHierarchyManager<any>|null = null;
-	private __isRoot!: boolean;
+class HierarchyClass {
+	public children: Set<WebComponentHierarchyManager<any>> = new Set();
+	public parent: WebComponentHierarchyManager<any>|null = null;
+	public isRoot!: boolean;
 
-	protected __getParent<T extends WebComponentHierarchyManager<any>>(): T|null {
-		return this.__parent as T;
+	constructor(private _self: WebComponentHierarchyManager<any>) { }
+
+	public __getParent<T extends WebComponentHierarchyManager<any>>(): T|null {
+		return this.parent as T;
 	}
 
-	private __getGlobalProperties<G extends {
+	public getGlobalProperties<G extends {
 		[key: string]: string;
 	}>() {
-		if (!this.__isRoot) {
+		if (!this.isRoot) {
 			return {};
 		}
 
 		const props: Partial<G> = {};
-		for (let i = 0; i < this.attributes.length; i++) {
-			const attr = this.attributes[i];
+		for (let i = 0; i < this._self.attributes.length; i++) {
+			const attr = this._self.attributes[i];
 			if (attr.name.startsWith('prop_')) {
 				props[attr.name.slice('prop_'.length)] = 
 					decodeURIComponent(
@@ -39,18 +41,8 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		return props;
 	}
 
-	connectedCallback() {
-		this.__isRoot = this.hasAttribute('_root');
-		this.__internals.globalProperties = {...{
-			theme: 'light',
-			isWeb: (location.protocol === 'http:' || location.protocol === 'https:') ?
-				'true' : 'false'
-		}, ...this.__getGlobalProperties()};
-		this.__registerToParent();
-	}
-
 	private __findLocalRoot(): null|WebComponentHierarchyManager<any> {
-		let element: Node|null = this.parentNode;
+		let element: Node|null = this._self.parentNode;
 		while (element && !(element instanceof (window as any).ShadowRoot) && 
 			(element as any) !== document && !(element instanceof DocumentFragment)) {
 				element = element.parentNode as HTMLElement|null;
@@ -60,7 +52,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 			return null;
 		}
 		if (<any>element === document) {
-			return this;
+			return this._self;
 		}
 		const host = element instanceof WebComponentHierarchyManager ?
 			element : (<ShadowRoot><any>element).host;
@@ -72,7 +64,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 	}
 
 	private __findDirectParents(): null|WebComponentHierarchyManager<any> {
-		let element: Node|null = this.parentNode;
+		let element: Node|null = this._self.parentNode;
 		while (element && !(element instanceof (window as any).ShadowRoot) && 
 			(element as any) !== document && !(element instanceof DocumentFragment) &&
 			!(element instanceof WebComponentHierarchyManager)) {
@@ -85,7 +77,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 		}
 		if (<any>element === document) {
 			//This is in the light DOM, ignore it since it's the root
-			return this;
+			return this._self;
 		}
 		const host = element instanceof WebComponentHierarchyManager ?
 			element : (<ShadowRoot><any>element).host;
@@ -98,7 +90,7 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 
 	private __getRoot(): null|WebComponentHierarchyManager<any> {
 		const localRoot = this.__findLocalRoot();
-		if (localRoot !== null && localRoot !== this) {
+		if (localRoot !== null && localRoot !== this._self) {
 			//Found an actual root, use that
 			return localRoot;
 		}
@@ -106,111 +98,126 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 	}
 
 	@bindToClass
-	private __registerToParent() {
+	public registerToParent() {
 		const root = this.__getRoot();
-		if (root === this) {
-			this.__isRoot = true;
+		if (root === this._self) {
+			this.isRoot = true;
 			return;
 		} else if (root === null) {
 			return;
 		}
 		
-		this.__parent = root;
-		const newProps = {...root.registerChild(this)};
+		this.parent = root;
+		const newProps = {...root.registerChild(this._self)};
 		for (const key in newProps) {
-			this.__setGlobalProperty(key as Extract<keyof typeof newProps, string>, 
+			this.setGlobalProperty(key as Extract<keyof typeof newProps, string>, 
 				newProps[key as keyof typeof newProps]);
 		}
 	}
 
-	private __clearNonExistentChildren() {
-		const nodeChildren = Array.prototype.slice.apply(this.children) as HTMLElement[];
-		for (const child of this.__children.values()) {
-			if (!this.shadowRoot!.contains(child) && 
+	public clearNonExistentChildren() {
+		const nodeChildren = Array.prototype.slice.apply(this._self.children) as HTMLElement[];
+		for (const child of this.children.values()) {
+			if (!this._self.shadowRoot!.contains(child) && 
 				!nodeChildren.filter(nodeChild => nodeChild.contains(child)).length) {
-					this.__children.delete(child);
+					this.children.delete(child);
 				}
 		}
 	}
 
-	public registerChild<G extends {
-		[key: string]: any;
-	}>(element: WebComponentHierarchyManager<any>): G {
-		this.__clearNonExistentChildren();
-		this.__children.add(element);
-		return this.__internals.globalProperties as G;
-	}
-
-	private __setGlobalProperty<G extends {
+	public setGlobalProperty<G extends {
 		[key: string]: any;
 	}, P extends keyof G = keyof G, V extends G[P] = G[P]>(key: Extract<P, string>,
 		value: V) {
-			if (this.__internals.globalProperties[key] !== value) {
-				this.__internals.globalProperties[key] = value;
-				this.fire('globalPropChange', key, value);
+			if (this._self.___definerClass.internals.globalProperties[key] !== value) {
+				this._self.___definerClass.internals.globalProperties[key] = value;
+				this._self.fire('globalPropChange', key, value);
 			}
 		}
 
-	private __propagateThroughTree<R>(fn: (element: WebComponentHierarchyManager<any>) => R): R[] {
-		if (this.__isRoot) {
+	public propagateThroughTree<R>(fn: (element: WebComponentHierarchyManager<any>) => R): R[] {
+		if (this.isRoot) {
 			const results: R[] = [];
 			this.__propagateDown(fn, results);
 			return results;
-		} else if (this.__parent) {
-			return this.__parent.__propagateThroughTree(fn);
+		} else if (this.parent) {
+			return this.parent.___hierarchyClass.propagateThroughTree(fn);
 		}
 		return [];
 	}
 
 	private __propagateDown<R>(fn: (element: WebComponentHierarchyManager<any>) => R, results: R[]) {
-		results.push(fn(this));
+		results.push(fn(this._self));
 
-		for (const child of this.__children) {
-			child.__propagateDown(fn, results);
+		for (const child of this.children) {
+			child.___hierarchyClass.__propagateDown(fn, results);
 		}
 	}
 
-	private __globalPropsFns: GlobalPropsFunctions<any>|null = null;
+	public globalPropsFns: GlobalPropsFunctions<any>|null = null;
+}
+
+export abstract class WebComponentHierarchyManager<E extends EventListenerObj> extends WebComponentListenable<E> {
+	public ___hierarchyClass: HierarchyClass = new HierarchyClass(this);
+
+	connectedCallback() {
+		this.___hierarchyClass.isRoot = this.hasAttribute('_root');
+		this.___definerClass.internals.globalProperties = {...{
+			theme: 'light',
+			isWeb: (location.protocol === 'http:' || location.protocol === 'https:') ?
+				'true' : 'false'
+		}, ...this.___hierarchyClass.getGlobalProperties()};
+		this.___hierarchyClass.registerToParent();
+	}
+
+	public registerChild<G extends {
+		[key: string]: any;
+	}>(element: WebComponentHierarchyManager<any>): G {
+		this.___hierarchyClass.clearNonExistentChildren();
+		this.___hierarchyClass.children.add(element);
+		return this.___definerClass.internals.globalProperties as G;
+	}
+
 	public globalProps<G extends {
 		[key: string]: any;
 	}>(): GlobalPropsFunctions<G> {
-		if (this.__globalPropsFns) {
-			return this.__globalPropsFns;
+		if (this.___hierarchyClass.globalPropsFns) {
+			return this.___hierarchyClass.globalPropsFns;
 		}
 
 		const __this = this;
 		const fns: GlobalPropsFunctions<G> = {
 			get all() {
-				return __this.__internals.globalProperties;
+				return __this.___definerClass.internals.globalProperties;
 			},
 			get<K extends keyof G>(key: Extract<K, string>): G[K] {
-				if (!__this.__internals.globalProperties) {
+				if (!__this.___definerClass.internals.globalProperties) {
 					return undefined as any;
 				}
-				return __this.__internals.globalProperties[key] as any;
+				return __this.___definerClass.internals.globalProperties[key] as any;
 			},
 			set<K extends keyof G, V extends G[K]>(key: Extract<K, string>, value: V): void {
-				if (!__this.__parent && !__this.__isRoot) {
+				if (!__this.___hierarchyClass.parent && !__this.___hierarchyClass.isRoot) {
 					console.warn(`Failed to propagate global property "${key}" since this element has no registered parent`);
 					return;
 				}
-				__this.__propagateThroughTree((element) => {
-					element.__setGlobalProperty<G>(key, value);
+				__this.___hierarchyClass.propagateThroughTree((element) => {
+					element.___hierarchyClass.setGlobalProperty<G>(key, value);
 				});
 			}
 		};
-		return (this.__globalPropsFns = fns);
+		return (this.___hierarchyClass.globalPropsFns = fns);
 	}
 
 	public getRoot<T>(): T {
-		if (this.__isRoot) {
+		if (this.___hierarchyClass.isRoot) {
 			return <T><any>this;
 		}
-		return this.__parent!.getRoot();
+		return this.___hierarchyClass.parent!.getRoot();
 	}
 
 	public runGlobalFunction<R>(fn: (element: ConfigurableWebComponent<any>) => R): R[] {
-		return this.__propagateThroughTree(fn);
+		return this.___hierarchyClass.propagateThroughTree(fn);
 	}
 
 	public listenGP<GP extends {
@@ -228,6 +235,6 @@ export abstract class WebComponentHierarchyManager<E extends EventListenerObj> e
 	}>(event: 'globalPropChange', 
 		listener: (prop: keyof GP, newValue: GP[typeof prop], oldValue: typeof newValue) => void,
 		once: boolean = false) {
-			this._listen(event, listener, once);
+			this.___listenableClass.listen(event, listener, once);
 	}
 }

@@ -6,8 +6,9 @@ export interface EventListenerObj {
 		returnType?: any;
 	};
 }
-export abstract class WebComponentListenable<E extends EventListenerObj> extends WebComponentBase {
-	private __listenerMap: {
+
+class ListenableClass<E extends EventListenerObj> {
+	public listenerMap: {
 		[P in keyof E]: Set<(...params: E[P]['args']) => E[P]['returnType']>;
 	} = {} as any;
 
@@ -27,22 +28,32 @@ export abstract class WebComponentListenable<E extends EventListenerObj> extends
 		}
 	}
 
-	protected _listen<EV extends keyof E>(event: EV, listener: (...args: E[EV]['args']) => E[EV]['returnType'], once: boolean = false) {
-		this.__assertKeyExists(event, this.__listenerMap);
+	public listen<EV extends keyof E>(event: EV, listener: (...args: E[EV]['args']) => E[EV]['returnType'], once: boolean = false) {
+		this.__assertKeyExists(event, this.listenerMap);
 		if (once) {
-			this.__insertOnce(this.__listenerMap[event], listener);
+			this.__insertOnce(this.listenerMap[event], listener);
 		} else {
-			this.__listenerMap[event].add(listener);
+			this.listenerMap[event].add(listener);
 		}
 	}
 
+	public __clearListeners<EV extends keyof E>(event: EV) {
+		if (event in this.listenerMap) {
+			this.listenerMap[event].clear();
+		}
+	}
+}
+
+export abstract class WebComponentListenable<E extends EventListenerObj> extends WebComponentBase {
+	protected ___listenableClass: ListenableClass<E> = new ListenableClass<E>();
+
 	public listen<EV extends keyof E>(event: EV, listener: (...args: E[EV]['args']) => E[EV]['returnType'], once: boolean = false) {
-		this._listen(event, listener, once);
+		this.___listenableClass.listen(event, listener, once);
 	}
 
 	public clearListener<EV extends keyof E>(event: EV, listener?: (...args: E[EV]['args']) => E[EV]['returnType']) {
-		if (event in this.__listenerMap) {
-			const eventListeners = this.__listenerMap[event];
+		if (event in this.___listenableClass.listenerMap) {
+			const eventListeners = this.___listenableClass.listenerMap[event];
 			if (!listener) {
 				eventListeners.clear();
 				return;
@@ -51,18 +62,12 @@ export abstract class WebComponentListenable<E extends EventListenerObj> extends
 		}
 	}
 
-	protected __clearListeners<EV extends keyof E>(event: EV) {
-		if (event in this.__listenerMap) {
-			this.__listenerMap[event].clear();
-		}
-	}
-
 	public fire<EV extends keyof E, R extends E[EV]['returnType']>(event: EV, ...params: E[EV]['args']): R[] {
-		if (!(event in this.__listenerMap)) {
+		if (!(event in this.___listenableClass.listenerMap)) {
 			return [];
 		}
 
-		const set = this.__listenerMap[event];
+		const set = this.___listenableClass.listenerMap[event];
 		const returnValues: R[] = [];
 		for (const listener of set.values()) {
 			returnValues.push(listener(...params));

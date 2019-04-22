@@ -176,26 +176,33 @@ class ComplexTemplateProcessor implements TemplateProcessor {
 	}
 }
 
-type ComplexValue = TemplateFn|Function|Object;
-export abstract class WebComponentTemplateManager<E extends EventListenerObj> extends WebComponentI18NManager<E> {
-	private __reffed: ComplexValue[] = [];
-	private __templateProcessor: ComplexTemplateProcessor = new ComplexTemplateProcessor(this, this.__genRef);
+class TemplateClass {
+	public reffed: ComplexValue[] = [];
+	public templateProcessor: ComplexTemplateProcessor = new ComplexTemplateProcessor(this._self, this.genRef);
+
+	constructor(private _self: WebComponentTemplateManager<any>) { }
 
 	@bindToClass
-	private __genRef(value: ComplexValue) {
-		if (this.__reffed.indexOf(value) !== -1) {
+	public genRef(value: ComplexValue) {
+		if (this.reffed.indexOf(value) !== -1) {
 			return `${refPrefix}${
-				this.__reffed.indexOf(value)}`;
+				this.reffed.indexOf(value)}`;
 		}
 
-		this.__reffed.push(value);
-		const refIndex = this.__reffed.length - 1;
+		this.reffed.push(value);
+		const refIndex = this.reffed.length - 1;
 		return `${refPrefix}${refIndex}`;
 	}
+}
+
+type ComplexValue = TemplateFn|Function|Object;
+export abstract class WebComponentTemplateManager<E extends EventListenerObj> extends WebComponentI18NManager<E> {
+	private ___templateClass: TemplateClass = new TemplateClass(this);
+	
 
 	@bindToClass
 	public generateHTMLTemplate(strings: TemplateStringsArray, ...values: any[]): TemplateResult {
-		return new TemplateResult(strings, values, 'html', this.__templateProcessor);
+		return new TemplateResult(strings, values, 'html', this.___templateClass.templateProcessor);
 	}
 
 	public getRef(ref: string) {
@@ -203,11 +210,11 @@ export abstract class WebComponentTemplateManager<E extends EventListenerObj> ex
 			return undefined;
 		}
 		const refNumber = ~~ref.split(refPrefix)[1];
-		return this.__reffed[refNumber];
+		return this.___templateClass.reffed[refNumber];
 	}
 
 	public getParentRef(ref: string) {
-		const parent = this.__getParent<WebComponentTemplateManager<any>>();
+		const parent = this.___hierarchyClass.__getParent<WebComponentTemplateManager<any>>();
 		if (!parent) {
 			console.warn('Could not find parent of', this, 
 				'and because of that could not find ref with id', ref);

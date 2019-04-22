@@ -20,7 +20,6 @@ export const InfiniteListCSS = new TemplateFn<InfiniteList<any, any, any>>(funct
 		#contentContainer {
 			display: flex;
 			position: relative;
-			overflow-y: scroll;
 			background-color: ${theme.background};
 		}
 

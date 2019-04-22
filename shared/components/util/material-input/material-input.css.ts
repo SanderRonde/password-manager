@@ -5,6 +5,7 @@ import { MaterialInput } from './material-input';
 
 export const MaterialInputCSS = [
 	new TemplateFn<MaterialInput, ProjectTheme>((html, _props, theme) => {
+		console.log('theme', theme);
 		return html`<style>
 			/** From https://github.com/google/material-design-lite/blob/mdl-1.x/src/textfield/_textfield.scss */
 			/**
