@@ -405,7 +405,7 @@ namespace PropsDefiner {
 		if (renderMap.has(element)) {
 			const mapped = renderMap.get(element);
 			//Check if this change type has higher priority
-			if (mapped === CHANGE_TYPE.ALWAYS) return;
+			if (mapped && mapped & CHANGE_TYPE.ALWAYS) return;
 			if (mapped !== changeType) {
 				//It's either theme & prop or prop & theme,
 				// change it to always render

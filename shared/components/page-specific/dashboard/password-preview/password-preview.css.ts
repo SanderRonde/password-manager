@@ -121,4 +121,4 @@ export const PasswordPreviewCSS = new TemplateFn<PasswordPreview, ProjectTheme>(
 			background-color: ${theme.oppositeBackground};
 		}
 	</style>`
-}, CHANGE_TYPE.ALWAYS);
+}, CHANGE_TYPE.PROP | CHANGE_TYPE.THEME);

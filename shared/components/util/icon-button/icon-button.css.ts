@@ -265,4 +265,4 @@ export const IconButtonCSS = new TemplateFn<IconButton, ProjectTheme>((html, pro
 				40 : 100)}
 		}
 	</style>`
-}, CHANGE_TYPE.ALWAYS);
+}, CHANGE_TYPE.PROP | CHANGE_TYPE.THEME);

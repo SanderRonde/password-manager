@@ -46,4 +46,4 @@ export const MDCardCSS = new TemplateFn<MDCard, ProjectTheme>((html, props, them
 			}
 		}	
 	</style>`;
-}, CHANGE_TYPE.ALWAYS);
+}, CHANGE_TYPE.PROP | CHANGE_TYPE.THEME);

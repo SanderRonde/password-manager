@@ -4,22 +4,22 @@ import { mapArr } from '../shared';
 
 export function joinTemplates<T extends WebComponent<any>>(...templates: TemplateFn<T>[]): TemplateFn<T> {
 	const changeType = templates.reduce((prev, template) => {
-		if (template.changeOn === CHANGE_TYPE.ALWAYS ||
-			prev === CHANGE_TYPE.ALWAYS) {
+		if (template.changeOn & CHANGE_TYPE.ALWAYS ||
+			prev & CHANGE_TYPE.ALWAYS) {
 				return CHANGE_TYPE.ALWAYS
 			}
-		if (template.changeOn === CHANGE_TYPE.PROP || 
-			template.changeOn === CHANGE_TYPE.THEME) {
-				if (prev === CHANGE_TYPE.NEVER) {
+		if (template.changeOn & CHANGE_TYPE.PROP || 
+			template.changeOn & CHANGE_TYPE.THEME) {
+				if (prev & CHANGE_TYPE.NEVER) {
 					return template.changeOn;
 				}
-				if (template.changeOn !== prev) {
+				if (!(template.changeOn & prev)) {
 					return CHANGE_TYPE.ALWAYS;
 				}
 				return prev;
 			}
-		if (prev === CHANGE_TYPE.PROP ||
-			prev === CHANGE_TYPE.THEME) {
+		if (prev & CHANGE_TYPE.PROP ||
+			prev & CHANGE_TYPE.THEME) {
 				return prev;
 			}
 		return CHANGE_TYPE.NEVER;

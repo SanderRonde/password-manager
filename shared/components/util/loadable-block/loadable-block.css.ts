@@ -28,4 +28,4 @@ export const LoadableBlockCSS = new TemplateFn<LoadableBlock>((html, props, them
 			opacity: 1;
 		}
 	</style>`
-}, CHANGE_TYPE.ALWAYS);
+}, CHANGE_TYPE.PROP | CHANGE_TYPE.THEME);

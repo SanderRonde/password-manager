@@ -37,7 +37,10 @@ function typeSafeCall<T extends (this: any, ...args: any[]) => any>(fn: T,
 	}
 
 export const enum CHANGE_TYPE {
-	PROP, THEME, NEVER, ALWAYS
+	PROP = 1, 
+	THEME = 2, 
+	NEVER = 4, 
+	ALWAYS = 8
 }
 
 type Templater<R> = (strings: TemplateStringsArray, ...values: any[]) => R;
@@ -88,7 +91,7 @@ export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme 
 					componentTemplateMap.set(component, new WeakMap());
 				}
 				const templateMap = componentTemplateMap.get(component)!;
-				if (this.changeOn === CHANGE_TYPE.NEVER) {
+				if (this.changeOn & CHANGE_TYPE.NEVER) {
 					//Never change, return the only render
 					const cached = templateMap.get(this);
 					if (cached) {
@@ -108,9 +111,9 @@ export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme 
 						rendered: rendered as TR
 					}
 				}
-				if (this.changeOn === CHANGE_TYPE.ALWAYS || 
-					changeType === CHANGE_TYPE.ALWAYS ||
-					this.changeOn === changeType ||
+				if (this.changeOn & CHANGE_TYPE.ALWAYS || 
+					changeType & CHANGE_TYPE.ALWAYS ||
+					this.changeOn & changeType ||
 					!templateMap.has(this)) {
 						//Change, rerender
 						const rendered = typeSafeCall(this._template as TemplateRenderFunction<C, T, R|TR>, 
@@ -216,8 +219,8 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		if (this.___privateCSS !== null) return this.___privateCSS;
 		return (this.___privateCSS = 
 			this.__cssArr.filter((template) => {
-				return !(template.changeOn === CHANGE_TYPE.THEME ||
-					template.changeOn === CHANGE_TYPE.NEVER);
+				return !(template.changeOn & CHANGE_TYPE.THEME ||
+					template.changeOn & CHANGE_TYPE.NEVER);
 			}));
 	};
 	private static __cssSheets: {
@@ -323,8 +326,8 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	private static __genConstructedCSS() {
 		// Create them
 		this.__cssSheets = this.__cssSheets || this.__cssArr.filter((template) => {
-			return template.changeOn === CHANGE_TYPE.THEME ||
-				template.changeOn === CHANGE_TYPE.NEVER;
+			return template.changeOn & CHANGE_TYPE.THEME ||
+				template.changeOn & CHANGE_TYPE.NEVER;
 		}).map(t => ({
 			sheet: new CSSStyleSheet(),
 			template: t
@@ -348,7 +351,7 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 			change = CHANGE_TYPE.ALWAYS;
 		}
 
-		if (change !== CHANGE_TYPE.THEME && change !== CHANGE_TYPE.ALWAYS) {
+		if (!(change & CHANGE_TYPE.THEME || change & CHANGE_TYPE.ALWAYS)) {
 			// Only render on theme or everything change
 			return;
 		}

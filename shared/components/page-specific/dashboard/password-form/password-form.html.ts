@@ -330,4 +330,4 @@ export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, pro
 		</floating-action-button>
 	</div>
 	`;
-}, CHANGE_TYPE.ALWAYS);
+}, CHANGE_TYPE.PROP | CHANGE_TYPE.THEME);

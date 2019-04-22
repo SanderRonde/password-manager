@@ -72,4 +72,4 @@ export const PasswordDetailCSS = new TemplateFn<PasswordDetail>((html, _props, t
 			padding: 30px;
 		}
 	</style>`
-}, CHANGE_TYPE.ALWAYS);
+}, CHANGE_TYPE.PROP | CHANGE_TYPE.THEME);
