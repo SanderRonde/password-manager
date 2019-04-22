@@ -139,4 +139,4 @@ export const LoginHTML = new TemplateFn<Login>(function (html, props, _) {
 				</paper-dialog>
 			</div>
 		</div>`;
-}, CHANGE_TYPE.PROP);
+}, CHANGE_TYPE.PROP | CHANGE_TYPE.LANG);

@@ -61,6 +61,7 @@ function rewriteEsModuleImports(file: string): string {
 		.replace(/import (.*) from ['"]tslib['"]/g, 'import $1 from \'/modules/tslib\'')
 		.replace(/import (.*) from ['"]u2f-api['"]/g, 'import $1 from \'/modules/u2f-api\'')
 		.replace(/import (.*) from ['"]lit-html['"]/g, 'import $1 from \'/modules/lit-html/lit-html.js\'')
+		.replace(/import (.*) from ['"]lit-html\/directives\/until['"]/g, 'import $1 from \'/modules/lit-html/directives/until\'')
 		.replace(/import (.*) from ['"]lit-html\/lib\/lit-extended['"]/g, 'import $1 from \'/modules/lit-html/lib/lit-extended\'');
 }
 
@@ -196,6 +197,16 @@ export function initDevelopmentMiddleware(webserver: Webserver) {
 	webserver.app.all('/modules/lit-html/lib/lit-extended.js.map', async (_req, res) => {
 		res.contentType('.js');
 		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/lit-html/lib/lit-extended.js.map')));
+		res.end();
+	});
+	webserver.app.all('/modules/lit-html/directives/until', async (_req, res) => {
+		res.contentType('.js');
+		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/lit-html/directives/until.js')));
+		res.end();
+	});
+	webserver.app.all('/modules/lit-html/directives/until.js.map', async (_req, res) => {
+		res.contentType('.js');
+		res.write(await fs.readFile(path.join(PROJECT_ROOT, 'node_modules/lit-html/directives/until.js.map')));
 		res.end();
 	});
 	webserver.app.use(serve(path.join(PROJECT_ROOT, 'node_modules/lit-html/'), {

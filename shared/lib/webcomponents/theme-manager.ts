@@ -55,9 +55,12 @@ export abstract class WebComponentThemeManger<E extends EventListenerObj> extend
 	private static __theme: {
 		[name: string]: Theme;
 	}|null = null;
-	static setTheme<T extends {
+	static initTheme<T extends {
 		[name: string]: Theme;
-	}>(theme: T, defaultTheme?: Extract<keyof T, string>) {
+	}>({ theme, defaultTheme }: {
+		theme: T;
+		defaultTheme?: Extract<keyof T, string>
+	}) {
 		this.__theme = theme;
 		if (defaultTheme) {
 			this.setDefaultTheme(defaultTheme);

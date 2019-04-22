@@ -1,10 +1,10 @@
+import { WebComponentThemeManger } from './theme-manager';
 import { repeat, makeArray } from '../webcomponent-util';
 import { TemplateResult, html, render } from 'lit-html';
 import { ConfiguredComponent } from './configurable';
 import { WebComponentDefiner } from './definer';
 import { Theme } from './webcomponent-types';
 import { WebComponent } from './component';
-import { WebComponentThemeManger } from './theme-manager';
 
 export function bindToClass<T extends Function>(_target: object, propertyKey: string, 
 	descriptor: TypedPropertyDescriptor<T>): TypedPropertyDescriptor<T> | void {

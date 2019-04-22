@@ -5,6 +5,7 @@ import {
 } from 'lit-html';
 import { RenderOptions } from 'lit-html/lib/render-options';
 import { WebComponentThemeManger } from './theme-manager';
+import { WebComponentI18NManager } from './i18n-manager';
 import { classNames, ClassNamesArg } from './shared';
 import { TemplateFn, CHANGE_TYPE } from './base';
 import { EventListenerObj } from './listener';
@@ -176,7 +177,7 @@ class ComplexTemplateProcessor implements TemplateProcessor {
 }
 
 type ComplexValue = TemplateFn|Function|Object;
-export abstract class WebComponentTemplateManager<E extends EventListenerObj> extends WebComponentThemeManger<E> {
+export abstract class WebComponentTemplateManager<E extends EventListenerObj> extends WebComponentI18NManager<E> {
 	private __reffed: ComplexValue[] = [];
 	private __templateProcessor: ComplexTemplateProcessor = new ComplexTemplateProcessor(this, this.__genRef);
 
