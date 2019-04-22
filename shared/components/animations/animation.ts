@@ -33,11 +33,11 @@ export function animation<T extends HTMLElement = HTMLElement>(
 	animationDescriptor: typeof AnimationDescriptor) {
 		return (target: any): any => {
 			return class Animated extends (target as ExtendTarget) {
-				protected css!: TemplateFn;
-				protected __hasCustomCSS!: () => boolean;
-				protected customCSS!: () => TemplateFn;
-				protected html!: TemplateFn;
-				protected get self(): typeof ConfiguredComponent { return {} as any}
+				public css!: TemplateFn;
+				public __hasCustomCSS!: () => boolean;
+				public customCSS!: () => TemplateFn;
+				public html!: TemplateFn;
+				public get self(): typeof ConfiguredComponent { return {} as any}
 
 				private __htmlRoot: HTMLElement|null = null;
 				private __animation: AnimationDescriptor<T> = new animationDescriptor<T>();
