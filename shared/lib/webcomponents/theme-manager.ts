@@ -1,5 +1,4 @@
 import { WebComponentHierarchyManager } from './hierarchy-manager';
-import { GlobalProperties } from '../../types/shared-types';
 import { EventListenerObj } from './listener';
 import { Theme } from './webcomponent-types';
 import { CHANGE_TYPE } from './base';
@@ -22,7 +21,9 @@ export abstract class WebComponentThemeManger<E extends EventListenerObj> extend
 	constructor() {
 		super();
 
-		this.listenGP<GlobalProperties, 'theme'>('globalPropChange', (prop) => {
+		this.listenGP<{
+			theme: string;
+		}, 'theme'>('globalPropChange', (prop) => {
 			if (prop === 'theme') {
 				this.__setTheme();
 			}
