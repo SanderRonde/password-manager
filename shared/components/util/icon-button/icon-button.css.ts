@@ -269,5 +269,5 @@ export const IconButtonCSS = [
 					40 : 100)}
 			}
 		</style>`;
-	}, CHANGE_TYPE.PROP)
+	}, CHANGE_TYPE.PROP | CHANGE_TYPE.THEME)
 ];
