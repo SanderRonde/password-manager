@@ -16,7 +16,7 @@ export const noCustomCSS = new TemplateFn<PasswordPreview>((html) => html``, CHA
 
 export const PasswordPreviewCSS = new TemplateFn<PasswordPreview, ProjectTheme>(function (html, props, theme) {
 	return html`
-		${RippleCSS.renderTemplate(CHANGE_TYPE.THEME, this)}
+		${RippleCSS.renderSame(CHANGE_TYPE.THEME, this, html)}
 		<style>
 
 		#container {
