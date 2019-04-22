@@ -4,6 +4,7 @@ import { ConfiguredComponent } from './configurable';
 import { WebComponentDefiner } from './definer';
 import { Theme } from './webcomponent-types';
 import { WebComponent } from './component';
+import { WebComponentThemeManger } from './theme-manager';
 
 export function bindToClass<T extends Function>(_target: object, propertyKey: string, 
 	descriptor: TypedPropertyDescriptor<T>): TypedPropertyDescriptor<T> | void {
@@ -39,8 +40,9 @@ function typeSafeCall<T extends (this: any, ...args: any[]) => any>(fn: T,
 export const enum CHANGE_TYPE {
 	PROP = 1, 
 	THEME = 2, 
-	NEVER = 4, 
-	ALWAYS = 8
+	NEVER = 4,
+	LANG = 8, 
+	ALWAYS = 16
 }
 
 type Templater<R> = (strings: TemplateStringsArray, ...values: any[]) => R;
@@ -104,7 +106,9 @@ export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme 
 						html`` : (this._template instanceof TemplateResult) ?
 							this._template : typeSafeCall(this._template as TemplateRenderFunction<C, T, R|TR>, 
 								component, templater, component.props, 
-								component.getTheme<T>());
+								'getTheme' in component ? 
+									(component as unknown as WebComponentThemeManger<any>)
+										.getTheme<T>() : null as any);
 					templateMap.set(this, rendered);
 					return {
 						changed: true,
@@ -118,7 +122,9 @@ export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme 
 						//Change, rerender
 						const rendered = typeSafeCall(this._template as TemplateRenderFunction<C, T, R|TR>, 
 							component, templater, component.props, 
-							component.getTheme<T>());
+							'getTheme' in component ? 
+								(component as unknown as WebComponentThemeManger<any>)
+									.getTheme<T>() : null as any);
 						templateMap.set(this, rendered);
 						return {
 							changed: true,
