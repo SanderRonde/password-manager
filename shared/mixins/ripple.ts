@@ -1,3 +1,4 @@
+import { ConfiguredComponent } from '../lib/webcomponents/configurable';
 import { ProjectTheme } from '../components/theming/theme/theme.es';
 import { listenWithIdentifier } from '../lib/webcomponent-util';
 import { TemplateFn, CHANGE_TYPE } from '../lib/webcomponents';
@@ -84,6 +85,7 @@ export function rippleEffect(target: ExtendableComponent): any {
 		protected __hasCustomCSS!: () => boolean;
 		protected customCSS!: () => TemplateFn;
 		protected html!: TemplateFn;
+		protected get self(): typeof ConfiguredComponent { return {} as any}
 		private _rippleElement!: HTMLElement|null;
 		private _rippleSize!: number;
 		private _ignoringMouseDown!: boolean;
