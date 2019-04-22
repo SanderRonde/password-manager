@@ -53,6 +53,10 @@ export const LoginCSS = new TemplateFn<Login>((html, _props, theme) => {
 			width: 100vw;
 			position: absolute;
 			overflow: hidden;
+		}
+
+		#lockAnimationContainer.animating #lockAnimationTopHalf,
+		#lockAnimationContainer.animating #lockAnimationBottomHalf {
 			transition: transform ${SPLIT_TIME}ms cubic-bezier(0.4, 0, 1, 1),
 				background-color ${DIALOG_FADE_TIME + KEY_TURN_TIME + SPLIT_TIME}ms ease-in-out;
 		}

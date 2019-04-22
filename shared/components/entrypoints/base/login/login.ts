@@ -151,6 +151,8 @@ export abstract class Login extends ConfigurableWebComponent<{
 		const root = this.getRoot<GlobalController>();
 		root.loadEntrypoint(ENTRYPOINT.DASHBOARD);
 		const dashboardEl = root.addNewPage(ENTRYPOINT.DASHBOARD);
+		this.$.lockAnimationContainer.classList.add('animating');
+		await wait(0);
 		this.$.lockAnimationContainer.classList.add('changeColor');
 		this.$.pageContainer.classList.add('invisible');
 		await wait(DIALOG_FADE_TIME);
