@@ -1,3 +1,4 @@
+import { ConfiguredComponent } from '../../lib/webcomponents/configurable';
 import { TemplateFn, WebComponent } from '../../lib/webcomponents';
 
 type AnimationFunction<T extends HTMLElement> = (htmlRoot: HTMLElement, element: T) => void;
@@ -36,6 +37,7 @@ export function animation<T extends HTMLElement = HTMLElement>(
 				protected __hasCustomCSS!: () => boolean;
 				protected customCSS!: () => TemplateFn;
 				protected html!: TemplateFn;
+				protected get self(): typeof ConfiguredComponent { return {} as any}
 
 				private __htmlRoot: HTMLElement|null = null;
 				private __animation: AnimationDescriptor<T> = new animationDescriptor<T>();
