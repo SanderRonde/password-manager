@@ -1,4 +1,3 @@
-import { GlobalProperties } from '../../types/shared-types';
 import { WebComponentThemeManger } from './theme-manager';
 import { EventListenerObj } from './listener';
 import { CHANGE_TYPE } from './base';
@@ -24,7 +23,9 @@ class I18NClass {
 	constructor(private _self: WebComponentI18NManager<any>) { }
 
 	public setInitialLang() {
-		const lang = this._self.globalProps<GlobalProperties>().get('lang');
+		const lang = this._self.globalProps<{
+			lang: string;
+		}>().get('lang');
 		if (lang === undefined) {
 			this.setLang(I18NClass.__loadingLang!);
 		}
@@ -98,7 +99,9 @@ export abstract class WebComponentI18NManager<E extends EventListenerObj> extend
 	constructor() {
 		super();
 
-		this.listenGP<GlobalProperties, 'lang'>('globalPropChange', (prop, value) => {
+		this.listenGP<{
+			lang: string;
+		}, 'lang'>('globalPropChange', (prop, value) => {
 			if (prop === 'lang') {
 				this.___i18nClass.setLang(value!);
 			}
@@ -108,7 +111,9 @@ export abstract class WebComponentI18NManager<E extends EventListenerObj> extend
 
 	
 	public setLang<L extends string>(lang: L) {
-		this.globalProps<GlobalProperties>().set('lang', lang);
+		this.globalProps<{
+			lang: string;
+		}>().set('lang', lang);
 	}
 
 	public getLang() {
