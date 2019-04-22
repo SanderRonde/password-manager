@@ -233,11 +233,11 @@ export class MaterialInput extends ConfigurableWebComponent<{
 				}
 				
 				const isInvalid = this.$.container.classList.contains('is-invalid');
-				this.updateClasses();
 				if (isInvalid) {
 					this.$.container.classList.add('is-invalid');
 				}
 			}
+			this.updateClasses();
 		}
 	}
 }

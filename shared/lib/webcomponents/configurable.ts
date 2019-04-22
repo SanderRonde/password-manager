@@ -17,6 +17,7 @@ export class ConfigurableWebComponent<ELS extends {
 	public static config: WebComponentConfiguration;
 	public config!: WebComponentConfiguration;
 	protected css!: TemplateFn;
+	protected get self(): typeof ConfiguredComponent { return {} as any}
 }
 
 export declare abstract class WebComponentInterface extends WebComponent<any, any> {
@@ -49,9 +50,14 @@ export function genIsAccessor(name: string, component: () => typeof WebComponent
 
 export interface WebComponentConfiguration {
 	is: string;
-	css: TemplateFn;
+	css: TemplateFn|TemplateFn[];
 	dependencies?: (typeof WebComponentBase|null)[];
 	html: TemplateFn;
+}
+export abstract class ConfiguredComponent extends WebComponentBase {
+	static is: ComponentIs;
+	static dependencies: (typeof WebComponentBase | null)[]
+	static config: WebComponentConfiguration;
 }
 export function config(config: WebComponentConfiguration) {
 	const {
@@ -74,6 +80,9 @@ export function config(config: WebComponentConfiguration) {
 			config = config;
 			html = html;
 			css = config.css;
+			get self() {
+				return <any>WebComponentConfig as typeof ConfiguredComponent;
+			}
 		}
 		return <any>WebComponentConfig as T;
 	}

@@ -7,7 +7,7 @@ import { PaperButton } from './paper-button';
 
 export const PaperButtonCSS = new TemplateFn<PaperButton|AnimatedButton, ProjectTheme>(function (html, _props, theme) {
 	return html`
-		${RippleCSS.renderTemplate(CHANGE_TYPE.THEME, this)}
+		${RippleCSS.renderSame(CHANGE_TYPE.THEME, this, html)}
 		<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.

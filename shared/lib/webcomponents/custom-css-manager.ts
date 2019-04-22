@@ -40,7 +40,7 @@ export abstract class WebComponentCustomCSSManager<E extends EventListenerObj> e
 			return this.__noCustomCSS;
 		}
 
-		return this.getParentRef(this.getAttribute(CUSTOM_CSS_PROP_NAME)!) as TemplateFn<any>
+		return this.getParentRef(this.getAttribute(CUSTOM_CSS_PROP_NAME)!) as TemplateFn<any>|TemplateFn<any>[]
 	}
 
 	protected customCSS() {

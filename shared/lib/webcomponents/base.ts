@@ -1,4 +1,6 @@
+import { repeat, makeArray } from '../webcomponent-util';
 import { TemplateResult, html, render } from 'lit-html';
+import { ConfiguredComponent } from './configurable';
 import { WebComponentDefiner } from './definer';
 import { Theme } from './webcomponent-types';
 import { WebComponent } from './component';
@@ -38,14 +40,20 @@ export const enum CHANGE_TYPE {
 	PROP, THEME, NEVER, ALWAYS
 }
 
-type TemplateRenderFunction<C extends WebComponent<any, any>, T extends Theme, R> = (this: C, 
-	complexHTML: (strings: TemplateStringsArray, ...values: any[]) => TemplateResult,
-	props: C['props'], theme: T) => R;
+type Templater<R> = (strings: TemplateStringsArray, ...values: any[]) => R;
 
-const componentTemplateMap: WeakMap<WebComponent<any, any>, 
-	WeakMap<TemplateFn<any, any, any>, 
-		//Any = R in TemplateFn
-		any|null>> = new WeakMap();
+type TemplateRenderFunction<C extends WebComponent<any, any>, T extends Theme, TR> = (this: C, 
+	complexHTML: Templater<TR>,
+	props: C['props'], theme: T) => TR;
+
+/**
+ * Maps templaters -> components -> functions -> results
+ */
+const templaterMap: WeakMap<Templater<any>, 
+	WeakMap<WebComponent<any, any>, 
+		WeakMap<TemplateFn<any, any, any>, 
+			//Any = R in TemplateFn
+			any|null>>> = new WeakMap();
 export type TemplateFnConfig<R> = {
 	changeOn: CHANGE_TYPE.NEVER;
 	template: R|null;
@@ -56,77 +64,112 @@ export type TemplateFnConfig<R> = {
 type Renderer<T> = (template: T, container: HTMLElement|Element|Node) => any;
 export class TemplateFn<C extends WebComponent<any, any> = any, T extends Theme = Theme, 
 	R = TemplateResult> {
-		public changeOn!: CHANGE_TYPE;
-		private _template!: (TemplateRenderFunction<C, T, R>)|R|null;
-		private _initialized: boolean = false;
+		private _lastRenderChanged: boolean = true;
 
-		constructor(_fn: (TemplateRenderFunction<C, T, R>)|null,
-			_changeType: CHANGE_TYPE.NEVER, renderer?: Renderer<R>);
-		constructor(_fn: (TemplateRenderFunction<C, T, R>),
-			_changeType: CHANGE_TYPE.ALWAYS|CHANGE_TYPE.PROP|CHANGE_TYPE.THEME, 
+		constructor(_template: (TemplateRenderFunction<C, T, R>)|null,
+			changeOn: CHANGE_TYPE.NEVER, renderer?: Renderer<R>);
+		constructor(_template: (TemplateRenderFunction<C, T, R>),
+			changeOn: CHANGE_TYPE.ALWAYS|CHANGE_TYPE.PROP|CHANGE_TYPE.THEME, 
 			renderer?: Renderer<R>);
-		constructor(private _fn: (TemplateRenderFunction<C, T, R>)|null,
-			private _changeType: CHANGE_TYPE, 
+		constructor(private _template: (TemplateRenderFunction<C, T, R>)|null,
+			public changeOn: CHANGE_TYPE, 
 			private _renderer?: Renderer<R>) { }
 
-		private _doInitialRender(component: C) {
-			if (this._changeType === CHANGE_TYPE.NEVER) {
-				//Args don't matter here as they aren't used
-				this.changeOn = CHANGE_TYPE.NEVER;
-				if (this._fn) {
-					this._template = typeSafeCall(this._fn as TemplateRenderFunction<C, T, R>, 
-						component, component.generateHTMLTemplate, component.props, 
-						component.getTheme<T>());
-				} else {
-					this._template = null;
+		private _renderWithTemplater<TR>(changeType: CHANGE_TYPE, component: C,
+			templater: Templater<TR>): {
+				changed: boolean;
+				rendered: TR
+			 } {
+				if (!templaterMap.has(templater)) {
+					templaterMap.set(templater, new WeakMap());
 				}
-			} else {
-				this.changeOn = this._changeType,
-				this._template = this._fn as any
+				const componentTemplateMap = templaterMap.get(templater)!;
+				if (!componentTemplateMap.has(component)) {
+					componentTemplateMap.set(component, new WeakMap());
+				}
+				const templateMap = componentTemplateMap.get(component)!;
+				if (this.changeOn === CHANGE_TYPE.NEVER) {
+					//Never change, return the only render
+					const cached = templateMap.get(this);
+					if (cached) {
+						return {
+							changed: false,
+							rendered: cached
+						}
+					}
+					const rendered = this._template === null ?
+						html`` : (this._template instanceof TemplateResult) ?
+							this._template : typeSafeCall(this._template as TemplateRenderFunction<C, T, R|TR>, 
+								component, templater, component.props, 
+								component.getTheme<T>());
+					templateMap.set(this, rendered);
+					return {
+						changed: true,
+						rendered: rendered as TR
+					}
+				}
+				if (this.changeOn === CHANGE_TYPE.ALWAYS || 
+					changeType === CHANGE_TYPE.ALWAYS ||
+					this.changeOn === changeType ||
+					!templateMap.has(this)) {
+						//Change, rerender
+						const rendered = typeSafeCall(this._template as TemplateRenderFunction<C, T, R|TR>, 
+							component, templater, component.props, 
+							component.getTheme<T>());
+						templateMap.set(this, rendered);
+						return {
+							changed: true,
+							rendered: rendered as TR
+						}
+					}
+				
+				//No change, return what was last rendered
+				return {
+					changed: false,
+					rendered: templateMap.get(this)!
+				};
 			}
+
+		private static _textRenderer(strings: TemplateStringsArray, ...values: any[]): string {
+			const result: string[] = [strings[0]];
+			for (let i = 0; i < values.length; i++) {
+				result.push(values[i], strings[i + 1]);
+			}
+			return result.join('');
+		}
+
+		public renderAsText(changeType: CHANGE_TYPE, component: C): string {
+			const { changed, rendered } = this._renderWithTemplater(changeType, component,
+				TemplateFn._textRenderer);
+			this._lastRenderChanged = changed;
+			return rendered;
 		}
 
 		public renderTemplate(changeType: CHANGE_TYPE, component: C): R {
-			if (!this._initialized) {
-				this._doInitialRender(component);
-				this._initialized = true;
-			}
-
-			if (!componentTemplateMap.has(component)) {
-				componentTemplateMap.set(component, new WeakMap());
-			}
-			const templateMap = componentTemplateMap.get(component)!;
-			if (this.changeOn === CHANGE_TYPE.NEVER) {
-				//Never change, return the only render
-				const cached = templateMap.get(this);
-				if (cached) {
-					return cached;
-				}
-				const rendered = this._template === null ?
-					html`` : (this._template instanceof TemplateResult) ?
-						this._template : typeSafeCall(this._template as TemplateRenderFunction<C, T, R>, 
-							component, component.generateHTMLTemplate, component.props, 
-							component.getTheme<T>());
-				templateMap.set(this, rendered);
-				return rendered as R;
-			}
-			if (this.changeOn === CHANGE_TYPE.ALWAYS || 
-				changeType === CHANGE_TYPE.ALWAYS ||
-				this.changeOn === changeType ||
-				!templateMap.has(this)) {
-					//Change, rerender
-					const rendered = typeSafeCall(this._template as TemplateRenderFunction<C, T, R>, 
-						component, component.generateHTMLTemplate, component.props, 
-						component.getTheme<T>());
-					templateMap.set(this, rendered);
-					return rendered;
-				}
-			
-			//No change, return what was last rendered
-			return templateMap.get(this)!;
+			const { changed, rendered } = this._renderWithTemplater(changeType, component,
+				component.generateHTMLTemplate as unknown as Templater<R>);
+			this._lastRenderChanged = changed;
+			return rendered;
 		}
 
+		public renderSame<TR>(changeType: CHANGE_TYPE, component: C,
+			templater: Templater<TR>): TR {
+				const { changed, rendered } = this._renderWithTemplater(changeType, component,
+					templater);
+				this._lastRenderChanged = changed;
+				return rendered;
+			}
+
 		public render(template: R, target: HTMLElement) {
+			if (this._renderer) {
+				this._renderer(template, target);
+			} else {
+				render(<TemplateResult><unknown>template, target);
+			}
+		}
+
+		public renderIfNew(template: R, target: HTMLElement) {
+			if (!this._lastRenderChanged) return;
 			if (this._renderer) {
 				this._renderer(template, target);
 			} else {
@@ -154,9 +197,43 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	}, CHANGE_TYPE.ALWAYS);
 
 	/**
+	 * The element's constructor
+	 */
+	protected abstract get self(): typeof ConfiguredComponent;
+
+	/**
 	 * The render method that will render this component's css
 	 */
-	protected abstract css: TemplateFn = new TemplateFn(null, CHANGE_TYPE.NEVER);
+	protected abstract css: TemplateFn|TemplateFn[] = new TemplateFn(null, CHANGE_TYPE.NEVER);
+	private static ___cssArr: TemplateFn[]|null = null;
+	private static get __cssArr(): TemplateFn[] {
+		if (this.___cssArr !== null) return this.___cssArr;
+		return (this.___cssArr = 
+			makeArray((<typeof ConfiguredComponent>this).config.css));
+	};
+	private static ___privateCSS: TemplateFn[]|null = null;
+	private static get __privateCSS(): TemplateFn[] {
+		if (this.___privateCSS !== null) return this.___privateCSS;
+		return (this.___privateCSS = 
+			this.__cssArr.filter((template) => {
+				return !(template.changeOn === CHANGE_TYPE.THEME ||
+					template.changeOn === CHANGE_TYPE.NEVER);
+			}));
+	};
+	private static __cssSheets: {
+		sheet: CSSStyleSheet;
+		template: TemplateFn;
+	}[]|null = null;
+
+	private static __constructedCSSRendered: boolean = false;
+	protected static _constructedCSSChanged(_element: WebComponentBase): boolean {
+		// Assume nothing can be changed then, only do first render
+		if (this.__constructedCSSRendered) {
+			return false;
+		}
+		this.__constructedCSSRendered = true;
+		return true;
+	}
 
 	/**
 	 * A function signalign whether this component has custom CSS applied to it
@@ -166,7 +243,7 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	/**
 	 * The render method that will render this component's css
 	 */
-	protected abstract customCSS(): TemplateFn;
+	protected abstract customCSS(): TemplateFn|TemplateFn[];
 
 	/**
 	 * The root of this component's DOM
@@ -197,21 +274,37 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 	}
 
 	private ___renderContainers: {
-		css: HTMLElement;
+		css: HTMLElement[];
 		html: HTMLElement;
-		customCSS: HTMLElement;
+		customCSS: HTMLElement[];
 	}|null = null;
 	private __createFixtures() {
 		//Attribute is just for clarity when looking through devtools
-		const css = document.createElement('span');
-		css.setAttribute('data-type', 'css');
-		const customCSS = document.createElement('span');
-		customCSS.setAttribute('data-type', 'custom-css');
+		const css = (() => {
+			return this.self.__cssArr.map(() => {
+				const el = document.createElement('span');
+				el.setAttribute('data-type', 'css');
+				return el;
+			});
+		})();
+		
+		const customCSS = (() => {
+			if (this.__hasCustomCSS()) {
+				return repeat(
+					makeArray(this.customCSS()).length).map(() => {
+						const el = document.createElement('span');
+						el.setAttribute('data-type', 'custom-css');
+						return el;
+					});
+			} else {
+				return [];
+			}
+		})();
 		const html = document.createElement('span');
 		html.setAttribute('data-type', 'html');
 		
-		this.root.appendChild(css);
-		this.root.appendChild(customCSS);
+		css.forEach(n => this.root.appendChild(n));
+		customCSS.forEach(n => this.root.appendChild(n));
 		this.root.appendChild(html);
 
 		return {
@@ -227,6 +320,65 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 		return (this.___renderContainers = this.__createFixtures());
 	}
 
+	private static __genConstructedCSS() {
+		// Create them
+		this.__cssSheets = this.__cssSheets || this.__cssArr.filter((template) => {
+			return template.changeOn === CHANGE_TYPE.THEME ||
+				template.changeOn === CHANGE_TYPE.NEVER;
+		}).map(t => ({
+			sheet: new CSSStyleSheet(),
+			template: t
+		}));
+	}
+
+	private get __cssSheets() {
+		return this.self.__cssSheets;
+	}
+
+	private __sheetsMounted: boolean = false;
+	private __renderConstructedCSS(change: CHANGE_TYPE) {
+		if (!this.__sheetsMounted) {
+			this.self.__genConstructedCSS();
+
+			// Mount them
+			this.root.adoptedStyleSheets = this.__cssSheets!.map(s => s.sheet);
+			this.__sheetsMounted = true;
+
+			// Force new render
+			change = CHANGE_TYPE.ALWAYS;
+		}
+
+		if (change !== CHANGE_TYPE.THEME && change !== CHANGE_TYPE.ALWAYS) {
+			// Only render on theme or everything change
+			return;
+		}
+
+		// Check if it should render at all
+		if (!this.self._constructedCSSChanged(this)) {
+			return
+		}
+
+		this.__cssSheets!.forEach(({ sheet, template }) => {
+			sheet.replaceSync(template.renderAsText(change, this).replace(
+				/<\/?style>/g, ''));
+		});
+	}
+
+	private ___canUseConstructedCSS: boolean|null = null;
+	private get __canUseConstructedCSS() {
+		if (this.___canUseConstructedCSS !== null) {
+			return this.___canUseConstructedCSS;
+		}
+		return (this.___canUseConstructedCSS = (() => {
+			try { 
+				new CSSStyleSheet(); 
+				return true; 
+			} catch(e) { 
+				return false;
+			}
+		})());
+	}
+
 	@bindToClass
 	/**
 	 * The method that starts the rendering cycle
@@ -237,17 +389,22 @@ export abstract class WebComponentBase extends WebComponentDefiner {
 			return;
 		}
 
-		this.css.render(
-			this.css.renderTemplate(change, this as any), 
-			this.__renderContainers.css);
-		if (this.__hasCustomCSS()) {
-			this.customCSS().render(
-				this.customCSS().renderTemplate(change, this as any),
-				this.__renderContainers.customCSS);
-		} else if (this.__renderContainers.customCSS.innerHTML !== '') {
-			this.__renderContainers.customCSS.innerHTML = '';
+		if (this.__canUseConstructedCSS) {
+			this.__renderConstructedCSS(change);
 		}
-		this.html.render(
+		this.self.__privateCSS.forEach((sheet, index) => {
+			sheet.renderIfNew(
+				sheet.renderTemplate(change, this as any), 
+				this.__renderContainers.css[index]);
+		});
+		if (this.__hasCustomCSS()) {
+			makeArray(this.customCSS()).forEach((sheet, index) => {
+				sheet.renderIfNew(
+					sheet.renderTemplate(change, this as any),
+					this.__renderContainers.customCSS[index]);
+			});
+		}
+		this.html.renderIfNew(
 			this.html.renderTemplate(change, this as any), 
 			this.__renderContainers.html);
 		this.__doPostRenderLifecycle();

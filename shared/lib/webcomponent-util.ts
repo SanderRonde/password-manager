@@ -69,3 +69,10 @@ export function chain(...functions: Function[]) {
 		functions.forEach(fn => fn(...args));
 	}
 }
+
+export function makeArray<T>(value: T|T[]): T[] {
+	if (Array.isArray(value)) {
+		return value;
+	}
+	return [value];
+}

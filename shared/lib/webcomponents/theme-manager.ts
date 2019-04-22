@@ -31,7 +31,6 @@ export abstract class WebComponentThemeManger<E extends EventListenerObj> extend
 
 	connectedCallback() {
 		super.connectedCallback();
-		this.__setTheme();
 	}
 
 	private __setTheme() {
@@ -45,8 +44,9 @@ export abstract class WebComponentThemeManger<E extends EventListenerObj> extend
 
 	public getTheme<T extends Theme = Theme>(): T {
 		if (WebComponentThemeManger.__theme) {
-			if (this.getThemeName() && this.getThemeName() in WebComponentThemeManger.__theme) {
-				return WebComponentThemeManger.__theme[this.getThemeName()] as T;
+			const themeName = this.getThemeName();
+			if (themeName && themeName in WebComponentThemeManger.__theme) {
+				return WebComponentThemeManger.__theme[themeName] as T;
 			}
 		}
 		return noTheme as T;
@@ -73,5 +73,15 @@ export abstract class WebComponentThemeManger<E extends EventListenerObj> extend
 
 	static getTheme() {
 		return this.__theme;
+	}
+
+	private static __lastRenderedTheme: string|null = null;
+	protected static _constructedCSSChanged(element: WebComponentThemeManger<any>): boolean {
+		const theme = element.getThemeName();
+		if (this.__lastRenderedTheme === theme) {
+			return false;
+		}
+		this.__lastRenderedTheme = theme;
+		return true;
 	}
 }
