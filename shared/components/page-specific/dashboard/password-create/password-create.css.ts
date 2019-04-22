@@ -4,6 +4,6 @@ import { PasswordCreate } from './password-create';
 
 export const PasswordCreateCSS = new TemplateFn<PasswordCreate>(function (html) {
 		return html`<style>
-			${PasswordFormCSS.renderSame(CHANGE_TYPE.THEME, this as any, html)}
+			${PasswordFormCSS.renderSame(CHANGE_TYPE.THEME & CHANGE_TYPE.THEME, this as any, html)}
 		</style>`
-	}, CHANGE_TYPE.PROP);
+	}, CHANGE_TYPE.PROP & CHANGE_TYPE.THEME);
