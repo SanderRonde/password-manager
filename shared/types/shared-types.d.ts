@@ -14,7 +14,8 @@ export const enum ENTRYPOINT {
 	DASHBOARD = 'dashboard'
 }
 export type GlobalProperties = {
-	theme?: 'dark'|'light';
+	theme?: string;
+	lang?: string;
 	isWeb: 'true'|'false';
 } & Partial<{
 	page: ENTRYPOINT;
