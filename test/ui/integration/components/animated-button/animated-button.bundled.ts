@@ -1,6 +1,9 @@
 import { AnimatedButton } from '../../../../../shared/components/util/animated-button/animated-button';
-import { WebComponentThemeManger } from '../../../../../shared/lib/webcomponents/theme-manager';
 import { theme } from '../../../../../shared/components/theming/theme/theme.cjs';
+import { WebComponentThemeManger } from 'wclib';
 
-WebComponentThemeManger.setTheme(theme, 'light');
+WebComponentThemeManger.initTheme({
+	theme, 
+	defaultTheme: 'light'
+});
 AnimatedButton.define();

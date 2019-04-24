@@ -1,6 +1,9 @@
 import { HorizontalCenterer } from "../../../../../shared/components/util/horizontal-centerer/horizontal-centerer";
-import { WebComponentThemeManger } from "../../../../../shared/lib/webcomponents/theme-manager";
 import { theme } from "../../../../../shared/components/theming/theme/theme";
+import { WebComponentThemeManger } from "wclib";
 
-WebComponentThemeManger.setTheme(theme, 'light');
+WebComponentThemeManger.initTheme({
+	theme, 
+	defaultTheme: 'light'
+});
 HorizontalCenterer.define();

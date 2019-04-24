@@ -1,8 +1,8 @@
 /// <reference types="Cypress" />
 import { theme, ProjectTheme } from '../../../shared/components/theming/theme/theme.cjs';
 import { VALID_THEMES_T, GlobalProperties } from "../../../shared/types/shared-types";
-import { WebComponent } from '../../../shared/lib/webcomponents';
 import { COLOR_NAME_MAP } from "./ui-test-const";
+import { WebComponent } from 'wclib';
 
 export function chainFunctions(fns: (() => Cypress.Chainable<any>)[]) {
 	let current: Cypress.Chainable<any> = fns[0]();
