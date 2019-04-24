@@ -1,5 +1,5 @@
-import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { LoadableBlock } from './loadable-block';
+import { CHANGE_TYPE, TemplateFn } from 'wclib';
 
 export const LoadableBlockHTML = new TemplateFn<LoadableBlock>(function(html) {
 	const { big, medium, dimensions } = this.getSpinnerSizes();

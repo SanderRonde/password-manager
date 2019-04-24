@@ -1,8 +1,9 @@
-import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
+import { ProjectTheme } from '../../theming/theme/theme.es';
 import { LoadableBlock } from './loadable-block';
+import { CHANGE_TYPE, TemplateFn } from 'wclib';
 
 export const ANIMATE_TIME = 500;
-export const LoadableBlockCSS = new TemplateFn<LoadableBlock>((html, props, theme) => {
+export const LoadableBlockCSS = new TemplateFn<LoadableBlock, ProjectTheme>((html, props, theme) => {
 	return html`<style>
 		:host {
 			display: block;

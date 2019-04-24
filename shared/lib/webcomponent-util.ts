@@ -1,6 +1,3 @@
-export { removeAllElementListeners, listenToComponent, listenIfNew, listenWithIdentifier, isNewElement, listen } from './webcomponents/listeners';
-export { wait, mapArr, classNames } from './webcomponents/shared';
-
 export function isDefined<U extends string>(value: null|undefined|U): value is U {
 	return value !== undefined && value !== null && value !== 'false';
 }

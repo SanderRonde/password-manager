@@ -1,8 +1,9 @@
 import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
-import { CHANGE_TYPE, TemplateFn } from '../../../../lib/webcomponents';
+import { ProjectTheme } from '../../../theming/theme/theme.es';
 import { GlobalController } from './global-controller';
+import { CHANGE_TYPE, TemplateFn } from 'wclib';
 
-export const GlobalControllerCSS = new TemplateFn<GlobalController>((html, _props, _theme) => {
+export const GlobalControllerCSS = new TemplateFn<GlobalController, ProjectTheme>((html, _props, _theme) => {
 	return html`<style>
 		#content .newpage.invisible {
 			opacity: 1;

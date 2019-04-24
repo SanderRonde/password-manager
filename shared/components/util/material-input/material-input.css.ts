@@ -1,11 +1,9 @@
-import { changeOpacity } from '../../../lib/webcomponents/template-util';
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE, changeOpacity } from 'wclib';
 import { ProjectTheme } from '../../theming/theme/theme.es';
 import { MaterialInput } from './material-input';
 
 export const MaterialInputCSS = [
 	new TemplateFn<MaterialInput, ProjectTheme>((html, _props, theme) => {
-		console.log('theme', theme);
 		return html`<style>
 			/** From https://github.com/google/material-design-lite/blob/mdl-1.x/src/textfield/_textfield.scss */
 			/**

@@ -1,7 +1,6 @@
-import { changeOpacity } from '../../../../lib/webcomponents/template-util';
 import { pythagoras } from '../../../icons/triangle-arrow/triangle-arrow';
 import { InfiniteList } from '../../../util/infinite-list/infinite-list';
-import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { changeOpacity, TemplateFn, CHANGE_TYPE } from 'wclib';
 import { ProjectTheme } from '../../../theming/theme/theme.es';
 import { Dashboard } from './dashboard';
 
@@ -55,7 +54,7 @@ export const CustomDashboardCSS = {
 			margin-top: 2px;
 		}
 	</style>`, CHANGE_TYPE.THEME),
-	infiniteList: new TemplateFn<InfiniteList<any, any, any>>((html, _props, _theme) => html`<style>
+	infiniteList: new TemplateFn<InfiniteList<any, any, any>, ProjectTheme>((html, _props, _theme) => html`<style>
 		#contentContainer {
 			overflow-y: hidden;
 		}
@@ -65,7 +64,7 @@ export const CustomDashboardCSS = {
 			margin-left: 5px;
 		}
 	</style>`, CHANGE_TYPE.NEVER),
-	templateList: new TemplateFn<InfiniteList<any, any, any>>((html, _props, theme) => {
+	templateList: new TemplateFn<InfiniteList<any, any, any>, ProjectTheme>((html, _props, theme) => {
 		const color = changeOpacity(theme.text, 25);
 		const actualWidth = pythagoras(35);
 		const actualHeight = pythagoras(35);

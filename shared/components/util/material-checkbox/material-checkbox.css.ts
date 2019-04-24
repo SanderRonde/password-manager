@@ -1,8 +1,8 @@
-import { changeOpacity } from '../../../lib/webcomponents/template-util';
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE, changeOpacity } from 'wclib';
+import { ProjectTheme } from '../../theming/theme/theme.es';
 import { MaterialCheckbox } from './material-checkbox';
 
-export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox>((html, props, theme) => {
+export const MaterialCheckboxCSS = new TemplateFn<MaterialCheckbox, ProjectTheme>((html, props, theme) => {
 	return html`<style>
 		/*!
 		Material Components for the Web

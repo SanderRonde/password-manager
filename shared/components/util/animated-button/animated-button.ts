@@ -1,12 +1,10 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
+import { ConfigurableWebComponent, config, Props, PROP_TYPE, bindToClass, isNewElement, wait } from "wclib";
 import { AnimatedButtonCSS, FADE_IN_OUT_TIME, COLOR_FADE_TIME } from './animated-button.css';
-import { isNewElement, wait } from '../../../lib/webcomponent-util';
+import { AnimatedButtonIDMap, AnimatedButtonClassMap } from './animated-button-querymap';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
-import { AnimatedButtonIDMap, AnimatedButtonClassMap } from './animated-button-querymap';
 import { AnimatedButtonHTML } from './animated-button.html';
-import { bindToClass } from '../../../lib/decorators';
 
 @config({
 	is: 'animated-button',

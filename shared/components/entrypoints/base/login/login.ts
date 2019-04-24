@@ -1,24 +1,22 @@
 /// <reference path="../../../../types/elements.d.ts" />
 import { LoginData, VALID_THEMES_T, GlobalProperties, ENTRYPOINT } from '../../../../types/shared-types';
+import { ConfigurableWebComponent, Props, PROP_TYPE, awaitMounted, bindToClass, wait } from "wclib";
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
-import { ConfigurableWebComponent, Props, PROP_TYPE } from "../../../../lib/webcomponents";
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
-import { isDefined, getCookie, wait } from '../../../../lib/webcomponent-util'
+import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
+import { isDefined, getCookie } from '../../../../lib/webcomponent-util'
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
 import { MaterialInput } from '../../../util/material-input/material-input';
+import { DIALOG_FADE_TIME, KEY_TURN_TIME, SPLIT_TIME } from './login.css';
 import { PaperDialog } from '../../../util/paper-dialog/paper-dialog';
 import { PaperButton } from '../../../util/paper-button/paper-button';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
 import { GlobalController } from '../global/global-controller';
-import { bindToClass } from '../../../../lib/decorators';
+import { LoginIDMap, LoginClassMap } from './login-querymap';
 import { MDCard } from '../../../util/md-card/md-card';
 import { JSONResponse } from '../../../../types/api';
-import { LoginIDMap, LoginClassMap } from './login-querymap';
-import { DIALOG_FADE_TIME, KEY_TURN_TIME, SPLIT_TIME } from './login.css';
-import { awaitMounted } from '../../../../lib/webcomponents/template-util';
-import { ANIMATE_TIME } from '../../../util/loadable-block/loadable-block.css';
 
 export const LoginDependencies = [
 	VerticalCenterer, 

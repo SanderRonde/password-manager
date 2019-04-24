@@ -1,23 +1,22 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { config, ConfigurableWebComponent, Props, ComplexType, PROP_TYPE, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { config, ConfigurableWebComponent, Props, ComplexType, PROP_TYPE, CHANGE_TYPE, bindToClass, wait } from 'wclib';
+import { PasswordCreateIDMap, PasswordCreateClassMap } from './password-create-querymap';
 import { GlobalController } from '../../../entrypoints/base/global/global-controller';
 import { MaterialCheckbox } from '../../../util/material-checkbox/material-checkbox';
 import { getDefaultResponseError } from '../../../entrypoints/web/login/login-web';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MetaPasswords } from '../../../entrypoints/base/dashboard/dashboard';
 import { MaterialInput } from '../../../util/material-input/material-input';
-import { findElementInPath, wait } from '../../../../lib/webcomponent-util';
+import { findElementInPath } from '../../../../lib/webcomponent-util';
 import { PaperButton } from '../../../util/paper-button/paper-button';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { PasswordDetail } from '../password-detail/password-detail';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { IconButton } from '../../../util/icon-button/icon-button';
-import { PasswordCreateIDMap, PasswordCreateClassMap } from './password-create-querymap';
 import { getHost } from '../password-form/password-form.html';
 import { PasswordCreateHTML } from './password-create.html';
 import { PasswordCreateCSS } from './password-create.css';
-import { bindToClass } from '../../../../lib/decorators';
 import { encrypt } from '../../../../lib/browser-crypto';
 import { JSONResponse } from '../../../../types/api';
 

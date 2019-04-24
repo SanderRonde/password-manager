@@ -1,10 +1,8 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { createCancellableTimeout, awaitMounted } from '../../../lib/webcomponents/template-util';
-import { ConfigurableWebComponent, config, Props, PROP_TYPE } from '../../../lib/webcomponents';
-import { isNewElement, wait } from '../../../lib/webcomponent-util';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE, createCancellableTimeout, awaitMounted, isNewElement, wait } from 'wclib';
+import { PaperToastIDMap, PaperToastClassMap } from './paper-toast-querymap';
 import { CheckmarkSize } from '../../icons/checkmark/checkmark';
 import { PaperButton } from '../paper-button/paper-button';
-import { PaperToastIDMap, PaperToastClassMap } from './paper-toast-querymap';
 import { rippleEffect } from '../../../mixins/ripple';
 import { PaperToastHTML } from './paper-toast.html';
 import { PaperToastCSS } from './paper-toast.css';

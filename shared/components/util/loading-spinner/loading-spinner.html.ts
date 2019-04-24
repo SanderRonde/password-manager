@@ -1,5 +1,5 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { LoadingSpinner } from "./loading-spinner";
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
 export const LoadingSpinnerHTML = new TemplateFn<LoadingSpinner>((html) => {
 	return html`

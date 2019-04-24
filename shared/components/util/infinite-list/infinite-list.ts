@@ -1,11 +1,13 @@
-import { createNumberList, any, listenWithIdentifier, isNewElement, listen, wait } from '../../../lib/webcomponent-util';
-import { ConfigurableWebComponent, config, Props, PROP_TYPE, ComplexType } from '../../../lib/webcomponents';
-import { createDisposableWindowListener } from '../../../lib/webcomponents/template-util';
+import { 
+	ConfigurableWebComponent, config, Props, PROP_TYPE, 
+	ComplexType, createDisposableWindowListener, bindToClass, 
+	listenWithIdentifier, isNewElement, listen, wait 
+} from 'wclib';
 import { InfiniteListIDMap, InfiniteListClassMap } from './infinite-list-querymap';
+import { createNumberList, any } from '../../../lib/webcomponent-util';
 import { TemplateResult, html, render } from 'lit-html';
 import { InfiniteListHTML } from './infinite-list.html';
 import { InfiniteListCSS } from './infinite-list.css';
-import { bindToClass } from '../../../lib/decorators';
 
 export type ListItemContainer<D, ID, P> = HTMLDivElement & {
 	host: InfiniteList<D, ID, P>

@@ -1,11 +1,9 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { ConfigurableWebComponent, config, Props, PROP_TYPE } from '../../../lib/webcomponents';
-import { listen, isNewElement } from '../../../lib/webcomponent-util';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE, bindToClass, listen, isNewElement } from 'wclib';
 import { MaterialCheckboxIDMap, MaterialCheckboxClassMap } from './material-checkbox-querymap';
 import { MaterialCheckboxHTML } from './material-checkbox.html';
 import { MaterialCheckboxCSS } from './material-checkbox.css';
-import { bindToClass } from '../../../lib/decorators';
 
 @config({
 	is: 'material-checkbox',

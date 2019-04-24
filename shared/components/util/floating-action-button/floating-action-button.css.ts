@@ -1,8 +1,8 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { FloatingActionButton } from './floating-action-button';
 import { ProjectTheme } from '../../theming/theme/theme.es';
 import { RippleCSS } from '../../../mixins/ripple';
 import { getShadow } from '../md-card/md-card.css';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 import { html } from 'lit-html';
 
 const floatCSS = html`<style>

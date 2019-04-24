@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
 import { VerticalCentererIDMap, VerticalCentererClassMap } from './vertical-centerer-querymap';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "wclib";
 import { VerticalCentererHTML } from './vertical-centerer.html';
 import { VerticalCentererCSS } from './vertical-centerer.css';
 

@@ -1,10 +1,9 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 import { PaperDialog } from './paper-dialog';
-import { html } from 'lit-html';
 
 export const ANIMATION_DURATION = 400;
 
-export const PaperDialogCSS = new TemplateFn<PaperDialog>((_props) => {
+export const PaperDialogCSS = new TemplateFn<PaperDialog>((html) => {
 	return html`<style>
 		#centerersContainer {
 			position: fixed;

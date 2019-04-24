@@ -1,9 +1,8 @@
 import { HollowTriangleArrowSize } from '../../../icons/triangle-arrow/triangle-arrow';
 import { QuestionmarkSize } from '../../../icons/questionmark/questionmark';
 import { LockClosedUnfilled } from '../../../icons/lockClosed/lockClosed';
-import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { invertedCardCSS, noCustomCSS } from './password-preview.css';
-import { mapArr } from '../../../../lib/webcomponent-util';
+import { TemplateFn, CHANGE_TYPE, mapArr } from 'wclib';
 import { PasswordPreview } from './password-preview';
 
 function prefixWithWWW(url: string) {

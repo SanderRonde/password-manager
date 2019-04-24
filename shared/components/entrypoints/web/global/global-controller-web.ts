@@ -2,7 +2,7 @@ import { GlobalController, GlobalControllerDependencies } from '../../base/globa
 import { GlobalControllerHTML } from '../../base/global/global-controller.html';
 import { GlobalControllerCSS } from '../../base/global/global-controller.css';
 import { ENTRYPOINT } from '../../../../types/shared-types';
-import { config } from '../../../../lib/webcomponents';
+import { config } from 'wclib';
 
 @config({
 	is: 'global-controller',

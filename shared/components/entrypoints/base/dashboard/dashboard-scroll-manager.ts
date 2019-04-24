@@ -1,9 +1,6 @@
-import { createDisposableWindowListener } from '../../../../lib/webcomponents/template-util';
-import { ConfigurableWebComponent } from '../../../../lib/webcomponents';
+import { ConfigurableWebComponent, createDisposableWindowListener, isNewElement, bindToClass } from 'wclib';
 import { DashboardIDMap, DashboardClassMap } from './dashboard-querymap';
-import { isNewElement } from "../../../../lib/webcomponents/listeners";
 import { PW_VIEW_SCROLL, TITLE_BAR_HEIGHT } from './dashboard.css';
-import { bindToClass } from '../../../../lib/decorators';
 
 const MAX_DOC_SCROLL = PW_VIEW_SCROLL - TITLE_BAR_HEIGHT;
 

@@ -1,10 +1,8 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
-import { listen, isNewElement } from '../../../lib/webcomponent-util';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE, listen, isNewElement, bindToClass } from "wclib";
 import { MaterialInputIDMap, MaterialInputClassMap } from './material-input-querymap';
 import { MaterialInputHTML } from './material-input.html';
 import { MaterialInputCSS } from './material-input.css';
-import { bindToClass } from '../../../lib/decorators';
 
 //A lot of functions on this class are based on those in
 // https://github.com/google/material-design-lite/tree/mdl-1.x/src/textfield

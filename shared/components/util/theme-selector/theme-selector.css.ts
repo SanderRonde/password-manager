@@ -1,7 +1,8 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { ProjectTheme } from '../../theming/theme/theme.es';
 import { ThemeSelector } from './theme-selector';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
-export const ThemeSelectorCSS = new TemplateFn<ThemeSelector>((html, _props, theme) => {
+export const ThemeSelectorCSS = new TemplateFn<ThemeSelector, ProjectTheme>((html, _props, theme) => {
 	return html`<style>
 		.themeContainer {
 			height: 40px;

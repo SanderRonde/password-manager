@@ -1,6 +1,6 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { LockClosed } from "../../../icons/lockClosed/lockClosed";
 import { LockOpen } from "../../../icons/lockOpen/lockOpen";
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 import { Login } from "./login";
 
 export const LoginHTML = new TemplateFn<Login>(function (html, props, _) {

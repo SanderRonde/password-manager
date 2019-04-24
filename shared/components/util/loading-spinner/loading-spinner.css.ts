@@ -1,5 +1,6 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { ProjectTheme } from '../../theming/theme/theme.es';
 import { LoadingSpinner } from './loading-spinner';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
 function getDimensions(props: LoadingSpinner['props']) {
 	if (props.dimensions) {
@@ -14,7 +15,7 @@ function getDimensions(props: LoadingSpinner['props']) {
 	return 28;
 }
 
-export const LoadingSpinnerCSS = new TemplateFn<LoadingSpinner>((html, props) => {
+export const LoadingSpinnerCSS = new TemplateFn<LoadingSpinner, ProjectTheme>((html, props) => {
 	return html`<style>
 		/**
 		* Copyright 2015 Google Inc. All Rights Reserved.

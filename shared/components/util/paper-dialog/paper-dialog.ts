@@ -1,12 +1,11 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { ConfigurableWebComponent, config, Props, ComplexType, PROP_TYPE } from '../../../lib/webcomponents';
+import { ConfigurableWebComponent, config, Props, ComplexType, PROP_TYPE, wait } from 'wclib';
+import { PaperDialogIDMap, PaperDialogClassMap } from './paper-dialog-querymap';
 import { HorizontalCenterer } from '../horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../vertical-centerer/vertical-centerer';
 import { PaperDialogCSS, ANIMATION_DURATION } from './paper-dialog.css';
-import { PaperDialogIDMap, PaperDialogClassMap } from './paper-dialog-querymap';
 import { PaperDialogHTML } from './paper-dialog.html';
-import { wait } from '../../../lib/webcomponent-util';
 import { MDCard } from '../md-card/md-card';
 
 export const enum DISPLAY_MODE {

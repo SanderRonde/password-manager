@@ -1,5 +1,5 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { MaterialCheckbox } from './material-checkbox';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
 export const MaterialCheckboxHTML = new TemplateFn<MaterialCheckbox>(function (html, props) {
 	return html`

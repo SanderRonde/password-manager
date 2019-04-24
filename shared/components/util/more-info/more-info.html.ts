@@ -1,4 +1,4 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 import { MoreInfo } from './more-info';
 
 export const MoreInfoHTML = new TemplateFn<MoreInfo>((html, props) => {

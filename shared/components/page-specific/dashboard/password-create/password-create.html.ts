@@ -1,12 +1,13 @@
 import { passwordDetailDataStore, passwordDetailDataSymbol } from '../password-detail/password-detail.html';
 import { getString, genHostUpdateFn, saveChangesButtonCustomCSS } from '../password-form/password-form.html';
-import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Visible, VisibleHidden } from '../../../icons/visible/visible';
-import { mapArr, chain } from '../../../../lib/webcomponent-util';
+import { ProjectTheme } from '../../../theming/theme/theme.es';
+import { chain } from '../../../../lib/webcomponent-util';
+import { TemplateFn, CHANGE_TYPE, mapArr } from 'wclib';
 import { Cross } from '../../../icons/cross/cross';
 import { PasswordCreate } from './password-create';
 
-export const PasswordCreateHTML = new TemplateFn<PasswordCreate>(function (html, props, theme) {
+export const PasswordCreateHTML = new TemplateFn<PasswordCreate, ProjectTheme>(function (html, props, theme) {
 	return html`
 		<div id="container">
 			<div id="passwordCredentials">

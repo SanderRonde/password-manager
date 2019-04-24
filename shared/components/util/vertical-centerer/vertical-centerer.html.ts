@@ -1,5 +1,5 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { VerticalCenterer } from "./vertical-centerer";
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
 export const VerticalCentererHTML = new TemplateFn<VerticalCenterer>((html, props) => {
 	return html`

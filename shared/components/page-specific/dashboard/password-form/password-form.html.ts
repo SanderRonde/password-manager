@@ -1,12 +1,11 @@
 import { passwordDetailDataStore, passwordDetailDataSymbol } from '../password-detail/password-detail.html';
-import { changeOpacity } from '../../../../lib/webcomponents/template-util';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
 import { MaterialInput } from '../../../util/material-input/material-input';
-import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { Visible, VisibleHidden } from '../../../icons/visible/visible';
+import { TemplateFn, CHANGE_TYPE, changeOpacity, mapArr } from 'wclib';
 import { PasswordCreate } from '../password-create/password-create';
+import { ProjectTheme } from '../../../theming/theme/theme.es';
 import { Checkmark } from '../../../icons/checkmark/checkmark';
-import { mapArr } from '../../../../lib/webcomponent-util';
 import { Delete } from '../../../icons/delete/delete';
 import { Cross } from '../../../icons/cross/cross';
 import { Link } from '../../../icons/link/link';
@@ -48,7 +47,7 @@ export function getHost(fullUrl: string) {
 	}
 }
 
-export const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((html, _, theme) => {
+export const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton, ProjectTheme>((html, _, theme) => {
 	return html`<style>
 		#button .mdl-ripple {
 			background: ${theme.success};
@@ -77,7 +76,7 @@ export const saveChangesButtonCustomCSS = new TemplateFn<AnimatedButton>((html, 
 	</style>`;
 }, CHANGE_TYPE.THEME);
 
-const twofactorTokenCustomCSS = new TemplateFn<MaterialInput>((html, _, theme) => {
+const twofactorTokenCustomCSS = new TemplateFn<MaterialInput, ProjectTheme>((html, _, theme) => {
 	return html`<style>
 		@keyframes animate-line {
 			0%  {
@@ -125,7 +124,7 @@ export function getString(base: unknown, fallback: string): string {
 	return fallback;
 }
 
-export const PasswordFormHTML = new TemplateFn<PasswordForm>(function (html, props, theme) {
+export const PasswordFormHTML = new TemplateFn<PasswordForm, ProjectTheme>(function (html, props, theme) {
 	return html`
 	<div id="passwordCredentials">
 		<material-input id="passwordUsername" name="username"

@@ -1,5 +1,4 @@
-import { changeOpacity } from '../../../lib/webcomponents/template-util';
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE, changeOpacity } from 'wclib';
 import { ProjectTheme } from '../../theming/theme/theme.es';
 import { MoreInfo } from './more-info';
 

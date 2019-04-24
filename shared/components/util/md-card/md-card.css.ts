@@ -1,5 +1,5 @@
-import { CHANGE_TYPE, TemplateFn } from '../../../lib/webcomponents';
 import { ProjectTheme } from '../../theming/theme/theme.es';
+import { CHANGE_TYPE, TemplateFn } from 'wclib';
 import { MDCard } from './md-card';
 
 export function getShadow(level: number) {
@@ -28,7 +28,6 @@ function assertNumber(value: any, fallback: number): number {
 }
 
 export const MDCardCSS = new TemplateFn<MDCard, ProjectTheme>((html, props, theme) => {
-	debugger;
 	return html`<style>
 		:host {
 			position: relative;

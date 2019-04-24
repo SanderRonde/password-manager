@@ -1,7 +1,5 @@
-import { ConfiguredComponent } from '../lib/webcomponents/configurable';
+import { TemplateFn, CHANGE_TYPE, ConfiguredComponent, listenWithIdentifier } from 'wclib';
 import { ProjectTheme } from '../components/theming/theme/theme.es';
-import { listenWithIdentifier } from '../lib/webcomponent-util';
-import { TemplateFn, CHANGE_TYPE } from '../lib/webcomponents';
 import { ExtendableComponent } from '../lib/decorators';
 
 export const RippleCSS = new TemplateFn<any, ProjectTheme>((html, _props, theme) => {
@@ -81,11 +79,11 @@ export interface RippleEffect {
 // so credit goes to the original authors
 export function rippleEffect(target: ExtendableComponent): any {
 	return class Rippled extends target implements RippleEffect {
-		protected css!: TemplateFn;
-		protected __hasCustomCSS!: () => boolean;
-		protected customCSS!: () => TemplateFn;
-		protected html!: TemplateFn;
-		protected get self(): typeof ConfiguredComponent { return {} as any}
+		public css!: TemplateFn;
+		public __hasCustomCSS!: () => boolean;
+		public customCSS!: () => TemplateFn;
+		public html!: TemplateFn;
+		public get self(): typeof ConfiguredComponent { return {} as any}
 		private _rippleElement!: HTMLElement|null;
 		private _rippleSize!: number;
 		private _ignoringMouseDown!: boolean;

@@ -1,9 +1,9 @@
 import { GlobalControllerWeb } from "../../../../../../../../../shared/components/entrypoints/web/global/global-controller-web";
-import { WebComponentThemeManger } from "../../../../../../../../../shared/lib/webcomponents/theme-manager";
-import { WebComponentI18NManager } from "../../../../../../../../../shared/lib/webcomponents/i18n-manager";
 import { LoginWeb } from "../../../../../../../../../shared/components/entrypoints/web/login/login-web";
 import { theme } from "../../../../../../../../../shared/components/theming/theme/theme.es";
+import { WebComponentThemeManger, WebComponentI18NManager } from "wclib";
 import { registerServiceWorker } from "../../../static/js/sw";
+import { directive, Part } from "lit-html";
 
 WebComponentThemeManger.initTheme({
 	theme: theme, 
@@ -11,7 +11,17 @@ WebComponentThemeManger.initTheme({
 });
 WebComponentI18NManager.initI18N({
 	path: '/i18n/',
-	defaultLang: 'en'
+	defaultLang: 'en',
+	returner: directive((promise: Promise<string>, content: string) => (part: Part) => {
+		part.setValue(content);
+		part.commit();
+		promise.then((value) => {
+			if (part.value === content) {
+				part.setValue(value);
+				part.commit();
+			}
+		});
+	})
 });
 GlobalControllerWeb.define();
 LoginWeb.define();

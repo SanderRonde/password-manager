@@ -1,4 +1,4 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 import { PaperButton } from "./paper-button";
 
 export const PaperButtonHTML = new TemplateFn<PaperButton>(function(html, props) {

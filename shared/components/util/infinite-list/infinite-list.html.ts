@@ -1,4 +1,4 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 import { InfiniteList } from './infinite-list';
 
 export const InfiniteListHTML = new TemplateFn<InfiniteList<any, any, any>>(function (html) {

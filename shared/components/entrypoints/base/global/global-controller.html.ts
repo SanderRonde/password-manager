@@ -1,5 +1,5 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { GlobalController } from './global-controller';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
 export const GlobalControllerHTML = new TemplateFn<GlobalController>((html, _props, _theme) => {
 	return html`

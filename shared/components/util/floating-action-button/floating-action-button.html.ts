@@ -1,5 +1,5 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { FloatingActionButton } from './floating-action-button';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
 export const FloatingActionButtonHTML = new TemplateFn<FloatingActionButton>(function (html, props) {
 	return html`

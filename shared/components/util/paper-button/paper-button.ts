@@ -1,11 +1,9 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
-import { changeOpacity } from '../../../lib/webcomponents/template-util';
-import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
-import { isNewElement } from '../../../lib/webcomponent-util';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE, changeOpacity, bindToClass, isNewElement } from "wclib";
 import { PaperButtonIDMap, PaperButtonClassMap } from './paper-button-querymap';
+import { rippleEffect, RippleEffect } from '../../../mixins/ripple'
+import { ProjectTheme } from '../../theming/theme/theme';
 import { PaperButtonHTML } from './paper-button.html';
-import { bindToClass } from '../../../lib/decorators';
 import { PaperButtonCSS } from './paper-button.css';
 import { html } from 'lit-html';
 
@@ -60,7 +58,7 @@ export class PaperButton extends ConfigurableWebComponent<{
 				#button {
 					border: 2px solid ${this.props.borderColor || 
 						this.props.color || this.props.rippleColor ||
-						this.props.background || this.getTheme().primary.main};
+						this.props.background || this.getTheme<ProjectTheme>().primary.main};
 				}
 			</style>
 		`;

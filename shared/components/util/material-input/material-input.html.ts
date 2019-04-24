@@ -1,5 +1,5 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { MaterialInput } from "./material-input";
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
 export const MaterialInputHTML = new TemplateFn<MaterialInput>(function (html, props) {
 	return html`

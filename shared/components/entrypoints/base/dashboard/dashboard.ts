@@ -1,10 +1,10 @@
 import { PasswordPreview, PasswordPreviewHost } from '../../../page-specific/dashboard/password-preview/password-preview';
 import { PasswordDetailWeb } from '../../../page-specific/dashboard/web/password-detail-web/password-detail-web';
-import { WebComponentBase, Props, ComplexType, PROP_TYPE, CHANGE_TYPE } from "../../../../lib/webcomponents";
 import { STATIC_VIEW_HEIGHT } from '../../../page-specific/dashboard/password-detail/password-detail.css';
 import { PasswordDetailData } from '../../../page-specific/dashboard/password-detail/password-detail';
 import { FloatingActionButton } from '../../../util/floating-action-button/floating-action-button';
 import { PasswordCreate } from '../../../page-specific/dashboard/password-create/password-create';
+import { WebComponentBase, Props, ComplexType, PROP_TYPE, CHANGE_TYPE, wait } from "wclib";
 import { HorizontalCenterer } from '../../../util/horizontal-centerer/horizontal-centerer';
 import { MaterialInput } from '../../../util/material-input/material-input';
 import { ThemeSelector } from '../../../util/theme-selector/theme-selector';
@@ -12,7 +12,6 @@ import { InfiniteList } from '../../../util/infinite-list/infinite-list';
 import { DashboardScrollManager } from './dashboard-scroll-manager';
 import { PublicKeyDecrypted } from '../../../../types/db-types';
 import { APISuccessfulReturns } from '../../../../types/api';
-import { wait } from '../../../../lib/webcomponent-util';
 import { MDCard } from '../../../util/md-card/md-card';
 import * as devPasswords from './dev-passwords';
 

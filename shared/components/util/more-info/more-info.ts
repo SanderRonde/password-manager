@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { ConfigurableWebComponent, config, Props, PROP_TYPE } from '../../../lib/webcomponents';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE } from 'wclib';
 import { MoreInfoIDMap, MoreInfoClassMap } from './more-info-querymap';
 import { MoreInfoHTML } from './more-info.html';
 import { MoreInfoCSS } from './more-info.css';

@@ -1,4 +1,4 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 import { SizingBlock } from './sizing-block';
 
 export const SizingBlockHTML = new TemplateFn<SizingBlock>(function (html) {

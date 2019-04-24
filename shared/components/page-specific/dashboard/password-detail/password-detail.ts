@@ -1,13 +1,13 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
 import { APIToken, ERRS, Encrypted, Hashed, Padded, MasterPasswordDecryptionpadding, EncryptionAlgorithm } from '../../../../types/crypto';
+import { ConfigurableWebComponent, Props, ComplexType, bindToClass, wait, isNewElement, listenWithIdentifier } from 'wclib';
 import { StringifiedObjectId, EncryptedInstance, ServerPublicKey, MasterPassword } from '../../../../types/db-types';
 import { reportDefaultResponseErrors, getDefaultResponseError } from '../../../entrypoints/web/login/login-web';
-import { wait, isNewElement, listenWithIdentifier } from '../../../../lib/webcomponent-util';
-import { ConfigurableWebComponent, Props, ComplexType } from '../../../../lib/webcomponents';
 import { passwordDetailDataStore, passwordDetailDataSymbol } from './password-detail.html';
 import { decryptWithPrivateKey, decrypt, encrypt } from '../../../../lib/browser-crypto';
 import { MetaPasswords, Dashboard } from '../../../entrypoints/base/dashboard/dashboard';
+import { PasswordDetailIDMap, PasswordDetailClassMap } from './password-detail-querymap';
 import { GlobalController } from '../../../entrypoints/base/global/global-controller';
 import { createClientAPIRequest, filterUndefined } from '../../../../lib/apirequests';
 import { VerticalCenterer } from '../../../util/vertical-centerer/vertical-centerer';
@@ -19,10 +19,8 @@ import { VIEW_FADE_TIME, STATIC_VIEW_HEIGHT } from './password-detail.css';
 import { PasswordPreview } from '../password-preview/password-preview';
 import { SizingBlock } from '../../../util/sizing-block/sizing-block';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
-import { PasswordDetailIDMap, PasswordDetailClassMap } from './password-detail-querymap';
 import { getHost } from '../password-form/password-form.html';
 import { PasswordForm } from '../password-form/password-form';
-import { bindToClass } from '../../../../lib/decorators';
 import { JSONResponse } from '../../../../types/api';
 
 const MIN_LOADING_TIME = 100;
@@ -218,7 +216,7 @@ export abstract class PasswordDetail extends ConfigurableWebComponent<{
 		this.animateView('noneSelectedView', STATIC_VIEW_HEIGHT);
 		//Remove from list
 		this.props.ref.props.metaPasswords = 
-			this.props.ref.props.metaPasswords.filter((pw) => {
+			this.props.ref.props.metaPasswords.filter((pw: any) => {
 				return pw.id !== password.id
 			});
 	}

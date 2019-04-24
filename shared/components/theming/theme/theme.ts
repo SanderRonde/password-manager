@@ -1,9 +1,8 @@
 import { VALID_THEMES_T as VALID_THEMES_T } from '../../../types/shared-types';
-import { Theme } from '../../../lib/webcomponents/webcomponent-types';
 
 export const VALID_THEMES: VALID_THEMES_T[] = ['light', 'dark'];
 
-export interface ProjectTheme extends Theme {
+export interface ProjectTheme {
 	/**
 	 * The primary color
 	 */
@@ -50,6 +49,22 @@ export interface ProjectTheme extends Theme {
 	 * The color of a material design card
 	 */
 	card: string;
+	/**
+	 * The color of an error message
+	 */
+	error: string;
+	/**
+	 * The color of a success result messages
+	 */
+	success: string;
+	/**
+	 * The color of text
+	 */
+	text: string;
+	/**
+	 * The color of backgrounds
+	 */
+	background: string;
 	/**
 	 * The greyest possible text that still fits the contrast spec on this theme's background
 	 */

@@ -1,14 +1,12 @@
 /// <reference path="../../../types/elements.d.ts" />
 
-import { ConfigurableWebComponent, config, Props, PROP_TYPE } from '../../../lib/webcomponents';
-import { HorizontalCenterer } from '../horizontal-centerer/horizontal-centerer';
 import { FloatingActionButtonIDMap, FloatingActionButtonClassMap } from './floating-action-button-querymap';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE, isNewElement, bindToClass } from 'wclib';
+import { HorizontalCenterer } from '../horizontal-centerer/horizontal-centerer';
 import { VerticalCenterer } from '../vertical-centerer/vertical-centerer';
 import { FloatingActionButtonHTML } from './floating-action-button.html';
 import { FloatingActionButtonCSS } from './floating-action-button.css';
 import { rippleEffect, RippleEffect } from '../../../mixins/ripple';
-import { isNewElement } from '../../../lib/webcomponents/listeners';
-import { bindToClass } from '../../../lib/decorators';
 
 @config({
 	is: 'floating-action-button',

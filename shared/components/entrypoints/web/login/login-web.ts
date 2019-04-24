@@ -1,5 +1,5 @@
 import { genRSAKeyPair, encryptWithPublicKey, hash, pad, decryptWithPrivateKey } from '../../../../lib/browser-crypto';
-import { cancelTimeout, createCancellableTimeout } from '../../../../lib/webcomponents/template-util';
+import { cancelTimeout, createCancellableTimeout, config, bindToClass, wait } from 'wclib';
 import { SlideInAnimation } from '../../../animations/slide-in-animation';
 import { GlobalController } from '../../base/global/global-controller';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
@@ -7,10 +7,7 @@ import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { Login, LoginDependencies } from '../../base/login/login';
 import { API_ERRS, APIReturns } from '../../../../types/api';
 import { animation } from '../../../animations/animation';
-import { wait } from '../../../../lib/webcomponent-util';
-import { bindToClass } from '../../../../lib/decorators';
 import { LoginHTML } from '../../base/login/login.html';
-import { config } from '../../../../lib/webcomponents';
 import { LoginCSS } from '../../base/login/login.css';
 import { ERRS } from '../../../../types/crypto';
 

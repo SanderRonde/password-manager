@@ -1,6 +1,5 @@
 import { PasswordPreview } from '../../../page-specific/dashboard/password-preview/password-preview';
-import { joinTemplates } from '../../../../lib/webcomponents/template-util';
-import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE, joinTemplates } from 'wclib';
 import { Search } from '../../../icons/search/search';
 import { CustomDashboardCSS } from './dashboard.css';
 import { Dashboard } from './dashboard';

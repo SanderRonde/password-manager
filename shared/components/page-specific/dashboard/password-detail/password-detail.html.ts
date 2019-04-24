@@ -1,11 +1,11 @@
 import { LockClosedUnfilledSize, LockClosedSize } from '../../../icons/lockClosed/lockClosed';
 import { AnimatedButton } from '../../../util/animated-button/animated-button';
-import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
 import { ProjectTheme } from '../../../theming/theme/theme.es';
 import { repeat } from '../../../../lib/webcomponent-util';
 import { CrossSize } from '../../../icons/cross/cross';
 import { PasswordDetail } from './password-detail';
 import { KeySize } from '../../../icons/key/key';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
 export const passwordDetailDataSymbol = Symbol('passwordDetailData');
 export const passwordDetailDataStore: {

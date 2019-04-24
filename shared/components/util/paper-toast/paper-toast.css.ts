@@ -1,5 +1,4 @@
-import { changeOpacity, isDark } from '../../../lib/webcomponents/template-util';
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE, changeOpacity, isDark } from 'wclib';
 import { ProjectTheme } from '../../theming/theme/theme.es';
 import { PaperToast } from './paper-toast';
 

@@ -1,7 +1,8 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { ProjectTheme } from '../../theming/theme/theme.es';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 import { InfiniteList } from './infinite-list';
 
-export const InfiniteListCSS = new TemplateFn<InfiniteList<any, any, any>>(function(html, _props, theme) {
+export const InfiniteListCSS = new TemplateFn<InfiniteList<any, any, any>, ProjectTheme>(function(html, _props, theme) {
 	return html`<style>
 		:host {
 			display: flex;

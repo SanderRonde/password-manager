@@ -5,11 +5,11 @@ import { Dashboard, DashboardDependencies } from '../../base/dashboard/dashboard
 import { ENTRYPOINT, GlobalProperties } from '../../../../types/shared-types';
 import { createClientAPIRequest } from '../../../../lib/apirequests';
 import { DashboardHTML } from '../../base/dashboard/dashboard.html';
-import { CHANGE_TYPE, config } from '../../../../lib/webcomponents';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
 import { DashboardCSS } from '../../base/dashboard/dashboard.css';
 import { MasterPassword } from '../../../../types/db-types';
 import { Remove } from '../../../../types/serviceworker';
+import { CHANGE_TYPE, config } from 'wclib';
 
 @config({
 	is: 'dashboard-page',

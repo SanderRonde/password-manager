@@ -1,15 +1,13 @@
 /// <reference path="../../../../types/elements.d.ts" />
 
-import { ConfigurableWebComponent, CHANGE_TYPE, config, Props, PROP_TYPE, ComplexType } from '../../../../lib/webcomponents';
+import { ConfigurableWebComponent, CHANGE_TYPE, config, Props, PROP_TYPE, ComplexType, bindToClass, isNewElement } from 'wclib';
 import { MetaPasswords, MetaPasswordsPreviewData } from '../../../entrypoints/base/dashboard/dashboard';
 import { PasswordPreviewIDMap, PasswordPreviewClassMap } from './password-preview-querymap';
 import { InfiniteList, ListRendered } from '../../../util/infinite-list/infinite-list';
 import { rippleEffect, RippleEffect } from '../../../../mixins/ripple';
 import { PaperToast } from '../../../util/paper-toast/paper-toast';
-import { isNewElement } from '../../../../lib/webcomponent-util';
 import { PasswordPreviewHTML } from './password-preview.html';
 import { PasswordPreviewCSS } from './password-preview.css';
-import { bindToClass } from '../../../../lib/decorators';
 import { MDCard } from '../../../util/md-card/md-card';
 
 export interface PasswordPreviewHost {

@@ -1,5 +1,4 @@
-import { ConfiguredComponent } from '../../lib/webcomponents/configurable';
-import { TemplateFn, WebComponent } from '../../lib/webcomponents';
+import { TemplateFn, WebComponent, ConfiguredComponent } from 'wclib';
 
 type AnimationFunction<T extends HTMLElement> = (htmlRoot: HTMLElement, element: T) => void;
 export class AnimationDescriptor<T extends HTMLElement> {

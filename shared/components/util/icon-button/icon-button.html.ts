@@ -1,4 +1,4 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 import { IconButton } from "./icon-button";
 
 export const IconButtonHTML = new TemplateFn<IconButton>((html, props) => {

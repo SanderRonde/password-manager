@@ -1,4 +1,4 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 import { PaperToast } from './paper-toast';
 
 export const PaperToastHTML = new TemplateFn<PaperToast>((html, props) => {

@@ -1,5 +1,5 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { PaperDialog, DISPLAY_MODE } from './paper-dialog';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
 export const PaperDialogHTML = new TemplateFn<PaperDialog>((html, props) => {
 	return html`

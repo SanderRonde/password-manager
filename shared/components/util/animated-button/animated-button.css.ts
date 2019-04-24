@@ -1,10 +1,11 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../lib/webcomponents';
 import { PaperButtonCSS } from '../paper-button/paper-button.css';
+import { ProjectTheme } from '../../theming/theme/theme.es';
 import { AnimatedButton } from './animated-button';
+import { TemplateFn, CHANGE_TYPE } from 'wclib';
 
 export const COLOR_FADE_TIME = 300;
 export const FADE_IN_OUT_TIME = COLOR_FADE_TIME / 2;
-export const AnimatedButtonCSS = new TemplateFn<AnimatedButton>(function(html, _props, theme) {
+export const AnimatedButtonCSS = new TemplateFn<AnimatedButton, ProjectTheme>(function(html, _props, theme) {
 	return html`
 		${PaperButtonCSS.renderSame(CHANGE_TYPE.THEME, this, html)}
 		<style>

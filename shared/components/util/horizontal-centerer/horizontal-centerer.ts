@@ -1,6 +1,6 @@
 /// <reference path="../../../types/elements.d.ts" />
-import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "../../../lib/webcomponents";
 import { HorizontalCentererIDMap, HorizontalCentererClassMap } from './horizontal-centerer-querymap';
+import { ConfigurableWebComponent, config, Props, PROP_TYPE } from "wclib";
 import { HorizontalCentererHTML } from './horizontal-centerer.html';
 import { HorizontalCentererCSS } from './horizontal-centerer.css';
 

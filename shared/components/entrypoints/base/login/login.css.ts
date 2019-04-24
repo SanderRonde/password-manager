@@ -1,12 +1,11 @@
-import { TemplateFn, CHANGE_TYPE } from '../../../../lib/webcomponents';
+import { TemplateFn, CHANGE_TYPE, isDark, mergeColors } from 'wclib';
+import { ProjectTheme } from '../../../theming/theme/theme.es';
 import { Login } from './login';
-import { isDark } from '../../../../lib/webcomponents/template-util';
-import { mergeColors } from '../../../../lib/webcomponents/template-util/color';
 
 export const DIALOG_FADE_TIME = 800;
 export const KEY_TURN_TIME = 500;
 export const SPLIT_TIME = 600;
-export const LoginCSS = new TemplateFn<Login>((html, _props, theme) => {
+export const LoginCSS = new TemplateFn<Login, ProjectTheme>((html, _props, theme) => {
 	return html`<style>
 		#formContainer {
 			width: 400px;
