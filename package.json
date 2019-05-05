@@ -47,7 +47,8 @@
     "tslib": "^1.9.3",
     "u2f": "^0.1.3",
     "u2f-api": "^1.0.6",
-    "wclib": "https://github.com/SanderRonde/wc-lib"
+    "wclib": "https://github.com/SanderRonde/wc-lib",
+    "snyk": "^1.161.1"
   },
   "devDependencies": {
     "@types/babel-core": "^6.25.5",
@@ -104,6 +105,9 @@
     "compile": "gulp precompile && tsc --build tsconfig.json --force",
     "build": "yarn compile && gulp dashboard",
     "pretest": "yarn compile && gulp pretest && tsc --build --force test/tsconfig.json",
-    "test": "yarn pretest && mocha test/unit/unit.test.js --exit"
-  }
+    "test": "yarn pretest && mocha test/unit/unit.test.js --exit",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
