@@ -39,7 +39,7 @@
     "mongodb": "^3.0.8",
     "morgan": "^1.9.1",
     "node-webcrypto-ossl": "^1.0.39",
-    "nodemailer": "^4.6.7",
+    "nodemailer": "^6.4.16",
     "progress": "^2.0.0",
     "serve-static": "^1.13.2",
     "spdy": "^3.4.7",
